@@ -19,7 +19,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        autoLoadEntities: true, // Automatically loads entity files
+        entities: [__dirname + '/**/*.entity{.ts}'], //loads all entities from the entities folder with the .entity.ts extension
         synchronize: true, // ⚠️ Auto-sync schema (disable in production)
       }),
     }),
