@@ -39,6 +39,7 @@
     "pg": "^8.14.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
+    "stellar-sdk": "^13.1.0",
     "typeorm": "^0.3.21"
   },
   "devDependencies": {
