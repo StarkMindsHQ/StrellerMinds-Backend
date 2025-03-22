@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { User } from "./user.entity"
-import { Course } from "src/courses/entities/course.entity"
-import { Lesson } from "src/lesson/enitity/lesson.entity"
+import { Course } from "../../courses/entities/course.entity"
+import { Lesson } from "../../lesson/entity/lesson.entity"
 
 
 @Entity("user_progress")

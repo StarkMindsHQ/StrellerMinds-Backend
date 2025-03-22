@@ -1,15 +1,14 @@
-import { CourseReview } from "src/courses/entities/course-review.entity"
-import { Course } from "src/courses/entities/course.entity"
-import { Payment } from "src/payment/entities/payment.entity"
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
+import { Course } from "../../courses/entities/course.entity"
+import { CourseReview } from "../../courses/entities/course-review.entity"
+import { Payment } from "../../payment/entities/payment.entity"
 import { UserProgress } from "./user-progress.entity"
 import { LessonProgress } from "../../progress/entities/lesson-progress.entity"
-import { ForumPost } from "src/forum/entities/forum-post.entity"
-import { Certificate } from "src/certificate/entity/certificate.entity"
-import { ForumComment } from "src/forum/entities/forum-comment.entity"
-import { AuthToken } from "src/auth/entities/auth-token.entity"
-import { Notification } from "src/notification/entities/notification.entity"
-
+import { ForumPost } from "../../forum/entities/forum-post.entity"
+import { Certificate } from "../../certificate/entity/certificate.entity"
+import { ForumComment } from "../../forum/entities/forum-comment.entity"
+import { AuthToken } from "../../auth/entities/auth-token.entity"
+import { Notification } from "../../notification/entities/notification.entity"
 
 @Entity("users")
 export class User {
@@ -44,30 +43,18 @@ export class User {
   updatedAt: Date
 
   // Instructor relationship
-  @OneToMany(
-    () => Course,
-    (course) => course.instructor,
-  )
-  instructorCourses: Course[]
+  @OneToMany(() => Course, (course) => course.instructor)
+  instructorCourses: Promise<Course[]>
 
   // User relationships
-  @OneToMany(
-    () => CourseReview,
-    (review) => review.user,
-  )
-  reviews: CourseReview[]
+  @OneToMany(() => CourseReview, (review) => review.user)
+  reviews: Promise<CourseReview[]>
 
-  @OneToMany(
-    () => Payment,
-    (payment) => payment.user,
-  )
-  payments: Payment[]
+  @OneToMany(() => Payment, (payment) => payment.user)
+  payments: Promise<Payment[]>
 
-  @OneToMany(
-    () => UserProgress,
-    (progress) => progress.user,
-  )
-  progress: UserProgress[]
+  @OneToMany(() => UserProgress, (progress) => progress.user)
+  progress: Promise<UserProgress[]>
 
   @OneToMany(() => LessonProgress, (lessonProgress) => lessonProgress.user)
   lessonProgress: LessonProgress[];
@@ -76,30 +63,30 @@ export class User {
     () => Certificate,
     (certificate) => certificate.user,
   )
-  certificates: Certificate[]
+  certificates: Promise<Certificate[]>
 
   @OneToMany(
     () => ForumPost,
     (post) => post.author,
   )
-  forumPosts: ForumPost[]
+  forumPosts: Promise<ForumPost[]>
 
   @OneToMany(
     () => ForumComment,
     (comment) => comment.author,
   )
-  forumComments: ForumComment[]
+  forumComments: Promise<ForumComment[]>
 
   @OneToMany(
     () => Notification,
     (notification) => notification.user,
   )
-  notifications: Notification[]
+  notifications: Promise<Notification[]>
 
   @OneToMany(
     () => AuthToken,
     (token) => token.user,
   )
-  authTokens: AuthToken[]
+  authTokens: Promise<AuthToken[]>
 }
 

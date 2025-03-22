@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { ForumPost } from "./forum-post.entity"
-import { User } from "src/users/entities/user.entity"
+import { User } from "../../users/entities/user.entity"
 
 @Entity("forum_comments")
 export class ForumComment {
@@ -26,7 +26,7 @@ export class ForumComment {
     { nullable: false },
   )
   @Index()
-  author: User
+  author: Promise<User>
 
   @ManyToOne(
     () => ForumPost,
@@ -34,6 +34,6 @@ export class ForumComment {
     { nullable: false, onDelete: "CASCADE" },
   )
   @Index()
-  post: ForumPost
+  post: Promise<ForumPost>
 }
 

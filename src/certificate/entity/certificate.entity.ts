@@ -1,17 +1,16 @@
-import { Course } from "src/courses/entities/course.entity"
-import { User } from "src/users/entities/user.entity"
+import { Course } from "../../courses/entities/course.entity"
+import { User } from "../../users/entities/user.entity"
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, CreateDateColumn } from "typeorm"
-
 
 @Entity("certificates")
 export class Certificate {
   @PrimaryGeneratedColumn("uuid")
   id: string
 
-  @Column({ unique: true })
+  @Column()
   certificateNumber: string
 
-  @Column()
+  @Column({ type: "date" })
   issueDate: Date
 
   @Column({ nullable: true })
@@ -21,20 +20,12 @@ export class Certificate {
   createdAt: Date
 
   // Many-to-One relationships
-  @ManyToOne(
-    () => User,
-    (user) => user.certificates,
-    { nullable: false },
-  )
+  @ManyToOne(() => User, user => user.certificates, { nullable: false })
   @Index()
-  user: User
+  user: Promise<User>
 
-  @ManyToOne(
-    () => Course,
-    (course) => course.certificates,
-    { nullable: false },
-  )
+  @ManyToOne(() => Course, course => course.certificates, { nullable: false })
   @Index()
-  course: Course
+  course: Promise<Course>
 }
 

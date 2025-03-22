@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { Course } from "./course.entity"
-import { User } from "src/users/entities/user.entity"
+import { User } from "../../users/entities/user.entity"
 
 @Entity("course_reviews")
 export class CourseReview {
@@ -20,20 +20,12 @@ export class CourseReview {
   updatedAt: Date
 
   // Many-to-One relationships
-  @ManyToOne(
-    () => User,
-    (user) => user.reviews,
-    { nullable: false },
-  )
+  @ManyToOne(() => User, (user) => user.reviews, { nullable: false })
   @Index()
-  user: User
+  user: Promise<User>
 
-  @ManyToOne(
-    () => Course,
-    (course) => course.reviews,
-    { nullable: false, onDelete: "CASCADE" },
-  )
+  @ManyToOne(() => Course, (course) => course.reviews, { nullable: false, onDelete: "CASCADE" })
   @Index()
-  course: Course
+  course: Promise<Course>
 }
 

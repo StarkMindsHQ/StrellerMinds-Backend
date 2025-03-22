@@ -26,6 +26,6 @@ export class ForumCategory {
     () => ForumTopic,
     (topic) => topic.category,
   )
-  topics: ForumTopic[]
+  topics: Promise<ForumTopic[]>
 }
 
