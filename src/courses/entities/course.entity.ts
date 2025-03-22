@@ -1,4 +1,9 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
+import { CourseReview } from "./course-review.entity"
+import { Tag } from "./tag.entity"
+import { Category } from "./category.entity"
+import { CourseModule } from "./course-module.entity"
+import { User } from "src/users/entities/user.entity"
 
 @Entity("courses")
 export class Course {
@@ -58,6 +63,28 @@ export class Course {
 
   @Column({ nullable: true })
   categoryId: string
+
+  
+  @ManyToOne(() => User, user => user.intructorCourses)
+  instructor: User;
+
+  @OneToMany(() => CourseModule, module => module.course, { cascade: true })
+  modules: CourseModule[];
+
+  @ManyToOne(() => Category, category => category.courses)
+  category: Category;
+
+  @ManyToMany(() => Tag)
+  @JoinTable({
+    name: 'course_tags',
+    joinColumn: { name: 'course_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' }
+  })
+  tags: Tag[];
+
+  @OneToMany(() => CourseReview, review => review.course)
+  reviews: CourseReview[];
+
 
   @CreateDateColumn()
   createdAt: Date

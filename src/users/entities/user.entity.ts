@@ -42,6 +42,9 @@ export class User {
   @Column({ nullable: true })
   lastLogin: Date
 
+  @Column({ nullable: true })
+  intructorCourses: string
+
   @CreateDateColumn()
   createdAt: Date
 

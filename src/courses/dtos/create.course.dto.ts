@@ -1,10 +1,20 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, MaxLength, IsArray, Max } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, MaxLength, IsArray, Max, ArrayMinSize } from 'class-validator';
+import { ManyToOne } from 'typeorm';
+import { Course } from '../entities/course.entity';
+import { User } from 'src/users/entities/user.entity';
+import { CreateCourseModuleDto } from './create.course.moduledto';
+import { Type } from 'class-transformer';
 
 export class CreateCourseDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   title: string;
+
+
+  
+  @ManyToOne(() => User)
+  user: User;
 
   @IsString()
   @IsNotEmpty()
@@ -74,4 +84,24 @@ export class CreateCourseDto {
   @IsUUID()
   @IsOptional()
   categoryId?: string;
+
+  
+  @ManyToOne(() => Course, course => course.reviewCount, { onDelete: 'CASCADE' })
+  course: Course;
+
+  
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(0)
+  @IsUUID(undefined, { each: true })
+  tagIds?: string[];
+
+
+  
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(0)
+  @Type(() => CreateCourseModuleDto)
+  modules?: CreateCourseModuleDto[];
+
 }
