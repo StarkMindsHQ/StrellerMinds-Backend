@@ -3,6 +3,7 @@ import { Course } from "src/courses/entities/course.entity"
 import { Payment } from "src/payment/entities/payment.entity"
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { UserProgress } from "./user-progress.entity"
+import { LessonProgress } from "../../progress/entities/lesson-progress.entity"
 import { ForumPost } from "src/forum/entities/forum-post.entity"
 import { Certificate } from "src/certificate/entity/certificate.entity"
 import { ForumComment } from "src/forum/entities/forum-comment.entity"
@@ -67,6 +68,9 @@ export class User {
     (progress) => progress.user,
   )
   progress: UserProgress[]
+
+  @OneToMany(() => LessonProgress, (lessonProgress) => lessonProgress.user)
+  lessonProgress: LessonProgress[];
 
   @OneToMany(
     () => Certificate,
