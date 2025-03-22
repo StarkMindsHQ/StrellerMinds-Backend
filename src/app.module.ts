@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
@@ -14,6 +14,7 @@ import { NotificationModule } from './notification/notification.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
 import { FilesModule } from './files/files.module';
 import { EmailModule } from './email/email.module';
+import { ErrorHandlerMiddleware } from './common/middlewares/error-handler.middleware';
 
 @Module({
   imports: [
@@ -64,4 +65,8 @@ import { EmailModule } from './email/email.module';
     EmailModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ErrorHandlerMiddleware).forRoutes('*');
+  }
+}
