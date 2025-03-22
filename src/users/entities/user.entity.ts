@@ -3,11 +3,12 @@ import { Course } from "../../courses/entities/course.entity"
 import { CourseReview } from "../../courses/entities/course-review.entity"
 import { Payment } from "../../payment/entities/payment.entity"
 import { UserProgress } from "./user-progress.entity"
-import { Certificate } from "../../certificate/entity/certificate.entity"
+import { LessonProgress } from "../../progress/entities/lesson-progress.entity"
 import { ForumPost } from "../../forum/entities/forum-post.entity"
+import { Certificate } from "../../certificate/entity/certificate.entity"
 import { ForumComment } from "../../forum/entities/forum-comment.entity"
-import { Notification } from "../../notification/entities/notification.entity"
 import { AuthToken } from "../../auth/entities/auth-token.entity"
+import { Notification } from "../../notification/entities/notification.entity"
 
 @Entity("users")
 export class User {
@@ -54,6 +55,9 @@ export class User {
 
   @OneToMany(() => UserProgress, (progress) => progress.user)
   progress: Promise<UserProgress[]>
+
+  @OneToMany(() => LessonProgress, (lessonProgress) => lessonProgress.user)
+  lessonProgress: LessonProgress[];
 
   @OneToMany(
     () => Certificate,
