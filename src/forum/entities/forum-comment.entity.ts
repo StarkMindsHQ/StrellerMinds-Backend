@@ -1,39 +1,41 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { ForumPost } from "./forum-post.entity"
-import { User } from "../../users/entities/user.entity"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { ForumPost } from '../../post/entities/forum-post.entity';
+import { User } from '../../users/entities/user.entity';
 
-@Entity("forum_comments")
+@Entity('forum_comments')
 export class ForumComment {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column({ type: "text" })
-  content: string
+  @Column({ type: 'text' })
+  content: string;
 
   @Column({ default: 0 })
-  likes: number
+  likes: number;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
   // Many-to-One relationships
-  @ManyToOne(
-    () => User,
-    (user) => user.forumComments,
-    { nullable: false },
-  )
+  @ManyToOne(() => User, (user) => user.forumComments, { nullable: false })
   @Index()
-  author: Promise<User>
+  author: Promise<User>;
 
-  @ManyToOne(
-    () => ForumPost,
-    (post) => post.comments,
-    { nullable: false, onDelete: "CASCADE" },
-  )
+  @ManyToOne(() => ForumPost, (post) => post.comments, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   @Index()
-  post: Promise<ForumPost>
+  post: Promise<ForumPost>;
 }
-

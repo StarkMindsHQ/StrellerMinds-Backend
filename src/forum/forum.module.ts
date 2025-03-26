@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ForumController } from './forum.controller';
-import { ForumService } from './forum.service';
-import { ForumCategory } from './entities/forum-category.entity';
-import { ForumTopic } from './entities/forum-topic.entity';
-import { ForumPost } from './entities/forum-post.entity';
+import { ForumCategory } from '../catogory/entities/forum-category.entity';
+import { ForumTopic } from '../topic/entities/forum-topic.entity';
+import { ForumPost } from '../post/entities/forum-post.entity';
 import { ForumComment } from './entities/forum-comment.entity';
 import { User } from '../users/entities/user.entity';
+import { ForumsController } from './forum.controller';
+import { ForumsService } from './forum.service';
 
 @Module({
   imports: [
@@ -15,11 +15,11 @@ import { User } from '../users/entities/user.entity';
       ForumTopic,
       ForumPost,
       ForumComment,
-      User
-    ])
+      User,
+    ]),
   ],
-  controllers: [ForumController],
-  providers: [ForumService],
-  exports: [TypeOrmModule]
+  controllers: [ForumsController],
+  providers: [ForumsService],
+  exports: [TypeOrmModule],
 })
-export class ForumModule { }
+export class ForumModule {}

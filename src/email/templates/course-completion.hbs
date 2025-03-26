@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Completion Certificate</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .content {
+      padding: 20px;
+    }
+    .footer {
+      background-color: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #6c757d;
+      border-top: 1px solid #e9ecef;
+    }
+    .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    .certificate {
+      border: 2px solid #007bff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: center;
+      background-color: #f8f9fa;
+    }
+    .certificate-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #007bff;
+    }
+    .certificate-text {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .certificate-course {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    .certificate-date {
+      font-style: italic;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Congratulations on Completing Your Course!</h1>
+    </div>
+    <div class="content">
+      <p>Hello {{name}},</p>
+      <p>Congratulations on successfully completing the course "{{courseName}}"! We're proud of your dedication and hard work.</p>
+      
+      <div class="certificate">
+        <div class="certificate-title">Certificate of Completion</div>
+        <div class="certificate-text">This certifies that</div>
+        <div class="certificate-text"><strong>{{name}}</strong></div>
+        <div class="certificate-text">has successfully completed</div>
+        <div class="certificate-course">{{courseName}}</div>
+        <div class="certificate-text">with a score of {{score}}%</div>
+        <div class="certificate-date">Completed on {{completionDate}}</div>
+      </div>
+      
+      <p>You can download your official certificate and share your achievement by clicking the button below:</p>
+      <p>
+        <a href="{{certificateUrl}}" class="button">Download Certificate</a>
+      </p>
+      
+      <p>We hope you enjoyed the course and found it valuable. Check out our other courses that might interest you:</p>
+      <p>
+        <a href="{{courseCatalogUrl}}" class="button">Explore More Courses</a>
+      </p>
+      
+      <p>Best regards,<br>The Education Team</p>
+    </div>
+    <div class="footer">
+      <p>© {{year}} Our Company. All rights reserved.</p>
+      <p>
+        <a href="{{unsubscribeUrl}}">Manage email preferences</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+

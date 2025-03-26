@@ -1,52 +1,46 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Index, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { User } from "./user.entity"
-import { Course } from "../../courses/entities/course.entity"
-import { Lesson } from "../../lesson/entity/lesson.entity"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  Index,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { User } from './user.entity';
+import { Course } from '../../courses/entities/course.entity';
+import { Lesson } from '../../lesson/entity/lesson.entity';
 
-
-@Entity("user_progress")
+@Entity('user_progress')
 export class UserProgress {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ default: false })
-  isCompleted: boolean
+  isCompleted: boolean;
 
-  @Column({ type: "decimal", precision: 5, scale: 2, default: 0 })
-  progressPercentage: number
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  progressPercentage: number;
 
-  @Column({ nullable: true, type: "json" })
-  metadata: Record<string, any>
+  @Column({ nullable: true, type: 'json' })
+  metadata: Record<string, any>;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
   // Many-to-One relationships
-  @ManyToOne(
-    () => User,
-    (user) => user.progress,
-    { nullable: false },
-  )
+  @ManyToOne(() => User, (user) => user.progress, { nullable: false })
   @Index()
-  user: User
+  user: User;
 
-  @ManyToOne(
-    () => Course,
-    (course) => course.userProgress,
-    { nullable: false },
-  )
+  @ManyToOne(() => Course, (course) => course.userProgress, { nullable: false })
   @Index()
-  course: Course
+  course: Course;
 
-  @ManyToOne(
-    () => Lesson,
-    (lesson) => lesson.userProgress,
-    { nullable: true },
-  )
+  @ManyToOne(() => Lesson, (lesson) => lesson.userProgress, { nullable: true })
   @Index()
-  lesson: Lesson
+  lesson: Lesson;
 }
-

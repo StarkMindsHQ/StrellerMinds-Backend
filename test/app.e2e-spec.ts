@@ -14,10 +14,10 @@ import { Certificate } from '../src/certificate/entity/certificate.entity';
 import { Payment } from '../src/payment/entities/payment.entity';
 import { UserProgress } from '../src/users/entities/user-progress.entity';
 import { Lesson } from '../src/lesson/entity/lesson.entity';
-import { ForumPost } from '../src/forum/entities/forum-post.entity';
+import { ForumPost } from '../src/post/entities/forum-post.entity';
 import { ForumComment } from '../src/forum/entities/forum-comment.entity';
-import { ForumTopic } from '../src/forum/entities/forum-topic.entity';
-import { ForumCategory } from '../src/forum/entities/forum-category.entity';
+import { ForumTopic } from '../src/topic/entities/forum-topic.entity';
+import { ForumCategory } from '../src/catogory/entities/forum-category.entity';
 import { Notification } from '../src/notification/entities/notification.entity';
 import { AuthToken } from '../src/auth/entities/auth-token.entity';
 
@@ -52,37 +52,39 @@ describe('AppController (e2e)', () => {
         }),
       })
       .overrideModule(TypeOrmModule)
-      .useModule(TypeOrmModule.forRoot({
-        type: 'postgres',
-        host: 'localhost',
-        port: 5432,
-        username: 'postgres',
-        password: 'postgres',
-        database: 'postgres',
-        entities: [
-          CourseModule,
-          Course,
-          User,
-          Category,
-          Tag,
-          CourseReview,
-          Certificate,
-          Payment,
-          UserProgress,
-          Lesson,
-          ForumPost,
-          ForumComment,
-          ForumTopic,
-          ForumCategory,
-          Notification,
-          AuthToken
-        ],
-        synchronize: true,
-        autoLoadEntities: true,
-        logging: true,
-        retryAttempts: 3,
-        retryDelay: 1000
-      }))
+      .useModule(
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host: 'localhost',
+          port: 5432,
+          username: 'postgres',
+          password: 'postgres',
+          database: 'postgres',
+          entities: [
+            CourseModule,
+            Course,
+            User,
+            Category,
+            Tag,
+            CourseReview,
+            Certificate,
+            Payment,
+            UserProgress,
+            Lesson,
+            ForumPost,
+            ForumComment,
+            ForumTopic,
+            ForumCategory,
+            Notification,
+            AuthToken,
+          ],
+          synchronize: true,
+          autoLoadEntities: true,
+          logging: true,
+          retryAttempts: 3,
+          retryDelay: 1000,
+        }),
+      )
       .compile();
 
     app = moduleFixture.createNestApplication();

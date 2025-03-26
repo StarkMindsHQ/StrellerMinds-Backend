@@ -10,6 +10,6 @@ import { UserProgress } from '../users/entities/user-progress.entity';
   imports: [TypeOrmModule.forFeature([Lesson, CourseModule, UserProgress])],
   controllers: [LessonController],
   providers: [LessonService],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule],
 })
-export class LessonModule { }
+export class LessonModule {}
