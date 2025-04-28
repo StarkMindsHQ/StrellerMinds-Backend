@@ -47,6 +47,6 @@ export class JwtAuthStrategy extends JwtStrategy {
   }
 
   async validate(payload: any) {
-    return { userId: payload.sub };
+    return { userId: payload.sub, email: payload.email, role: payload.role };
   }
 }

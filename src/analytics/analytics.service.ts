@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Analytics } from './analytics.entity';
-import { parse } from 'json2csv'; // CSV Converter
+import { parse } from 'json2csv'; 
+import { Analytics } from './entities/analytics.entity';
 
 @Injectable()
 export class AnalyticsService {

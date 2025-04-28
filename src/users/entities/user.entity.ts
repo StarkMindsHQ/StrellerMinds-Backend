@@ -1,9 +1,8 @@
-// src/users/entities/user.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, OneToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { UserProgress } from './user-progress.entity';
 import { WalletInfo } from './wallet-info.entity'; // Ensure this import is present
 import * as bcrypt from 'bcrypt';
-import { UserRole } from '../enums/userRole.enum';
+import { Role } from '../enums/userRole.enum'; // Adjust the import path as necessary
 
 @Entity('users')
 export class User {
@@ -31,8 +30,8 @@ export class User {
   @Column({ nullable: true })
   profilePicture: string;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.STUDENT })
-  role: UserRole;
+  @Column({ type: 'enum', enum: Role, default: Role.Student })
+  role: Role;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -40,12 +39,16 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column({ default: true }) // Ensure `isActive` is a column in the database
+  isActive: boolean;
+
   @OneToMany(() => UserProgress, (progress) => progress.user)
-  progress: Promise<UserProgress[]>;
+  progress: UserProgress[]; // You can return it as a normal array if you're handling it directly in code
 
   @OneToOne(() => WalletInfo, (walletInfo) => walletInfo.user) // This defines the inverse relation
   walletInfo: WalletInfo;
 
+  // Password handling
   async setPassword(password: string): Promise<void> {
     const salt = await bcrypt.genSalt();
     this.password = await bcrypt.hash(password, salt);

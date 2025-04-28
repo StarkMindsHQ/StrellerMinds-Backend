@@ -1,6 +1,6 @@
 
 import { Module } from '@nestjs/common';
-import { ProgressModule } from './progress/progres.module';
+// import { ProgressModule } from './progress/progress.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
@@ -18,19 +18,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LessonModule } from './lesson/lesson.module';
 import { IpfsModule } from './ipfs/ipfs.module';
-import { Module } from '@nestjs/common';
 import { ModerationModule } from './moderation/moderation.module';
 import { CatogoryModule } from './catogory/catogory.module';
 import { PostModule } from './post/post.module';
 import { TopicModule } from './topic/topic.module';
 
 @Module({
-  imports: [ProgressModule],
+  imports: [
+    // ProgressModule,
     ConfigModule.forRoot({
       isGlobal: true, // Makes config available across all modules
       envFilePath: ['.env.development'], // Loads variables from .env file
     }),
-
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
