@@ -8,7 +8,7 @@ export class ProgressService {
   private courseModuleCount = new Map<number, number>(); // courseId -> totalModules
   private completedCourses = new Set<string>(); // "userId:courseId"
 
-  // Mark lesson as completed and check for course completion
+  // ✅ Mark lesson as completed and check for course completion
   completeLesson(userId: number, lessonId: number, courseId: number) {
     if (!this.userProgress.has(userId)) {
       this.userProgress.set(userId, new Map());
@@ -26,12 +26,12 @@ export class ProgressService {
     this.markCourseCompleted(userId, courseId);
   }
 
-  // Define how many modules a course has
+  // ✅ Define how many modules a course has
   setCourseModules(courseId: number, totalModules: number) {
     this.courseModuleCount.set(courseId, totalModules);
   }
 
-  // Calculate progress percentage for a course
+  // ✅ Calculate progress percentage for a course
   getCompletionPercentage(userId: number, courseId: number): number {
     const completed = this.userProgress.get(userId)?.get(courseId)?.size || 0;
     const total = this.courseModuleCount.get(courseId) || 0;
@@ -39,7 +39,7 @@ export class ProgressService {
     return total === 0 ? 0 : (completed / total) * 100;
   }
 
-  // Get all progress data
+  // ✅ Get all progress data
   getProgressData(userId: number, courseId: number) {
     const completedLessons = Array.from(
       this.userProgress.get(userId)?.get(courseId) || []
@@ -56,7 +56,7 @@ export class ProgressService {
     };
   }
 
-  // Check & mark course as completed
+  // ✅ Check & mark course as completed
   private markCourseCompleted(userId: number, courseId: number) {
     const key = `${userId}:${courseId}`;
     const completion = this.getCompletionPercentage(userId, courseId);
@@ -70,12 +70,12 @@ export class ProgressService {
     }
   }
 
-  // Simulate certificate issuance
+  // ✅ Simulate certificate issuance
   private issueCertificate(userId: number, courseId: number) {
     this.logger.log(`🎓 Certificate issued to user ${userId} for course ${courseId}`);
   }
 
-  // Emit an event log
+  // ✅ Emit an event log
   private emitCourseCompletionEvent(userId: number, courseId: number) {
     this.logger.log(`📢 Event: CourseCompleted { userId: ${userId}, courseId: ${courseId} }`);
   }
