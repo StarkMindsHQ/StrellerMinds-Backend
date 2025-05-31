@@ -9,8 +9,8 @@ import {
 import type { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import type { JwtService } from '@nestjs/jwt';
-import type { NotificationsService } from './notifications.service';
+import { JwtService } from '@nestjs/jwt';
+import { NotificationsService } from './notifications.service';
 import {
   NotificationStatus,
   type Notification,

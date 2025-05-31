@@ -30,6 +30,7 @@ import { PreferenceService } from "./providers/preferences.service"
     }),
     EventEmitterModule.forRoot(),
     UsersModule,
+    ConfigModule,
   ],
   controllers: [NotificationsController],
   providers: [

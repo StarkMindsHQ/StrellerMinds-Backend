@@ -37,7 +37,7 @@ export class PostService {
     const reaction = this.reactionRepository.create({
       user: { id: userId },
       post: { id: postId },
-      type: reactionType,
+      reactionType: reactionType,
     });
 
     return this.reactionRepository.save(reaction);

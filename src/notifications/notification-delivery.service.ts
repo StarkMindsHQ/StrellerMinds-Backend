@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common"
-import type { ConfigService } from "@nestjs/config"
+import { ConfigService } from "@nestjs/config"
 import { type Notification, NotificationType } from "./entities/notification.entity"
-import type { EmailService } from "./providers/email.service"
-import type { PushNotificationService } from "./providers/push-notification.service"
+import { EmailService } from "./providers/email.service"
+import { PushNotificationService } from "./providers/push-notification.service"
 import { UsersService } from "src/users/services/users.service"
 
 @Injectable()

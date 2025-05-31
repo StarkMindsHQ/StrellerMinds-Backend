@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmailService } from './email.service';
@@ -14,6 +14,7 @@ import { EmailTemplateController } from './admin/template.controller';
 import { EmailTemplateService } from './admin/template.service';
 import { EmailTestService } from './utils/test.util';
 import { EmailPreviewController } from './admin/preview.controller';
+import { MockEmailService } from './mock-email.service';
 
 @Module({
   imports: [
@@ -31,7 +32,26 @@ import { EmailPreviewController } from './admin/preview.controller';
     EmailPreviewController,
   ],
   providers: [
-    EmailService,
+    {
+      provide: EmailService,
+      useFactory: (config: ConfigService) => {
+        if (
+          config.get('NODE_ENV') === 'development' ||
+          config.get('EMAIL_ENABLED') === 'false'
+        ) {
+          return new MockEmailService();
+        }
+        // The real EmailService will be instantiated by Nest with DI for other deps
+        return new EmailService(
+          config,
+          undefined, // emailQueue
+          undefined, // emailTemplateRepository
+          undefined, // emailLogRepository
+          undefined, // emailPreferenceRepository
+        );
+      },
+      inject: [ConfigService],
+    },
     EmailProcessor,
     EmailTemplateService,
     EmailTestService,

@@ -26,23 +26,33 @@ export class ForumPost {
   @Column({ default: 0 })
   likes: number;
 
+  @Column({ default: 0 })
+  voteScore: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column({ default: false })
+  isDeleted: boolean;
+
+  @Column({ default: false })
+  isLocked: boolean;
+
   // Many-to-One relationships
-  @ManyToOne(() => User, (user) => user.id, { nullable: false })
+  @ManyToOne(() => User, (user) => user.id, { nullable: false, eager: true })
   @Index()
-  author: User; // Remove Promise, use the entity directly
+  author: User;
 
   @ManyToOne(() => ForumTopic, (topic) => topic.posts, {
     nullable: false,
     onDelete: 'CASCADE',
+    eager: true,
   })
   @Index()
-  topic: ForumTopic; // Remove Promise, use the entity directly
+  topic: ForumTopic;
 
   // One-to-Many relationship for comments
   @OneToMany(() => ForumComment, (comment) => comment.post)

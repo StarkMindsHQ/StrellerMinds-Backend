@@ -20,6 +20,7 @@ import { Payment } from '../../payment/entities/payment.entity';
 import { UserProgress } from '../../users/entities/user-progress.entity';
 // import { Lesson } from 'src/modules/lesson/entities/lesson.entity';
 import { Lesson } from 'src/lesson/entity/lesson.entity';
+import { ForumTopic } from '../../topic/entities/forum-topic.entity';
 
 @Entity('courses')
 export class Course {
@@ -88,4 +89,7 @@ export class Course {
 
   @OneToMany(() => Lesson, (lesson) => lesson.course)
   lessons: Lesson[];
+
+  @OneToMany(() => ForumTopic, topic => topic.course)
+  forumTopics: ForumTopic[];
 }

@@ -13,6 +13,10 @@ export class CreateForumTopicDto {
   @IsBoolean()
   isClosed?: boolean;
 
+  @IsOptional()
+  @IsUUID()
+  courseId?: string;
+
   @IsUUID()
   categoryId: string;
 }

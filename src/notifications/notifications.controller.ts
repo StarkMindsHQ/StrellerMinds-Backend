@@ -20,7 +20,7 @@ import {
   ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
-import type { NotificationsService } from './notifications.service';
+import { NotificationsService } from './notifications.service';
 import type { CreateNotificationDto } from './dto/create-notification.dto';
 import type { CreateNotificationFromTemplateDto } from './dto/create-notification-from-template.dto';
 import type { UpdateNotificationDto } from './dto/update-notification.dto';

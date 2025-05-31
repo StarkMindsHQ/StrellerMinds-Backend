@@ -148,6 +148,11 @@ export class UsersService {
     }
   }
 
-
-
+  public async findByUsername(username: string): Promise<User | undefined> {
+    try {
+      return await this.userRepo.findOne({ where: { username } });
+    } catch (error) {
+      throw new InternalServerErrorException('Error fetching user by username');
+    }
+  }
 }

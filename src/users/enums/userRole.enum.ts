@@ -2,6 +2,7 @@ export enum UserRole {
     STUDENT = "STUDENT",
     INSTRUCTOR = "INSTRUCTOR",
     ADMIN = "ADMIN",
+    FORUM_MODERATOR = "FORUM_MODERATOR",
   }
   
   

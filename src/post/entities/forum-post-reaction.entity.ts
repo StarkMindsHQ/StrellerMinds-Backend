@@ -1,18 +1,19 @@
-import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, Unique } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 import { ForumPost } from './forum-post.entity';
 
 @Entity('post_reactions')
+@Unique(['user', 'post', 'reactionType']) // User can only react once with a specific type per post
 export class PostReaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  type: string; // e.g., 'like', 'dislike'
+  @Column({ length: 50 }) // e.g., 'like', 'love', 'haha', 'wow', 'sad', 'angry'
+  reactionType: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, user => user.id, { nullable: false, onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => ForumPost, (post) => post.reactions)
+  @ManyToOne(() => ForumPost, post => post.reactions, { nullable: false, onDelete: 'CASCADE' })
   post: ForumPost;
 }

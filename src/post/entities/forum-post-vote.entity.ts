@@ -1,18 +1,19 @@
-import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, Unique } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 import { ForumPost } from './forum-post.entity';
 
-@Entity()
+@Entity('post_votes')
+@Unique(['user', 'post']) // User can only vote once per post
 export class PostVote {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @ManyToOne(() => ForumPost, (post) => post.votes, { nullable: false })
-  post: ForumPost;
+  @Column({ type: 'boolean', default: true }) // true for upvote, false for downvote (optional)
+  isUpvote: boolean; 
 
-  @ManyToOne(() => User, (user) => user.id, { nullable: false })
+  @ManyToOne(() => User, user => user.id, { nullable: false, onDelete: 'CASCADE' })
   user: User;
 
-  @Column()
-  value: number; // 1 for upvote, -1 for downvote
+  @ManyToOne(() => ForumPost, post => post.votes, { nullable: false, onDelete: 'CASCADE' })
+  post: ForumPost;
 }

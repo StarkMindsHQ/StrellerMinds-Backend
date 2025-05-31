@@ -63,12 +63,16 @@ export class EmailService {
   }
 
   async sendEmail(options: EmailOptions): Promise<boolean> {
+    const emailEnabled = this.configService.get<string>('EMAIL_ENABLED');
+    if (emailEnabled === 'false' || emailEnabled === '0') {
+      this.logger.log('Email sending is disabled by EMAIL_ENABLED flag. Skipping email.');
+      return false;
+    }
     try {
       if (await this.hasUserOptedOut(options.to, options.templateName)) {
         this.logger.log(`User ${options.to} has opted out of ${options.templateName} emails`);
         return false;
       }
-
       await this.emailQueue.add('send', options, {
         attempts: 3,
         backoff: {
@@ -76,7 +80,6 @@ export class EmailService {
           delay: 5000,
         },
       });
-
       return true;
     } catch (error) {
       this.logger.error(`Failed to queue email: ${error.message}`, error.stack);
@@ -85,6 +88,11 @@ export class EmailService {
   }
 
   async sendImmediate(options: EmailOptions): Promise<boolean> {
+    const emailEnabled = this.configService.get<string>('EMAIL_ENABLED');
+    if (emailEnabled === 'false' || emailEnabled === '0') {
+      this.logger.log('Email sending is disabled by EMAIL_ENABLED flag. Skipping immediate email.');
+      return false;
+    }
     try {
       const template = await this.getTemplate(options.templateName);
       const compiledTemplate = Handlebars.compile(template);

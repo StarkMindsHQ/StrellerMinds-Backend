@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, forwardRef, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
-import type { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   Notification,
   NotificationStatus,
@@ -15,7 +15,7 @@ import type { UpdateNotificationDto } from './dto/update-notification.dto';
 import type { NotificationPreferenceDto } from './dto/notification-preference.dto';
 import type { QueryNotificationsDto } from './dto/query-notifications.dto';
 import { UsersService } from 'src/users/services/users.service';
-import type { NotificationDeliveryService } from './notification-delivery.service';
+import { NotificationDeliveryService } from './notification-delivery.service';
 import { InAppService } from './providers/in-app.service';
 import { PreferenceService } from './providers/preferences.service';
 import { EmailService } from './providers/email.service';
@@ -34,8 +34,10 @@ export class NotificationsService {
 
     private usersService: UsersService,
 
+    @Inject(forwardRef(() => NotificationDeliveryService))
     private deliveryService: NotificationDeliveryService,
 
+    @Inject(forwardRef(() => EventEmitter2))
     private eventEmitter: EventEmitter2,
 
     private readonly inAppService: InAppService,
@@ -343,5 +345,9 @@ export class NotificationsService {
         metadata: {},
       });
     }
+  }
+
+  public async getUserByUsername(username: string) {
+    return this.usersService.findByUsername(username);
   }
 }
