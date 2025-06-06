@@ -34,6 +34,11 @@ import databaseConfig from './config/database.config';
 import { EventSignupModule } from './event-signup/event-signup.module';
 import { GdprModule } from './gdpr/gdpr.module';
 import { MonitoringModule } from './monitoring/monitoring-module';
+import { ProductsModule } from './products/products.module';
+import cacheConfig from './config/cache.config';
+import { CacheModule } from './cache/cache.module';
+
+
 
 const ENV = process.env.NODE_ENV;
 console.log('NODE_ENV:', process.env.NODE_ENV);
@@ -100,6 +105,10 @@ console.log('ENV:', ENV);
     UserSettingsModule,
     GdprModule,
     MonitoringModule,
+    CacheModule,
+    UsersModule,
+    ProductsModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
