@@ -14,6 +14,7 @@ import * as path from 'path';
       loaderOptions: {
         path: path.join(__dirname, 'i18n'),
         watch: true,
+        include: ['en', 'es', 'ar', 'error_messages'],
       },
     }),
   ],

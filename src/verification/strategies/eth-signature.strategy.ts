@@ -9,7 +9,7 @@ export class EthSignatureStrategy {
     const address = '0xYourExpectedAddress';
 
     try {
-      const recoveredAddress = ethers.utils.verifyMessage(message, signature);
+      const recoveredAddress = ethers.verifyMessage(message, signature);
       const isValid = recoveredAddress.toLowerCase() === address.toLowerCase();
 
       return {

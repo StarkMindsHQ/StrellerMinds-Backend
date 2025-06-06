@@ -10,6 +10,7 @@ import { MatchRequestDto } from '../dto/match-request.dto';
 import { UpdateMatchStatusDto } from '../dto/update-match-status.dto';
 import { MatchingService } from './matching.service';
 import { NotificationsService } from '../../notifications/notifications.service';
+import { NotificationType } from '../../notifications/entities/notification.entity';
 
 @Injectable()
 export class MentorshipService {
@@ -384,21 +385,23 @@ export class MentorshipService {
   private async sendMatchNotifications(match: MentorshipMatch): Promise<void> {
     try {
       // Notify mentor
-      await this.notificationsService.createNotification({
+      await this.notificationsService.create({
         userId: match.mentorId,
         title: 'New Mentorship Match',
-        message: `You have a new mentee match with compatibility score of ${match.compatibilityScore}%`,
-        type: 'mentorship_match',
-        data: { matchId: match.id },
+        content: `You have a new mentee match with compatibility score of ${match.compatibilityScore}%`,
+        category: 'mentorship_match',
+        metadata: { matchId: match.id },
+        types: [NotificationType.IN_APP],
       });
 
       // Notify mentee
-      await this.notificationsService.createNotification({
+      await this.notificationsService.create({
         userId: match.menteeId,
         title: 'New Mentorship Match',
-        message: `You have been matched with a mentor with compatibility score of ${match.compatibilityScore}%`,
-        type: 'mentorship_match',
-        data: { matchId: match.id },
+        content: `You have been matched with a mentor with compatibility score of ${match.compatibilityScore}%`,
+        category: 'mentorship_match',
+        metadata: { matchId: match.id },
+        types: [NotificationType.IN_APP],
       });
     } catch (error) {
       this.logger.error(`Failed to send match notifications: ${error.message}`, error.stack);
@@ -438,12 +441,13 @@ export class MentorshipService {
       }
 
       // Send notification
-      await this.notificationsService.createNotification({
+      await this.notificationsService.create({
         userId: recipientId,
         title: 'Mentorship Status Update',
-        message,
-        type: 'mentorship_status_update',
-        data: { matchId: match.id, status: match.status },
+        content: message,
+        category: 'mentorship_status_update',
+        metadata: { matchId: match.id, status: match.status },
+        types: [NotificationType.IN_APP],
       });
     } catch (error) {
       this.logger.error(`Failed to send status update notification: ${error.message}`, error.stack);

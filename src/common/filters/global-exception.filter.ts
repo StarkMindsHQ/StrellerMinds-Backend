@@ -7,11 +7,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { I18nService } from 'nestjs-i18n';
+import { I18nService } from '../../i18n/i18n.service';
 import { ErrorCode } from '../errors/error-codes.enum';
 import { ErrorResponseDto } from '../errors/error-response.dto';
 import { ValidationError } from 'class-validator';
 import { CustomException } from '../errors/custom.exception';
+import { I18nTranslations } from '../../i18n/i18n.types';
 
 @Catch()
 export class GlobalExceptionsFilter implements ExceptionFilter {
@@ -23,32 +24,31 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const lang = request.acceptsLanguages(['en', 'fr']) || 'en';
+    const lang = request.headers['accept-language']?.split(',')[0] || 'en';
 
     let errorResponse: ErrorResponseDto;
 
     if (exception instanceof CustomException) {
-      const exceptionResponse = exception.getResponse() as any;
+      const httpException = exception as HttpException;
+      const exceptionResponse = httpException.getResponse() as any;
       errorResponse = {
-        errorCode: exceptionResponse.errorCode,
-        statusCode: exception.getStatus(),
-        message: await this.i18n.translate(`errors.${exceptionResponse.errorCode}`, {
-          lang,
-          args: exceptionResponse.args,
-        }),
+        errorCode: exception.errorCode,
+        statusCode: httpException.getStatus(),
+        message: exceptionResponse.message, // Message is already translated in CustomException
         details: exceptionResponse.details,
         timestamp: new Date().toISOString(),
         path: request.url,
       };
     } else if (exception instanceof HttpException) {
-      const exceptionResponse = exception.getResponse() as any;
+      const httpException = exception as HttpException;
+      const exceptionResponse = httpException.getResponse() as any;
       
       // Handle class-validator validation errors
       if (Array.isArray(exceptionResponse.message)) {
         errorResponse = {
           errorCode: ErrorCode.INVALID_INPUT,
-          statusCode: exception.getStatus(),
-          message: await this.i18n.translate('errors.INVALID_INPUT', { lang }),
+          statusCode: httpException.getStatus(),
+          message: await (this.i18n.translate('errors.INVALID_INPUT', { lang })) as string,
           details: this.formatValidationErrors(exceptionResponse.message),
           timestamp: new Date().toISOString(),
           path: request.url,
@@ -56,8 +56,8 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
       } else {
         errorResponse = {
           errorCode: ErrorCode.INTERNAL_ERROR,
-          statusCode: exception.getStatus(),
-          message: exceptionResponse.message || await this.i18n.translate('errors.INTERNAL_ERROR', { lang }),
+          statusCode: httpException.getStatus(),
+          message: (await this.i18n.translate(`error_messages.common.internalServerError`, { lang })) as string,
           timestamp: new Date().toISOString(),
           path: request.url,
         };
@@ -67,7 +67,7 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
       errorResponse = {
         errorCode: ErrorCode.INTERNAL_ERROR,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: await this.i18n.translate('errors.INTERNAL_ERROR', { lang }),
+        message: (await this.i18n.translate(`error_messages.common.internalServerError`, { lang })) as string,
         timestamp: new Date().toISOString(),
         path: request.url,
       };

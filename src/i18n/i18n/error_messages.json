@@ -1,0 +1,34 @@
+{
+  "auth": {
+    "invalidCredentials": "Invalid email or password. Please try again.",
+    "passwordMismatch": "Passwords do not match. Please ensure both fields are identical.",
+    "emailExists": "This email address is already registered. Please use a different email or log in.",
+    "userNotFound": "User not found with the provided credentials.",
+    "unauthorizedAccess": "Unauthorized access. Please log in to continue."
+  },
+  "validation": {
+    "required": "This field is required and cannot be left blank.",
+    "email": "Please enter a valid email address (e.g., user@example.com).",
+    "minLength": "This field must be at least {{min}} characters long.",
+    "maxLength": "This field cannot exceed {{max}} characters.",
+    "passwordStrength": "Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character.",
+    "invalidFormat": "The input provided is in an invalid format."
+  },
+  "common": {
+    "notFound": "The requested resource could not be found.",
+    "internalServerError": "An unexpected error occurred. Please try again later.",
+    "badRequest": "The request was malformed or invalid. Please check your input.",
+    "forbidden": "You do not have permission to access this resource.",
+    "unsupportedMediaType": "The media type provided in the request is not supported.",
+    "tooManyRequests": "Too many requests. Please try again after some time."
+  },
+  "course": {
+    "courseNotFound": "The specified course could not be found.",
+    "enrollmentFailed": "Failed to enroll in the course. Please try again.",
+    "alreadyEnrolled": "You are already enrolled in this course."
+  },
+  "payment": {
+    "paymentFailed": "Payment processing failed. Please check your payment details and try again.",
+    "invalidAmount": "The payment amount is invalid."
+  }
+}
