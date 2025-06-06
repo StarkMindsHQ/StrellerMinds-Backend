@@ -4,11 +4,26 @@ import { RolesGuard } from './role/roles.guard';
 import { GlobalExceptionsFilter } from './common/filters/global-exception.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import compress from '@fastify/compress';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  );
 
-  // ✅ Global Validation Pipe with i18n error support
+  // Register compression
+  await app.register(compress, {
+    threshold: 1024, // Only compress if response > 1KB
+    global: true,
+    encodings: ['gzip', 'deflate', 'br'],
+  });
+
+  // Global Validation Pipe
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -17,13 +32,12 @@ async function bootstrap() {
     }),
   );
 
-  // ✅ Global exception and role guards
-  app.useGlobalFilters(
-
-  );
+  // Global exception and role guards
+  const i18n = app.get('I18nService');
+  app.useGlobalFilters(new GlobalExceptionsFilter(i18n));
   app.useGlobalGuards(new RolesGuard(new Reflector()));
 
-  // ✅ Swagger setup
+  // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Mentor Grading API')
     .setDescription(
@@ -36,7 +50,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ? Number(process.env.PORT) : 3000);
 }
 
 bootstrap();
