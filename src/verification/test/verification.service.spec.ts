@@ -1,9 +1,8 @@
-// test/verification.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { VerificationService } from '../verification.service';
 import { EthSignatureStrategy } from '../strategies/eth-signature.strategy';
-import { JwtStrategy } from "../strategies/jwt.strategy"
-import { IpfsProofStrategy } '../strategies/ipfs-proof.strategy';
+import { JwtStrategy } from '../strategies/jwt.strategy';
+import { IpfsProofStrategy } from '../strategies/ipfs-proof.strategy';
 
 describe('VerificationService', () => {
   let service: VerificationService;

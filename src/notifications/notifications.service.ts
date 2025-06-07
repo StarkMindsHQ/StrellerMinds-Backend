@@ -47,10 +47,9 @@ export class NotificationsService {
     private readonly prefService: PreferenceService,
   ) {}
 
-  async create(
+  async createNotification(
     createNotificationDto: CreateNotificationDto,
   ): Promise<Notification> {
-    // Check if user exists
     const user = await this.usersService.findOne(createNotificationDto.userId);
     if (!user) {
       throw new NotFoundException(
@@ -58,19 +57,16 @@ export class NotificationsService {
       );
     }
 
-    // Check user preferences
     const preferences = await this.getOrCreatePreference(
       user.id,
       createNotificationDto.category,
     );
 
-    // Filter notification types based on user preferences
     const allowedTypes = createNotificationDto.types.filter(
       (type) => preferences.enabled && preferences.enabledTypes.includes(type),
     );
 
     if (allowedTypes.length === 0) {
-      // User has disabled this notification type, but still save it for record
       const notification = this.notificationsRepository.create({
         ...createNotificationDto,
         types: createNotificationDto.types,
@@ -79,7 +75,6 @@ export class NotificationsService {
       return this.notificationsRepository.save(notification);
     }
 
-    // Create and save notification
     const notification = this.notificationsRepository.create({
       ...createNotificationDto,
       types: allowedTypes,
@@ -88,16 +83,13 @@ export class NotificationsService {
     const savedNotification =
       await this.notificationsRepository.save(notification);
 
-    // Send notification if requested
     if (createNotificationDto.sendImmediately !== false) {
       await this.deliveryService.deliverNotification(savedNotification);
 
-      // Mark as delivered
       savedNotification.isDelivered = true;
       savedNotification.deliveredAt = new Date();
       await this.notificationsRepository.save(savedNotification);
 
-      // Emit event for real-time updates
       this.eventEmitter.emit('notification.created', savedNotification);
     }
 
@@ -107,7 +99,6 @@ export class NotificationsService {
   async createFromTemplate(
     dto: CreateNotificationFromTemplateDto,
   ): Promise<Notification> {
-    // Find template
     const template = await this.templatesRepository.findOne({
       where: { code: dto.templateCode, isActive: true },
     });
@@ -118,7 +109,6 @@ export class NotificationsService {
       );
     }
 
-    // Process template variables
     const title = this.processTemplate(
       template.titleTemplate,
       dto.templateVariables,
@@ -128,7 +118,6 @@ export class NotificationsService {
       dto.templateVariables,
     );
 
-    // Create notification using processed template
     const createDto: CreateNotificationDto = {
       userId: dto.userId,
       title,
@@ -140,7 +129,7 @@ export class NotificationsService {
       sendImmediately: dto.sendImmediately,
     };
 
-    return this.create(createDto);
+    return this.createNotification(createDto);
   }
 
   async findAllForUser(userId: string, query: QueryNotificationsDto) {
@@ -205,7 +194,6 @@ export class NotificationsService {
   ): Promise<Notification> {
     const notification = await this.findOne(id, userId);
 
-    // Update status and readAt if marking as read
     if (
       updateNotificationDto.status === NotificationStatus.READ &&
       notification.status === NotificationStatus.UNREAD
@@ -237,7 +225,6 @@ export class NotificationsService {
     await this.notificationsRepository.remove(notification);
   }
 
-  // Notification Preferences
   async getPreferences(userId: string): Promise<NotificationPreference[]> {
     return this.preferencesRepository.find({
       where: { userId },
@@ -248,7 +235,6 @@ export class NotificationsService {
     userId: string,
     preferences: NotificationPreferenceDto[],
   ): Promise<NotificationPreference[]> {
-    // Validate user exists
     await this.usersService.findOne(userId);
 
     const results: NotificationPreference[] = [];
@@ -259,11 +245,9 @@ export class NotificationsService {
       });
 
       if (existing) {
-        // Update existing preference
         Object.assign(existing, pref);
         results.push(await this.preferencesRepository.save(existing));
       } else {
-        // Create new preference
         const newPref = this.preferencesRepository.create({
           userId,
           ...pref,
@@ -275,7 +259,6 @@ export class NotificationsService {
     return results;
   }
 
-  // Helper methods
   private async getOrCreatePreference(
     userId: string,
     category: string,
@@ -285,12 +268,10 @@ export class NotificationsService {
     });
 
     if (!preference) {
-      // Create default preference
       preference = this.preferencesRepository.create({
         userId,
         category,
         enabled: true,
-        // Default to all notification types
         enabledTypes: Object.values(NotificationType),
       });
 
@@ -315,7 +296,10 @@ export class NotificationsService {
   }
 
   async getUserEmail(userId: string): Promise<string> {
-    const user = await this.usersService.findByEmail(userId);
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
     return user.email;
   }
 
@@ -327,7 +311,7 @@ export class NotificationsService {
     const prefs = await this.prefService.getOrCreate(userId);
 
     if (prefs.preferences.email) {
-      const email = await this.getUserEmail(userId); // Make sure it's implemented
+      const email = await this.getUserEmail(userId);
       await this.emailService.sendEmail({
         to: email,
         subject: payload.title,

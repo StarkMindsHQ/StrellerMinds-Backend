@@ -333,174 +333,27 @@ export class MentorshipService {
     matchId: string,
     updateMatchStatusDto: UpdateMatchStatusDto,
   ): Promise<MentorshipMatch> {
-    const match = await this.matchRepository.findOne({
-      where: { id: matchId },
-    });
+    const match = await this.matchRepository.findOne({ where: { id: matchId } });
 
     if (!match) {
-      throw new NotFoundException(`Match with ID ${matchId} not found`);
+      throw new NotFoundException(`Mentorship match ${matchId} not found`);
     }
 
-    // Verify user is either the mentor or mentee in this match
+    // Only mentor or mentee involved can update status
     if (match.mentorId !== userId && match.menteeId !== userId) {
-      throw new BadRequestException(
-        'You are not authorized to update this match',
-      );
     }
-
-    // Update match status
     match.status = updateMatchStatusDto.status;
-
-    // Update feedback based on who is updating the status
-    if (userId === match.mentorId && updateMatchStatusDto.feedback) {
-      match.mentorFeedback = updateMatchStatusDto.feedback;
-    } else if (userId === match.menteeId && updateMatchStatusDto.feedback) {
-      match.menteeFeedback = updateMatchStatusDto.feedback;
-    }
-
-    // If match is being accepted, set the start date
-    if (updateMatchStatusDto.status === MatchStatus.ACCEPTED) {
-      match.startDate = new Date();
-    }
-
-    // If match is being completed or canceled, set the end date
-    if (
-      updateMatchStatusDto.status === MatchStatus.COMPLETED ||
-      updateMatchStatusDto.status === MatchStatus.CANCELED
-    ) {
-      match.endDate = new Date();
-    }
 
     const updatedMatch = await this.matchRepository.save(match);
 
-    // Send notification about the status update
-    await this.sendStatusUpdateNotification(updatedMatch, userId);
+    // Notify the other party about status update
+    await this.sendMatchStatusUpdateNotification(updatedMatch);
 
     return updatedMatch;
   }
 
   /**
-   * Get all matches for a user (as either mentor or mentee)
+   * Private helper: Send notifications on new match creation
    */
-  async getUserMatches(
-    userId: string,
-    status?: MatchStatus,
-  ): Promise<MentorshipMatch[]> {
-    const whereCondition: any = [{ mentorId: userId }, { menteeId: userId }];
-
-    if (status) {
-      whereCondition[0].status = status;
-      whereCondition[1].status = status;
-    }
-
-    return this.matchRepository.find({
-      where: whereCondition,
-      order: { createdAt: 'DESC' },
-    });
-  }
-
-  /**
-   * Get a specific match by ID
-   */
-  async getMatchById(
-    userId: string,
-    matchId: string,
-  ): Promise<MentorshipMatch> {
-    const match = await this.matchRepository.findOne({
-      where: { id: matchId },
-    });
-
-    if (!match) {
-      throw new NotFoundException(`Match with ID ${matchId} not found`);
-    }
-
-    // Verify user is either the mentor or mentee in this match
-    if (match.mentorId !== userId && match.menteeId !== userId) {
-      throw new BadRequestException(
-        'You are not authorized to view this match',
-      );
-    }
-
-    return match;
-  }
-
-  /**
-   * Send notifications for a new match
-   */
-  private async sendMatchNotifications(match: MentorshipMatch): Promise<void> {
-    try {
-      // Notify mentor
-      await this.notificationsService.create({
-        userId: match.mentorId,
-        title: 'New Mentorship Match',
-        content: `You have a new mentee match with compatibility score of ${match.compatibilityScore}%`,
-        types: [NotificationType.IN_APP], // Use enum value instead of string
-        category: 'mentorship',
-        metadata: { matchId: match.id },
-      });
-
-      // Notify mentee
-      await this.notificationsService.create({
-        userId: match.menteeId,
-        title: 'New Mentorship Match',
-        content: `You have been matched with a mentor with compatibility score of ${match.compatibilityScore}%`,
-        types: [NotificationType.IN_APP], // Use enum value instead of string
-        category: 'mentorship',
-        metadata: { matchId: match.id },
-      });
-    } catch (error) {
-      this.logger.error(
-        `Failed to send match notifications: ${error.message}`,
-        error.stack,
-      );
-      // Don't throw the error, as we don't want to fail the match creation if notifications fail
-    }
-  }
-
-  private async sendStatusUpdateNotification(
-    match: MentorshipMatch,
-    updatedByUserId: string,
-  ): Promise<void> {
-    try {
-      // Determine recipient (the other user in the match)
-      const recipientId =
-        match.mentorId === updatedByUserId ? match.menteeId : match.mentorId;
-      const role = match.mentorId === updatedByUserId ? 'Mentor' : 'Mentee';
-
-      // Create message based on status
-      let content = '';
-      switch (match.status) {
-        case MatchStatus.ACCEPTED:
-          content = `${role} has accepted your mentorship match request`;
-          break;
-        case MatchStatus.DECLINED:
-          content = `${role} has declined your mentorship match request`;
-          break;
-        case MatchStatus.COMPLETED:
-          content = `${role} has marked your mentorship as completed`;
-          break;
-        case MatchStatus.CANCELED:
-          content = `${role} has canceled your mentorship match`;
-          break;
-        default:
-          content = `${role} has updated your mentorship match status to ${match.status}`;
-      }
-
-      // Send notification
-      await this.notificationsService.create({
-        userId: recipientId,
-        title: 'Mentorship Status Update',
-        content,
-        types: [NotificationType.IN_APP], // Use enum value instead of string
-        category: 'mentorship',
-        metadata: { matchId: match.id, status: match.status },
-      });
-    } catch (error) {
-      this.logger.error(
-        `Failed to send status update notification: ${error.message}`,
-        error.stack,
-      );
-      // Don't throw the error, as we don't want to fail the status update if notification fails
-    }
   }
 }

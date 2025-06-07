@@ -16,12 +16,22 @@ export class NotificationsService {
     return this.notificationsRepository.save(notification);
   }
 
+  // ✅ Add this to match other files that call `createNotification(...)`
+  async createNotification(dto: CreateNotificationDto): Promise<Notification> {
+    const notification = this.notificationsRepository.create(dto);
+    return this.notificationsRepository.save(notification);
+  }
+
   async findAll(): Promise<Notification[]> {
     return this.notificationsRepository.find();
   }
 
   async findOne(id: string): Promise<Notification> {
-    return this.notificationsRepository.findOneBy({ id });
+    const notification = await this.notificationsRepository.findOneBy({ id });
+    if (!notification) {
+      throw new NotFoundException(`Notification with id ${id} not found`);
+    }
+    return notification;
   }
 
   async update(id: string, dto: Partial<CreateNotificationDto>): Promise<Notification> {
@@ -30,27 +40,11 @@ export class NotificationsService {
   }
 
   async remove(id: string): Promise<void> {
-    await this.notificationsRepository.delete(id);
+    const result = await this.notificationsRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Notification with id ${id} not found`);
+    }
   }
 
   async notifyUser(userId: string, message: string): Promise<Notification> {
-    const notification = this.notificationsRepository.create({
-      title: 'New Feedback',
-      message,
-      isRead: false,
-      recipientId: userId
-    });
-
-    return this.notificationsRepository.save(notification);
-  }
-
-  async markAsRead(id: string): Promise<Notification> {
-    const notification = await this.notificationsRepository.findOneBy({ id });
-    if (!notification) {
-      throw new Error('Notification not found');
-    }
-    
-    notification.isRead = true;
-    return this.notificationsRepository.save(notification);
-  }
-}
+    const notification = this.no
