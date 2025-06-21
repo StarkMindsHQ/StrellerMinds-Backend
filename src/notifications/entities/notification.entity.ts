@@ -10,83 +10,83 @@ import {
 } from "typeorm"
 import { User } from "../../users/entities/user.entity"
 
-export enum NotificationType {
-  IN_APP = "in_app",
-  EMAIL = "email",
-  PUSH = "push",
-}
-
-export enum NotificationStatus {
-  UNREAD = "unread",
-  READ = "read",
-}
-
-export enum NotificationPriority {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-}
-
-@Entity("notifications")
-@Index(["userId", "createdAt"])
+import { NotificationPlatform, NotificationPriority } from '../dto/create-notification.dto';
+@Index(['status', 'scheduledAt'])
 export class Notification {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column({ name: "user_id" })
-  userId: string
+  @Column()
+  title: string;
 
-  @ManyToOne(() => User)
-  @JoinColumn({ name: "user_id" })
-  user: User
+  @Column('text')
+  body: string;
 
-  @Column({ type: "varchar", length: 255 })
-  title: string
+  @Column({ nullable: true })
+  imageUrl?: string;
 
-  @Column({ type: "text" })
-  content: string
+  @Column({ nullable: true })
+  clickAction?: string;
 
   @Column({
-    type: "enum",
-    enum: NotificationType,
-    array: true,
-    default: [NotificationType.IN_APP],
+    type: 'enum',
+    enum: NotificationPlatform,
+    default: NotificationPlatform.ALL
   })
-  types: NotificationType[]
+  platform: NotificationPlatform;
 
   @Column({
-    type: "enum",
-    enum: NotificationStatus,
-    default: NotificationStatus.UNREAD,
-  })
-  status: NotificationStatus
-
-  @Column({
-    type: "enum",
+    type: 'enum',
     enum: NotificationPriority,
-    default: NotificationPriority.MEDIUM,
+    default: NotificationPriority.NORMAL
   })
-  priority: NotificationPriority
+  priority: NotificationPriority;
 
-  @Column({ type: "varchar", length: 100 })
-  category: string
+  @Column({
+    type: 'enum',
+    enum: Notification
+  })
+  type: Notification;
 
-  @Column({ type: "jsonb", nullable: true })
-  metadata: Record<string, any>
+  @Column({
+    type: 'enum',
+    enum: Notification,
+    default: Notification.PENDING
+  })
+  status: Notification;
 
-  @Column({ type: "boolean", default: false })
-  isDelivered: boolean
+  @Column('json', { nullable: true })
+  data?: Record<string, any>;
 
-  @Column({ type: "timestamp", nullable: true })
-  readAt: Date
+  @Column('json', { nullable: true })
+  deviceTokens?: string[];
 
-  @Column({ type: "timestamp", nullable: true })
-  deliveredAt: Date
+  @Column({ nullable: true })
+  @Index()
+  userId?: string;
 
-  @CreateDateColumn({ name: "created_at" })
-  createdAt: Date
+  @Column({ nullable: true })
+  topic?: string;
 
-  @UpdateDateColumn({ name: "updated_at" })
-  updatedAt: Date
+  @Column({ type: 'timestamp', nullable: true })
+  scheduledAt?: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  sentAt?: Date;
+
+  @Column({ default: false })
+  silent: boolean;
+
+  @Column({ nullable: true })
+  errorMessage?: string;
+
+  @Column({ default: 0 })
+  retryCount: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+  static PENDING: any;
 }
-

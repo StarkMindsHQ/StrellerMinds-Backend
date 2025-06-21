@@ -2,7 +2,28 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
 import { IsString, IsUUID, IsEnum, IsArray, IsOptional, IsObject, IsBoolean } from "class-validator"
 import { NotificationType, NotificationPriority } from "../entities/notification.entity"
 
+
+
+export enum NotificationPlatform {
+  IOS = 'ios',
+  ANDROID = 'android',
+  WEB = 'web',
+  ALL = 'all'
+}
+
+export enum NotificationPriority {
+  LOW = 'low',
+  NORMAL = 'normal',
+  HIGH = 'high'
+}
+
 export class CreateNotificationDto {
+    quietHoursStart: any
+    quietHoursEnd: any
+    body: any
+    platform(platform: any) {
+        throw new Error('Method not implemented.')
+    }
   @ApiProperty({ description: "User ID to send notification to" })
   @IsUUID()
   userId: string
@@ -47,5 +68,53 @@ export class CreateNotificationDto {
   @IsBoolean()
   @IsOptional()
   sendImmediately?: boolean
+    scheduledAt: any
 }
 
+export class CreatePushNotificationDto {
+  @IsString()
+  title: string;
+
+  @IsString()
+  body: string;
+
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  clickAction?: string;
+
+  @IsEnum(NotificationPlatform)
+  platform: NotificationPlatform;
+
+  @IsEnum(NotificationPriority)
+  @IsOptional()
+  priority?: NotificationPriority = NotificationPriority.NORMAL;
+
+  @IsOptional()
+  @IsObject()
+  data?: Record<string, any>;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  deviceTokens?: string[];
+
+  @IsOptional()
+  @IsString()
+  userId?: string;
+
+  @IsOptional()
+  @IsString()
+  topic?: string;
+
+  @IsOptional()
+  @IsDateString()
+  scheduledAt?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  silent?: boolean;
+}
