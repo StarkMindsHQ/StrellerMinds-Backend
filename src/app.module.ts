@@ -38,6 +38,7 @@ import { AuthControllerV2 } from './modules/auth/controllers/auth.controller.v2'
 import { VersionController } from './modules/version/version.controller';
 import { apiVersionConfig } from './config/api-version.config';
 import { VersionHeaderMiddleware } from './common/middleware/version-header.middleware';
+import { StellarService } from './blockchain/stellar/stellar.service';
 
 
 const ENV = process.env.NODE_ENV;
@@ -120,6 +121,7 @@ console.log('ENV:', ENV);
       provide: APP_GUARD,
       useClass: CustomThrottlerGuard,
     },
+    StellarService,
 ],
 })
 
