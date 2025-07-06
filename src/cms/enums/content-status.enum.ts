@@ -1,0 +1,6 @@
+export enum ContentStatus {
+  DRAFT = 'DRAFT',
+  PENDING_REVIEW = 'PENDING_REVIEW',
+  PUBLISHED = 'PUBLISHED',
+  REJECTED = 'REJECTED',
+}
