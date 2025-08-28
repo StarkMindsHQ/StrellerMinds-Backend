@@ -33,6 +33,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 import { EmailModule } from 'src/email/email.module';
 import { SharedModule } from 'src/shared/shared.module';
+import { CommonModule } from '../common/common.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { SharedModule } from 'src/shared/shared.module';
     EmailModule,
     CloudinaryModule,
     SharedModule,
+    CommonModule, // Import CommonModule for shared services
   ],
   controllers: [UsersController, ProgressController, AdminUsersController],
   providers: [

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 /**
  * CoursesModule provides course management features.
@@ -17,6 +18,7 @@ import { User } from 'src/users/entities/user.entity';
 import { UsersModule } from 'src/users/users.module';
 import { EmailModule } from 'src/email/email.module';
 import { Lesson } from 'src/lesson/entity/lesson.entity';
+import { CommonModule } from '../common/common.module';
 // import { Lesson } from 'src/modules/lesson/entities/lesson.entity';
 
 @Module({
@@ -32,6 +34,8 @@ import { Lesson } from 'src/lesson/entity/lesson.entity';
     ]),
     UsersModule,
     EmailModule,
+    CommonModule, // Import CommonModule for shared services
+    EventEmitterModule.forRoot(), // Import EventEmitter for event-driven architecture
   ],
   providers: [CourseService],
   controllers: [CourseController],

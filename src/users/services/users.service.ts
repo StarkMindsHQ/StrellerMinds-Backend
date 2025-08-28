@@ -5,154 +5,232 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Repository, FindOptionsWhere } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { CreateUsersDto } from '../dtos/create.users.dto';
 import { updateUsersDto } from '../dtos/update.users.dto';
-import { EmailService } from 'src/email/email.service';
-import { ConfigService } from '@nestjs/config';
+import { BaseService, PaginationOptions, PaginatedResult } from '../../common/services/base.service';
+import { IUserService } from '../../common/interfaces/service.interface';
+import { SharedUtilityService } from '../../common/services/shared-utility.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends BaseService<User> implements IUserService<User> {
   constructor(
     @InjectRepository(User)
-    private readonly userRepo: Repository<User>,
+    private readonly userRepository: Repository<User>,
+    private readonly sharedUtilityService: SharedUtilityService,
+  ) {
+    super(userRepository);
+  }
 
-    private readonly cloudinaryService: CloudinaryService,
-
-    private readonly emailService: EmailService,
-
-    private readonly configService: ConfigService,
-  ) {}
-
-  public async create(
-    createUsersDto: CreateUsersDto,
-    file?: Express.Multer.File,
-  ): Promise<User> {
+  /**
+   * Create a new user
+   */
+  public async create(createUsersDto: CreateUsersDto): Promise<User> {
     try {
-      const existingUser = await this.userRepo.findOne({
+      // Validate email format
+      if (!this.sharedUtilityService.isValidEmail(createUsersDto.email)) {
+        throw new ConflictException('Invalid email format');
+      }
+
+      // Check if user already exists
+      const existingUser = await this.userRepository.findOne({
         where: { email: createUsersDto.email },
+        select: ['id', 'email'],
       });
 
       if (existingUser) {
         throw new ConflictException('Email already exists');
       }
 
-      // Handle image upload logic here
-      if (file) {
-        const uploadResult = await this.cloudinaryService.uploadImage(file);
-        createUsersDto.profileImageUrl = uploadResult.secure_url;
+      // Validate password strength
+      const passwordValidation = this.sharedUtilityService.validatePasswordStrength(createUsersDto.password);
+      if (!passwordValidation.isValid) {
+        throw new ConflictException(`Password validation failed: ${passwordValidation.errors.join(', ')}`);
       }
 
-      // Create and save the user
-      const user = this.userRepo.create(createUsersDto);
-      return await this.userRepo.save(user);
+      // Hash password
+      const hashedPassword = await bcrypt.hash(createUsersDto.password, 10);
+
+      // Sanitize input data
+      const sanitizedData = {
+        ...createUsersDto,
+        password: hashedPassword,
+        firstName: this.sharedUtilityService.sanitizeInput(createUsersDto.firstName),
+        lastName: this.sharedUtilityService.sanitizeInput(createUsersDto.lastName),
+        bio: createUsersDto.bio ? this.sharedUtilityService.sanitizeInput(createUsersDto.bio) : undefined,
+      };
+
+      return await this.createEntity(sanitizedData);
     } catch (error) {
-      throw new InternalServerErrorException('Error creating user');
+      if (error instanceof ConflictException) throw error;
+      return this.handleError(error, 'creating user');
     }
   }
 
-  public async findAll(): Promise<User[]> {
+  /**
+   * Find all users with pagination and filtering
+   */
+  public async findAll(
+    options: PaginationOptions = { page: 1, limit: 10 },
+    where?: FindOptionsWhere<User>,
+  ): Promise<PaginatedResult<User>> {
     try {
-      return await this.userRepo.find();
+      return await this.findEntitiesWithPagination({
+        page: options.page,
+        limit: options.limit,
+        where,
+        select: ['id', 'firstName', 'lastName', 'email', 'role', 'status', 'createdAt'],
+        order: { createdAt: 'DESC' },
+      });
     } catch (error) {
-      throw new InternalServerErrorException('Error fetching users');
+      return this.handleError(error, 'fetching users');
     }
   }
 
-  public async findOne(id: string): Promise<User> {
+  /**
+   * Find user by ID with optional relations
+   */
+  public async findOne(id: string, relations: string[] = []): Promise<User> {
     try {
-      const user = await this.userRepo.findOne({ where: { id } });
-      if (!user) {
-        throw new NotFoundException(`User with ID ${id} not found`);
-      }
-      return user;
+      return await this.findEntityById(id, relations);
     } catch (error) {
-      throw new InternalServerErrorException('Error fetching user');
+      if (error instanceof NotFoundException) throw error;
+      return this.handleError(error, 'fetching user');
     }
   }
 
+  /**
+   * Update user by ID
+   */
   public async update(
     id: string,
     updateUserDto: updateUsersDto,
   ): Promise<User> {
     try {
-      await this.findOne(id);
-      await this.userRepo.update(id, updateUserDto);
-      return await this.findOne(id);
+      // Sanitize input data
+      const sanitizedData = this.sharedUtilityService.removeEmptyValues({
+        ...updateUserDto,
+        firstName: updateUserDto.firstName ? this.sharedUtilityService.sanitizeInput(updateUserDto.firstName) : undefined,
+        lastName: updateUserDto.lastName ? this.sharedUtilityService.sanitizeInput(updateUserDto.lastName) : undefined,
+        bio: updateUserDto.bio ? this.sharedUtilityService.sanitizeInput(updateUserDto.bio) : undefined,
+      });
+
+      return await this.updateEntity(id, sanitizedData);
     } catch (error) {
-      throw new InternalServerErrorException('Error updating user');
+      if (error instanceof NotFoundException) throw error;
+      return this.handleError(error, 'updating user');
     }
   }
 
+  /**
+   * Delete user by ID (soft delete)
+   */
   public async delete(id: string): Promise<void> {
     try {
-      const result = await this.userRepo.delete(id);
-      if (result.affected === 0) {
-        throw new NotFoundException(`User with ID ${id} not found`);
-      }
+      await this.deleteEntity(id);
     } catch (error) {
-      throw new InternalServerErrorException('Error deleting user');
+      if (error instanceof NotFoundException) throw error;
+      return this.handleError(error, 'deleting user');
     }
   }
 
-  public async requestAccountDeletion(userId: string): Promise<void> {
+  /**
+   * Update user's refresh token
+   */
+  async updateRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
     try {
-      const user = await this.findOne(userId); // reuse your findOne method
+      await this.userRepository.update(userId, { refreshToken });
+    } catch (error) {
+      return this.handleError(error, 'updating refresh token');
+    }
+  }
 
-      // (Optional) Here you can generate a secure deletion token (we'll add this later)
+  /**
+   * Find user by email
+   */
+  async findByEmail(email: string): Promise<User | undefined> {
+    try {
+      if (!this.sharedUtilityService.isValidEmail(email)) {
+        return undefined;
+      }
 
-      const confirmationUrl = `${this.configService.get<string>('FRONTEND_URL')}/confirm-deletion?userId=${user.id}`;
-      const unsubscribeUrl = `${this.configService.get<string>('FRONTEND_URL')}/preferences?email=${user.email}`;
-
-      await this.emailService.sendEmail({
-        to: user.email,
-        subject: 'Confirm Your Account Deletion',
-        templateName: 'account-deletion-confirmation',
-        context: {
-          name: user.firstName,
-          confirmationUrl,
-          companyName: 'YourCompanyName',
-          unsubscribeUrl,
-          year: new Date().getFullYear(),
-        },
+      return await this.userRepository.findOne({
+        where: { email },
+        select: ['id', 'email', 'password', 'role', 'status'],
       });
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Error sending account deletion email',
-      );
+      this.logger.error(`Error finding user by email ${email}: ${error.message}`);
+      return undefined;
     }
   }
 
-  public async findByEmail(email: string): Promise<User> {
+  /**
+   * Find user by ID
+   */
+  async findById(id: string): Promise<User | undefined> {
     try {
-      const user = await this.userRepo.findOne({ where: { email } });
-      if (!user) {
-        throw new NotFoundException(`User with email ${email} not found`);
+      return await this.userRepository.findOne({
+        where: { id },
+        select: ['id', 'email', 'role', 'status'],
+      });
+    } catch (error) {
+      this.logger.error(`Error finding user by ID ${id}: ${error.message}`);
+      return undefined;
+    }
+  }
+
+  /**
+   * Update user password
+   */
+  async updatePassword(userId: string, hashedPassword: string): Promise<void> {
+    try {
+      await this.userRepository.update(userId, { password: hashedPassword });
+    } catch (error) {
+      return this.handleError(error, 'updating password');
+    }
+  }
+
+  /**
+   * Validate user credentials
+   */
+  async validateCredentials(email: string, password: string): Promise<boolean> {
+    try {
+      const user = await this.findByEmail(email);
+      if (!user || !user.password) {
+        return false;
       }
-      return user;
+
+      return await bcrypt.compare(password, user.password);
     } catch (error) {
-      throw new InternalServerErrorException('Error fetching user by email');
+      this.logger.error(`Error validating credentials for ${email}: ${error.message}`);
+      return false;
     }
   }
 
-  public async updateRefreshToken(
-    id: string,
-    refreshToken: string | null,
-  ): Promise<void> {
+  /**
+   * Find users by criteria
+   */
+  async findByCriteria(criteria: Record<string, any>): Promise<User[]> {
     try {
-      await this.userRepo.update(id, { refreshToken });
-    } catch (error) {
-      throw new InternalServerErrorException('Error updating refresh token');
-    }
-  }
+      // Sanitize criteria
+      const sanitizedCriteria = Object.entries(criteria).reduce((acc, [key, value]) => {
+        if (typeof value === 'string') {
+          acc[key] = this.sharedUtilityService.sanitizeInput(value);
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, any>);
 
-  public async findByUsername(username: string): Promise<User | undefined> {
-    try {
-      return await this.userRepo.findOne({ where: { username } });
+      return await this.userRepository.find({
+        where: sanitizedCriteria as FindOptionsWhere<User>,
+        select: ['id', 'firstName', 'lastName', 'email', 'role', 'status', 'createdAt'],
+      });
     } catch (error) {
-      throw new InternalServerErrorException('Error fetching user by username');
+      this.logger.error(`Error finding users by criteria: ${error.message}`);
+      return [];
     }
   }
 }
