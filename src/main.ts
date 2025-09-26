@@ -12,8 +12,11 @@ import {
 import fastifyHelmet from '@fastify/helmet';
 import fastifyCsrf from '@fastify/csrf-protection';
 
+import { setupTracing } from './monitoring/tracing.bootstrap';
 
 async function bootstrap() {
+    await setupTracing();
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
