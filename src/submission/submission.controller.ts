@@ -7,11 +7,13 @@ import {
   import { extname } from 'path';
 import { SubmissionService } from './provider/submission.service';
 import { CreateSubmissionDto } from './dtos/createSubmission.dto';
+import { FileRateLimit } from '../common/decorators/rate-limit.decorator';
   
   @Controller('submissions')
   export class SubmissionController {
     constructor(private readonly submissionService: SubmissionService) {}
   
+    @FileRateLimit.upload()
     @Post()
     @UseInterceptors(FileInterceptor('file', {
       storage: diskStorage({
@@ -33,6 +35,7 @@ import { CreateSubmissionDto } from './dtos/createSubmission.dto';
       return this.submissionService.findOne(id);
     }
   
+    @FileRateLimit.upload()
     @Patch(':id')
     @UseInterceptors(FileInterceptor('file'))
     update(

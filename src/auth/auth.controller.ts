@@ -36,6 +36,7 @@ import {
 } from '@nestjs/swagger';
 import { UsersService } from 'src/users/services/users.service';
 import { RateLimitGuard } from 'src/common/guards/rate-limiter.guard';
+import { AuthRateLimit } from 'src/common/decorators/rate-limit.decorator';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import { JwtLocalStrategy } from './strategies/jwt-local.strategy';
 import { AuthGuard } from '@nestjs/passport';
@@ -52,12 +53,13 @@ export class AuthController {
     private readonly authService: AuthService,
   ) {}
 
-  @UseGuards(RateLimitGuard)
+  @AuthRateLimit.login()
   @Post('login')
   @ApiOperation({ summary: 'User login' })
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, description: 'Login successful.' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiResponse({ status: 429, description: 'Too many login attempts' })
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: LoginDto) {
     const user = await this.jwtLocalStrategy.validateUser(
@@ -70,10 +72,12 @@ export class AuthController {
     return this.jwtLocalStrategy.login(user);
   }
 
+  @AuthRateLimit.register()
   @Post('register')
   @ApiOperation({ summary: 'User registration' })
   @ApiBody({ type: RegisterDto })
   @ApiResponse({ status: 201, description: 'Registration successful.' })
+  @ApiResponse({ status: 429, description: 'Too many registration attempts' })
   async register(@Body() registerDto: RegisterDto) {
     try {
       const { email, password, ...userData } = registerDto;
@@ -95,10 +99,12 @@ export class AuthController {
     };
   }
 
+  @AuthRateLimit.refreshToken()
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refresh successful' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
+  @ApiResponse({ status: 429, description: 'Too many token refresh attempts' })
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() body: RefreshTokenDto) {
     if (!body.userId || !body.refreshToken) {
@@ -107,9 +113,11 @@ export class AuthController {
     return this.jwtLocalStrategy.refreshToken(body.userId, body.refreshToken);
   }
 
+  @AuthRateLimit.passwordReset()
   @Post('forgot-password')
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Password reset requested' })
+  @ApiResponse({ status: 429, description: 'Too many password reset attempts' })
   async forgotPassword(@Body('email') email: string) {
     return this.jwtLocalStrategy.requestPasswordReset(email);
   }
@@ -123,9 +131,11 @@ export class AuthController {
     return { message: 'Token is valid' };
   }
 
+  @AuthRateLimit.passwordReset()
   @Post('reset-password')
   @ApiOperation({ summary: 'Reset password' })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
+  @ApiResponse({ status: 429, description: 'Too many password reset attempts' })
   async resetPassword(@Body() resetDto: ResetPasswordDto) {
     return this.jwtLocalStrategy.resetPassword(
       resetDto.token,
