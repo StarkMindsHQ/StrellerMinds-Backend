@@ -1,6 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { CredentialService } from './credential.service';
 import { Credential } from './entities/credential.entity';
 import { StellarService } from '../blockchain/stellar/stellar.service';
@@ -68,11 +69,84 @@ describe('CredentialService.verifyCredential', () => {
     expect(result.verified).toBe(false);
     expect(result.credential.verificationStatus).toBe(false);
   });
+
+  it('uses mainnet when credential network contains mainnet', async () => {
+    const credential: Partial<Credential> = {
+      id: 'cred-3',
+      userId: 'user-1',
+      txHash: 'tx-mainnet',
+      network: 'stellar-mainnet',
+      blockHeight: 123,
+      verificationStatus: false,
+    };
+    repo.findOne.mockResolvedValue(credential as Credential);
+    stellar.monitorTransaction.mockResolvedValue({ ledger: 123, successful: true });
+    repo.save.mockImplementation(async (c: Credential) => c);
+
+    await service.verifyCredential('user-1', 'cred-3');
+
+    expect(stellar.monitorTransaction).toHaveBeenCalledWith('tx-mainnet', 'mainnet');
+  });
+
+  it('uses mainnet when credential network contains public', async () => {
+    const credential: Partial<Credential> = {
+      id: 'cred-4',
+      userId: 'user-1',
+      txHash: 'tx-public',
+      network: 'stellar-public',
+      blockHeight: 456,
+      verificationStatus: false,
+    };
+    repo.findOne.mockResolvedValue(credential as Credential);
+    stellar.monitorTransaction.mockResolvedValue({ ledger: 456, successful: true });
+    repo.save.mockImplementation(async (c: Credential) => c);
+
+    await service.verifyCredential('user-1', 'cred-4');
+
+    expect(stellar.monitorTransaction).toHaveBeenCalledWith('tx-public', 'mainnet');
+  });
+
+  it('defaults to testnet for ambiguous network values', async () => {
+    const credential: Partial<Credential> = {
+      id: 'cred-5',
+      userId: 'user-1',
+      txHash: 'tx-test',
+      network: 'stellar',
+      blockHeight: 789,
+      verificationStatus: false,
+    };
+    repo.findOne.mockResolvedValue(credential as Credential);
+    stellar.monitorTransaction.mockResolvedValue({ ledger: 789, successful: true });
+    repo.save.mockImplementation(async (c: Credential) => c);
+
+    await service.verifyCredential('user-1', 'cred-5');
+
+    expect(stellar.monitorTransaction).toHaveBeenCalledWith('tx-test', 'testnet');
+  });
+
+  it('returns verified false when transaction was unsuccessful', async () => {
+    const credential: Partial<Credential> = {
+      id: 'cred-6',
+      userId: 'user-1',
+      txHash: 'tx-failed',
+      network: 'stellar',
+      verificationStatus: false,
+    };
+    repo.findOne.mockResolvedValue(credential as Credential);
+    stellar.monitorTransaction.mockResolvedValue({ ledger: 999, successful: false });
+    repo.save.mockImplementation(async (c: Credential) => c);
+
+    const result = await service.verifyCredential('user-1', 'cred-6');
+
+    expect(result.verified).toBe(false);
+    expect(result.credential.verificationStatus).toBe(false);
+  });
 });
 
-import { Test, TestingModule } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { CredentialService } from '../credential.service';
 import { Credential } from '../entities/credential.entity';
 import { BlockchainService } from '../../blockchain/blockchain.service';
