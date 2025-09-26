@@ -21,6 +21,7 @@ import { AppService } from './app.service';
 import { MentorshipModule } from './mentorship/mentorship.module';
 import { ArchiveModule } from './archive/archive.module';
 import databaseConfig from './config/database.config';
+import stellarConfig from './config/stellar.config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GdprModule } from './gdpr/gdpr.module';
 import { MonitoringModule } from './monitoring/monitoring-module';
@@ -34,6 +35,7 @@ import { VersionTrackingInterceptor } from './common/interceptors/version-tracki
 import { VersionAnalyticsService } from './common/services/version-analytics.service';
 import { PerformanceInterceptor } from './monitoring/performance.interceptor';
 import { ApiUsageLog } from './common/entities/api-usage-log.entity';
+import { StellarService } from './blockchain/stellar/stellar.service';
 import { AuthControllerV1 } from './modules/auth/controllers/auth.controller.v1';
 import { AuthControllerV2 } from './modules/auth/controllers/auth.controller.v2';
 // import { CoursesControllerV1 } from './modules/courses/controllers/courses.controller.v1';
@@ -42,8 +44,9 @@ import { VersionController } from './modules/version/version.controller';
 import { apiVersionConfig } from './config/api-version.config';
 import { VersionHeaderMiddleware } from './common/middleware/version-header.middleware';
 import { PaymentModule } from './payment/payment.module';
+import { CmsModule } from './cms/cms.module';
 
-const ENV = process.env.NODE_ENV;;
+const ENV = process.env.NODE_ENV;
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('ENV:', ENV);
 
@@ -58,7 +61,7 @@ console.log('ENV:', ENV);
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: !ENV ? '.env' : `.env.${ENV.trim()}`,
-      load: [databaseConfig, () => ({ api: apiVersionConfig })],
+      load: [databaseConfig, stellarConfig, () => ({ api: apiVersionConfig })],
     }),
 
     // Database
@@ -78,9 +81,7 @@ console.log('ENV:', ENV);
         extra: {
           max: configService.get<number>('database.maxPoolSize'),
           min: configService.get<number>('database.minPoolSize'),
-          idleTimeoutMillis: configService.get<number>(
-            'database.poolIdleTimeout',
-          ),
+          idleTimeoutMillis: configService.get<number>('database.poolIdleTimeout'),
         },
         // Retry Mechanism
         retryAttempts: configService.get<number>('database.retryAttempts'),
@@ -138,11 +139,7 @@ console.log('ENV:', ENV);
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(
-        VersionHeaderMiddleware,
-        DeprecationWarningMiddleware,
-        ApiUsageLoggerMiddleware,
-      )
+      .apply(VersionHeaderMiddleware, DeprecationWarningMiddleware, ApiUsageLoggerMiddleware)
       .forRoutes('*');
   }
 }
