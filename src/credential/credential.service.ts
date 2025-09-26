@@ -29,7 +29,7 @@ export class CredentialService {
     queryParams: CredentialHistoryQueryDto,
   ): Promise<CredentialHistoryResponseDto> {
     const { page = 1, limit = 10, credentialType, startDate, endDate, status } = queryParams;
-    
+
     // Build query conditions
     const findOptions: FindManyOptions<Credential> = {
       where: { userId },
@@ -44,9 +44,9 @@ export class CredentialService {
     }
 
     if (startDate && endDate) {
-      findOptions.where = { 
-        ...findOptions.where, 
-        issuedAt: Between(startDate, endDate) 
+      findOptions.where = {
+        ...findOptions.where,
+        issuedAt: Between(startDate, endDate),
       };
     }
 
@@ -56,9 +56,9 @@ export class CredentialService {
 
     // Execute query with pagination
     const [credentials, totalItems] = await this.credentialRepository.findAndCount(findOptions);
-    
+
     // Map to DTOs
-    const mappedCredentials = credentials.map(credential => this.mapToCredentialDto(credential));
+    const mappedCredentials = credentials.map((credential) => this.mapToCredentialDto(credential));
 
     return {
       data: mappedCredentials,
@@ -73,15 +73,18 @@ export class CredentialService {
 
   /**
    * Verify a user's credential by its ID.
-   * 
+   *
    * @param userId - The ID of the user who owns the credential.
    * @param credentialId - The ID of the credential to be verified.
    * @returns A promise that resolves to an object containing the verification result and the credential DTO.
    */
-  async verifyCredential(userId: string, credentialId: string): Promise<{ verified: boolean; credential: CredentialDto }> {
+  async verifyCredential(
+    userId: string,
+    credentialId: string,
+  ): Promise<{ verified: boolean; credential: CredentialDto }> {
     // Find the credential
-    const credential = await this.credentialRepository.findOne({ 
-      where: { id: credentialId, userId } 
+    const credential = await this.credentialRepository.findOne({
+      where: { id: credentialId, userId },
     });
 
     if (!credential) {
@@ -95,13 +98,31 @@ export class CredentialService {
         // Currently only Stellar network is supported for on-chain verification
         verified = false;
       } else if (credential.txHash) {
-        const tx = await this.stellarService.monitorTransaction(credential.txHash);
+        // Determine the specific Stellar network (mainnet/testnet) for validation
+        // Default to testnet if not specified or if network value is ambiguous
+        let stellarNetwork: 'mainnet' | 'testnet' = 'testnet';
+        
+        if (credential.network) {
+          const networkLower = credential.network.toLowerCase();
+          if (networkLower.includes('mainnet') || networkLower.includes('public')) {
+            stellarNetwork = 'mainnet';
+          }
+        }
+
+        const tx = await this.stellarService.monitorTransaction(credential.txHash, stellarNetwork);
         if (tx) {
-          // If blockHeight is stored, ensure it matches the ledger sequence
-          if (credential.blockHeight && typeof tx.ledger === 'number') {
-            verified = Number(credential.blockHeight) === Number(tx.ledger);
+          // Verify transaction success - check if transaction was successful
+          const isSuccessful = tx.successful !== false; // Stellar API returns successful field
+          
+          if (isSuccessful) {
+            // If blockHeight is stored, ensure it matches the ledger sequence
+            if (credential.blockHeight && typeof tx.ledger === 'number') {
+              verified = Number(credential.blockHeight) === Number(tx.ledger);
+            } else {
+              verified = true;
+            }
           } else {
-            verified = true;
+            verified = false; // Transaction found but failed
           }
         }
       }
