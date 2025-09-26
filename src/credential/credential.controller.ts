@@ -4,6 +4,8 @@
 import {
   Controller,
   Get,
+  Post,
+  Param,
   Query,
   UseGuards,
   HttpStatus,
@@ -20,18 +22,17 @@ import {
   ApiOperation,
   ApiResponse,
   ApiQuery,
+  ApiParam,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 /**
  * Custom decorator to extract the user object from the request.
  */
-export const User = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user;
-  },
-);
+export const User = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest();
+  return request.user;
+});
 
 @ApiTags('credentials')
 @Controller('credentials')
@@ -103,5 +104,84 @@ export class CredentialController {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     return this.credentialService.getUserCredentialHistory(user.id, queryParams);
+  }
+
+  /**
+   * Verify a specific credential on the Stellar blockchain.
+   *
+   * Verifies a user's credential by validating the transaction on the Stellar network,
+   * checking transaction existence, success, and metadata validation.
+   *
+   * @param user - The user object, automatically injected
+   * @param credentialId - The ID of the credential to verify
+   * @returns The verification result with credential details
+   */
+  @Post(':credentialId/verify')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Verify credential on Stellar blockchain',
+    description:
+      "Verifies a user's credential by validating the transaction on the Stellar network, checking transaction existence, success, and metadata validation.",
+  })
+  @ApiParam({
+    name: 'credentialId',
+    description: 'The unique identifier of the credential to verify',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Credential verification completed successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        verified: {
+          type: 'boolean',
+          description: 'Whether the credential is verified on the blockchain',
+          example: true,
+        },
+        credential: {
+          type: 'object',
+          description: 'The verified credential details',
+          properties: {
+            id: { type: 'string', example: '123e4567-e89b-12d3-a456-426614174000' },
+            type: { type: 'string', example: 'course-completion' },
+            name: { type: 'string', example: 'Blockchain Basics Certificate' },
+            verificationStatus: { type: 'boolean', example: true },
+            blockchainReference: {
+              type: 'object',
+              properties: {
+                txHash: { type: 'string', example: 'abc123txhash' },
+                network: { type: 'string', example: 'stellar' },
+                blockHeight: { type: 'number', example: 12345 },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Credential not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid credential ID or verification failed',
+  })
+  async verifyCredential(
+    @User() user: any,
+    @Param('credentialId') credentialId: string,
+  ): Promise<{ verified: boolean; credential: any }> {
+    if (!user || !user.id) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!credentialId || credentialId.trim() === '') {
+      throw new HttpException('Invalid credential ID provided', HttpStatus.BAD_REQUEST);
+    }
+
+    return this.credentialService.verifyCredential(user.id, credentialId);
   }
 }
