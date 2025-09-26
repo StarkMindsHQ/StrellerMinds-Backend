@@ -43,7 +43,17 @@ async function bootstrap() {
 
   // Global exception and role guards
   const i18n = app.get('I18nService');
-  app.useGlobalFilters(new GlobalExceptionsFilter(i18n));
+  const loggerService = app.get('LoggerService');
+  const sentryService = app.get('SentryService');
+  const alertingService = app.get('AlertingService');
+  const errorDashboardService = app.get('ErrorDashboardService');
+  app.useGlobalFilters(new GlobalExceptionsFilter(
+    i18n,
+    loggerService,
+    sentryService,
+    alertingService,
+    errorDashboardService
+  ));
   app.useGlobalGuards(new RolesGuard(new Reflector()));
 
   // Swagger setup
