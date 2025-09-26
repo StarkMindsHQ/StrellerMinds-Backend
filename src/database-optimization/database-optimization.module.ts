@@ -2,6 +2,9 @@ import { Module, type DynamicModule } from "@nestjs/common"
 import { ScheduleModule } from "@nestjs/schedule"
 import { QueryAnalyzerService } from "./services/query-analyzer.service"
 import { PerformanceMonitorService } from "./services/performance-monitor.service"
+import { QueryCacheService } from "./services/query-cache.service"
+import { DatabaseDashboardService } from "./services/database-dashboard.service"
+import { DatabaseDashboardController } from "./controllers/database-dashboard.controller"
 import { DatabaseOptimizationConfig, DEFAULT_OPTIMIZATION_CONFIG } from "./interfaces/optimization-config.interface"
 
 @Module({})
@@ -20,14 +23,13 @@ export class DatabaseOptimizationModule {
           provide: "DATABASE_OPTIMIZATION_CONFIG",
           useValue: optimizationConfig,
         },
-        {
-          provide: DatabaseOptimizationConfig,
-          useValue: optimizationConfig,
-        },
         QueryAnalyzerService,
         PerformanceMonitorService,
+        QueryCacheService,
+        DatabaseDashboardService,
       ],
-      exports: [QueryAnalyzerService, PerformanceMonitorService, DatabaseOptimizationConfig],
+      controllers: [DatabaseDashboardController],
+      exports: [QueryAnalyzerService, PerformanceMonitorService, QueryCacheService, DatabaseDashboardService],
       global: true,
     }
   }
@@ -35,8 +37,9 @@ export class DatabaseOptimizationModule {
   static forFeature(): DynamicModule {
     return {
       module: DatabaseOptimizationModule,
-      providers: [QueryAnalyzerService, PerformanceMonitorService],
-      exports: [QueryAnalyzerService, PerformanceMonitorService],
+      providers: [QueryAnalyzerService, PerformanceMonitorService, QueryCacheService, DatabaseDashboardService],
+      controllers: [DatabaseDashboardController],
+      exports: [QueryAnalyzerService, PerformanceMonitorService, QueryCacheService, DatabaseDashboardService],
     }
   }
 }

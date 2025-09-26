@@ -21,9 +21,9 @@ export default registerAs('database', () => ({
     // Query Logging and Performance
     logging: true,
     logger: 'advanced-console',
-    maxQueryExecutionTime: 1000, 
+    maxQueryExecutionTime: 100, // Changed from 1000 to 100ms
     
-    // Cache Settings  1 minute cache duration
+    // Cache Settings - 1 minute cache duration
     cache: {
         duration: 60000,
     },
@@ -39,4 +39,8 @@ export default registerAs('database', () => ({
         averageExecutionTime: 0,
         // Add more metrics as needed
     },
+    
+    // Connection Pool Monitoring
+    enablePoolMonitoring: process.env.DATABASE_POOL_MONITORING === 'true' ? true : false,
+    poolMetricsInterval: parseInt(process.env.DATABASE_POOL_METRICS_INTERVAL) || 30000, // 30 seconds
 }))
