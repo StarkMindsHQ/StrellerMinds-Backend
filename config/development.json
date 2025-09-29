@@ -1,0 +1,35 @@
+{
+  "app": {
+    "name": "strellerminds-backend",
+    "version": "1.0.0",
+    "environment": "development"
+  },
+  "server": {
+    "port": 3000,
+    "host": "0.0.0.0",
+    "cors": {
+      "enabled": true,
+      "origins": ["http://localhost:3000", "http://localhost:3001"]
+    },
+    "rateLimit": {
+      "windowMs": 900000,
+      "maxRequests": 1000
+    }
+  },
+  "logging": {
+    "level": "debug",
+    "format": "text",
+    "file": {
+      "enabled": true,
+      "path": "logs/app.log",
+      "maxSize": "10MB",
+      "maxFiles": 5
+    }
+  },
+  "features": {
+    "videoStreaming": true,
+    "analytics": true,
+    "notifications": true,
+    "aiAssistant": true
+  }
+}

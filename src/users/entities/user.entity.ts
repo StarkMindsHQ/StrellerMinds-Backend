@@ -12,7 +12,7 @@ import {
   DeleteDateColumn,
   Index,
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserProgress } from './user-progress.entity';
 import { WalletInfo } from './wallet-info.entity';
@@ -134,10 +134,6 @@ export class User {
   @ApiProperty({ description: 'Username', example: 'johndoe', uniqueItems: true })
   @Column({ unique: true, nullable: false })
   username: string;
-
-  @ApiPropertyOptional({ description: 'Stripe customer ID linked to this user', example: 'cus_123456789' })
-  @Column({ nullable: true })
-  stripeCustomerId?: string;
 
   gradesGiven: any;
   gradesReceived: any;

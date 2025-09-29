@@ -12,7 +12,7 @@ import {
   Check,
   Unique,
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserProgress } from '../../users/entities/user-progress.entity';
 import { WalletInfo } from '../../users/entities/wallet-info.entity';

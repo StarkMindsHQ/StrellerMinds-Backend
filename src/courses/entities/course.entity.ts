@@ -19,7 +19,6 @@ import { CourseModule } from './course-module.entity';
 import { Certificate } from '../../certificate/entity/certificate.entity';
 import { UserProgress } from '../../users/entities/user-progress.entity';
 import { Lesson } from 'src/lesson/entity/lesson.entity';
-import { SubscriptionPlan } from '../../payment/entities/subscription.entity';
 
 @Entity('courses')
 export class Course {
@@ -59,14 +58,6 @@ export class Course {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @ApiPropertyOptional({ description: 'Marks course as premium gated content', example: true })
-  @Column({ type: 'boolean', default: false })
-  isPremium: boolean;
-
-  @ApiPropertyOptional({ description: 'Minimum subscription plan required to access', enum: SubscriptionPlan })
-  @Column({ type: 'enum', enum: SubscriptionPlan, nullable: true })
-  requiredPlan?: SubscriptionPlan | null;
 
   // Many-to-One relationships
   @ManyToOne(() => User, (user) => user.id, { nullable: false })

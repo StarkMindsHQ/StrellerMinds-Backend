@@ -5,7 +5,6 @@ import { SubscriptionEntity, SubscriptionStatus, SubscriptionPlan, BillingCycle 
 import { StripeService } from './stripe.service';
 import { PaymentService } from './payment.service';
 import { InvoiceService } from './invoice.service';
-import { UsersService } from '../users/services/users.service';
 
 export interface CreateSubscriptionDto {
   userId: string;
@@ -19,8 +18,6 @@ export interface CreateSubscriptionDto {
   customerName?: string;
   couponCode?: string;
   metadata?: Record<string, any>;
-  priceId?: string; // predefined Stripe price ID (preferred)
-  quantity?: number; // for seat-based plans
 }
 
 export interface UpdateSubscriptionDto {
@@ -28,6 +25,7 @@ export interface UpdateSubscriptionDto {
   plan?: SubscriptionPlan;
   billingCycle?: BillingCycle;
   amount?: number;
+  paymentMethodId?: string;
   metadata?: Record<string, any>;
 }
 
@@ -41,7 +39,6 @@ export class SubscriptionService {
     private stripeService: StripeService,
     private paymentService: PaymentService,
     private invoiceService: InvoiceService,
-    private usersService: UsersService,
   ) {}
 
   /**
@@ -54,54 +51,42 @@ export class SubscriptionService {
         email: data.customerEmail,
         name: data.customerName,
       });
-      // Persist stripeCustomerId on user for future use
-      if (customer?.id) {
-        await this.usersService.updateStripeCustomerId(data.userId, customer.id);
-      }
 
-      // Determine price to use
-      let priceIdToUse: string | undefined = data.priceId;
-      if (!priceIdToUse) {
-        // fallback: create product and price dynamically (legacy path)
-        const product = await this.stripeService.createProduct({
-          name: `${data.plan} Plan`,
-          description: `Subscription for ${data.plan} plan`,
-          metadata: {
-            plan: data.plan,
-            billingCycle: data.billingCycle,
-          },
-        });
+      // Create product and price in Stripe
+      const product = await this.stripeService.createProduct({
+        name: `${data.plan} Plan`,
+        description: `Subscription for ${data.plan} plan`,
+        metadata: {
+          plan: data.plan,
+          billingCycle: data.billingCycle,
+        },
+      });
 
-        const price = await this.stripeService.createPrice({
-          unitAmount: data.amount,
-          currency: data.currency,
-          recurring: {
-            interval: this.getStripeInterval(data.billingCycle),
-          },
-          productId: product.id,
-          nickname: `${data.plan} - ${data.billingCycle}`,
-          metadata: {
-            plan: data.plan,
-            billingCycle: data.billingCycle,
-          },
-        });
-        priceIdToUse = price.id;
-      }
+      const price = await this.stripeService.createPrice({
+        unitAmount: data.amount,
+        currency: data.currency,
+        recurring: {
+          interval: this.getStripeInterval(data.billingCycle),
+        },
+        productId: product.id,
+        nickname: `${data.plan} - ${data.billingCycle}`,
+        metadata: {
+          plan: data.plan,
+          billingCycle: data.billingCycle,
+        },
+      });
 
-      // Create subscription in Stripe (predefined price path supports seat quantity)
+      // Create subscription in Stripe
       const stripeSubscription = await this.stripeService.createSubscription({
         customerId: customer.id,
-        priceId: priceIdToUse!,
+        priceId: price.id,
         paymentMethodId: data.paymentMethodId,
         trialDays: data.trialDays,
-        quantity: data.quantity,
         metadata: {
           ...data.metadata,
           userId: data.userId,
           plan: data.plan,
           billingCycle: data.billingCycle,
-          priceId: priceIdToUse,
-          quantity: data.quantity,
         },
       });
 

@@ -9,7 +9,7 @@ import {
   Networks,
   Operation,
   Asset,
-} from '@stellar/stellar-sdk';
+} from 'stellar-sdk';
 import axios from 'axios';
 import { exec } from 'child_process';
 

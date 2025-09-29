@@ -8,10 +8,12 @@ import {
   Param,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
   Req,
   BadRequestException,
 } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -30,7 +32,6 @@ import { VideoSecurityService } from '../services/video-security.service';
 import { CreateVideoDto } from '../dto/create-video.dto';
 import { CreateVideoAnalyticsDto, VideoAnalyticsQueryDto } from '../dto/video-analytics.dto';
 import { Video, VideoStatus, VideoVisibility } from '../entities/video.entity';
-import { FileRateLimit } from '../../common/decorators/rate-limit.decorator';
 
 @ApiTags('Video Streaming')
 @Controller('video-streaming')
@@ -53,29 +54,22 @@ export class VideoStreamingController {
     return this.videoStreamingService.createVideo(createVideoDto, user);
   }
 
-  @FileRateLimit.videoUpload()
   @Post(':id/upload')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('video'))
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload video file' })
   @ApiParam({ name: 'id', description: 'Video ID' })
   @ApiResponse({ status: 200, description: 'Video uploaded successfully' })
-  @ApiResponse({ status: 429, description: 'Too many video upload attempts' })
   async uploadVideo(
     @Param('id') videoId: string,
-    @Req() req: FastifyRequest,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    const part = await (req as any).file();
-    if (!part) {
+    if (!file) {
       throw new BadRequestException('Video file is required');
     }
-    const file = {
-      buffer: await part.toBuffer(),
-      mimetype: part.mimetype,
-      originalname: part.filename || part.fieldname,
-      size: part.file?.bytesRead,
-    } as any;
+
     await this.videoStreamingService.uploadVideoFile(videoId, file);
     return { message: 'Video uploaded successfully' };
   }

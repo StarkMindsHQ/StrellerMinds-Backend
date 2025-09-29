@@ -1,31 +1,30 @@
 // src/submission/submission.controller.ts
 import {
-    Controller, Post, Body, Get, Param, Patch, UseGuards, Req
+    Controller, Post, Body, Get, Param, UploadedFile, UseInterceptors, Patch, UseGuards
   } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
-  import { SubmissionService } from './provider/submission.service';
-  import { CreateSubmissionDto } from './dtos/createSubmission.dto';
-  import { FileRateLimit } from '../common/decorators/rate-limit.decorator';
+  import { FileInterceptor } from '@nestjs/platform-express';
+  import { diskStorage } from 'multer';
+  import { extname } from 'path';
+import { SubmissionService } from './provider/submission.service';
+import { CreateSubmissionDto } from './dtos/createSubmission.dto';
   
   @Controller('submissions')
   export class SubmissionController {
     constructor(private readonly submissionService: SubmissionService) {}
   
-    @FileRateLimit.upload()
     @Post()
-    async create(
+    @UseInterceptors(FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (_, file, cb) => {
+          cb(null, `${Date.now()}${extname(file.originalname)}`);
+        },
+      }),
+    }))
+    create(
       @Body() createDto: CreateSubmissionDto,
-      @Req() req: FastifyRequest,
+      @UploadedFile() file: Express.Multer.File,
     ) {
-      const part = await (req as any).file();
-      const file = part
-        ? ({
-            buffer: await part.toBuffer(),
-            mimetype: part.mimetype,
-            originalname: part.filename || part.fieldname,
-            size: part.file?.bytesRead,
-          } as any)
-        : undefined;
       return this.submissionService.create(createDto, file);
     }
   
@@ -34,22 +33,13 @@ import { FastifyRequest } from 'fastify';
       return this.submissionService.findOne(id);
     }
   
-    @FileRateLimit.upload()
     @Patch(':id')
-    async update(
+    @UseInterceptors(FileInterceptor('file'))
+    update(
       @Param('id') id: string,
       @Body() updateDto: Partial<CreateSubmissionDto>,
-      @Req() req: FastifyRequest,
+      @UploadedFile() file?: Express.Multer.File,
     ) {
-      const part = await (req as any).file();
-      const file = part
-        ? ({
-            buffer: await part.toBuffer(),
-            mimetype: part.mimetype,
-            originalname: part.filename || part.fieldname,
-            size: part.file?.bytesRead,
-          } as any)
-        : undefined;
       return this.submissionService.update(id, updateDto, file);
     }
   }  

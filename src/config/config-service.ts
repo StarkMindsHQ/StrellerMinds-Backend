@@ -4,6 +4,8 @@ import { readFileSync, watchFile, existsSync } from 'fs';
 import { resolve } from 'path';
 import { EventEmitter } from 'events';
 import { AppConfig } from './types';
+import { SecretsManager } from './secrets-manager';
+import { ConfigValidator } from './config-validator';
 
 @Injectable()
 export class ConfigurationService extends EventEmitter {
@@ -12,9 +14,12 @@ export class ConfigurationService extends EventEmitter {
   private configPath: string;
   private watching: boolean = false;
   private version: string = '1.0.0';
+  private secretsManager: SecretsManager;
+  private sensitiveKeys = ['password', 'secret', 'key', 'token', 'credentials', 'apikey'];
 
   constructor(private nestConfigService: NestConfigService) {
     super();
+    this.secretsManager = new SecretsManager();
     this.configPath = this.resolveConfigPath();
     this.loadConfiguration();
   }
@@ -46,6 +51,14 @@ export class ConfigurationService extends EventEmitter {
       } else {
         // Use environment variables and defaults
         this.config = this.buildConfigFromEnv();
+      }
+
+      // Validate configuration
+      const validationResult = ConfigValidator.validate(this.config as any);
+      ConfigValidator.logValidationResults(validationResult);
+
+      if (!validationResult.isValid) {
+        throw new Error('Configuration validation failed. Check logs for details.');
       }
 
       this.version = this.generateVersion();
@@ -86,7 +99,7 @@ export class ConfigurationService extends EventEmitter {
         host: process.env.DATABASE_HOST || 'localhost',
         port: parseInt(process.env.DATABASE_PORT || '5432'),
         username: process.env.DATABASE_USERNAME || 'postgres',
-        password: process.env.DATABASE_PASSWORD || 'postgres',
+        password: this.secretsManager.getSecret('DATABASE_PASSWORD') || process.env.DATABASE_PASSWORD || 'postgres',
         database: process.env.DATABASE_NAME || 'myapp',
         ssl: process.env.DATABASE_SSL === 'true',
         maxConnections: parseInt(process.env.DATABASE_MAX_CONNECTIONS || '10'),
@@ -95,7 +108,7 @@ export class ConfigurationService extends EventEmitter {
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
-        password: process.env.REDIS_PASSWORD,
+        password: this.secretsManager.getSecret('REDIS_PASSWORD') || process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
         maxRetries: parseInt(process.env.REDIS_MAX_RETRIES || '3'),
       },
@@ -165,8 +178,17 @@ export class ConfigurationService extends EventEmitter {
     this.watching = true;
     watchFile(this.configPath, { interval: 1000 }, () => {
       try {
-        this.logger.log('Configuration file changed, reloading...');
+        this.logger.log('Configuration file changed, reloading non-sensitive settings...');
+        const oldConfig = { ...this.config };
         this.loadConfiguration();
+
+        // Only reload non-sensitive settings
+        if (oldConfig && this.config) {
+          // Preserve sensitive settings from being hot-reloaded
+          this.config.database.password = oldConfig.database.password;
+          this.config.redis.password = oldConfig.redis.password;
+        }
+
         this.emit('configReloaded', this.config);
       } catch (error) {
         this.logger.error('Failed to reload configuration:', error);

@@ -1,7 +1,7 @@
 /**
  * EmailService provides logic for sending emails, managing preferences, analytics, and tracking.
  */
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InjectQueue } from '@nestjs/bull';
@@ -141,9 +141,6 @@ export class EmailService {
         templateName: options.templateName,
         messageId: info.messageId,
         status: 'sent',
-        // tracking
-        trackingEnabled: !options.skipTracking,
-        trackingToken: !options.skipTracking ? emailId : null,
       });
 
       return true;
@@ -363,84 +360,14 @@ export class EmailService {
    * @param id - Email log ID
    * @param url - URL that was clicked
    */
-  async markEmailAsClicked(
-    trackingToken: string,
-    url: string,
-    metadata?: { userAgent?: string; ipAddress?: string },
-  ): Promise<void> {
-    const emailLog = await this.emailLogRepository.findOne({ where: { trackingToken } });
-    if (!emailLog) {
-      throw new NotFoundException('Email tracking token not found');
-    }
-
-    const now = new Date();
-    const events = Array.isArray(emailLog.clickEvents) ? emailLog.clickEvents.slice() : [];
-    events.push({
-      clickedAt: now.toISOString(),
-      url,
-      userAgent: metadata?.userAgent,
-      ipAddress: metadata?.ipAddress,
-    });
-
-    const updates: Partial<EmailLog> = {
-      clickCount: (emailLog.clickCount || 0) + 1,
-      clickEvents: events,
-    };
-    if (!emailLog.firstClickedAt) {
-      updates.firstClickedAt = now;
-    }
-
-    await this.emailLogRepository.update({ id: emailLog.id }, updates);
-    this.logger.log(`Email link clicked: ${trackingToken} -> ${url}`);
+  async markEmailAsClicked(id: string, url: string): Promise<void> {
   }
 
   /**
    * Mark an email as opened by its log ID.
    * @param id - Email log ID
    */
-  async markEmailAsOpened(
-    trackingToken: string,
-    metadata?: { userAgent?: string; ipAddress?: string },
-  ): Promise<void> {
-    const emailLog = await this.emailLogRepository.findOne({ where: { trackingToken } });
-    if (!emailLog) {
-      throw new NotFoundException('Email tracking token not found');
-    }
-
-    const now = new Date();
-    const updates: Partial<EmailLog> = {
-      openedAt: now,
-      openCount: (emailLog.openCount || 0) + 1,
-    };
-    if (!emailLog.firstOpenedAt) {
-      updates.firstOpenedAt = now;
-    }
-
-    await this.emailLogRepository.update({ id: emailLog.id }, updates);
-    this.logger.log(`Email opened: ${trackingToken}`);
-  }
-
-  /**
-   * Get analytics for a specific email log
-   */
-  async getEmailAnalytics(emailId: string): Promise<any> {
-    const emailLog = await this.emailLogRepository.findOne({ where: { id: emailId } });
-    if (!emailLog) {
-      throw new NotFoundException('Email not found');
-    }
-    return {
-      id: emailLog.id,
-      to: emailLog.recipient,
-      subject: emailLog.subject,
-      sentAt: emailLog.createdAt,
-      opened: !!emailLog.firstOpenedAt,
-      openedAt: emailLog.firstOpenedAt,
-      openCount: emailLog.openCount || 0,
-      clicked: !!emailLog.firstClickedAt,
-      firstClickedAt: emailLog.firstClickedAt,
-      clickCount: emailLog.clickCount || 0,
-      clicks: emailLog.clickEvents || [],
-    };
+  async markEmailAsOpened(id: string): Promise<void> {
   }
 
   /**

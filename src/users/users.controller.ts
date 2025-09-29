@@ -12,7 +12,8 @@ import {
   Patch,
   ParseUUIDPipe,
   InternalServerErrorException,
-  Req,
+  UseInterceptors,
+  UploadedFile,
   UseGuards,
   createParamDecorator,
   ExecutionContext,
@@ -22,7 +23,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody, ApiParam } 
 import { CreateUsersDto } from './dtos/create.users.dto';
 import { updateUsersDto } from './dtos/update.users.dto';
 import { UsersService } from './services/users.service';
-import { FastifyRequest } from 'fastify';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { RateLimitGuard } from 'src/common/guards/rate-limiter.guard';
 
 @ApiTags('Users')
@@ -40,23 +41,15 @@ export class UsersController {
   @ApiOperation({ summary: 'Create a new user' })
   @ApiBody({ type: CreateUsersDto })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
+  @UseInterceptors(FileInterceptor('file'))
   @UseGuards(RateLimitGuard)
   @Post('create')
   async createUser(
-    @Req() req: FastifyRequest,
+    @UploadedFile() file: Express.Multer.File,
     @Body() createUsersDto: CreateUsersDto,
   ) {
     try {
-      const part = await (req as any).file();
-      const file = part
-        ? ({
-            buffer: await part.toBuffer(),
-            mimetype: part.mimetype,
-            originalname: part.filename || part.fieldname,
-            size: part.file?.bytesRead,
-          } as any)
-        : undefined;
-      const user = await this.userService.create(createUsersDto);
+      const user = await this.userService.create(createUsersDto, file);
       return user;
     } catch (error) {
       throw new InternalServerErrorException('Error creating user');

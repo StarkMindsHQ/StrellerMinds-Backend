@@ -1,5 +1,4 @@
 import { PaginationOptions, PaginatedResult } from '../services/base.service';
-import { UploadedFileLike } from '../types/uploaded-file-like';
 
 // Common DTOs and Types
 export interface UserDto {
@@ -179,7 +178,7 @@ export interface ICourseService<T, CreateDto, UpdateDto> extends ICrudService<T,
  * Interface for services that handle file operations
  */
 export interface IFileService<T> {
-  upload(file: UploadedFileLike): Promise<FileDto>;
+  upload(file: Express.Multer.File): Promise<FileDto>;
   download(fileId: string): Promise<Buffer>;
   delete(fileId: string): Promise<void>;
   getFileInfo(fileId: string): Promise<FileDto>;

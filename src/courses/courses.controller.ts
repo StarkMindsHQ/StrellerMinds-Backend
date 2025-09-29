@@ -10,13 +10,11 @@ import {
     Delete,
     Patch,
     ParseUUIDPipe,
-    UseGuards,
   } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { CourseService } from './courses.service';
 import { CreateCourseDto } from './dtos/create.course.dto';
 import { UpdateCourseDto } from './dtos/update.course.dto';
-import { PremiumContentGuard } from '../billing/premium-content.guard';
 
 @ApiTags('Courses')
 @ApiBearerAuth()
@@ -43,7 +41,6 @@ export class CourseController {
     @ApiParam({ name: 'id', type: 'string', description: 'Course ID' })
     @ApiResponse({ status: 200, description: 'Course found.' })
     @Get(':id')
-    @UseGuards(PremiumContentGuard)
     public async findOne(@Param('id', ParseUUIDPipe) id: string) {
       return await this.courseService.findOne(id);
     }

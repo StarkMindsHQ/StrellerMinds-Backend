@@ -5,6 +5,7 @@ import {
   ExceptionFilter,
   HttpStatus,
   Logger,
+  Inject,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
@@ -16,7 +17,6 @@ import { LoggerService, ErrorLogContext } from '../logging/logger.service';
 import { SentryService } from '../sentry/sentry.service';
 import { AlertingService } from '../alerting/alerting.service';
 import { v4 as uuidv4 } from 'uuid';
-import { ErrorDashboardService } from '../../error-dashboard/error-dashboard.service';
 
 @Catch()
 export class GlobalExceptionsFilter implements ExceptionFilter {
@@ -27,7 +27,6 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
     private readonly loggerService: LoggerService,
     private readonly sentryService: SentryService,
     private readonly alertingService: AlertingService,
-    private readonly errorDashboardService: ErrorDashboardService,
   ) {
     this.loggerService.setContext('GlobalExceptionsFilter');
   }
@@ -58,11 +57,6 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
       userAgent: request.get('User-Agent'),
       requestId: request.headers['x-request-id'] as string,
       timestamp: new Date().toISOString(),
-      // Add additional context for better error tracking
-      referer: request.get('Referer'),
-      contentType: request.get('Content-Type'),
-      contentLength: request.get('Content-Length'),
-      acceptLanguage: request.get('Accept-Language'),
     };
 
     let errorResponse: ErrorResponseDto;
@@ -87,32 +81,8 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
         ...errorContext,
         errorCode: exceptionResponse.errorCode,
         errorType: 'CustomException',
-        errorCategory: this.categorizeError(exceptionResponse.errorCode),
         statusCode: exception.getStatus(),
         details: exceptionResponse.details,
-      });
-
-      // Add to error dashboard
-      await this.errorDashboardService.addErrorLog({
-        correlationId,
-        errorCode: exceptionResponse.errorCode,
-        message: await this.i18n.translate(`errors.${exceptionResponse.errorCode}`, {
-          lang,
-          args: exceptionResponse.args,
-        }),
-        statusCode: exception.getStatus(),
-        timestamp: new Date().toISOString(),
-        endpoint: request.url,
-        method: request.method,
-        userId: user?.id,
-        userAgent: request.get('User-Agent'),
-        ip: request.ip,
-        severity: this.getSeverityForErrorCode(exceptionResponse.errorCode),
-        category: this.categorizeError(exceptionResponse.errorCode),
-        context: {
-          ...errorContext,
-          details: exceptionResponse.details,
-        }
       });
     } else if (exception instanceof HttpException) {
       const exceptionResponse = exception.getResponse() as any;
@@ -134,29 +104,8 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
           ...errorContext,
           errorCode: ErrorCode.INVALID_INPUT,
           errorType: 'ValidationError',
-          errorCategory: this.categorizeError(ErrorCode.INVALID_INPUT),
           statusCode: exception.getStatus(),
           validationErrors: exceptionResponse.message,
-        });
-
-        // Add to error dashboard
-        await this.errorDashboardService.addErrorLog({
-          correlationId,
-          errorCode: ErrorCode.INVALID_INPUT,
-          message: await this.i18n.translate('errors.INVALID_INPUT', { lang }),
-          statusCode: exception.getStatus(),
-          timestamp: new Date().toISOString(),
-          endpoint: request.url,
-          method: request.method,
-          userId: user?.id,
-          userAgent: request.get('User-Agent'),
-          ip: request.ip,
-          severity: this.getSeverityForErrorCode(ErrorCode.INVALID_INPUT),
-          category: this.categorizeError(ErrorCode.INVALID_INPUT),
-          context: {
-            ...errorContext,
-            validationErrors: exceptionResponse.message,
-          }
         });
       } else {
         errorResponse = {
@@ -173,29 +122,8 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
           ...errorContext,
           errorCode: ErrorCode.INTERNAL_ERROR,
           errorType: 'HttpException',
-          errorCategory: this.categorizeError(ErrorCode.INTERNAL_ERROR),
           statusCode: exception.getStatus(),
           originalMessage: exceptionResponse.message,
-        });
-
-        // Add to error dashboard
-        await this.errorDashboardService.addErrorLog({
-          correlationId,
-          errorCode: ErrorCode.INTERNAL_ERROR,
-          message: exceptionResponse.message || await this.i18n.translate('errors.INTERNAL_ERROR', { lang }),
-          statusCode: exception.getStatus(),
-          timestamp: new Date().toISOString(),
-          endpoint: request.url,
-          method: request.method,
-          userId: user?.id,
-          userAgent: request.get('User-Agent'),
-          ip: request.ip,
-          severity: this.getSeverityForErrorCode(ErrorCode.INTERNAL_ERROR),
-          category: this.categorizeError(ErrorCode.INTERNAL_ERROR),
-          context: {
-            ...errorContext,
-            originalMessage: exceptionResponse.message,
-          }
         });
       }
     } else {
@@ -214,7 +142,6 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
         ...errorContext,
         errorCode: ErrorCode.INTERNAL_ERROR,
         errorType: exception instanceof Error ? exception.constructor.name : 'Unknown',
-        errorCategory: this.categorizeError(ErrorCode.INTERNAL_ERROR),
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         stack: exception instanceof Error ? exception.stack : undefined,
         originalError: exception instanceof Error ? {
@@ -245,24 +172,6 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
         `Unhandled error: ${exception instanceof Error ? exception.message : 'Unknown error'}`,
         exception instanceof Error ? exception.stack : undefined,
       );
-
-      // Add to error dashboard
-      await this.errorDashboardService.addErrorLog({
-        correlationId,
-        errorCode: ErrorCode.INTERNAL_ERROR,
-        message: await this.i18n.translate('errors.INTERNAL_ERROR', { lang }),
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        timestamp: new Date().toISOString(),
-        endpoint: request.url,
-        method: request.method,
-        userId: user?.id,
-        userAgent: request.get('User-Agent'),
-        ip: request.ip,
-        severity: this.getSeverityForErrorCode(ErrorCode.INTERNAL_ERROR),
-        category: this.categorizeError(ErrorCode.INTERNAL_ERROR),
-        stackTrace: exception instanceof Error ? exception.stack : undefined,
-        context: fatalErrorContext
-      });
     }
 
     // Add stack trace in development environment
@@ -290,83 +199,5 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
       field: error.property,
       message: Object.values(error.constraints || {}).join(', '),
     }));
-  }
-
-  /**
-   * Categorize errors for better tracking and reporting
-   * @param errorCode The error code to categorize
-   * @returns The category of the error
-   */
-  private categorizeError(errorCode: ErrorCode): string {
-    switch (errorCode) {
-      case ErrorCode.UNAUTHORIZED:
-      case ErrorCode.INVALID_CREDENTIALS:
-      case ErrorCode.TOKEN_EXPIRED:
-      case ErrorCode.FORBIDDEN:
-        return 'AUTHENTICATION';
-      
-      case ErrorCode.NOT_FOUND:
-      case ErrorCode.ALREADY_EXISTS:
-      case ErrorCode.CONFLICT:
-        return 'RESOURCE';
-      
-      case ErrorCode.INVALID_INPUT:
-      case ErrorCode.MISSING_REQUIRED_FIELD:
-      case ErrorCode.INVALID_FORMAT:
-        return 'VALIDATION';
-      
-      case ErrorCode.INSUFFICIENT_FUNDS:
-      case ErrorCode.PAYMENT_FAILED:
-      case ErrorCode.COURSE_NOT_AVAILABLE:
-      case ErrorCode.ENROLLMENT_CLOSED:
-        return 'BUSINESS_LOGIC';
-      
-      case ErrorCode.INTERNAL_ERROR:
-      case ErrorCode.SERVICE_UNAVAILABLE:
-      case ErrorCode.DATABASE_ERROR:
-      case ErrorCode.EXTERNAL_SERVICE_ERROR:
-        return 'SYSTEM';
-      
-      default:
-        return 'UNKNOWN';
-    }
-  }
-
-  /**
-   * Get severity level for error code
-   * @param errorCode The error code
-   * @returns The severity level
-   */
-  private getSeverityForErrorCode(errorCode: ErrorCode): 'low' | 'medium' | 'high' | 'critical' {
-    switch (errorCode) {
-      case ErrorCode.UNAUTHORIZED:
-      case ErrorCode.INVALID_CREDENTIALS:
-      case ErrorCode.TOKEN_EXPIRED:
-      case ErrorCode.FORBIDDEN:
-      case ErrorCode.NOT_FOUND:
-        return 'low';
-      
-      case ErrorCode.INVALID_INPUT:
-      case ErrorCode.MISSING_REQUIRED_FIELD:
-      case ErrorCode.INVALID_FORMAT:
-      case ErrorCode.ALREADY_EXISTS:
-      case ErrorCode.CONFLICT:
-        return 'medium';
-      
-      case ErrorCode.INSUFFICIENT_FUNDS:
-      case ErrorCode.PAYMENT_FAILED:
-      case ErrorCode.COURSE_NOT_AVAILABLE:
-      case ErrorCode.ENROLLMENT_CLOSED:
-        return 'high';
-      
-      case ErrorCode.INTERNAL_ERROR:
-      case ErrorCode.SERVICE_UNAVAILABLE:
-      case ErrorCode.DATABASE_ERROR:
-      case ErrorCode.EXTERNAL_SERVICE_ERROR:
-        return 'critical';
-      
-      default:
-        return 'medium';
-    }
   }
 }

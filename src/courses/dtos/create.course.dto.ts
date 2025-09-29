@@ -6,11 +6,10 @@
  * All fields are documented for OpenAPI/Swagger UI.
  */
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, MaxLength, IsArray, ArrayMinSize, IsEnum } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, MaxLength, IsArray, Max, ArrayMinSize } from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from '../../users/entities/user.entity';
 import { CreateCourseModuleDto } from './create.course.moduledto';
-import { SubscriptionPlan } from '../../payment/entities/subscription.entity';
 
 export class CreateCourseDto {
   @ApiProperty({ example: 'Introduction to Blockchain', maxLength: 255, description: 'Course title' })
@@ -45,16 +44,6 @@ export class CreateCourseDto {
   @IsString()
   @IsOptional()
   thumbnail?: string;
-
-  @ApiPropertyOptional({ example: false, description: 'Whether the course is premium gated' })
-  @IsOptional()
-  @IsBoolean()
-  isPremium?: boolean;
-
-  @ApiPropertyOptional({ enum: SubscriptionPlan, description: 'Minimum subscription plan required' })
-  @IsOptional()
-  @IsEnum(SubscriptionPlan)
-  requiredPlan?: SubscriptionPlan;
 
   @ApiProperty({ example: 'uuid-instructor', description: 'Instructor user ID' })
   @IsUUID()

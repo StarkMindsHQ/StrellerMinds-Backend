@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Index } from "typeorm";
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
@@ -64,49 +64,5 @@ export class EmailLog {
   @ApiPropertyOptional({ description: 'Additional metadata', type: 'object', example: { ip: '127.0.0.1' } })
   @Column({ nullable: true, type: "jsonb" })
   metadata: Record<string, any>;
-
-  /** First opened timestamp */
-  @ApiPropertyOptional({ description: 'First time the email was opened', type: String, format: 'date-time' })
-  @Column({ type: 'timestamp', nullable: true })
-  @Index()
-  firstOpenedAt: Date | null;
-
-  /** Total number of opens */
-  @ApiPropertyOptional({ description: 'Total number of opens', example: 0 })
-  @Column({ type: 'int', default: 0 })
-  openCount: number;
-
-  /** First clicked timestamp */
-  @ApiPropertyOptional({ description: 'First time a link was clicked', type: String, format: 'date-time' })
-  @Column({ type: 'timestamp', nullable: true })
-  @Index()
-  firstClickedAt: Date | null;
-
-  /** Total number of clicks */
-  @ApiPropertyOptional({ description: 'Total number of clicks', example: 0 })
-  @Column({ type: 'int', default: 0 })
-  clickCount: number;
-
-  /** Click events history */
-  @ApiPropertyOptional({ description: 'Array of click events', type: 'array', example: [{ clickedAt: '2025-06-29T12:10:00Z', url: 'https://example.com' }] })
-  @Column({ type: 'jsonb', nullable: true })
-  clickEvents: Array<{ clickedAt: string; url: string; userAgent?: string; ipAddress?: string }> | null;
-
-  /** Whether tracking is enabled for this email */
-  @ApiPropertyOptional({ description: 'Tracking enabled for this email', example: true })
-  @Column({ type: 'boolean', default: false })
-  @Index()
-  trackingEnabled: boolean;
-
-  /** Unique tracking token for this email */
-  @ApiPropertyOptional({ description: 'Unique tracking token', example: 'a1b2c3...' })
-  @Column({ type: 'varchar', length: 64, nullable: true })
-  @Index()
-  trackingToken: string | null;
-
-  /** When the log was last updated */
-  @ApiPropertyOptional({ description: 'Date/time when the email log was last updated', type: String, format: 'date-time' })
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
 

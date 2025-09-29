@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Param, Body, Query, HttpCode, HttpStatus } from "@nestjs/common"
 import type { CertificateService } from "../services/certificate.service"
 import type { CreateCertificateDto } from "../dto/create-certificate.dto"
-import { BlockchainRateLimit } from "../../common/decorators/rate-limit.decorator"
 
 @Controller("certificates")
 export class CertificateController {
@@ -32,7 +31,6 @@ export class CertificateController {
     return this.certificateService.findOne(id)
   }
 
-  @BlockchainRateLimit.certificateIssue()
   @Post(":id/issue")
   async issue(@Param("id") id: string, @Body("issuedBy") issuedBy: string) {
     return this.certificateService.issueCertificate(id, issuedBy)
@@ -43,7 +41,6 @@ export class CertificateController {
     return this.certificateService.revokeCertificate(id, reason)
   }
 
-  @BlockchainRateLimit.verification()
   @Post("verify")
   @HttpCode(HttpStatus.OK)
   async verify(@Body("certificateNumber") certificateNumber: string, @Body("verifierInfo") verifierInfo: any) {

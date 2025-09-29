@@ -27,11 +27,6 @@ export interface AlertConfig {
     errorRate: number;
     responseTime: number;
     criticalErrors: string[];
-    // Error category based thresholds
-    categoryThresholds: Record<string, {
-      rate: number;
-      severity: 'low' | 'medium' | 'high' | 'critical';
-    }>;
   };
   rateLimiting: {
     enabled: boolean;
@@ -88,51 +83,6 @@ export class AlertingService {
       title: `Critical Error: ${error.message}`,
       description: this.formatErrorDescription(error, context),
       context,
-      timestamp: new Date().toISOString(),
-    };
-
-    await this.sendAlert(alertData);
-    this.recordAlert(alertKey);
-  }
-
-  /**
-   * Send alert for categorized errors based on error rate thresholds
-   * @param errorCategory The category of the error
-   * @param errorRate The current error rate for this category
-   * @param context Additional context for the alert
-   */
-  async sendCategorizedErrorAlert(
-    errorCategory: string, 
-    errorRate: number, 
-    context: Partial<AlertContext>
-  ): Promise<void> {
-    if (!this.config.enabled) {
-      return;
-    }
-
-    // Check if there's a specific threshold for this category
-    const categoryThreshold = this.config.thresholds.categoryThresholds[errorCategory];
-    if (!categoryThreshold || errorRate < categoryThreshold.rate) {
-      return;
-    }
-
-    const alertKey = `categorized_error_${errorCategory}`;
-    
-    if (!this.shouldSendAlert(alertKey)) {
-      return;
-    }
-
-    const alertData = {
-      type: 'categorized_error',
-      severity: categoryThreshold.severity,
-      title: `High ${errorCategory} Error Rate Detected: ${(errorRate * 100).toFixed(2)}%`,
-      description: `${errorCategory} errors have exceeded the threshold of ${(categoryThreshold.rate * 100).toFixed(2)}%`,
-      context: {
-        ...context,
-        errorCategory,
-        errorRate,
-        threshold: categoryThreshold.rate,
-      },
       timestamp: new Date().toISOString(),
     };
 
@@ -238,7 +188,7 @@ export class AlertingService {
         severity: alertData.severity,
         correlationId: alertData.context?.correlationId,
       });
-    } catch (error: any) {
+    } catch (error) {
       this.loggerService.error('Failed to send alert', {
         error: error.message,
         alertType: alertData.type,
@@ -401,10 +351,6 @@ export class AlertingService {
         errorRate: this.configService.get<number>('ERROR_RATE_THRESHOLD', 0.05),
         responseTime: this.configService.get<number>('RESPONSE_TIME_THRESHOLD', 5000),
         criticalErrors: this.configService.get<string>('CRITICAL_ERROR_CODES', 'INTERNAL_ERROR,DATABASE_ERROR').split(','),
-        // Default category thresholds
-        categoryThresholds: this.parseCategoryThresholds(
-          this.configService.get<string>('CATEGORY_ERROR_THRESHOLDS', '{}')
-        ),
       },
       rateLimiting: {
         enabled: this.configService.get<boolean>('ALERT_RATE_LIMITING_ENABLED', true),
@@ -419,27 +365,6 @@ export class AlertingService {
       return JSON.parse(headersString);
     } catch {
       return {};
-    }
-  }
-
-  /**
-   * Parse category thresholds from configuration string
-   * @param thresholdsString JSON string of category thresholds
-   * @returns Parsed category thresholds object
-   */
-  private parseCategoryThresholds(thresholdsString: string): Record<string, { rate: number; severity: 'low' | 'medium' | 'high' | 'critical' }> {
-    try {
-      return JSON.parse(thresholdsString);
-    } catch {
-      // Return default thresholds
-      return {
-        'AUTHENTICATION': { rate: 0.1, severity: 'high' },
-        'VALIDATION': { rate: 0.05, severity: 'medium' },
-        'RESOURCE': { rate: 0.02, severity: 'medium' },
-        'BUSINESS_LOGIC': { rate: 0.01, severity: 'low' },
-        'SYSTEM': { rate: 0.005, severity: 'critical' },
-        'UNKNOWN': { rate: 0.01, severity: 'medium' },
-      };
     }
   }
 }

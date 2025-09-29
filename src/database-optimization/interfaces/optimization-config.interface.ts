@@ -10,7 +10,7 @@ export interface DatabaseOptimizationConfig {
 
 export const DEFAULT_OPTIMIZATION_CONFIG: DatabaseOptimizationConfig = {
   enableQueryLogging: true,
-  slowQueryThreshold: 100, // Changed from 1000 to 100ms
+  slowQueryThreshold: 1000,
   maxQueryHistorySize: 1000,
   enableAutomaticIndexSuggestions: true,
   performanceAnalysisInterval: 60,

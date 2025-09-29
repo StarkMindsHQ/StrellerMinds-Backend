@@ -18,7 +18,6 @@ import { ConnectWalletDto } from '../dto/connect-wallet.dto';
 import { ShareCredentialDto } from '../dto/share-credential.dto';
 import { CredentialFilterDto } from '../dto/credential-filter.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { BlockchainRateLimit } from '../../common/decorators/rate-limit.decorator';
 
 /**
  * Controller for wallet-related operations (connect, disconnect, credentials, sharing, stats).
@@ -34,11 +33,9 @@ export class WalletController {
    * @param connectWalletDto - Wallet connection details
    * @returns Wallet connection result
    */
-  @BlockchainRateLimit.walletConnect()
   @Post('connect')
   @ApiOperation({ summary: 'Connect a wallet and authenticate the user' })
   @ApiResponse({ status: 200, description: 'Wallet connected successfully.' })
-  @ApiResponse({ status: 429, description: 'Too many wallet connection attempts' })
   @HttpCode(HttpStatus.OK)
   async connectWallet(@Body() connectWalletDto: ConnectWalletDto) {
     return await this.walletService.connectWallet(connectWalletDto);
@@ -90,11 +87,9 @@ export class WalletController {
    * @param shareDto - Credential sharing details
    * @returns Sharing result
    */
-  @BlockchainRateLimit.credentialShare()
   @Post('credentials/share')
   @ApiOperation({ summary: 'Share credentials from the authenticated user\'s wallet' })
   @ApiResponse({ status: 201, description: 'Credentials shared successfully.' })
-  @ApiResponse({ status: 429, description: 'Too many credential sharing attempts' })
   @UseGuards(JwtAuthGuard)
   async shareCredentials(
     @Request() req,

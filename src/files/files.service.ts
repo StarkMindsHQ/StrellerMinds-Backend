@@ -7,7 +7,6 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import ffmpeg from 'fluent-ffmpeg';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { UploadedFileLike } from '../common/types/uploaded-file-like';
 import { RedisService } from '../shared/services/redis.service';
 
 @Injectable()
@@ -26,7 +25,7 @@ export class FilesService {
   async saveChunk(
     uploadId: string,
     chunkIndex: number,
-    file: UploadedFileLike,
+    file: Express.Multer.File,
   ) {
     const chunkDir = path.join(this.tempDir, uploadId);
     if (!fs.existsSync(chunkDir)) {

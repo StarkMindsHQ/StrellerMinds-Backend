@@ -19,7 +19,6 @@ export interface CreateSubscriptionDto {
   paymentMethodId?: string;
   trialDays?: number;
   metadata?: Record<string, any>;
-  quantity?: number;
 }
 
 export interface CreateInvoiceDto {
@@ -129,7 +128,7 @@ export class StripeService {
     try {
       const subscription = await this.stripe.subscriptions.create({
         customer: data.customerId,
-        items: [{ price: data.priceId, quantity: data.quantity }],
+        items: [{ price: data.priceId }],
         payment_behavior: 'default_incomplete',
         payment_settings: { save_default_payment_method: 'on_subscription' },
         expand: ['latest_invoice.payment_intent'],
@@ -429,64 +428,6 @@ export class StripeService {
   }
 
   /**
-   * Create a Stripe Billing Portal session
-   */
-  async createBillingPortalSession(params: {
-    customerId: string;
-    returnUrl: string;
-  }): Promise<Stripe.BillingPortal.Session> {
-    try {
-      const session = await this.stripe.billingPortal.sessions.create({
-        customer: params.customerId,
-        return_url: params.returnUrl,
-      });
-      this.logger.log(`Created billing portal session: ${session.id}`);
-      return session;
-    } catch (error) {
-      this.logger.error('Failed to create billing portal session', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Retrieve a price by ID
-   */
-  async getPrice(priceId: string): Promise<Stripe.Price> {
-    try {
-      return await this.stripe.prices.retrieve(priceId);
-    } catch (error) {
-      this.logger.error('Failed to get price', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Report metered usage for a subscription item
-   */
-  async createUsageRecord(params: {
-    subscriptionItemId: string;
-    quantity: number;
-    timestamp?: number; // seconds since epoch
-    action?: 'increment' | 'set';
-  }): Promise<Stripe.UsageRecord> {
-    try {
-      const usage = await this.stripe.subscriptionItems.createUsageRecord(
-        params.subscriptionItemId,
-        {
-          quantity: params.quantity,
-          timestamp: params.timestamp ?? Math.floor(Date.now() / 1000),
-          action: params.action ?? 'increment',
-        }
-      );
-      this.logger.log(`Reported usage on ${params.subscriptionItemId}: +${params.quantity}`);
-      return usage;
-    } catch (error) {
-      this.logger.error('Failed to create usage record', error);
-      throw error;
-    }
-  }
-
-  /**
    * Verify webhook signature
    */
   verifyWebhookSignature(
@@ -502,5 +443,4 @@ export class StripeService {
       throw error;
     }
   }
-}
- 
+} 

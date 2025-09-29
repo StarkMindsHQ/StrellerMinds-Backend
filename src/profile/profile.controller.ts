@@ -1,12 +1,13 @@
 import {
   Controller,
   Post,
+  UseInterceptors,
+  UploadedFile,
   Delete,
   Body,
   BadRequestException,
-  Req,
 } from '@nestjs/common';
-import { FastifyRequest } from 'fastify';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 
@@ -24,19 +25,14 @@ export class ProfileController {
    * Upload a profile image for the user.
    */
   @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload profile image', description: 'Uploads a profile image (JPEG, PNG, JPG, max 5MB) for the user.' })
   @ApiResponse({ status: 201, description: 'Image uploaded successfully', schema: { properties: { url: { type: 'string' }, publicId: { type: 'string' } } } })
-  async uploadProfileImage(@Req() req: FastifyRequest) {
-    const part = await (req as any).file();
-    if (!part) {
+  async uploadProfileImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    const file = {
-      buffer: await part.toBuffer(),
-      mimetype: part.mimetype,
-      originalname: part.filename || part.fieldname,
-      size: part.file?.bytesRead,
-    } as any;
+
     const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
     if (!allowedTypes.includes(file.mimetype)) {
       throw new BadRequestException('Invalid file type');

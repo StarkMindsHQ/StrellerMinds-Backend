@@ -193,17 +193,6 @@ export class UsersService extends BaseService<User> implements IUserService<User
   }
 
   /**
-   * Update user's Stripe customer ID
-   */
-  async updateStripeCustomerId(userId: string, stripeCustomerId: string): Promise<void> {
-    try {
-      await this.userRepository.update(userId, { stripeCustomerId });
-    } catch (error) {
-      return this.handleError(error, 'updating stripe customer id');
-    }
-  }
-
-  /**
    * Validate user credentials
    */
   async validateCredentials(email: string, password: string): Promise<boolean> {
