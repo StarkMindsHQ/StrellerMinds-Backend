@@ -1,138 +1,104 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { UsersService } from '../users/services/users.service';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { PasswordValidationService } from './password-validation.service';
-import { EmailService } from '../email/email.service';
-import * as bcrypt from 'bcryptjs';
-
-jest.mock('bcryptjs');
-
-describe('AuthService', () => {
-  let service: AuthService;
-  let usersService: UsersService;
-  let jwtService: JwtService;
-  let configService: ConfigService;
-  let passwordValidationService: PasswordValidationService;
-  let emailService: EmailService;
-
-  const mockUser = {
-    id: '1',
-    email: 'test@example.com',
-    password: 'hashedPassword',
-    roles: ['STUDENT'],
-    isEmailVerified: true,
-  };
-
-  const mockTokens = {
-    accessToken: 'mockAccessToken',
-    refreshToken: 'mockRefreshToken',
-    expiresIn: 3600,
-  };
-
-  beforeEach(async () => {
-    const usersServiceMock = {
-      findOne: jest.fn(),
-      findByEmail: jest.fn(),
-      create: jest.fn(),
-      findById: jest.fn(),
-      updatePassword: jest.fn(),
-      updateRefreshToken: jest.fn(),
-      userRepository: {},
-    };
-
-    const jwtServiceMock = {
-      sign: jest.fn().mockReturnValue('test-token'),
-      verify: jest.fn().mockReturnValue({ sub: 'test-id' }),
-      signAsync: jest.fn(),
-      verifyAsync: jest.fn(),
-      options: {},
-      logger: {
-        error: jest.fn(),
-        warn: jest.fn(),
-        log: jest.fn(),
-      },
-      mergeJwtOptions: jest.fn(),
-      overrideSecretFromOptions: jest.fn(),
-      getSecretKey: jest.fn(),
-    };
-
-    const configServiceMock = {
-      get: jest.fn().mockReturnValue('testSecret'),
-    };
-
-    const passwordValidationServiceMock = {
-      validatePassword: jest.fn(),
-      MIN_LENGTH: 8,
-      MIN_SCORE: 3,
-    };
-
-    const emailServiceMock = {
-      sendEmail: jest.fn().mockResolvedValue({}),
-    };
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        { provide: UsersService, useValue: usersServiceMock },
-        { provide: JwtService, useValue: jwtServiceMock },
-        { provide: ConfigService, useValue: configServiceMock },
-        { provide: EmailService, useValue: emailServiceMock },
-        {
-          provide: PasswordValidationService,
-          useValue: passwordValidationServiceMock,
-        },
-      ],
-    }).compile();
-
-    service = module.get<AuthService>(AuthService);
-    usersService = module.get<UsersService>(UsersService);
-    jwtService = module.get<JwtService>(JwtService);
-    configService = module.get<ConfigService>(ConfigService);
-    passwordValidationService = module.get<PasswordValidationService>(
-      PasswordValidationService,
-    );
-    emailService = module.get<EmailService>(EmailService);
-
-    (bcrypt.compare as jest.Mock).mockImplementation((plainText, hash) =>
-      Promise.resolve(plainText === 'correctPassword'),
-    );
-    (bcrypt.hash as jest.Mock).mockImplementation((text) =>
-      Promise.resolve(`hashed-${text}`),
-    );
-  });
-});
+import { IAuthStrategy } from './strategies/auth-strategy.interface';
 
 describe('AuthService', () => {
   let service: AuthService;
 
-  const mockGoogle = {
+  const mockGoogle: IAuthStrategy = {
     name: 'google',
     validate: jest.fn().mockResolvedValue({ email: 'test@gmail.com' }),
     login: jest.fn().mockResolvedValue({ token: 'jwt-token' }),
+    register: jest.fn().mockResolvedValue({ token: 'registered-token' }),
+  };
+
+  const mockFacebook: IAuthStrategy = {
+    name: 'facebook',
+    validate: jest.fn().mockResolvedValue({ email: 'fb@test.com' }),
+    login: jest.fn().mockResolvedValue({ token: 'fb-token' }),
+    // No register method -> will trigger BadRequestException
   };
 
   beforeEach(async () => {
-    const module = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: 'AUTH_STRATEGIES', useValue: [mockGoogle] },
+        { provide: 'AUTH_STRATEGIES', useValue: [mockGoogle, mockFacebook] },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
   });
 
-  it('should validate with Google', async () => {
-    const result = await service.validate('google', {});
-    expect(result).toEqual({ email: 'test@gmail.com' });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
-  it('should fail for missing strategy', async () => {
-    await expect(service.login('facebook', {})).rejects.toThrow(
-      /Strategy for facebook not found/,
-    );
+  describe('getStrategy', () => {
+    it('should return strategy if found', () => {
+      const strategy = (service as any).getStrategy('google');
+      expect(strategy).toBe(mockGoogle);
+    });
+
+    it('should throw BadRequestException if strategy not found', () => {
+      expect(() => (service as any).getStrategy('apple')).toThrow(BadRequestException);
+    });
+  });
+
+  describe('validate', () => {
+    it('should call validate on the correct strategy', async () => {
+      const result = await service.validate('google', {});
+      expect(mockGoogle.validate).toHaveBeenCalledWith({});
+      expect(result).toEqual({ email: 'test@gmail.com' });
+    });
+
+    it('should throw BadRequestException for unsupported strategy', async () => {
+      await expect(service.validate('apple', {})).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw if validate rejects inside strategy', async () => {
+      (mockGoogle.validate as jest.Mock).mockRejectedValueOnce(new UnauthorizedException('Invalid creds'));
+      await expect(service.validate('google', {})).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('login', () => {
+    it('should call login on the correct strategy', async () => {
+      const result = await service.login('facebook', { id: 1 });
+      expect(mockFacebook.login).toHaveBeenCalledWith({ id: 1 });
+      expect(result).toEqual({ token: 'fb-token' });
+    });
+
+    it('should throw BadRequestException for unsupported strategy', async () => {
+      await expect(service.login('apple', {})).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw if login rejects inside strategy', async () => {
+      (mockFacebook.login as jest.Mock).mockRejectedValueOnce(new UnauthorizedException('Login failed'));
+      await expect(service.login('facebook', { id: 1 })).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('register', () => {
+    it('should call register if supported', async () => {
+      const result = await service.register('google', { email: 'new@test.com' });
+      expect(mockGoogle.register).toHaveBeenCalledWith({ email: 'new@test.com' });
+      expect(result).toEqual({ token: 'registered-token' });
+    });
+
+    it('should throw BadRequestException if register not supported', async () => {
+      await expect(service.register('facebook', {})).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException for unsupported strategy', async () => {
+      await expect(service.register('apple', {})).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw if register rejects inside strategy', async () => {
+      (mockGoogle.register as jest.Mock).mockRejectedValueOnce(new UnauthorizedException('Registration failed'));
+      await expect(service.register('google', { email: 'fail@test.com' }))
+        .rejects.toThrow(UnauthorizedException);
+    });
   });
 });

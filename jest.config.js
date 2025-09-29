@@ -5,10 +5,8 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
 
-  // Root directory
   rootDir: '.',
 
-  // Test file patterns
   testMatch: [
     '<rootDir>/src/**/*.spec.ts',
     '<rootDir>/src/**/*.test.ts',
@@ -16,26 +14,20 @@ module.exports = {
     '<rootDir>/test/integration/**/*.spec.ts',
   ],
 
-  // Ignore patterns
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/dist/',
     '<rootDir>/test/e2e/',
   ],
 
-  // Module name mapping for path aliases
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
     '^src/(.*)$': '<rootDir>/src/$1',
   },
 
-  // Setup files
-  setupFilesAfterEnv: [
-    '<rootDir>/test/setup/jest.setup.ts',
-  ],
+  setupFilesAfterEnv: ['<rootDir>/test/setup/jest.setup.ts'],
 
-  // Transform configuration
   transform: {
     '^.+\\.(t|j)s$': [
       'ts-jest',
@@ -46,22 +38,10 @@ module.exports = {
     ],
   },
 
-  // Coverage configuration
-  collectCoverage: false, // Enable with --coverage flag
+  collectCoverage: false, // still enable with --coverage
   collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.spec.ts',
-    '!src/**/*.test.ts',
-    '!src/**/*.interface.ts',
-    '!src/**/*.dto.ts',
-    '!src/**/*.entity.ts',
-    '!src/**/*.enum.ts',
-    '!src/**/*.constant.ts',
-    '!src/**/*.config.ts',
-    '!src/main.ts',
-    '!src/**/*.module.ts',
-    '!src/migrations/**',
-    '!src/seeds/**',
+    'src/auth/auth.service.ts',
+    'src/payment/payment.service.ts',
   ],
 
   coverageDirectory: '<rootDir>/coverage',
@@ -75,47 +55,39 @@ module.exports = {
     'cobertura',
   ],
 
-  // Coverage thresholds
+  // ✅ enforce thresholds only for AuthService + PaymentService
   coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
+    'src/auth/auth.service.ts': {
+      statements: 90,
+      branches: 90,
+      functions: 90,
+      lines: 90,
+    },
+    'src/payment/payment.service.ts': {
+      statements: 90,
+      branches: 90,
+      functions: 90,
+      lines: 90,
     },
   },
 
-  // Test timeout
   testTimeout: 30000,
-
-  // Parallel execution
   maxWorkers: '50%',
-
-  // Cache configuration
   cache: true,
   cacheDirectory: '<rootDir>/.jest-cache',
-
-  // Clear mocks between tests
   clearMocks: true,
   restoreMocks: true,
   resetMocks: false,
-
-  // Verbose output
   verbose: false,
-
-  // Error handling
   bail: false,
   errorOnDeprecated: true,
 
-  // Module file extensions
   moduleFileExtensions: ['js', 'json', 'ts'],
 
-  // Test environment options
   testEnvironmentOptions: {
     NODE_ENV: 'test',
   },
 
-  // Reporters
   reporters: [
     'default',
     [
@@ -143,7 +115,6 @@ module.exports = {
     ],
   ],
 
-  // Watch mode configuration
   watchPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/dist/',

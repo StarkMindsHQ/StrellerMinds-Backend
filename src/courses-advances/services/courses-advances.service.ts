@@ -1,110 +1,42 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CoursesAdvance } from '../entities/courses-advance.entity';
-import { CreateCoursesAdvanceDto } from '../dto/create-courses-advance.dto';
-import { UpdateCoursesAdvanceDto } from '../dto/update-courses-advance.dto';
 
 @Injectable()
 export class CoursesAdvancesService {
   constructor(
     @InjectRepository(CoursesAdvance)
-    private courseRepository: Repository<CoursesAdvance>,
+    private readonly coursesAdvanceRepo: Repository<CoursesAdvance>,
   ) {}
 
-  async create(
-    createCourseDto: CreateCoursesAdvanceDto,
-    instructorId: string,
-  ): Promise<CoursesAdvance> {
-    const course = this.courseRepository.create({
-      ...createCourseDto,
-      instructorId,
-    });
-    return this.courseRepository.save(course);
+  async create(dto: any, instructorId: string) {
+    const course = this.coursesAdvanceRepo.create({ ...dto, instructorId });
+    return await this.coursesAdvanceRepo.save(course);
   }
 
-  async findAll(instructorId?: string): Promise<CoursesAdvance[]> {
-    const queryBuilder = this.courseRepository
-      .createQueryBuilder('course')
-      .leftJoinAndSelect('course.instructor', 'instructor')
-      .leftJoinAndSelect('course.versions', 'versions')
-      .orderBy('course.createdAt', 'DESC');
-
-    if (instructorId) {
-      queryBuilder.where('course.instructorId = :instructorId', {
-        instructorId,
-      });
-    }
-
-    return queryBuilder.getMany();
-  }
-
-  async findOne(id: string): Promise<CoursesAdvance> {
-    const course = await this.courseRepository.findOne({
-      where: { id },
-      relations: ['instructor', 'versions', 'analytics'],
-    });
-
+  async findOne(id: string) {
+    const course = await this.coursesAdvanceRepo.findOne({ where: { id } });
     if (!course) {
-      throw new NotFoundException('Course not found');
+      throw new NotFoundException(`Course with id ${id} not found`);
     }
-
     return course;
   }
 
-  async update(
-    id: string,
-    updateCourseDto: UpdateCoursesAdvanceDto,
-    userId: string,
-  ): Promise<CoursesAdvance> {
+  async update(id: string, dto: any, userId: string) {
     const course = await this.findOne(id);
-
     if (course.instructorId !== userId) {
-      throw new ForbiddenException('You can only update your own courses');
+      throw new ForbiddenException('You are not allowed to update this course');
     }
-
-    Object.assign(course, updateCourseDto);
-    return this.courseRepository.save(course);
+    Object.assign(course, dto);
+    return await this.coursesAdvanceRepo.save(course);
   }
 
-  async remove(id: string, userId: string): Promise<void> {
+  async remove(id: string, userId: string) {
     const course = await this.findOne(id);
-
     if (course.instructorId !== userId) {
-      throw new ForbiddenException('You can only delete your own courses');
+      throw new ForbiddenException('You are not allowed to remove this course');
     }
-
-    await this.courseRepository.remove(course);
-  }
-
-  async getCoursesByCategory(category: string): Promise<CoursesAdvance[]> {
-    return this.courseRepository.find({
-      where: { category, status: 'published' },
-      relations: ['instructor'],
-    });
-  }
-
-  async getPopularCourses(limit: number = 10): Promise<CoursesAdvance[]> {
-    return this.courseRepository.find({
-      where: { status: 'published' },
-      order: { enrollmentCount: 'DESC', averageRating: 'DESC' },
-      take: limit,
-      relations: ['instructor'],
-    });
-  }
-
-  async searchCourses(query: string): Promise<CoursesAdvance[]> {
-    return this.courseRepository
-      .createQueryBuilder('course')
-      .where('course.title ILIKE :query OR course.description ILIKE :query', {
-        query: `%${query}%`,
-      })
-      .andWhere('course.status = :status', { status: 'published' })
-      .leftJoinAndSelect('course.instructor', 'instructor')
-      .getMany();
+    return await this.coursesAdvanceRepo.remove(course);
   }
 }
