@@ -291,6 +291,47 @@ Replace `typescript-axios` and output path as needed for your target language.
 
 - `generate:openapi`: Exports the OpenAPI spec to `openapi.json` for SDK generation.
 
+### SDK Consumption
+
+You can consume the published TypeScript Axios SDK directly from npm once a release tag is created and the automation publishes the package.
+
+- Install:
+
+```
+npm install @starkmindshq/strellerminds-sdk
+```
+
+or
+
+```
+yarn add @starkmindshq/strellerminds-sdk
+```
+
+- Basic usage:
+
+```ts
+import { Configuration, DefaultApi } from '@starkmindshq/strellerminds-sdk';
+
+const config = new Configuration({
+  basePath: 'https://api.yourdomain.com',
+  accessToken: () => 'YOUR_JWT_TOKEN',
+});
+
+const api = new DefaultApi(config);
+
+// Example call (replace with actual API class/method generated from tags)
+api.healthControllerGetHealth().then((res) => {
+  console.log('API health:', res.data);
+});
+```
+
+- Version alignment:
+  The SDK version matches the backend `package.json` version used for the git tag. For example, pushing tag `v1.2.3` publishes SDK version `1.2.3`.
+
+- Release assets and spec:
+  Each GitHub Release includes the `openapi.json` and a `sdk-<version>.tgz` archive for manual download if needed.
+
+
 ## Contributing
 
 Please follow the contribution guidelines outlined in the **Getting Started** section. Additionally, ensure your code changes do not break the API contract and are reflected in the OpenAPI documentation.
