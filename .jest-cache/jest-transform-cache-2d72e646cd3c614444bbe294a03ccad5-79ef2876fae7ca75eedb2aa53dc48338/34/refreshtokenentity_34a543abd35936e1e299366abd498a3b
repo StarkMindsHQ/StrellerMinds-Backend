@@ -1,0 +1,51 @@
+84372c5873b25ed5e8371e6bfd9cab54
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RefreshToken = void 0;
+const typeorm_1 = require("typeorm");
+let RefreshToken = class RefreshToken {
+};
+exports.RefreshToken = RefreshToken;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], RefreshToken.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Index)(),
+    __metadata("design:type", String)
+], RefreshToken.prototype, "userId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'text' }),
+    __metadata("design:type", String)
+], RefreshToken.prototype, "token", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], RefreshToken.prototype, "isRevoked", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'timestamp' }),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], RefreshToken.prototype, "expiresAt", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], RefreshToken.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], RefreshToken.prototype, "updatedAt", void 0);
+exports.RefreshToken = RefreshToken = __decorate([
+    (0, typeorm_1.Entity)('refresh_tokens')
+], RefreshToken);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhdXRoXFxlbnRpdGllc1xccmVmcmVzaC10b2tlbi5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHFDQUE0RztBQUdyRyxJQUFNLFlBQVksR0FBbEIsTUFBTSxZQUFZO0NBc0J4QixDQUFBO0FBdEJZLG9DQUFZO0FBRXZCO0lBREMsSUFBQSxnQ0FBc0IsRUFBQyxNQUFNLENBQUM7O3dDQUNwQjtBQUlYO0lBRkMsSUFBQSxnQkFBTSxHQUFFO0lBQ1IsSUFBQSxlQUFLLEdBQUU7OzRDQUNPO0FBR2Y7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxJQUFJLEVBQUUsTUFBTSxFQUFFLENBQUM7OzJDQUNYO0FBR2Q7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxPQUFPLEVBQUUsS0FBSyxFQUFFLENBQUM7OytDQUNSO0FBR25CO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsSUFBSSxFQUFFLFdBQVcsRUFBRSxDQUFDO2tEQUNuQixJQUFJLG9CQUFKLElBQUk7K0NBQUM7QUFHaEI7SUFEQyxJQUFBLDBCQUFnQixHQUFFO2tEQUNSLElBQUksb0JBQUosSUFBSTsrQ0FBQztBQUdoQjtJQURDLElBQUEsMEJBQWdCLEdBQUU7a0RBQ1IsSUFBSSxvQkFBSixJQUFJOytDQUFDO3VCQXJCTCxZQUFZO0lBRHhCLElBQUEsZ0JBQU0sRUFBQyxnQkFBZ0IsQ0FBQztHQUNaLFlBQVksQ0FzQnhCIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcYXV0aFxcZW50aXRpZXNcXHJlZnJlc2gtdG9rZW4uZW50aXR5LnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEVudGl0eSwgQ29sdW1uLCBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uLCBDcmVhdGVEYXRlQ29sdW1uLCBVcGRhdGVEYXRlQ29sdW1uLCBJbmRleCB9IGZyb20gJ3R5cGVvcm0nO1xyXG5cclxuQEVudGl0eSgncmVmcmVzaF90b2tlbnMnKVxyXG5leHBvcnQgY2xhc3MgUmVmcmVzaFRva2VuIHtcclxuICBAUHJpbWFyeUdlbmVyYXRlZENvbHVtbigndXVpZCcpXHJcbiAgaWQ6IHN0cmluZztcclxuXHJcbiAgQENvbHVtbigpXHJcbiAgQEluZGV4KClcclxuICB1c2VySWQ6IHN0cmluZztcclxuXHJcbiAgQENvbHVtbih7IHR5cGU6ICd0ZXh0JyB9KVxyXG4gIHRva2VuOiBzdHJpbmc7IC8vIFN0b3JlcyBoYXNoZWQgdG9rZW5cclxuXHJcbiAgQENvbHVtbih7IGRlZmF1bHQ6IGZhbHNlIH0pXHJcbiAgaXNSZXZva2VkOiBib29sZWFuO1xyXG5cclxuICBAQ29sdW1uKHsgdHlwZTogJ3RpbWVzdGFtcCcgfSlcclxuICBleHBpcmVzQXQ6IERhdGU7XHJcblxyXG4gIEBDcmVhdGVEYXRlQ29sdW1uKClcclxuICBjcmVhdGVkQXQ6IERhdGU7XHJcblxyXG4gIEBVcGRhdGVEYXRlQ29sdW1uKClcclxuICB1cGRhdGVkQXQ6IERhdGU7XHJcbn0iXSwidmVyc2lvbiI6M30=

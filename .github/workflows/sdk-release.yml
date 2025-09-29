@@ -1,0 +1,87 @@
+name: SDK Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-publish-sdk:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+
+      - name: Build backend
+        run: npm run build
+
+      - name: Generate OpenAPI spec
+        run: SKIP_DB=true npm run generate:openapi
+
+      - name: Verify OpenAPI spec exists
+        run: test -s openapi.json
+
+      - name: Install OpenAPI Generator CLI
+        run: npm install -g @openapitools/openapi-generator-cli
+
+      - name: Extract version from tag (strip leading 'v')
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
+
+      - name: Check tag version matches package.json version
+        run: |
+          node -e "const v=require('./package.json').version; const tag=process.env.VERSION; if(v!==tag){console.error(`Version mismatch: package.json (${v}) != tag (${tag})`); process.exit(1);} else {console.log(`Version verified: ${v}`);}"
+
+      - name: Generate TypeScript Axios SDK
+        run: |
+          rm -rf sdk
+          openapi-generator-cli generate \
+            -i openapi.json \
+            -g typescript-axios \
+            -o sdk \
+            --additional-properties=supportsES6=true,useSingleRequestParameter=true,npmName=@starkmindshq/strellerminds-sdk,npmVersion=${VERSION}
+
+      - name: Update SDK package.json (name and version)
+        run: |
+          node -e "const fs=require('fs');const p=require('./sdk/package.json');p.name='@starkmindshq/strellerminds-sdk';p.version=process.env.VERSION;fs.writeFileSync('./sdk/package.json',JSON.stringify(p,null,2));"
+
+      - name: Archive SDK
+        run: tar -czf sdk-${{ env.VERSION }}.tgz -C sdk .
+
+      - name: Create GitHub Release and upload SDK artifact
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: SDK ${{ env.VERSION }}
+          body: |
+            Automated SDK generation for tag ${{ github.ref_name }}.
+            OpenAPI spec: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/openapi.json
+            SDK archive: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/sdk-${{ env.VERSION }}.tgz
+          files: |
+            openapi.json
+            sdk-${{ env.VERSION }}.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to npm
+        if: ${{ secrets.NPM_TOKEN != '' }}
+        run: |
+          cd sdk
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

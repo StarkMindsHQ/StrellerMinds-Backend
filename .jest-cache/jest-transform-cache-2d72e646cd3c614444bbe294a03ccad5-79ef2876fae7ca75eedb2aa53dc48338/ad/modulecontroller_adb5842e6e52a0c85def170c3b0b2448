@@ -1,0 +1,23 @@
+a1c8da2d3aa759a6c852ee895b4321dc
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ModuleController = void 0;
+const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * Controller for module-related endpoints.
+ */
+let ModuleController = class ModuleController {
+};
+exports.ModuleController = ModuleController;
+exports.ModuleController = ModuleController = __decorate([
+    (0, swagger_1.ApiTags)('Module'),
+    (0, common_1.Controller)('module')
+], ModuleController);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtb2R1bGVcXG1vZHVsZS5jb250cm9sbGVyLnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7OztBQUFBLDJDQUE0QztBQUM1Qyw2Q0FBMEM7QUFFMUM7O0dBRUc7QUFHSSxJQUFNLGdCQUFnQixHQUF0QixNQUFNLGdCQUFnQjtDQUFHLENBQUE7QUFBbkIsNENBQWdCOzJCQUFoQixnQkFBZ0I7SUFGNUIsSUFBQSxpQkFBTyxFQUFDLFFBQVEsQ0FBQztJQUNqQixJQUFBLG1CQUFVLEVBQUMsUUFBUSxDQUFDO0dBQ1IsZ0JBQWdCLENBQUciLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtb2R1bGVcXG1vZHVsZS5jb250cm9sbGVyLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IENvbnRyb2xsZXIgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IEFwaVRhZ3MgfSBmcm9tICdAbmVzdGpzL3N3YWdnZXInO1xyXG5cclxuLyoqXHJcbiAqIENvbnRyb2xsZXIgZm9yIG1vZHVsZS1yZWxhdGVkIGVuZHBvaW50cy5cclxuICovXHJcbkBBcGlUYWdzKCdNb2R1bGUnKVxyXG5AQ29udHJvbGxlcignbW9kdWxlJylcclxuZXhwb3J0IGNsYXNzIE1vZHVsZUNvbnRyb2xsZXIge31cclxuIl0sInZlcnNpb24iOjN9

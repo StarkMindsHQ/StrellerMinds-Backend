@@ -1,0 +1,53 @@
+769e4dd5e7eba7e6d8688133377940ad
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LeaderboardService = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const leaderboard_entry_entity_1 = require("../entities/leaderboard-entry.entity");
+let LeaderboardService = class LeaderboardService {
+    constructor(leaderboardRepo) {
+        this.leaderboardRepo = leaderboardRepo;
+    }
+    async getLeaderboard(period, limit = 10) {
+        return this.leaderboardRepo.find({
+            where: { period },
+            order: { score: 'DESC' },
+            take: limit,
+            relations: ['user'],
+        });
+    }
+    async updateScore(user, period, score) {
+        let entry = await this.leaderboardRepo.findOne({ where: { user: { id: user.id }, period } });
+        if (!entry) {
+            entry = this.leaderboardRepo.create({ user, period, score, rank: 0 });
+        }
+        else {
+            entry.score = score;
+        }
+        await this.leaderboardRepo.save(entry);
+        // Optionally, recalculate ranks here
+        return entry;
+    }
+};
+exports.LeaderboardService = LeaderboardService;
+exports.LeaderboardService = LeaderboardService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(leaderboard_entry_entity_1.LeaderboardEntry)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object])
+], LeaderboardService);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnYW1pZmljYXRpb25cXHNlcnZpY2VzXFxsZWFkZXJib2FyZC5zZXJ2aWNlLnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSwyQ0FBNEM7QUFDNUMsNkNBQW1EO0FBQ25ELHFDQUFxQztBQUNyQyxtRkFBd0U7QUFJakUsSUFBTSxrQkFBa0IsR0FBeEIsTUFBTSxrQkFBa0I7SUFDN0IsWUFFVSxlQUE2QztRQUE3QyxvQkFBZSxHQUFmLGVBQWUsQ0FBOEI7SUFDcEQsQ0FBQztJQUVKLEtBQUssQ0FBQyxjQUFjLENBQUMsTUFBYyxFQUFFLEtBQUssR0FBRyxFQUFFO1FBQzdDLE9BQU8sSUFBSSxDQUFDLGVBQWUsQ0FBQyxJQUFJLENBQUM7WUFDL0IsS0FBSyxFQUFFLEVBQUUsTUFBTSxFQUFFO1lBQ2pCLEtBQUssRUFBRSxFQUFFLEtBQUssRUFBRSxNQUFNLEVBQUU7WUFDeEIsSUFBSSxFQUFFLEtBQUs7WUFDWCxTQUFTLEVBQUUsQ0FBQyxNQUFNLENBQUM7U0FDcEIsQ0FBQyxDQUFDO0lBQ0wsQ0FBQztJQUVELEtBQUssQ0FBQyxXQUFXLENBQUMsSUFBVSxFQUFFLE1BQWMsRUFBRSxLQUFhO1FBQ3pELElBQUksS0FBSyxHQUFHLE1BQU0sSUFBSSxDQUFDLGVBQWUsQ0FBQyxPQUFPLENBQUMsRUFBRSxLQUFLLEVBQUUsRUFBRSxJQUFJLEVBQUUsRUFBRSxFQUFFLEVBQUUsSUFBSSxDQUFDLEVBQUUsRUFBRSxFQUFFLE1BQU0sRUFBRSxFQUFFLENBQUMsQ0FBQztRQUM3RixJQUFJLENBQUMsS0FBSyxFQUFFLENBQUM7WUFDWCxLQUFLLEdBQUcsSUFBSSxDQUFDLGVBQWUsQ0FBQyxNQUFNLENBQUMsRUFBRSxJQUFJLEVBQUUsTUFBTSxFQUFFLEtBQUssRUFBRSxJQUFJLEVBQUUsQ0FBQyxFQUFFLENBQUMsQ0FBQztRQUN4RSxDQUFDO2FBQU0sQ0FBQztZQUNOLEtBQUssQ0FBQyxLQUFLLEdBQUcsS0FBSyxDQUFDO1FBQ3RCLENBQUM7UUFDRCxNQUFNLElBQUksQ0FBQyxlQUFlLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUFDO1FBQ3ZDLHFDQUFxQztRQUNyQyxPQUFPLEtBQUssQ0FBQztJQUNmLENBQUM7Q0FDRixDQUFBO0FBMUJZLGdEQUFrQjs2QkFBbEIsa0JBQWtCO0lBRDlCLElBQUEsbUJBQVUsR0FBRTtJQUdSLFdBQUEsSUFBQSwwQkFBZ0IsRUFBQywyQ0FBZ0IsQ0FBQyxDQUFBO3lEQUNWLG9CQUFVLG9CQUFWLG9CQUFVO0dBSDFCLGtCQUFrQixDQTBCOUIiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnYW1pZmljYXRpb25cXHNlcnZpY2VzXFxsZWFkZXJib2FyZC5zZXJ2aWNlLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEluamVjdGFibGUgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IEluamVjdFJlcG9zaXRvcnkgfSBmcm9tICdAbmVzdGpzL3R5cGVvcm0nO1xyXG5pbXBvcnQgeyBSZXBvc2l0b3J5IH0gZnJvbSAndHlwZW9ybSc7XHJcbmltcG9ydCB7IExlYWRlcmJvYXJkRW50cnkgfSBmcm9tICcuLi9lbnRpdGllcy9sZWFkZXJib2FyZC1lbnRyeS5lbnRpdHknO1xyXG5pbXBvcnQgeyBVc2VyIH0gZnJvbSAnLi4vLi4vdXNlcnMvZW50aXRpZXMvdXNlci5lbnRpdHknO1xyXG5cclxuQEluamVjdGFibGUoKVxyXG5leHBvcnQgY2xhc3MgTGVhZGVyYm9hcmRTZXJ2aWNlIHtcclxuICBjb25zdHJ1Y3RvcihcclxuICAgIEBJbmplY3RSZXBvc2l0b3J5KExlYWRlcmJvYXJkRW50cnkpXHJcbiAgICBwcml2YXRlIGxlYWRlcmJvYXJkUmVwbzogUmVwb3NpdG9yeTxMZWFkZXJib2FyZEVudHJ5PixcclxuICApIHt9XHJcblxyXG4gIGFzeW5jIGdldExlYWRlcmJvYXJkKHBlcmlvZDogc3RyaW5nLCBsaW1pdCA9IDEwKTogUHJvbWlzZTxMZWFkZXJib2FyZEVudHJ5W10+IHtcclxuICAgIHJldHVybiB0aGlzLmxlYWRlcmJvYXJkUmVwby5maW5kKHtcclxuICAgICAgd2hlcmU6IHsgcGVyaW9kIH0sXHJcbiAgICAgIG9yZGVyOiB7IHNjb3JlOiAnREVTQycgfSxcclxuICAgICAgdGFrZTogbGltaXQsXHJcbiAgICAgIHJlbGF0aW9uczogWyd1c2VyJ10sXHJcbiAgICB9KTtcclxuICB9XHJcblxyXG4gIGFzeW5jIHVwZGF0ZVNjb3JlKHVzZXI6IFVzZXIsIHBlcmlvZDogc3RyaW5nLCBzY29yZTogbnVtYmVyKTogUHJvbWlzZTxMZWFkZXJib2FyZEVudHJ5PiB7XHJcbiAgICBsZXQgZW50cnkgPSBhd2FpdCB0aGlzLmxlYWRlcmJvYXJkUmVwby5maW5kT25lKHsgd2hlcmU6IHsgdXNlcjogeyBpZDogdXNlci5pZCB9LCBwZXJpb2QgfSB9KTtcclxuICAgIGlmICghZW50cnkpIHtcclxuICAgICAgZW50cnkgPSB0aGlzLmxlYWRlcmJvYXJkUmVwby5jcmVhdGUoeyB1c2VyLCBwZXJpb2QsIHNjb3JlLCByYW5rOiAwIH0pO1xyXG4gICAgfSBlbHNlIHtcclxuICAgICAgZW50cnkuc2NvcmUgPSBzY29yZTtcclxuICAgIH1cclxuICAgIGF3YWl0IHRoaXMubGVhZGVyYm9hcmRSZXBvLnNhdmUoZW50cnkpO1xyXG4gICAgLy8gT3B0aW9uYWxseSwgcmVjYWxjdWxhdGUgcmFua3MgaGVyZVxyXG4gICAgcmV0dXJuIGVudHJ5O1xyXG4gIH1cclxufSAiXSwidmVyc2lvbiI6M30=

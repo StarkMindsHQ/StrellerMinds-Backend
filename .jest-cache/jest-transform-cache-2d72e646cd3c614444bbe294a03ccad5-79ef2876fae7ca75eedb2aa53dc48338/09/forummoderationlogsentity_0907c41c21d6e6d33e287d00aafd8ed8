@@ -1,0 +1,57 @@
+4ccb6c6e69b7f310d567ac47b9232c9f
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ModerationLog = void 0;
+const user_entity_1 = require("src/users/entities/user.entity");
+const typeorm_1 = require("typeorm");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * Entity representing a moderation log entry.
+ */
+let ModerationLog = class ModerationLog {
+};
+exports.ModerationLog = ModerationLog;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Unique log ID', example: 'uuid-log' }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], ModerationLog.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Moderation action performed', example: 'ban' }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], ModerationLog.prototype, "action", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Type of entity moderated', example: 'post' }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], ModerationLog.prototype, "entityType", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'ID of the entity moderated', example: 'uuid-entity' }),
+    (0, typeorm_1.Column)('uuid'),
+    __metadata("design:type", String)
+], ModerationLog.prototype, "entityId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Moderator', type: () => user_entity_1.User }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    __metadata("design:type", typeof (_a = typeof user_entity_1.User !== "undefined" && user_entity_1.User) === "function" ? _a : Object)
+], ModerationLog.prototype, "moderator", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Date the moderation action was logged' }),
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], ModerationLog.prototype, "createdAt", void 0);
+exports.ModerationLog = ModerationLog = __decorate([
+    (0, typeorm_1.Entity)('moderation_logs')
+], ModerationLog);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtb2RlcmF0aW9uXFxlbnRpdGllc1xcZm9ydW0tbW9kZXJhdGlvbi1sb2dzLmVudGl0eS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUEsZ0VBQXNEO0FBQ3RELHFDQU1pQjtBQUNqQiw2Q0FBOEM7QUFFOUM7O0dBRUc7QUFFSSxJQUFNLGFBQWEsR0FBbkIsTUFBTSxhQUFhO0NBOEJ6QixDQUFBO0FBOUJZLHNDQUFhO0FBSXhCO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLGVBQWUsRUFBRSxPQUFPLEVBQUUsVUFBVSxFQUFFLENBQUM7SUFDbEUsSUFBQSxnQ0FBc0IsRUFBQyxNQUFNLENBQUM7O3lDQUNwQjtBQUtYO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLDZCQUE2QixFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsQ0FBQztJQUMzRSxJQUFBLGdCQUFNLEdBQUU7OzZDQUNNO0FBS2Y7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsMEJBQTBCLEVBQUUsT0FBTyxFQUFFLE1BQU0sRUFBRSxDQUFDO0lBQ3pFLElBQUEsZ0JBQU0sR0FBRTs7aURBQ1U7QUFLbkI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsNEJBQTRCLEVBQUUsT0FBTyxFQUFFLGFBQWEsRUFBRSxDQUFDO0lBQ2xGLElBQUEsZ0JBQU0sRUFBQyxNQUFNLENBQUM7OytDQUNFO0FBS2pCO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLFdBQVcsRUFBRSxJQUFJLEVBQUUsR0FBRyxFQUFFLENBQUMsa0JBQUksRUFBRSxDQUFDO0lBQzNELElBQUEsbUJBQVMsRUFBQyxHQUFHLEVBQUUsQ0FBQyxrQkFBSSxDQUFDO2tEQUNYLGtCQUFJLG9CQUFKLGtCQUFJO2dEQUFDO0FBS2hCO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLHVDQUF1QyxFQUFFLENBQUM7SUFDckUsSUFBQSwwQkFBZ0IsR0FBRTtrREFDUixJQUFJLG9CQUFKLElBQUk7Z0RBQUM7d0JBN0JMLGFBQWE7SUFEekIsSUFBQSxnQkFBTSxFQUFDLGlCQUFpQixDQUFDO0dBQ2IsYUFBYSxDQThCekIiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtb2RlcmF0aW9uXFxlbnRpdGllc1xcZm9ydW0tbW9kZXJhdGlvbi1sb2dzLmVudGl0eS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBVc2VyIH0gZnJvbSAnc3JjL3VzZXJzL2VudGl0aWVzL3VzZXIuZW50aXR5JztcclxuaW1wb3J0IHtcclxuICBDb2x1bW4sXHJcbiAgQ3JlYXRlRGF0ZUNvbHVtbixcclxuICBFbnRpdHksXHJcbiAgTWFueVRvT25lLFxyXG4gIFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4sXHJcbn0gZnJvbSAndHlwZW9ybSc7XHJcbmltcG9ydCB7IEFwaVByb3BlcnR5IH0gZnJvbSAnQG5lc3Rqcy9zd2FnZ2VyJztcclxuXHJcbi8qKlxyXG4gKiBFbnRpdHkgcmVwcmVzZW50aW5nIGEgbW9kZXJhdGlvbiBsb2cgZW50cnkuXHJcbiAqL1xyXG5ARW50aXR5KCdtb2RlcmF0aW9uX2xvZ3MnKVxyXG5leHBvcnQgY2xhc3MgTW9kZXJhdGlvbkxvZyB7XHJcbiAgLyoqIFVuaXF1ZSBsb2cgSUQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ1VuaXF1ZSBsb2cgSUQnLCBleGFtcGxlOiAndXVpZC1sb2cnIH0pXHJcbiAgQFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4oJ3V1aWQnKVxyXG4gIGlkOiBzdHJpbmc7XHJcblxyXG4gIC8qKiBNb2RlcmF0aW9uIGFjdGlvbiBwZXJmb3JtZWQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ01vZGVyYXRpb24gYWN0aW9uIHBlcmZvcm1lZCcsIGV4YW1wbGU6ICdiYW4nIH0pXHJcbiAgQENvbHVtbigpXHJcbiAgYWN0aW9uOiBzdHJpbmc7XHJcblxyXG4gIC8qKiBUeXBlIG9mIGVudGl0eSBtb2RlcmF0ZWQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ1R5cGUgb2YgZW50aXR5IG1vZGVyYXRlZCcsIGV4YW1wbGU6ICdwb3N0JyB9KVxyXG4gIEBDb2x1bW4oKVxyXG4gIGVudGl0eVR5cGU6IHN0cmluZztcclxuXHJcbiAgLyoqIElEIG9mIHRoZSBlbnRpdHkgbW9kZXJhdGVkICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdJRCBvZiB0aGUgZW50aXR5IG1vZGVyYXRlZCcsIGV4YW1wbGU6ICd1dWlkLWVudGl0eScgfSlcclxuICBAQ29sdW1uKCd1dWlkJylcclxuICBlbnRpdHlJZDogc3RyaW5nO1xyXG5cclxuICAvKiogTW9kZXJhdG9yIHdobyBwZXJmb3JtZWQgdGhlIGFjdGlvbiAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnTW9kZXJhdG9yJywgdHlwZTogKCkgPT4gVXNlciB9KVxyXG4gIEBNYW55VG9PbmUoKCkgPT4gVXNlcilcclxuICBtb2RlcmF0b3I6IFVzZXI7XHJcblxyXG4gIC8qKiBEYXRlIHRoZSBtb2RlcmF0aW9uIGFjdGlvbiB3YXMgbG9nZ2VkICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdEYXRlIHRoZSBtb2RlcmF0aW9uIGFjdGlvbiB3YXMgbG9nZ2VkJyB9KVxyXG4gIEBDcmVhdGVEYXRlQ29sdW1uKClcclxuICBjcmVhdGVkQXQ6IERhdGU7XHJcbn1cclxuIl0sInZlcnNpb24iOjN9

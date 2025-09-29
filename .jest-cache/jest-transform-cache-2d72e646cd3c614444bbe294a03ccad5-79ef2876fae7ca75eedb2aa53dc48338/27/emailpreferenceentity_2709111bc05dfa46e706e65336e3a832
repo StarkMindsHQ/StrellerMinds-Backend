@@ -1,0 +1,74 @@
+01351aab868f23f4f3242e52c6d76a53
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmailPreference = exports.EmailType = void 0;
+const typeorm_1 = require("typeorm");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * Enum for email preference types.
+ */
+var EmailType;
+(function (EmailType) {
+    EmailType["AUTHENTICATION"] = "authentication";
+    EmailType["MARKETING"] = "marketing";
+    EmailType["COURSE_UPDATES"] = "course_updates";
+    EmailType["FORUM_NOTIFICATIONS"] = "forum_notifications";
+    EmailType["SYSTEM_NOTIFICATIONS"] = "system_notifications";
+})(EmailType || (exports.EmailType = EmailType = {}));
+/**
+ * Entity representing a user's email preference.
+ */
+let EmailPreference = class EmailPreference {
+};
+exports.EmailPreference = EmailPreference;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Unique ID for the email preference', example: 'uuid-v4' }),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
+], EmailPreference.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'User email address', example: 'user@example.com' }),
+    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Index)(),
+    __metadata("design:type", String)
+], EmailPreference.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ enum: EmailType, description: 'Email type', default: EmailType.AUTHENTICATION }),
+    (0, typeorm_1.Column)({
+        type: "enum",
+        enum: EmailType,
+        default: EmailType.AUTHENTICATION,
+    }),
+    (0, typeorm_1.Index)(),
+    __metadata("design:type", String)
+], EmailPreference.prototype, "emailType", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Whether the user has opted out', example: false }),
+    (0, typeorm_1.Column)({ default: false }),
+    __metadata("design:type", Boolean)
+], EmailPreference.prototype, "optOut", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Date/time when the preference was created', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' }),
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], EmailPreference.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Date/time when the preference was last updated', type: String, format: 'date-time', example: '2025-06-29T12:10:00Z' }),
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], EmailPreference.prototype, "updatedAt", void 0);
+exports.EmailPreference = EmailPreference = __decorate([
+    (0, typeorm_1.Entity)("email_preferences"),
+    (0, typeorm_1.Unique)(["email", "emailType"])
+], EmailPreference);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxlbWFpbFxcZW50aXRpZXNcXGVtYWlsLXByZWZlcmVuY2UuZW50aXR5LnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7QUFBQSxxQ0FBb0g7QUFDcEgsNkNBQW1FO0FBRW5FOztHQUVHO0FBQ0gsSUFBWSxTQU1YO0FBTkQsV0FBWSxTQUFTO0lBQ25CLDhDQUFpQyxDQUFBO0lBQ2pDLG9DQUF1QixDQUFBO0lBQ3ZCLDhDQUFpQyxDQUFBO0lBQ2pDLHdEQUEyQyxDQUFBO0lBQzNDLDBEQUE2QyxDQUFBO0FBQy9DLENBQUMsRUFOVyxTQUFTLHlCQUFULFNBQVMsUUFNcEI7QUFFRDs7R0FFRztBQUdJLElBQU0sZUFBZSxHQUFyQixNQUFNLGVBQWU7Q0FvQzNCLENBQUE7QUFwQ1ksMENBQWU7QUFJMUI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsb0NBQW9DLEVBQUUsT0FBTyxFQUFFLFNBQVMsRUFBRSxDQUFDO0lBQ3RGLElBQUEsZ0NBQXNCLEVBQUMsTUFBTSxDQUFDOzsyQ0FDcEI7QUFNWDtJQUhDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxvQkFBb0IsRUFBRSxPQUFPLEVBQUUsa0JBQWtCLEVBQUUsQ0FBQztJQUMvRSxJQUFBLGdCQUFNLEdBQUU7SUFDUixJQUFBLGVBQUssR0FBRTs7OENBQ007QUFVZDtJQVBDLElBQUEscUJBQVcsRUFBQyxFQUFFLElBQUksRUFBRSxTQUFTLEVBQUUsV0FBVyxFQUFFLFlBQVksRUFBRSxPQUFPLEVBQUUsU0FBUyxDQUFDLGNBQWMsRUFBRSxDQUFDO0lBQzlGLElBQUEsZ0JBQU0sRUFBQztRQUNOLElBQUksRUFBRSxNQUFNO1FBQ1osSUFBSSxFQUFFLFNBQVM7UUFDZixPQUFPLEVBQUUsU0FBUyxDQUFDLGNBQWM7S0FDbEMsQ0FBQztJQUNELElBQUEsZUFBSyxHQUFFOztrREFDYTtBQUtyQjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxnQ0FBZ0MsRUFBRSxPQUFPLEVBQUUsS0FBSyxFQUFFLENBQUM7SUFDOUUsSUFBQSxnQkFBTSxFQUFDLEVBQUUsT0FBTyxFQUFFLEtBQUssRUFBRSxDQUFDOzsrQ0FDWDtBQUtoQjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSwyQ0FBMkMsRUFBRSxJQUFJLEVBQUUsTUFBTSxFQUFFLE1BQU0sRUFBRSxXQUFXLEVBQUUsT0FBTyxFQUFFLHNCQUFzQixFQUFFLENBQUM7SUFDN0ksSUFBQSwwQkFBZ0IsR0FBRTtrREFDUixJQUFJLG9CQUFKLElBQUk7a0RBQUM7QUFLaEI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsZ0RBQWdELEVBQUUsSUFBSSxFQUFFLE1BQU0sRUFBRSxNQUFNLEVBQUUsV0FBVyxFQUFFLE9BQU8sRUFBRSxzQkFBc0IsRUFBRSxDQUFDO0lBQ2xKLElBQUEsMEJBQWdCLEdBQUU7a0RBQ1IsSUFBSSxvQkFBSixJQUFJO2tEQUFDOzBCQW5DTCxlQUFlO0lBRjNCLElBQUEsZ0JBQU0sRUFBQyxtQkFBbUIsQ0FBQztJQUMzQixJQUFBLGdCQUFNLEVBQUMsQ0FBQyxPQUFPLEVBQUUsV0FBVyxDQUFDLENBQUM7R0FDbEIsZUFBZSxDQW9DM0IiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxlbWFpbFxcZW50aXRpZXNcXGVtYWlsLXByZWZlcmVuY2UuZW50aXR5LnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEVudGl0eSwgQ29sdW1uLCBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uLCBDcmVhdGVEYXRlQ29sdW1uLCBVcGRhdGVEYXRlQ29sdW1uLCBJbmRleCwgVW5pcXVlIH0gZnJvbSBcInR5cGVvcm1cIjtcclxuaW1wb3J0IHsgQXBpUHJvcGVydHksIEFwaVByb3BlcnR5T3B0aW9uYWwgfSBmcm9tICdAbmVzdGpzL3N3YWdnZXInO1xyXG5cclxuLyoqXHJcbiAqIEVudW0gZm9yIGVtYWlsIHByZWZlcmVuY2UgdHlwZXMuXHJcbiAqL1xyXG5leHBvcnQgZW51bSBFbWFpbFR5cGUge1xyXG4gIEFVVEhFTlRJQ0FUSU9OID0gXCJhdXRoZW50aWNhdGlvblwiLFxyXG4gIE1BUktFVElORyA9IFwibWFya2V0aW5nXCIsXHJcbiAgQ09VUlNFX1VQREFURVMgPSBcImNvdXJzZV91cGRhdGVzXCIsXHJcbiAgRk9SVU1fTk9USUZJQ0FUSU9OUyA9IFwiZm9ydW1fbm90aWZpY2F0aW9uc1wiLFxyXG4gIFNZU1RFTV9OT1RJRklDQVRJT05TID0gXCJzeXN0ZW1fbm90aWZpY2F0aW9uc1wiLFxyXG59XHJcblxyXG4vKipcclxuICogRW50aXR5IHJlcHJlc2VudGluZyBhIHVzZXIncyBlbWFpbCBwcmVmZXJlbmNlLlxyXG4gKi9cclxuQEVudGl0eShcImVtYWlsX3ByZWZlcmVuY2VzXCIpXHJcbkBVbmlxdWUoW1wiZW1haWxcIiwgXCJlbWFpbFR5cGVcIl0pXHJcbmV4cG9ydCBjbGFzcyBFbWFpbFByZWZlcmVuY2Uge1xyXG4gIC8qKiBVbmlxdWUgSUQgZm9yIHRoZSBlbWFpbCBwcmVmZXJlbmNlICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdVbmlxdWUgSUQgZm9yIHRoZSBlbWFpbCBwcmVmZXJlbmNlJywgZXhhbXBsZTogJ3V1aWQtdjQnIH0pXHJcbiAgQFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4oXCJ1dWlkXCIpXHJcbiAgaWQ6IHN0cmluZztcclxuXHJcbiAgLyoqIFVzZXIgZW1haWwgYWRkcmVzcyAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnVXNlciBlbWFpbCBhZGRyZXNzJywgZXhhbXBsZTogJ3VzZXJAZXhhbXBsZS5jb20nIH0pXHJcbiAgQENvbHVtbigpXHJcbiAgQEluZGV4KClcclxuICBlbWFpbDogc3RyaW5nO1xyXG5cclxuICAvKiogRW1haWwgdHlwZSAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGVudW06IEVtYWlsVHlwZSwgZGVzY3JpcHRpb246ICdFbWFpbCB0eXBlJywgZGVmYXVsdDogRW1haWxUeXBlLkFVVEhFTlRJQ0FUSU9OIH0pXHJcbiAgQENvbHVtbih7XHJcbiAgICB0eXBlOiBcImVudW1cIixcclxuICAgIGVudW06IEVtYWlsVHlwZSxcclxuICAgIGRlZmF1bHQ6IEVtYWlsVHlwZS5BVVRIRU5USUNBVElPTixcclxuICB9KVxyXG4gIEBJbmRleCgpXHJcbiAgZW1haWxUeXBlOiBFbWFpbFR5cGU7XHJcblxyXG4gIC8qKiBXaGV0aGVyIHRoZSB1c2VyIGhhcyBvcHRlZCBvdXQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ1doZXRoZXIgdGhlIHVzZXIgaGFzIG9wdGVkIG91dCcsIGV4YW1wbGU6IGZhbHNlIH0pXHJcbiAgQENvbHVtbih7IGRlZmF1bHQ6IGZhbHNlIH0pXHJcbiAgb3B0T3V0OiBib29sZWFuO1xyXG5cclxuICAvKiogRGF0ZS90aW1lIHdoZW4gdGhlIHByZWZlcmVuY2Ugd2FzIGNyZWF0ZWQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0RhdGUvdGltZSB3aGVuIHRoZSBwcmVmZXJlbmNlIHdhcyBjcmVhdGVkJywgdHlwZTogU3RyaW5nLCBmb3JtYXQ6ICdkYXRlLXRpbWUnLCBleGFtcGxlOiAnMjAyNS0wNi0yOVQxMjowMDowMFonIH0pXHJcbiAgQENyZWF0ZURhdGVDb2x1bW4oKVxyXG4gIGNyZWF0ZWRBdDogRGF0ZTtcclxuXHJcbiAgLyoqIERhdGUvdGltZSB3aGVuIHRoZSBwcmVmZXJlbmNlIHdhcyBsYXN0IHVwZGF0ZWQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0RhdGUvdGltZSB3aGVuIHRoZSBwcmVmZXJlbmNlIHdhcyBsYXN0IHVwZGF0ZWQnLCB0eXBlOiBTdHJpbmcsIGZvcm1hdDogJ2RhdGUtdGltZScsIGV4YW1wbGU6ICcyMDI1LTA2LTI5VDEyOjEwOjAwWicgfSlcclxuICBAVXBkYXRlRGF0ZUNvbHVtbigpXHJcbiAgdXBkYXRlZEF0OiBEYXRlO1xyXG59XHJcblxyXG4iXSwidmVyc2lvbiI6M30=

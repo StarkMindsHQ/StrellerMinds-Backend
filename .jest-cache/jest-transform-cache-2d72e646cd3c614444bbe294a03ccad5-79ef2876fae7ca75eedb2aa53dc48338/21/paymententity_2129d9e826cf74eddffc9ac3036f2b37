@@ -1,0 +1,149 @@
+12c221129d3f9ff2d164b9dde1ba4a2a
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d, _e, _f;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PaymentEntity = exports.PaymentType = exports.PaymentStatus = void 0;
+const typeorm_1 = require("typeorm");
+const user_entity_1 = require("../../users/entities/user.entity");
+const invoice_entity_1 = require("./invoice.entity");
+var PaymentStatus;
+(function (PaymentStatus) {
+    PaymentStatus["PENDING"] = "pending";
+    PaymentStatus["PROCESSING"] = "processing";
+    PaymentStatus["COMPLETED"] = "completed";
+    PaymentStatus["FAILED"] = "failed";
+    PaymentStatus["CANCELLED"] = "cancelled";
+    PaymentStatus["REFUNDED"] = "refunded";
+})(PaymentStatus || (exports.PaymentStatus = PaymentStatus = {}));
+var PaymentType;
+(function (PaymentType) {
+    PaymentType["COURSE_PURCHASE"] = "course_purchase";
+    PaymentType["SUBSCRIPTION"] = "subscription";
+    PaymentType["RENEWAL"] = "renewal";
+    PaymentType["UPGRADE"] = "upgrade";
+    PaymentType["REFUND"] = "refund";
+})(PaymentType || (exports.PaymentType = PaymentType = {}));
+let PaymentEntity = class PaymentEntity {
+};
+exports.PaymentEntity = PaymentEntity;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "userId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "stripePaymentIntentId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], PaymentEntity.prototype, "amount", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "currency", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: PaymentStatus,
+        default: PaymentStatus.PENDING,
+    }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: PaymentType,
+    }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "type", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "courseId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "subscriptionId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "description", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "failureReason", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "refundReason", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'jsonb', nullable: true }),
+    __metadata("design:type", typeof (_a = typeof Record !== "undefined" && Record) === "function" ? _a : Object)
+], PaymentEntity.prototype, "metadata", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "customerEmail", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "customerName", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "billingAddress", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Number)
+], PaymentEntity.prototype, "taxAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", Number)
+], PaymentEntity.prototype, "discountAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], PaymentEntity.prototype, "couponCode", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], PaymentEntity.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], PaymentEntity.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], PaymentEntity.prototype, "completedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", typeof (_e = typeof Date !== "undefined" && Date) === "function" ? _e : Object)
+], PaymentEntity.prototype, "refundedAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { onDelete: 'CASCADE' }),
+    (0, typeorm_1.JoinColumn)({ name: 'userId' }),
+    __metadata("design:type", typeof (_f = typeof user_entity_1.User !== "undefined" && user_entity_1.User) === "function" ? _f : Object)
+], PaymentEntity.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => invoice_entity_1.InvoiceEntity, (invoice) => invoice.payment),
+    __metadata("design:type", Array)
+], PaymentEntity.prototype, "invoices", void 0);
+exports.PaymentEntity = PaymentEntity = __decorate([
+    (0, typeorm_1.Entity)('payments')
+], PaymentEntity);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxwYXltZW50XFxlbnRpdGllc1xccGF5bWVudC5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHFDQVNpQjtBQUNqQixrRUFBd0Q7QUFDeEQscURBQWlEO0FBRWpELElBQVksYUFPWDtBQVBELFdBQVksYUFBYTtJQUN2QixvQ0FBbUIsQ0FBQTtJQUNuQiwwQ0FBeUIsQ0FBQTtJQUN6Qix3Q0FBdUIsQ0FBQTtJQUN2QixrQ0FBaUIsQ0FBQTtJQUNqQix3Q0FBdUIsQ0FBQTtJQUN2QixzQ0FBcUIsQ0FBQTtBQUN2QixDQUFDLEVBUFcsYUFBYSw2QkFBYixhQUFhLFFBT3hCO0FBRUQsSUFBWSxXQU1YO0FBTkQsV0FBWSxXQUFXO0lBQ3JCLGtEQUFtQyxDQUFBO0lBQ25DLDRDQUE2QixDQUFBO0lBQzdCLGtDQUFtQixDQUFBO0lBQ25CLGtDQUFtQixDQUFBO0lBQ25CLGdDQUFpQixDQUFBO0FBQ25CLENBQUMsRUFOVyxXQUFXLDJCQUFYLFdBQVcsUUFNdEI7QUFHTSxJQUFNLGFBQWEsR0FBbkIsTUFBTSxhQUFhO0NBb0Z6QixDQUFBO0FBcEZZLHNDQUFhO0FBRXhCO0lBREMsSUFBQSxnQ0FBc0IsRUFBQyxNQUFNLENBQUM7O3lDQUNwQjtBQUdYO0lBREMsSUFBQSxnQkFBTSxHQUFFOzs2Q0FDTTtBQUdmO0lBREMsSUFBQSxnQkFBTSxHQUFFOzs0REFDcUI7QUFHOUI7SUFEQyxJQUFBLGdCQUFNLEdBQUU7OzZDQUNNO0FBR2Y7SUFEQyxJQUFBLGdCQUFNLEdBQUU7OytDQUNRO0FBT2pCO0lBTEMsSUFBQSxnQkFBTSxFQUFDO1FBQ04sSUFBSSxFQUFFLE1BQU07UUFDWixJQUFJLEVBQUUsYUFBYTtRQUNuQixPQUFPLEVBQUUsYUFBYSxDQUFDLE9BQU87S0FDL0IsQ0FBQzs7NkNBQ29CO0FBTXRCO0lBSkMsSUFBQSxnQkFBTSxFQUFDO1FBQ04sSUFBSSxFQUFFLE1BQU07UUFDWixJQUFJLEVBQUUsV0FBVztLQUNsQixDQUFDOzsyQ0FDZ0I7QUFHbEI7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7OytDQUNUO0FBR2xCO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOztxREFDSDtBQUd4QjtJQURDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQzs7a0RBQ1A7QUFHcEI7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7O29EQUNMO0FBR3RCO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOzttREFDTjtBQUdyQjtJQURDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLElBQUksRUFBRSxPQUFPLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDO2tEQUNoQyxNQUFNLG9CQUFOLE1BQU07K0NBQWM7QUFHOUI7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7O29EQUNMO0FBR3RCO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOzttREFDTjtBQUdyQjtJQURDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQzs7cURBQ0o7QUFHdkI7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7O2dEQUNUO0FBR2xCO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOztxREFDSjtBQUd2QjtJQURDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQzs7aURBQ1I7QUFHbkI7SUFEQyxJQUFBLDBCQUFnQixHQUFFO2tEQUNSLElBQUksb0JBQUosSUFBSTtnREFBQztBQUdoQjtJQURDLElBQUEsMEJBQWdCLEdBQUU7a0RBQ1IsSUFBSSxvQkFBSixJQUFJO2dEQUFDO0FBR2hCO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDO2tEQUNkLElBQUksb0JBQUosSUFBSTtrREFBQztBQUdsQjtJQURDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQztrREFDZixJQUFJLG9CQUFKLElBQUk7aURBQUM7QUFLakI7SUFGQyxJQUFBLG1CQUFTLEVBQUMsR0FBRyxFQUFFLENBQUMsa0JBQUksRUFBRSxFQUFFLFFBQVEsRUFBRSxTQUFTLEVBQUUsQ0FBQztJQUM5QyxJQUFBLG9CQUFVLEVBQUMsRUFBRSxJQUFJLEVBQUUsUUFBUSxFQUFFLENBQUM7a0RBQ3pCLGtCQUFJLG9CQUFKLGtCQUFJOzJDQUFDO0FBR1g7SUFEQyxJQUFBLG1CQUFTLEVBQUMsR0FBRyxFQUFFLENBQUMsOEJBQWEsRUFBRSxDQUFDLE9BQU8sRUFBRSxFQUFFLENBQUMsT0FBTyxDQUFDLE9BQU8sQ0FBQzs7K0NBQ25DO3dCQW5GZixhQUFhO0lBRHpCLElBQUEsZ0JBQU0sRUFBQyxVQUFVLENBQUM7R0FDTixhQUFhLENBb0Z6QiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXHBheW1lbnRcXGVudGl0aWVzXFxwYXltZW50LmVudGl0eS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQge1xyXG4gIEVudGl0eSxcclxuICBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uLFxyXG4gIENvbHVtbixcclxuICBDcmVhdGVEYXRlQ29sdW1uLFxyXG4gIFVwZGF0ZURhdGVDb2x1bW4sXHJcbiAgTWFueVRvT25lLFxyXG4gIEpvaW5Db2x1bW4sXHJcbiAgT25lVG9NYW55LFxyXG59IGZyb20gJ3R5cGVvcm0nO1xyXG5pbXBvcnQgeyBVc2VyIH0gZnJvbSAnLi4vLi4vdXNlcnMvZW50aXRpZXMvdXNlci5lbnRpdHknO1xyXG5pbXBvcnQgeyBJbnZvaWNlRW50aXR5IH0gZnJvbSAnLi9pbnZvaWNlLmVudGl0eSc7XHJcblxyXG5leHBvcnQgZW51bSBQYXltZW50U3RhdHVzIHtcclxuICBQRU5ESU5HID0gJ3BlbmRpbmcnLFxyXG4gIFBST0NFU1NJTkcgPSAncHJvY2Vzc2luZycsXHJcbiAgQ09NUExFVEVEID0gJ2NvbXBsZXRlZCcsXHJcbiAgRkFJTEVEID0gJ2ZhaWxlZCcsXHJcbiAgQ0FOQ0VMTEVEID0gJ2NhbmNlbGxlZCcsXHJcbiAgUkVGVU5ERUQgPSAncmVmdW5kZWQnLFxyXG59XHJcblxyXG5leHBvcnQgZW51bSBQYXltZW50VHlwZSB7XHJcbiAgQ09VUlNFX1BVUkNIQVNFID0gJ2NvdXJzZV9wdXJjaGFzZScsXHJcbiAgU1VCU0NSSVBUSU9OID0gJ3N1YnNjcmlwdGlvbicsXHJcbiAgUkVORVdBTCA9ICdyZW5ld2FsJyxcclxuICBVUEdSQURFID0gJ3VwZ3JhZGUnLFxyXG4gIFJFRlVORCA9ICdyZWZ1bmQnLFxyXG59XHJcblxyXG5ARW50aXR5KCdwYXltZW50cycpXHJcbmV4cG9ydCBjbGFzcyBQYXltZW50RW50aXR5IHtcclxuICBAUHJpbWFyeUdlbmVyYXRlZENvbHVtbigndXVpZCcpXHJcbiAgaWQ6IHN0cmluZztcclxuXHJcbiAgQENvbHVtbigpXHJcbiAgdXNlcklkOiBzdHJpbmc7XHJcblxyXG4gIEBDb2x1bW4oKVxyXG4gIHN0cmlwZVBheW1lbnRJbnRlbnRJZDogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKClcclxuICBhbW91bnQ6IG51bWJlcjsgLy8gQW1vdW50IGluIGNlbnRzXHJcblxyXG4gIEBDb2x1bW4oKVxyXG4gIGN1cnJlbmN5OiBzdHJpbmc7XHJcblxyXG4gIEBDb2x1bW4oe1xyXG4gICAgdHlwZTogJ2VudW0nLFxyXG4gICAgZW51bTogUGF5bWVudFN0YXR1cyxcclxuICAgIGRlZmF1bHQ6IFBheW1lbnRTdGF0dXMuUEVORElORyxcclxuICB9KVxyXG4gIHN0YXR1czogUGF5bWVudFN0YXR1cztcclxuXHJcbiAgQENvbHVtbih7XHJcbiAgICB0eXBlOiAnZW51bScsXHJcbiAgICBlbnVtOiBQYXltZW50VHlwZSxcclxuICB9KVxyXG4gIHR5cGU6IFBheW1lbnRUeXBlO1xyXG5cclxuICBAQ29sdW1uKHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBjb3Vyc2VJZD86IHN0cmluZztcclxuXHJcbiAgQENvbHVtbih7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgc3Vic2NyaXB0aW9uSWQ/OiBzdHJpbmc7XHJcblxyXG4gIEBDb2x1bW4oeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGRlc2NyaXB0aW9uOiBzdHJpbmc7XHJcblxyXG4gIEBDb2x1bW4oeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGZhaWx1cmVSZWFzb246IHN0cmluZztcclxuXHJcbiAgQENvbHVtbih7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgcmVmdW5kUmVhc29uOiBzdHJpbmc7XHJcblxyXG4gIEBDb2x1bW4oeyB0eXBlOiAnanNvbmInLCBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIG1ldGFkYXRhOiBSZWNvcmQ8c3RyaW5nLCBhbnk+O1xyXG5cclxuICBAQ29sdW1uKHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBjdXN0b21lckVtYWlsOiBzdHJpbmc7XHJcblxyXG4gIEBDb2x1bW4oeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGN1c3RvbWVyTmFtZTogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBiaWxsaW5nQWRkcmVzczogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKHsgbnVsbGFibGU6IHRydWUgfSlcclxuICB0YXhBbW91bnQ6IG51bWJlcjtcclxuXHJcbiAgQENvbHVtbih7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgZGlzY291bnRBbW91bnQ6IG51bWJlcjtcclxuXHJcbiAgQENvbHVtbih7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgY291cG9uQ29kZTogc3RyaW5nO1xyXG5cclxuICBAQ3JlYXRlRGF0ZUNvbHVtbigpXHJcbiAgY3JlYXRlZEF0OiBEYXRlO1xyXG5cclxuICBAVXBkYXRlRGF0ZUNvbHVtbigpXHJcbiAgdXBkYXRlZEF0OiBEYXRlO1xyXG5cclxuICBAQ29sdW1uKHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBjb21wbGV0ZWRBdDogRGF0ZTtcclxuXHJcbiAgQENvbHVtbih7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgcmVmdW5kZWRBdDogRGF0ZTtcclxuXHJcbiAgLy8gUmVsYXRpb25zXHJcbiAgQE1hbnlUb09uZSgoKSA9PiBVc2VyLCB7IG9uRGVsZXRlOiAnQ0FTQ0FERScgfSlcclxuICBASm9pbkNvbHVtbih7IG5hbWU6ICd1c2VySWQnIH0pXHJcbiAgdXNlcjogVXNlcjtcclxuXHJcbiAgQE9uZVRvTWFueSgoKSA9PiBJbnZvaWNlRW50aXR5LCAoaW52b2ljZSkgPT4gaW52b2ljZS5wYXltZW50KVxyXG4gIGludm9pY2VzOiBJbnZvaWNlRW50aXR5W107XHJcbn0gIl0sInZlcnNpb24iOjN9

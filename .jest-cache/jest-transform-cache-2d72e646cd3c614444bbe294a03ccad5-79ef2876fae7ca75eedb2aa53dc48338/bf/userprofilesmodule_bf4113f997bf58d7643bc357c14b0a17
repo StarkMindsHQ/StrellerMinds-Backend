@@ -1,0 +1,29 @@
+13f645d7ba9806d91f8310f507997b99
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserProfilesModule = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const user_profiles_service_1 = require("./user-profiles.service");
+const user_profiles_controller_1 = require("./user-profiles.controller");
+const user_profile_entity_1 = require("./entities/user-profile.entity");
+const user_entity_1 = require("../users/entities/user.entity");
+const shared_module_1 = require("src/shared/shared.module");
+let UserProfilesModule = class UserProfilesModule {
+};
+exports.UserProfilesModule = UserProfilesModule;
+exports.UserProfilesModule = UserProfilesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([user_profile_entity_1.UserProfile, user_entity_1.User]), shared_module_1.SharedModule],
+        controllers: [user_profiles_controller_1.UserProfilesController],
+        providers: [user_profiles_service_1.UserProfilesService],
+        exports: [user_profiles_service_1.UserProfilesService],
+    })
+], UserProfilesModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx1c2VyLXByb2ZpbGVzXFx1c2VyLXByb2ZpbGVzLm1vZHVsZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7QUFBQSwyQ0FBd0M7QUFDeEMsNkNBQWdEO0FBQ2hELG1FQUE4RDtBQUM5RCx5RUFBb0U7QUFDcEUsd0VBQTZEO0FBQzdELCtEQUFxRDtBQUNyRCw0REFBd0Q7QUFRakQsSUFBTSxrQkFBa0IsR0FBeEIsTUFBTSxrQkFBa0I7Q0FBRyxDQUFBO0FBQXJCLGdEQUFrQjs2QkFBbEIsa0JBQWtCO0lBTjlCLElBQUEsZUFBTSxFQUFDO1FBQ04sT0FBTyxFQUFFLENBQUMsdUJBQWEsQ0FBQyxVQUFVLENBQUMsQ0FBQyxpQ0FBVyxFQUFFLGtCQUFJLENBQUMsQ0FBQyxFQUFFLDRCQUFZLENBQUM7UUFDdEUsV0FBVyxFQUFFLENBQUMsaURBQXNCLENBQUM7UUFDckMsU0FBUyxFQUFFLENBQUMsMkNBQW1CLENBQUM7UUFDaEMsT0FBTyxFQUFFLENBQUMsMkNBQW1CLENBQUM7S0FDL0IsQ0FBQztHQUNXLGtCQUFrQixDQUFHIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcdXNlci1wcm9maWxlc1xcdXNlci1wcm9maWxlcy5tb2R1bGUudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy9jb21tb24nO1xyXG5pbXBvcnQgeyBUeXBlT3JtTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy90eXBlb3JtJztcclxuaW1wb3J0IHsgVXNlclByb2ZpbGVzU2VydmljZSB9IGZyb20gJy4vdXNlci1wcm9maWxlcy5zZXJ2aWNlJztcclxuaW1wb3J0IHsgVXNlclByb2ZpbGVzQ29udHJvbGxlciB9IGZyb20gJy4vdXNlci1wcm9maWxlcy5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgVXNlclByb2ZpbGUgfSBmcm9tICcuL2VudGl0aWVzL3VzZXItcHJvZmlsZS5lbnRpdHknO1xyXG5pbXBvcnQgeyBVc2VyIH0gZnJvbSAnLi4vdXNlcnMvZW50aXRpZXMvdXNlci5lbnRpdHknO1xyXG5pbXBvcnQgeyBTaGFyZWRNb2R1bGUgfSBmcm9tICdzcmMvc2hhcmVkL3NoYXJlZC5tb2R1bGUnO1xyXG5cclxuQE1vZHVsZSh7XHJcbiAgaW1wb3J0czogW1R5cGVPcm1Nb2R1bGUuZm9yRmVhdHVyZShbVXNlclByb2ZpbGUsIFVzZXJdKSwgU2hhcmVkTW9kdWxlXSxcclxuICBjb250cm9sbGVyczogW1VzZXJQcm9maWxlc0NvbnRyb2xsZXJdLFxyXG4gIHByb3ZpZGVyczogW1VzZXJQcm9maWxlc1NlcnZpY2VdLFxyXG4gIGV4cG9ydHM6IFtVc2VyUHJvZmlsZXNTZXJ2aWNlXSxcclxufSlcclxuZXhwb3J0IGNsYXNzIFVzZXJQcm9maWxlc01vZHVsZSB7fVxyXG4iXSwidmVyc2lvbiI6M30=

@@ -1,0 +1,57 @@
+1943e3e59a7be790138a1ddf059dca62
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CoursesModule = void 0;
+const common_1 = require("@nestjs/common");
+const event_emitter_1 = require("@nestjs/event-emitter");
+/**
+ * CoursesModule provides course management features.
+ *
+ * @module Courses
+ */
+const typeorm_1 = require("@nestjs/typeorm");
+const course_entity_1 = require("./entities/course.entity");
+const course_module_entity_1 = require("./entities/course-module.entity");
+const category_entity_1 = require("./entities/category.entity");
+const tag_entity_1 = require("./entities/tag.entity");
+const course_review_entity_1 = require("./entities/course-review.entity");
+const courses_service_1 = require("./courses.service");
+const courses_controller_1 = require("./courses.controller");
+const user_entity_1 = require("src/users/entities/user.entity");
+const users_module_1 = require("src/users/users.module");
+const email_module_1 = require("src/email/email.module");
+const lesson_entity_1 = require("src/lesson/entity/lesson.entity");
+const common_module_1 = require("../common/common.module");
+// import { Lesson } from 'src/modules/lesson/entities/lesson.entity';
+let CoursesModule = class CoursesModule {
+};
+exports.CoursesModule = CoursesModule;
+exports.CoursesModule = CoursesModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([
+                course_entity_1.Course,
+                course_module_entity_1.CourseModule,
+                category_entity_1.Category,
+                tag_entity_1.Tag,
+                course_review_entity_1.CourseReview,
+                user_entity_1.User,
+                lesson_entity_1.Lesson,
+            ]),
+            users_module_1.UsersModule,
+            email_module_1.EmailModule,
+            common_module_1.CommonModule, // Import CommonModule for shared services
+            event_emitter_1.EventEmitterModule.forRoot(), // Import EventEmitter for event-driven architecture
+        ],
+        providers: [courses_service_1.CourseService],
+        controllers: [courses_controller_1.CourseController],
+        exports: [courses_service_1.CourseService],
+    })
+], CoursesModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxjb3Vyc2VzXFxjb3Vyc2VzLm1vZHVsZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7QUFBQSwyQ0FBd0M7QUFDeEMseURBQTJEO0FBRTNEOzs7O0dBSUc7QUFDSCw2Q0FBZ0Q7QUFDaEQsNERBQWtEO0FBQ2xELDBFQUErRDtBQUMvRCxnRUFBc0Q7QUFDdEQsc0RBQTRDO0FBQzVDLDBFQUErRDtBQUMvRCx1REFBa0Q7QUFDbEQsNkRBQXdEO0FBQ3hELGdFQUFzRDtBQUN0RCx5REFBcUQ7QUFDckQseURBQXFEO0FBQ3JELG1FQUF5RDtBQUN6RCwyREFBdUQ7QUFDdkQsc0VBQXNFO0FBc0IvRCxJQUFNLGFBQWEsR0FBbkIsTUFBTSxhQUFhO0NBQUcsQ0FBQTtBQUFoQixzQ0FBYTt3QkFBYixhQUFhO0lBcEJ6QixJQUFBLGVBQU0sRUFBQztRQUNOLE9BQU8sRUFBRTtZQUNQLHVCQUFhLENBQUMsVUFBVSxDQUFDO2dCQUN2QixzQkFBTTtnQkFDTixtQ0FBWTtnQkFDWiwwQkFBUTtnQkFDUixnQkFBRztnQkFDSCxtQ0FBWTtnQkFDWixrQkFBSTtnQkFDSixzQkFBTTthQUNQLENBQUM7WUFDRiwwQkFBVztZQUNYLDBCQUFXO1lBQ1gsNEJBQVksRUFBRSwwQ0FBMEM7WUFDeEQsa0NBQWtCLENBQUMsT0FBTyxFQUFFLEVBQUUsb0RBQW9EO1NBQ25GO1FBQ0QsU0FBUyxFQUFFLENBQUMsK0JBQWEsQ0FBQztRQUMxQixXQUFXLEVBQUUsQ0FBQyxxQ0FBZ0IsQ0FBQztRQUMvQixPQUFPLEVBQUUsQ0FBQywrQkFBYSxDQUFDO0tBQ3pCLENBQUM7R0FDVyxhQUFhLENBQUciLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxjb3Vyc2VzXFxjb3Vyc2VzLm1vZHVsZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBNb2R1bGUgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IEV2ZW50RW1pdHRlck1vZHVsZSB9IGZyb20gJ0BuZXN0anMvZXZlbnQtZW1pdHRlcic7XHJcblxyXG4vKipcclxuICogQ291cnNlc01vZHVsZSBwcm92aWRlcyBjb3Vyc2UgbWFuYWdlbWVudCBmZWF0dXJlcy5cclxuICpcclxuICogQG1vZHVsZSBDb3Vyc2VzXHJcbiAqL1xyXG5pbXBvcnQgeyBUeXBlT3JtTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy90eXBlb3JtJztcclxuaW1wb3J0IHsgQ291cnNlIH0gZnJvbSAnLi9lbnRpdGllcy9jb3Vyc2UuZW50aXR5JztcclxuaW1wb3J0IHsgQ291cnNlTW9kdWxlIH0gZnJvbSAnLi9lbnRpdGllcy9jb3Vyc2UtbW9kdWxlLmVudGl0eSc7XHJcbmltcG9ydCB7IENhdGVnb3J5IH0gZnJvbSAnLi9lbnRpdGllcy9jYXRlZ29yeS5lbnRpdHknO1xyXG5pbXBvcnQgeyBUYWcgfSBmcm9tICcuL2VudGl0aWVzL3RhZy5lbnRpdHknO1xyXG5pbXBvcnQgeyBDb3Vyc2VSZXZpZXcgfSBmcm9tICcuL2VudGl0aWVzL2NvdXJzZS1yZXZpZXcuZW50aXR5JztcclxuaW1wb3J0IHsgQ291cnNlU2VydmljZSB9IGZyb20gJy4vY291cnNlcy5zZXJ2aWNlJztcclxuaW1wb3J0IHsgQ291cnNlQ29udHJvbGxlciB9IGZyb20gJy4vY291cnNlcy5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgVXNlciB9IGZyb20gJ3NyYy91c2Vycy9lbnRpdGllcy91c2VyLmVudGl0eSc7XHJcbmltcG9ydCB7IFVzZXJzTW9kdWxlIH0gZnJvbSAnc3JjL3VzZXJzL3VzZXJzLm1vZHVsZSc7XHJcbmltcG9ydCB7IEVtYWlsTW9kdWxlIH0gZnJvbSAnc3JjL2VtYWlsL2VtYWlsLm1vZHVsZSc7XHJcbmltcG9ydCB7IExlc3NvbiB9IGZyb20gJ3NyYy9sZXNzb24vZW50aXR5L2xlc3Nvbi5lbnRpdHknO1xyXG5pbXBvcnQgeyBDb21tb25Nb2R1bGUgfSBmcm9tICcuLi9jb21tb24vY29tbW9uLm1vZHVsZSc7XHJcbi8vIGltcG9ydCB7IExlc3NvbiB9IGZyb20gJ3NyYy9tb2R1bGVzL2xlc3Nvbi9lbnRpdGllcy9sZXNzb24uZW50aXR5JztcclxuXHJcbkBNb2R1bGUoe1xyXG4gIGltcG9ydHM6IFtcclxuICAgIFR5cGVPcm1Nb2R1bGUuZm9yRmVhdHVyZShbXHJcbiAgICAgIENvdXJzZSxcclxuICAgICAgQ291cnNlTW9kdWxlLFxyXG4gICAgICBDYXRlZ29yeSxcclxuICAgICAgVGFnLFxyXG4gICAgICBDb3Vyc2VSZXZpZXcsXHJcbiAgICAgIFVzZXIsXHJcbiAgICAgIExlc3NvbixcclxuICAgIF0pLFxyXG4gICAgVXNlcnNNb2R1bGUsXHJcbiAgICBFbWFpbE1vZHVsZSxcclxuICAgIENvbW1vbk1vZHVsZSwgLy8gSW1wb3J0IENvbW1vbk1vZHVsZSBmb3Igc2hhcmVkIHNlcnZpY2VzXHJcbiAgICBFdmVudEVtaXR0ZXJNb2R1bGUuZm9yUm9vdCgpLCAvLyBJbXBvcnQgRXZlbnRFbWl0dGVyIGZvciBldmVudC1kcml2ZW4gYXJjaGl0ZWN0dXJlXHJcbiAgXSxcclxuICBwcm92aWRlcnM6IFtDb3Vyc2VTZXJ2aWNlXSxcclxuICBjb250cm9sbGVyczogW0NvdXJzZUNvbnRyb2xsZXJdLFxyXG4gIGV4cG9ydHM6IFtDb3Vyc2VTZXJ2aWNlXSxcclxufSlcclxuZXhwb3J0IGNsYXNzIENvdXJzZXNNb2R1bGUge31cclxuIl0sInZlcnNpb24iOjN9

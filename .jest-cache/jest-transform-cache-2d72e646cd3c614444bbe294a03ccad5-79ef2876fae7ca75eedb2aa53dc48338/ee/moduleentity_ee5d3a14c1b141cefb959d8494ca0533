@@ -1,0 +1,69 @@
+c0e8eedac03167e273d9c8c6eaf1d52c
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Module = void 0;
+const course_entity_1 = require("../../courses/entities/course.entity");
+const lesson_entity_1 = require("../../lesson/entity/lesson.entity");
+const typeorm_1 = require("typeorm");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * Entity representing a course module containing lessons.
+ */
+let Module = class Module {
+};
+exports.Module = Module;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Unique module ID', example: 'uuid-module' }),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
+], Module.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Module title', example: 'Algebra Basics' }),
+    (0, typeorm_1.Column)({ length: 255 }),
+    __metadata("design:type", String)
+], Module.prototype, "title", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Module description', required: false }),
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    __metadata("design:type", String)
+], Module.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Order of the module within the course', example: 1 }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Module.prototype, "order", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Creation date' }),
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], Module.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Last update date' }),
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], Module.prototype, "updatedAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Course this module belongs to', type: () => course_entity_1.Course }),
+    (0, typeorm_1.ManyToOne)(() => course_entity_1.Course, (course) => course.modules, { nullable: false, onDelete: "CASCADE" }),
+    (0, typeorm_1.Index)(),
+    __metadata("design:type", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
+], Module.prototype, "course", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Lessons in this module', type: () => [lesson_entity_1.Lesson] }),
+    (0, typeorm_1.OneToMany)(() => lesson_entity_1.Lesson, (lesson) => lesson.module, { cascade: true }),
+    __metadata("design:type", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+], Module.prototype, "lessons", void 0);
+exports.Module = Module = __decorate([
+    (0, typeorm_1.Entity)("modules")
+], Module);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtb2R1bGVcXGVudGl0aWVzXFxtb2R1bGUuZW50aXR5LnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7QUFBQSx3RUFBNkQ7QUFDN0QscUVBQTBEO0FBQzFELHFDQVNnQjtBQUNoQiw2Q0FBOEM7QUFFOUM7O0dBRUc7QUFFSSxJQUFNLE1BQU0sR0FBWixNQUFNLE1BQU07Q0FpRGxCLENBQUE7QUFqRFksd0JBQU07QUFJakI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsa0JBQWtCLEVBQUUsT0FBTyxFQUFFLGFBQWEsRUFBRSxDQUFDO0lBQ3hFLElBQUEsZ0NBQXNCLEVBQUMsTUFBTSxDQUFDOztrQ0FDckI7QUFLVjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxjQUFjLEVBQUUsT0FBTyxFQUFFLGdCQUFnQixFQUFFLENBQUM7SUFDdkUsSUFBQSxnQkFBTSxFQUFDLEVBQUUsTUFBTSxFQUFFLEdBQUcsRUFBRSxDQUFDOztxQ0FDWDtBQUtiO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLG9CQUFvQixFQUFFLFFBQVEsRUFBRSxLQUFLLEVBQUUsQ0FBQztJQUNuRSxJQUFBLGdCQUFNLEVBQUMsRUFBRSxJQUFJLEVBQUUsTUFBTSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQzs7MkNBQ3RCO0FBS25CO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLHVDQUF1QyxFQUFFLE9BQU8sRUFBRSxDQUFDLEVBQUUsQ0FBQztJQUNqRixJQUFBLGdCQUFNLEdBQUU7O3FDQUNJO0FBS2I7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsZUFBZSxFQUFFLENBQUM7SUFDN0MsSUFBQSwwQkFBZ0IsR0FBRTtrREFDUixJQUFJLG9CQUFKLElBQUk7eUNBQUE7QUFLZjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxrQkFBa0IsRUFBRSxDQUFDO0lBQ2hELElBQUEsMEJBQWdCLEdBQUU7a0RBQ1IsSUFBSSxvQkFBSixJQUFJO3lDQUFBO0FBVWY7SUFQQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsK0JBQStCLEVBQUUsSUFBSSxFQUFFLEdBQUcsRUFBRSxDQUFDLHNCQUFNLEVBQUUsQ0FBQztJQUNqRixJQUFBLG1CQUFTLEVBQ1IsR0FBRyxFQUFFLENBQUMsc0JBQU0sRUFDWixDQUFDLE1BQU0sRUFBRSxFQUFFLENBQUMsTUFBTSxDQUFDLE9BQU8sRUFDMUIsRUFBRSxRQUFRLEVBQUUsS0FBSyxFQUFFLFFBQVEsRUFBRSxTQUFTLEVBQUUsQ0FDekM7SUFDQSxJQUFBLGVBQUssR0FBRTtrREFDQSxPQUFPLG9CQUFQLE9BQU87c0NBQVE7QUFTdkI7SUFOQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsd0JBQXdCLEVBQUUsSUFBSSxFQUFFLEdBQUcsRUFBRSxDQUFDLENBQUMsc0JBQU0sQ0FBQyxFQUFFLENBQUM7SUFDNUUsSUFBQSxtQkFBUyxFQUNSLEdBQUcsRUFBRSxDQUFDLHNCQUFNLEVBQ1osQ0FBQyxNQUFNLEVBQUUsRUFBRSxDQUFDLE1BQU0sQ0FBQyxNQUFNLEVBQ3pCLEVBQUUsT0FBTyxFQUFFLElBQUksRUFBRSxDQUNsQjtrREFDUSxPQUFPLG9CQUFQLE9BQU87dUNBQVU7aUJBaERmLE1BQU07SUFEbEIsSUFBQSxnQkFBTSxFQUFDLFNBQVMsQ0FBQztHQUNMLE1BQU0sQ0FpRGxCIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcbW9kdWxlXFxlbnRpdGllc1xcbW9kdWxlLmVudGl0eS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBDb3Vyc2UgfSBmcm9tIFwiLi4vLi4vY291cnNlcy9lbnRpdGllcy9jb3Vyc2UuZW50aXR5XCJcclxuaW1wb3J0IHsgTGVzc29uIH0gZnJvbSBcIi4uLy4uL2xlc3Nvbi9lbnRpdHkvbGVzc29uLmVudGl0eVwiXHJcbmltcG9ydCB7XHJcbiAgRW50aXR5LFxyXG4gIFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4sXHJcbiAgQ29sdW1uLFxyXG4gIE1hbnlUb09uZSxcclxuICBPbmVUb01hbnksXHJcbiAgSW5kZXgsXHJcbiAgQ3JlYXRlRGF0ZUNvbHVtbixcclxuICBVcGRhdGVEYXRlQ29sdW1uLFxyXG59IGZyb20gXCJ0eXBlb3JtXCJcclxuaW1wb3J0IHsgQXBpUHJvcGVydHkgfSBmcm9tICdAbmVzdGpzL3N3YWdnZXInO1xyXG5cclxuLyoqXHJcbiAqIEVudGl0eSByZXByZXNlbnRpbmcgYSBjb3Vyc2UgbW9kdWxlIGNvbnRhaW5pbmcgbGVzc29ucy5cclxuICovXHJcbkBFbnRpdHkoXCJtb2R1bGVzXCIpXHJcbmV4cG9ydCBjbGFzcyBNb2R1bGUge1xyXG4gIC8qKiBVbmlxdWUgbW9kdWxlIElEICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdVbmlxdWUgbW9kdWxlIElEJywgZXhhbXBsZTogJ3V1aWQtbW9kdWxlJyB9KVxyXG4gIEBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uKFwidXVpZFwiKVxyXG4gIGlkOiBzdHJpbmdcclxuXHJcbiAgLyoqIE1vZHVsZSB0aXRsZSAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnTW9kdWxlIHRpdGxlJywgZXhhbXBsZTogJ0FsZ2VicmEgQmFzaWNzJyB9KVxyXG4gIEBDb2x1bW4oeyBsZW5ndGg6IDI1NSB9KVxyXG4gIHRpdGxlOiBzdHJpbmdcclxuXHJcbiAgLyoqIE1vZHVsZSBkZXNjcmlwdGlvbiAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnTW9kdWxlIGRlc2NyaXB0aW9uJywgcmVxdWlyZWQ6IGZhbHNlIH0pXHJcbiAgQENvbHVtbih7IHR5cGU6IFwidGV4dFwiLCBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGRlc2NyaXB0aW9uOiBzdHJpbmdcclxuXHJcbiAgLyoqIE9yZGVyIG9mIHRoZSBtb2R1bGUgd2l0aGluIHRoZSBjb3Vyc2UgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ09yZGVyIG9mIHRoZSBtb2R1bGUgd2l0aGluIHRoZSBjb3Vyc2UnLCBleGFtcGxlOiAxIH0pXHJcbiAgQENvbHVtbigpXHJcbiAgb3JkZXI6IG51bWJlclxyXG5cclxuICAvKiogRGF0ZSBtb2R1bGUgd2FzIGNyZWF0ZWQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0NyZWF0aW9uIGRhdGUnIH0pXHJcbiAgQENyZWF0ZURhdGVDb2x1bW4oKVxyXG4gIGNyZWF0ZWRBdDogRGF0ZVxyXG5cclxuICAvKiogRGF0ZSBtb2R1bGUgd2FzIGxhc3QgdXBkYXRlZCAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnTGFzdCB1cGRhdGUgZGF0ZScgfSlcclxuICBAVXBkYXRlRGF0ZUNvbHVtbigpXHJcbiAgdXBkYXRlZEF0OiBEYXRlXHJcblxyXG4gIC8qKiBDb3Vyc2UgdGhpcyBtb2R1bGUgYmVsb25ncyB0byAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnQ291cnNlIHRoaXMgbW9kdWxlIGJlbG9uZ3MgdG8nLCB0eXBlOiAoKSA9PiBDb3Vyc2UgfSlcclxuICBATWFueVRvT25lKFxyXG4gICAgKCkgPT4gQ291cnNlLFxyXG4gICAgKGNvdXJzZSkgPT4gY291cnNlLm1vZHVsZXMsXHJcbiAgICB7IG51bGxhYmxlOiBmYWxzZSwgb25EZWxldGU6IFwiQ0FTQ0FERVwiIH0sXHJcbiAgKVxyXG4gIEBJbmRleCgpXHJcbiAgY291cnNlOiBQcm9taXNlPENvdXJzZT5cclxuXHJcbiAgLyoqIExlc3NvbnMgaW4gdGhpcyBtb2R1bGUgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0xlc3NvbnMgaW4gdGhpcyBtb2R1bGUnLCB0eXBlOiAoKSA9PiBbTGVzc29uXSB9KVxyXG4gIEBPbmVUb01hbnkoXHJcbiAgICAoKSA9PiBMZXNzb24sXHJcbiAgICAobGVzc29uKSA9PiBsZXNzb24ubW9kdWxlLFxyXG4gICAgeyBjYXNjYWRlOiB0cnVlIH0sXHJcbiAgKVxyXG4gIGxlc3NvbnM6IFByb21pc2U8TGVzc29uW10+XHJcbn1cclxuXHJcbiJdLCJ2ZXJzaW9uIjozfQ==

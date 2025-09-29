@@ -1,0 +1,27 @@
+72b48d070fd2f56f2e74baa3f67d9b33
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IpfsModule = void 0;
+const common_1 = require("@nestjs/common");
+const ipfs_service_1 = require("./ipfs.service");
+const ipfs_controller_1 = require("./ipfs.controller");
+/**
+ * IPFS Module for decentralized file storage and retrieval.
+ * Provides controller and service for IPFS operations.
+ */
+let IpfsModule = class IpfsModule {
+};
+exports.IpfsModule = IpfsModule;
+exports.IpfsModule = IpfsModule = __decorate([
+    (0, common_1.Module)({
+        controllers: [ipfs_controller_1.IpfsController],
+        providers: [ipfs_service_1.IpfsService],
+    })
+], IpfsModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxpcGZzXFxpcGZzLm1vZHVsZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7QUFBQSwyQ0FBd0M7QUFDeEMsaURBQTZDO0FBQzdDLHVEQUFtRDtBQUduRDs7O0dBR0c7QUFLSSxJQUFNLFVBQVUsR0FBaEIsTUFBTSxVQUFVO0NBQUcsQ0FBQTtBQUFiLGdDQUFVO3FCQUFWLFVBQVU7SUFKdEIsSUFBQSxlQUFNLEVBQUM7UUFDTixXQUFXLEVBQUUsQ0FBQyxnQ0FBYyxDQUFDO1FBQzdCLFNBQVMsRUFBRSxDQUFDLDBCQUFXLENBQUM7S0FDekIsQ0FBQztHQUNXLFVBQVUsQ0FBRyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGlwZnNcXGlwZnMubW9kdWxlLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IE1vZHVsZSB9IGZyb20gJ0BuZXN0anMvY29tbW9uJztcclxuaW1wb3J0IHsgSXBmc1NlcnZpY2UgfSBmcm9tICcuL2lwZnMuc2VydmljZSc7XHJcbmltcG9ydCB7IElwZnNDb250cm9sbGVyIH0gZnJvbSAnLi9pcGZzLmNvbnRyb2xsZXInO1xyXG5pbXBvcnQgeyBBcGlUYWdzIH0gZnJvbSAnQG5lc3Rqcy9zd2FnZ2VyJztcclxuXHJcbi8qKlxyXG4gKiBJUEZTIE1vZHVsZSBmb3IgZGVjZW50cmFsaXplZCBmaWxlIHN0b3JhZ2UgYW5kIHJldHJpZXZhbC5cclxuICogUHJvdmlkZXMgY29udHJvbGxlciBhbmQgc2VydmljZSBmb3IgSVBGUyBvcGVyYXRpb25zLlxyXG4gKi9cclxuQE1vZHVsZSh7XHJcbiAgY29udHJvbGxlcnM6IFtJcGZzQ29udHJvbGxlcl0sXHJcbiAgcHJvdmlkZXJzOiBbSXBmc1NlcnZpY2VdLFxyXG59KVxyXG5leHBvcnQgY2xhc3MgSXBmc01vZHVsZSB7fVxyXG4iXSwidmVyc2lvbiI6M30=

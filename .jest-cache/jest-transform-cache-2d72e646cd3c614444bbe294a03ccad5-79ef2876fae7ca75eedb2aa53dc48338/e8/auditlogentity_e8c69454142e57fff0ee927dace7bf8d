@@ -1,0 +1,61 @@
+f9d579129801a1658b1f04bddc479c03
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuditLog = void 0;
+/**
+ * AuditLog entity representing audit log records.
+ */
+const swagger_1 = require("@nestjs/swagger");
+const typeorm_1 = require("typeorm");
+let AuditLog = class AuditLog {
+};
+exports.AuditLog = AuditLog;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Audit log ID', example: 'uuid-v4' }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], AuditLog.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Action performed', example: 'ACCOUNT_DELETED' }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], AuditLog.prototype, "action", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Entity type', example: 'User' }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], AuditLog.prototype, "entityType", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Entity ID', example: 'uuid-v4' }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], AuditLog.prototype, "entityId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'User who performed the action', example: 'admin-uuid' }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], AuditLog.prototype, "performedBy", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Details of the action', type: 'object', example: { reason: 'User request' } }),
+    (0, typeorm_1.Column)('jsonb', { default: {} }),
+    __metadata("design:type", typeof (_a = typeof Record !== "undefined" && Record) === "function" ? _a : Object)
+], AuditLog.prototype, "details", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Timestamp of the action', example: '2025-06-29T12:00:00Z' }),
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], AuditLog.prototype, "timestamp", void 0);
+exports.AuditLog = AuditLog = __decorate([
+    (0, typeorm_1.Entity)('audit_logs')
+], AuditLog);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhdWRpdFxcZW50aXRpZXNcXGF1ZGl0LmxvZy5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBOztHQUVHO0FBQ0gsNkNBQThDO0FBQzlDLHFDQUtpQjtBQUdWLElBQU0sUUFBUSxHQUFkLE1BQU0sUUFBUTtDQTRCcEIsQ0FBQTtBQTVCWSw0QkFBUTtBQUduQjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxjQUFjLEVBQUUsT0FBTyxFQUFFLFNBQVMsRUFBRSxDQUFDO0lBQ2hFLElBQUEsZ0NBQXNCLEVBQUMsTUFBTSxDQUFDOztvQ0FDcEI7QUFJWDtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxrQkFBa0IsRUFBRSxPQUFPLEVBQUUsaUJBQWlCLEVBQUUsQ0FBQztJQUM1RSxJQUFBLGdCQUFNLEdBQUU7O3dDQUNNO0FBSWY7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsYUFBYSxFQUFFLE9BQU8sRUFBRSxNQUFNLEVBQUUsQ0FBQztJQUM1RCxJQUFBLGdCQUFNLEdBQUU7OzRDQUNVO0FBSW5CO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLFdBQVcsRUFBRSxPQUFPLEVBQUUsU0FBUyxFQUFFLENBQUM7SUFDN0QsSUFBQSxnQkFBTSxHQUFFOzswQ0FDUTtBQUlqQjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSwrQkFBK0IsRUFBRSxPQUFPLEVBQUUsWUFBWSxFQUFFLENBQUM7SUFDcEYsSUFBQSxnQkFBTSxHQUFFOzs2Q0FDVztBQUlwQjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSx1QkFBdUIsRUFBRSxJQUFJLEVBQUUsUUFBUSxFQUFFLE9BQU8sRUFBRSxFQUFFLE1BQU0sRUFBRSxjQUFjLEVBQUUsRUFBRSxDQUFDO0lBQzFHLElBQUEsZ0JBQU0sRUFBQyxPQUFPLEVBQUUsRUFBRSxPQUFPLEVBQUUsRUFBRSxFQUFFLENBQUM7a0RBQ3hCLE1BQU0sb0JBQU4sTUFBTTt5Q0FBYztBQUk3QjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSx5QkFBeUIsRUFBRSxPQUFPLEVBQUUsc0JBQXNCLEVBQUUsQ0FBQztJQUN4RixJQUFBLDBCQUFnQixHQUFFO2tEQUNSLElBQUksb0JBQUosSUFBSTsyQ0FBQzttQkEzQkwsUUFBUTtJQURwQixJQUFBLGdCQUFNLEVBQUMsWUFBWSxDQUFDO0dBQ1IsUUFBUSxDQTRCcEIiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhdWRpdFxcZW50aXRpZXNcXGF1ZGl0LmxvZy5lbnRpdHkudHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyoqXHJcbiAqIEF1ZGl0TG9nIGVudGl0eSByZXByZXNlbnRpbmcgYXVkaXQgbG9nIHJlY29yZHMuXHJcbiAqL1xyXG5pbXBvcnQgeyBBcGlQcm9wZXJ0eSB9IGZyb20gJ0BuZXN0anMvc3dhZ2dlcic7XHJcbmltcG9ydCB7XHJcbiAgRW50aXR5LFxyXG4gIFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4sXHJcbiAgQ29sdW1uLFxyXG4gIENyZWF0ZURhdGVDb2x1bW4sXHJcbn0gZnJvbSAndHlwZW9ybSc7XHJcblxyXG5ARW50aXR5KCdhdWRpdF9sb2dzJylcclxuZXhwb3J0IGNsYXNzIEF1ZGl0TG9nIHtcclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0F1ZGl0IGxvZyBJRCcsIGV4YW1wbGU6ICd1dWlkLXY0JyB9KVxyXG4gIEBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uKCd1dWlkJylcclxuICBpZDogc3RyaW5nO1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0FjdGlvbiBwZXJmb3JtZWQnLCBleGFtcGxlOiAnQUNDT1VOVF9ERUxFVEVEJyB9KVxyXG4gIEBDb2x1bW4oKVxyXG4gIGFjdGlvbjogc3RyaW5nO1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0VudGl0eSB0eXBlJywgZXhhbXBsZTogJ1VzZXInIH0pXHJcbiAgQENvbHVtbigpXHJcbiAgZW50aXR5VHlwZTogc3RyaW5nO1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0VudGl0eSBJRCcsIGV4YW1wbGU6ICd1dWlkLXY0JyB9KVxyXG4gIEBDb2x1bW4oKVxyXG4gIGVudGl0eUlkOiBzdHJpbmc7XHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnVXNlciB3aG8gcGVyZm9ybWVkIHRoZSBhY3Rpb24nLCBleGFtcGxlOiAnYWRtaW4tdXVpZCcgfSlcclxuICBAQ29sdW1uKClcclxuICBwZXJmb3JtZWRCeTogc3RyaW5nO1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0RldGFpbHMgb2YgdGhlIGFjdGlvbicsIHR5cGU6ICdvYmplY3QnLCBleGFtcGxlOiB7IHJlYXNvbjogJ1VzZXIgcmVxdWVzdCcgfSB9KVxyXG4gIEBDb2x1bW4oJ2pzb25iJywgeyBkZWZhdWx0OiB7fSB9KVxyXG4gIGRldGFpbHM6IFJlY29yZDxzdHJpbmcsIGFueT47XHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnVGltZXN0YW1wIG9mIHRoZSBhY3Rpb24nLCBleGFtcGxlOiAnMjAyNS0wNi0yOVQxMjowMDowMFonIH0pXHJcbiAgQENyZWF0ZURhdGVDb2x1bW4oKVxyXG4gIHRpbWVzdGFtcDogRGF0ZTtcclxufVxyXG4iXSwidmVyc2lvbiI6M30=

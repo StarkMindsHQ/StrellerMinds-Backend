@@ -41,7 +41,7 @@ module.exports = {
       'ts-jest',
       {
         tsconfig: 'tsconfig.json',
-        isolatedModules: true,
+        // removed deprecated isolatedModules option per ts-jest warning
       },
     ],
   },

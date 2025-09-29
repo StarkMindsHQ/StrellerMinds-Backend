@@ -1,0 +1,51 @@
+a25af74a9b56dcb7a3ed640652f952f2
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Assignment = void 0;
+const typeorm_1 = require("typeorm");
+// import { Lesson } from './lesson.entity';
+const class_validator_1 = require("class-validator");
+// import { Lesson } from 'src/modules/lesson/entities/lesson.entity';
+const lesson_entity_1 = require("src/lesson/entity/lesson.entity");
+let Assignment = class Assignment {
+};
+exports.Assignment = Assignment;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], Assignment.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], Assignment.prototype, "title", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text'),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], Assignment.prototype, "instructions", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, class_validator_1.IsDateString)(),
+    __metadata("design:type", String)
+], Assignment.prototype, "dueDate", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => lesson_entity_1.Lesson, (lesson) => lesson.assignments, {
+        onDelete: 'CASCADE',
+    }),
+    __metadata("design:type", typeof (_a = typeof lesson_entity_1.Lesson !== "undefined" && lesson_entity_1.Lesson) === "function" ? _a : Object)
+], Assignment.prototype, "lesson", void 0);
+exports.Assignment = Assignment = __decorate([
+    (0, typeorm_1.Entity)()
+], Assignment);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhc3NpZ25tZW50XFxlbnRpdGllc1xcYXNzaWdubWVudC5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHFDQUE0RTtBQUM1RSw0Q0FBNEM7QUFDNUMscURBQTJEO0FBQzNELHNFQUFzRTtBQUN0RSxtRUFBeUQ7QUFHbEQsSUFBTSxVQUFVLEdBQWhCLE1BQU0sVUFBVTtDQW9CdEIsQ0FBQTtBQXBCWSxnQ0FBVTtBQUVyQjtJQURDLElBQUEsZ0NBQXNCLEdBQUU7O3NDQUNkO0FBSVg7SUFGQyxJQUFBLGdCQUFNLEdBQUU7SUFDUixJQUFBLDRCQUFVLEdBQUU7O3lDQUNDO0FBSWQ7SUFGQyxJQUFBLGdCQUFNLEVBQUMsTUFBTSxDQUFDO0lBQ2QsSUFBQSw0QkFBVSxHQUFFOztnREFDUTtBQUlyQjtJQUZDLElBQUEsZ0JBQU0sR0FBRTtJQUNSLElBQUEsOEJBQVksR0FBRTs7MkNBQ0M7QUFLaEI7SUFIQyxJQUFBLG1CQUFTLEVBQUMsR0FBRyxFQUFFLENBQUMsc0JBQU0sRUFBRSxDQUFDLE1BQU0sRUFBRSxFQUFFLENBQUMsTUFBTSxDQUFDLFdBQVcsRUFBRTtRQUN2RCxRQUFRLEVBQUUsU0FBUztLQUNwQixDQUFDO2tEQUNNLHNCQUFNLG9CQUFOLHNCQUFNOzBDQUFDO3FCQW5CSixVQUFVO0lBRHRCLElBQUEsZ0JBQU0sR0FBRTtHQUNJLFVBQVUsQ0FvQnRCIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcYXNzaWdubWVudFxcZW50aXRpZXNcXGFzc2lnbm1lbnQuZW50aXR5LnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEVudGl0eSwgUHJpbWFyeUdlbmVyYXRlZENvbHVtbiwgQ29sdW1uLCBNYW55VG9PbmUgfSBmcm9tICd0eXBlb3JtJztcclxuLy8gaW1wb3J0IHsgTGVzc29uIH0gZnJvbSAnLi9sZXNzb24uZW50aXR5JztcclxuaW1wb3J0IHsgSXNOb3RFbXB0eSwgSXNEYXRlU3RyaW5nIH0gZnJvbSAnY2xhc3MtdmFsaWRhdG9yJztcclxuLy8gaW1wb3J0IHsgTGVzc29uIH0gZnJvbSAnc3JjL21vZHVsZXMvbGVzc29uL2VudGl0aWVzL2xlc3Nvbi5lbnRpdHknO1xyXG5pbXBvcnQgeyBMZXNzb24gfSBmcm9tICdzcmMvbGVzc29uL2VudGl0eS9sZXNzb24uZW50aXR5JztcclxuXHJcbkBFbnRpdHkoKVxyXG5leHBvcnQgY2xhc3MgQXNzaWdubWVudCB7XHJcbiAgQFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4oKVxyXG4gIGlkOiBudW1iZXI7XHJcblxyXG4gIEBDb2x1bW4oKVxyXG4gIEBJc05vdEVtcHR5KClcclxuICB0aXRsZTogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKCd0ZXh0JylcclxuICBASXNOb3RFbXB0eSgpXHJcbiAgaW5zdHJ1Y3Rpb25zOiBzdHJpbmc7XHJcblxyXG4gIEBDb2x1bW4oKVxyXG4gIEBJc0RhdGVTdHJpbmcoKVxyXG4gIGR1ZURhdGU6IHN0cmluZztcclxuXHJcbiAgQE1hbnlUb09uZSgoKSA9PiBMZXNzb24sIChsZXNzb24pID0+IGxlc3Nvbi5hc3NpZ25tZW50cywge1xyXG4gICAgb25EZWxldGU6ICdDQVNDQURFJyxcclxuICB9KVxyXG4gIGxlc3NvbjogTGVzc29uO1xyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

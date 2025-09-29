@@ -1,0 +1,94 @@
+f7d293cf0bec5aed61d21f4153c169ad
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var AuditLogService_1;
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuditLogService = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const audit_log_entity_1 = require("../entities/audit.log.entity");
+/**
+ * AuditLogService provides logic for creating and retrieving audit logs.
+ */
+let AuditLogService = AuditLogService_1 = class AuditLogService {
+    constructor(auditLogRepository) {
+        this.auditLogRepository = auditLogRepository;
+        this.logger = new common_1.Logger(AuditLogService_1.name);
+    }
+    /**
+     * Create a new audit log entry.
+     * @param logData Log data to record
+     */
+    async createLog(logData) {
+        try {
+            const auditLog = new audit_log_entity_1.AuditLog();
+            auditLog.action = logData.action;
+            auditLog.entityType = logData.entityType;
+            auditLog.entityId = logData.entityId;
+            auditLog.performedBy = logData.performedBy;
+            auditLog.details = logData.details || {};
+            auditLog.timestamp = new Date();
+            const savedLog = await this.auditLogRepository.save(auditLog);
+            this.logger.log(`Audit log created: ${logData.action} on ${logData.entityType}:${logData.entityId}`);
+            return savedLog;
+        }
+        catch (error) {
+            this.logger.error(`Failed to create audit log`, error.stack);
+            // We don't want to fail the main operation if logging fails
+            // Just log the error and return null
+            return null;
+        }
+    }
+    /**
+     * Get audit logs for a specific entity.
+     * @param entityType Type of entity
+     * @param entityId Entity ID
+     */
+    async getLogsForEntity(entityType, entityId) {
+        return this.auditLogRepository.find({
+            where: {
+                entityType,
+                entityId,
+            },
+            order: {
+                timestamp: 'DESC',
+            },
+        });
+    }
+    /**
+     * Get all user deletion logs.
+     */
+    async getUserDeletionLogs() {
+        return this.auditLogRepository.find({
+            where: [
+                { action: 'ACCOUNT_DEACTIVATION' },
+                { action: 'ACCOUNT_DELETION_REQUESTED' },
+                { action: 'ACCOUNT_DELETED' },
+                { action: 'ACCOUNT_PURGED' },
+            ],
+            order: {
+                timestamp: 'DESC',
+            },
+        });
+    }
+};
+exports.AuditLogService = AuditLogService;
+exports.AuditLogService = AuditLogService = AuditLogService_1 = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(audit_log_entity_1.AuditLog)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object])
+], AuditLogService);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhdWRpdFxcc2VydmljZXNcXGF1ZGl0LmxvZy5zZXJ2aWNlLnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsMkNBQW9EO0FBQ3BELDZDQUFtRDtBQUNuRCxxQ0FBcUM7QUFDckMsbUVBQXdEO0FBR3hEOztHQUVHO0FBRUksSUFBTSxlQUFlLHVCQUFyQixNQUFNLGVBQWU7SUFHMUIsWUFFRSxrQkFBeUQ7UUFBeEMsdUJBQWtCLEdBQWxCLGtCQUFrQixDQUFzQjtRQUoxQyxXQUFNLEdBQUcsSUFBSSxlQUFNLENBQUMsaUJBQWUsQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUt4RCxDQUFDO0lBRUo7OztPQUdHO0lBQ0gsS0FBSyxDQUFDLFNBQVMsQ0FBQyxPQU1mO1FBQ0MsSUFBSSxDQUFDO1lBQ0gsTUFBTSxRQUFRLEdBQUcsSUFBSSwyQkFBUSxFQUFFLENBQUM7WUFDaEMsUUFBUSxDQUFDLE1BQU0sR0FBRyxPQUFPLENBQUMsTUFBTSxDQUFDO1lBQ2pDLFFBQVEsQ0FBQyxVQUFVLEdBQUcsT0FBTyxDQUFDLFVBQVUsQ0FBQztZQUN6QyxRQUFRLENBQUMsUUFBUSxHQUFHLE9BQU8sQ0FBQyxRQUFRLENBQUM7WUFDckMsUUFBUSxDQUFDLFdBQVcsR0FBRyxPQUFPLENBQUMsV0FBVyxDQUFDO1lBQzNDLFFBQVEsQ0FBQyxPQUFPLEdBQUcsT0FBTyxDQUFDLE9BQU8sSUFBSSxFQUFFLENBQUM7WUFDekMsUUFBUSxDQUFDLFNBQVMsR0FBRyxJQUFJLElBQUksRUFBRSxDQUFDO1lBRWhDLE1BQU0sUUFBUSxHQUFHLE1BQU0sSUFBSSxDQUFDLGtCQUFrQixDQUFDLElBQUksQ0FBQyxRQUFRLENBQUMsQ0FBQztZQUM5RCxJQUFJLENBQUMsTUFBTSxDQUFDLEdBQUcsQ0FDYixzQkFBc0IsT0FBTyxDQUFDLE1BQU0sT0FBTyxPQUFPLENBQUMsVUFBVSxJQUFJLE9BQU8sQ0FBQyxRQUFRLEVBQUUsQ0FDcEYsQ0FBQztZQUVGLE9BQU8sUUFBUSxDQUFDO1FBQ2xCLENBQUM7UUFBQyxPQUFPLEtBQUssRUFBRSxDQUFDO1lBQ2YsSUFBSSxDQUFDLE1BQU0sQ0FBQyxLQUFLLENBQUMsNEJBQTRCLEVBQUUsS0FBSyxDQUFDLEtBQUssQ0FBQyxDQUFDO1lBQzdELDREQUE0RDtZQUM1RCxxQ0FBcUM7WUFDckMsT0FBTyxJQUFJLENBQUM7UUFDZCxDQUFDO0lBQ0gsQ0FBQztJQUVEOzs7O09BSUc7SUFDSCxLQUFLLENBQUMsZ0JBQWdCLENBQ3BCLFVBQWtCLEVBQ2xCLFFBQWdCO1FBRWhCLE9BQU8sSUFBSSxDQUFDLGtCQUFrQixDQUFDLElBQUksQ0FBQztZQUNsQyxLQUFLLEVBQUU7Z0JBQ0wsVUFBVTtnQkFDVixRQUFRO2FBQ1Q7WUFDRCxLQUFLLEVBQUU7Z0JBQ0wsU0FBUyxFQUFFLE1BQU07YUFDbEI7U0FDRixDQUFDLENBQUM7SUFDTCxDQUFDO0lBRUQ7O09BRUc7SUFDSCxLQUFLLENBQUMsbUJBQW1CO1FBQ3ZCLE9BQU8sSUFBSSxDQUFDLGtCQUFrQixDQUFDLElBQUksQ0FBQztZQUNsQyxLQUFLLEVBQUU7Z0JBQ0wsRUFBRSxNQUFNLEVBQUUsc0JBQXNCLEVBQUU7Z0JBQ2xDLEVBQUUsTUFBTSxFQUFFLDRCQUE0QixFQUFFO2dCQUN4QyxFQUFFLE1BQU0sRUFBRSxpQkFBaUIsRUFBRTtnQkFDN0IsRUFBRSxNQUFNLEVBQUUsZ0JBQWdCLEVBQUU7YUFDN0I7WUFDRCxLQUFLLEVBQUU7Z0JBQ0wsU0FBUyxFQUFFLE1BQU07YUFDbEI7U0FDRixDQUFDLENBQUM7SUFDTCxDQUFDO0NBQ0YsQ0FBQTtBQTlFWSwwQ0FBZTswQkFBZixlQUFlO0lBRDNCLElBQUEsbUJBQVUsR0FBRTtJQUtSLFdBQUEsSUFBQSwwQkFBZ0IsRUFBQywyQkFBUSxDQUFDLENBQUE7eURBQ1Usb0JBQVUsb0JBQVYsb0JBQVU7R0FMdEMsZUFBZSxDQThFM0IiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhdWRpdFxcc2VydmljZXNcXGF1ZGl0LmxvZy5zZXJ2aWNlLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEluamVjdGFibGUsIExvZ2dlciB9IGZyb20gJ0BuZXN0anMvY29tbW9uJztcclxuaW1wb3J0IHsgSW5qZWN0UmVwb3NpdG9yeSB9IGZyb20gJ0BuZXN0anMvdHlwZW9ybSc7XHJcbmltcG9ydCB7IFJlcG9zaXRvcnkgfSBmcm9tICd0eXBlb3JtJztcclxuaW1wb3J0IHsgQXVkaXRMb2cgfSBmcm9tICcuLi9lbnRpdGllcy9hdWRpdC5sb2cuZW50aXR5JztcclxuXHJcblxyXG4vKipcclxuICogQXVkaXRMb2dTZXJ2aWNlIHByb3ZpZGVzIGxvZ2ljIGZvciBjcmVhdGluZyBhbmQgcmV0cmlldmluZyBhdWRpdCBsb2dzLlxyXG4gKi9cclxuQEluamVjdGFibGUoKVxyXG5leHBvcnQgY2xhc3MgQXVkaXRMb2dTZXJ2aWNlIHtcclxuICBwcml2YXRlIHJlYWRvbmx5IGxvZ2dlciA9IG5ldyBMb2dnZXIoQXVkaXRMb2dTZXJ2aWNlLm5hbWUpO1xyXG5cclxuICBjb25zdHJ1Y3RvcihcclxuICAgIEBJbmplY3RSZXBvc2l0b3J5KEF1ZGl0TG9nKVxyXG4gICAgcHJpdmF0ZSByZWFkb25seSBhdWRpdExvZ1JlcG9zaXRvcnk6IFJlcG9zaXRvcnk8QXVkaXRMb2c+LFxyXG4gICkge31cclxuXHJcbiAgLyoqXHJcbiAgICogQ3JlYXRlIGEgbmV3IGF1ZGl0IGxvZyBlbnRyeS5cclxuICAgKiBAcGFyYW0gbG9nRGF0YSBMb2cgZGF0YSB0byByZWNvcmRcclxuICAgKi9cclxuICBhc3luYyBjcmVhdGVMb2cobG9nRGF0YToge1xyXG4gICAgYWN0aW9uOiBzdHJpbmc7XHJcbiAgICBlbnRpdHlUeXBlOiBzdHJpbmc7XHJcbiAgICBlbnRpdHlJZDogc3RyaW5nO1xyXG4gICAgcGVyZm9ybWVkQnk6IHN0cmluZztcclxuICAgIGRldGFpbHM/OiBhbnk7XHJcbiAgfSk6IFByb21pc2U8QXVkaXRMb2c+IHtcclxuICAgIHRyeSB7XHJcbiAgICAgIGNvbnN0IGF1ZGl0TG9nID0gbmV3IEF1ZGl0TG9nKCk7XHJcbiAgICAgIGF1ZGl0TG9nLmFjdGlvbiA9IGxvZ0RhdGEuYWN0aW9uO1xyXG4gICAgICBhdWRpdExvZy5lbnRpdHlUeXBlID0gbG9nRGF0YS5lbnRpdHlUeXBlO1xyXG4gICAgICBhdWRpdExvZy5lbnRpdHlJZCA9IGxvZ0RhdGEuZW50aXR5SWQ7XHJcbiAgICAgIGF1ZGl0TG9nLnBlcmZvcm1lZEJ5ID0gbG9nRGF0YS5wZXJmb3JtZWRCeTtcclxuICAgICAgYXVkaXRMb2cuZGV0YWlscyA9IGxvZ0RhdGEuZGV0YWlscyB8fCB7fTtcclxuICAgICAgYXVkaXRMb2cudGltZXN0YW1wID0gbmV3IERhdGUoKTtcclxuXHJcbiAgICAgIGNvbnN0IHNhdmVkTG9nID0gYXdhaXQgdGhpcy5hdWRpdExvZ1JlcG9zaXRvcnkuc2F2ZShhdWRpdExvZyk7XHJcbiAgICAgIHRoaXMubG9nZ2VyLmxvZyhcclxuICAgICAgICBgQXVkaXQgbG9nIGNyZWF0ZWQ6ICR7bG9nRGF0YS5hY3Rpb259IG9uICR7bG9nRGF0YS5lbnRpdHlUeXBlfToke2xvZ0RhdGEuZW50aXR5SWR9YCxcclxuICAgICAgKTtcclxuXHJcbiAgICAgIHJldHVybiBzYXZlZExvZztcclxuICAgIH0gY2F0Y2ggKGVycm9yKSB7XHJcbiAgICAgIHRoaXMubG9nZ2VyLmVycm9yKGBGYWlsZWQgdG8gY3JlYXRlIGF1ZGl0IGxvZ2AsIGVycm9yLnN0YWNrKTtcclxuICAgICAgLy8gV2UgZG9uJ3Qgd2FudCB0byBmYWlsIHRoZSBtYWluIG9wZXJhdGlvbiBpZiBsb2dnaW5nIGZhaWxzXHJcbiAgICAgIC8vIEp1c3QgbG9nIHRoZSBlcnJvciBhbmQgcmV0dXJuIG51bGxcclxuICAgICAgcmV0dXJuIG51bGw7XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICAvKipcclxuICAgKiBHZXQgYXVkaXQgbG9ncyBmb3IgYSBzcGVjaWZpYyBlbnRpdHkuXHJcbiAgICogQHBhcmFtIGVudGl0eVR5cGUgVHlwZSBvZiBlbnRpdHlcclxuICAgKiBAcGFyYW0gZW50aXR5SWQgRW50aXR5IElEXHJcbiAgICovXHJcbiAgYXN5bmMgZ2V0TG9nc0ZvckVudGl0eShcclxuICAgIGVudGl0eVR5cGU6IHN0cmluZyxcclxuICAgIGVudGl0eUlkOiBzdHJpbmcsXHJcbiAgKTogUHJvbWlzZTxBdWRpdExvZ1tdPiB7XHJcbiAgICByZXR1cm4gdGhpcy5hdWRpdExvZ1JlcG9zaXRvcnkuZmluZCh7XHJcbiAgICAgIHdoZXJlOiB7XHJcbiAgICAgICAgZW50aXR5VHlwZSxcclxuICAgICAgICBlbnRpdHlJZCxcclxuICAgICAgfSxcclxuICAgICAgb3JkZXI6IHtcclxuICAgICAgICB0aW1lc3RhbXA6ICdERVNDJyxcclxuICAgICAgfSxcclxuICAgIH0pO1xyXG4gIH1cclxuXHJcbiAgLyoqXHJcbiAgICogR2V0IGFsbCB1c2VyIGRlbGV0aW9uIGxvZ3MuXHJcbiAgICovXHJcbiAgYXN5bmMgZ2V0VXNlckRlbGV0aW9uTG9ncygpOiBQcm9taXNlPEF1ZGl0TG9nW10+IHtcclxuICAgIHJldHVybiB0aGlzLmF1ZGl0TG9nUmVwb3NpdG9yeS5maW5kKHtcclxuICAgICAgd2hlcmU6IFtcclxuICAgICAgICB7IGFjdGlvbjogJ0FDQ09VTlRfREVBQ1RJVkFUSU9OJyB9LFxyXG4gICAgICAgIHsgYWN0aW9uOiAnQUNDT1VOVF9ERUxFVElPTl9SRVFVRVNURUQnIH0sXHJcbiAgICAgICAgeyBhY3Rpb246ICdBQ0NPVU5UX0RFTEVURUQnIH0sXHJcbiAgICAgICAgeyBhY3Rpb246ICdBQ0NPVU5UX1BVUkdFRCcgfSxcclxuICAgICAgXSxcclxuICAgICAgb3JkZXI6IHtcclxuICAgICAgICB0aW1lc3RhbXA6ICdERVNDJyxcclxuICAgICAgfSxcclxuICAgIH0pO1xyXG4gIH1cclxufVxyXG4iXSwidmVyc2lvbiI6M30=

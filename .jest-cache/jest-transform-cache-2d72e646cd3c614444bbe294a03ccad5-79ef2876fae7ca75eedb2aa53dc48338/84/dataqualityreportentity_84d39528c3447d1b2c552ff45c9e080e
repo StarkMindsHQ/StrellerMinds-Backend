@@ -1,0 +1,100 @@
+b6cb3df28cf56182d2d449727dc7a9d1
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d, _e, _f, _g, _h;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DataQualityReport = exports.ReportStatus = exports.ReportType = void 0;
+const typeorm_1 = require("typeorm");
+var ReportType;
+(function (ReportType) {
+    ReportType["DAILY"] = "daily";
+    ReportType["WEEKLY"] = "weekly";
+    ReportType["MONTHLY"] = "monthly";
+    ReportType["ADHOC"] = "adhoc";
+})(ReportType || (exports.ReportType = ReportType = {}));
+var ReportStatus;
+(function (ReportStatus) {
+    ReportStatus["GENERATING"] = "generating";
+    ReportStatus["COMPLETED"] = "completed";
+    ReportStatus["FAILED"] = "failed";
+})(ReportStatus || (exports.ReportStatus = ReportStatus = {}));
+let DataQualityReport = class DataQualityReport {
+};
+exports.DataQualityReport = DataQualityReport;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
+], DataQualityReport.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], DataQualityReport.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: "enum",
+        enum: ReportType,
+    }),
+    __metadata("design:type", String)
+], DataQualityReport.prototype, "reportType", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: "enum",
+        enum: ReportStatus,
+        default: ReportStatus.GENERATING,
+    }),
+    __metadata("design:type", String)
+], DataQualityReport.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp" }),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], DataQualityReport.prototype, "reportDate", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp" }),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], DataQualityReport.prototype, "startDate", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp" }),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], DataQualityReport.prototype, "endDate", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb"),
+    __metadata("design:type", typeof (_d = typeof Record !== "undefined" && Record) === "function" ? _d : Object)
+], DataQualityReport.prototype, "summary", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb"),
+    __metadata("design:type", typeof (_e = typeof Record !== "undefined" && Record) === "function" ? _e : Object)
+], DataQualityReport.prototype, "metrics", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb", { nullable: true }),
+    __metadata("design:type", typeof (_f = typeof Record !== "undefined" && Record) === "function" ? _f : Object)
+], DataQualityReport.prototype, "issues", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb", { nullable: true }),
+    __metadata("design:type", typeof (_g = typeof Record !== "undefined" && Record) === "function" ? _g : Object)
+], DataQualityReport.prototype, "recommendations", void 0);
+__decorate([
+    (0, typeorm_1.Column)("text", { nullable: true }),
+    __metadata("design:type", String)
+], DataQualityReport.prototype, "filePath", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], DataQualityReport.prototype, "generatedBy", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_h = typeof Date !== "undefined" && Date) === "function" ? _h : Object)
+], DataQualityReport.prototype, "createdAt", void 0);
+exports.DataQualityReport = DataQualityReport = __decorate([
+    (0, typeorm_1.Entity)("data_quality_reports"),
+    (0, typeorm_1.Index)(["reportType", "createdAt"]),
+    (0, typeorm_1.Index)(["status", "createdAt"])
+], DataQualityReport);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxkYXRhLXF1YWxpdHlcXGVudGl0aWVzXFxkYXRhLXF1YWxpdHktcmVwb3J0LmVudGl0eS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUEscUNBQXlGO0FBRXpGLElBQVksVUFLWDtBQUxELFdBQVksVUFBVTtJQUNwQiw2QkFBZSxDQUFBO0lBQ2YsK0JBQWlCLENBQUE7SUFDakIsaUNBQW1CLENBQUE7SUFDbkIsNkJBQWUsQ0FBQTtBQUNqQixDQUFDLEVBTFcsVUFBVSwwQkFBVixVQUFVLFFBS3JCO0FBRUQsSUFBWSxZQUlYO0FBSkQsV0FBWSxZQUFZO0lBQ3RCLHlDQUF5QixDQUFBO0lBQ3pCLHVDQUF1QixDQUFBO0lBQ3ZCLGlDQUFpQixDQUFBO0FBQ25CLENBQUMsRUFKVyxZQUFZLDRCQUFaLFlBQVksUUFJdkI7QUFLTSxJQUFNLGlCQUFpQixHQUF2QixNQUFNLGlCQUFpQjtDQWlEN0IsQ0FBQTtBQWpEWSw4Q0FBaUI7QUFFNUI7SUFEQyxJQUFBLGdDQUFzQixFQUFDLE1BQU0sQ0FBQzs7NkNBQ3JCO0FBR1Y7SUFEQyxJQUFBLGdCQUFNLEdBQUU7OytDQUNHO0FBTVo7SUFKQyxJQUFBLGdCQUFNLEVBQUM7UUFDTixJQUFJLEVBQUUsTUFBTTtRQUNaLElBQUksRUFBRSxVQUFVO0tBQ2pCLENBQUM7O3FEQUNvQjtBQU90QjtJQUxDLElBQUEsZ0JBQU0sRUFBQztRQUNOLElBQUksRUFBRSxNQUFNO1FBQ1osSUFBSSxFQUFFLFlBQVk7UUFDbEIsT0FBTyxFQUFFLFlBQVksQ0FBQyxVQUFVO0tBQ2pDLENBQUM7O2lEQUNrQjtBQUdwQjtJQURDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLElBQUksRUFBRSxXQUFXLEVBQUUsQ0FBQztrREFDbEIsSUFBSSxvQkFBSixJQUFJO3FEQUFBO0FBR2hCO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsSUFBSSxFQUFFLFdBQVcsRUFBRSxDQUFDO2tEQUNuQixJQUFJLG9CQUFKLElBQUk7b0RBQUE7QUFHZjtJQURDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLElBQUksRUFBRSxXQUFXLEVBQUUsQ0FBQztrREFDckIsSUFBSSxvQkFBSixJQUFJO2tEQUFBO0FBR2I7SUFEQyxJQUFBLGdCQUFNLEVBQUMsT0FBTyxDQUFDO2tEQUNQLE1BQU0sb0JBQU4sTUFBTTtrREFBYTtBQUc1QjtJQURDLElBQUEsZ0JBQU0sRUFBQyxPQUFPLENBQUM7a0RBQ1AsTUFBTSxvQkFBTixNQUFNO2tEQUFhO0FBRzVCO0lBREMsSUFBQSxnQkFBTSxFQUFDLE9BQU8sRUFBRSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQztrREFDM0IsTUFBTSxvQkFBTixNQUFNO2lEQUFhO0FBRzVCO0lBREMsSUFBQSxnQkFBTSxFQUFDLE9BQU8sRUFBRSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQztrREFDbEIsTUFBTSxvQkFBTixNQUFNOzBEQUFhO0FBR3JDO0lBREMsSUFBQSxnQkFBTSxFQUFDLE1BQU0sRUFBRSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQzs7bURBQ2xCO0FBR2pCO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOztzREFDUDtBQUdwQjtJQURDLElBQUEsMEJBQWdCLEdBQUU7a0RBQ1IsSUFBSSxvQkFBSixJQUFJO29EQUFBOzRCQWhESixpQkFBaUI7SUFIN0IsSUFBQSxnQkFBTSxFQUFDLHNCQUFzQixDQUFDO0lBQzlCLElBQUEsZUFBSyxFQUFDLENBQUMsWUFBWSxFQUFFLFdBQVcsQ0FBQyxDQUFDO0lBQ2xDLElBQUEsZUFBSyxFQUFDLENBQUMsUUFBUSxFQUFFLFdBQVcsQ0FBQyxDQUFDO0dBQ2xCLGlCQUFpQixDQWlEN0IiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxkYXRhLXF1YWxpdHlcXGVudGl0aWVzXFxkYXRhLXF1YWxpdHktcmVwb3J0LmVudGl0eS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBFbnRpdHksIFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4sIENvbHVtbiwgQ3JlYXRlRGF0ZUNvbHVtbiwgSW5kZXggfSBmcm9tIFwidHlwZW9ybVwiXHJcblxyXG5leHBvcnQgZW51bSBSZXBvcnRUeXBlIHtcclxuICBEQUlMWSA9IFwiZGFpbHlcIixcclxuICBXRUVLTFkgPSBcIndlZWtseVwiLFxyXG4gIE1PTlRITFkgPSBcIm1vbnRobHlcIixcclxuICBBREhPQyA9IFwiYWRob2NcIixcclxufVxyXG5cclxuZXhwb3J0IGVudW0gUmVwb3J0U3RhdHVzIHtcclxuICBHRU5FUkFUSU5HID0gXCJnZW5lcmF0aW5nXCIsXHJcbiAgQ09NUExFVEVEID0gXCJjb21wbGV0ZWRcIixcclxuICBGQUlMRUQgPSBcImZhaWxlZFwiLFxyXG59XHJcblxyXG5ARW50aXR5KFwiZGF0YV9xdWFsaXR5X3JlcG9ydHNcIilcclxuQEluZGV4KFtcInJlcG9ydFR5cGVcIiwgXCJjcmVhdGVkQXRcIl0pXHJcbkBJbmRleChbXCJzdGF0dXNcIiwgXCJjcmVhdGVkQXRcIl0pXHJcbmV4cG9ydCBjbGFzcyBEYXRhUXVhbGl0eVJlcG9ydCB7XHJcbiAgQFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4oXCJ1dWlkXCIpXHJcbiAgaWQ6IHN0cmluZ1xyXG5cclxuICBAQ29sdW1uKClcclxuICBuYW1lOiBzdHJpbmdcclxuXHJcbiAgQENvbHVtbih7XHJcbiAgICB0eXBlOiBcImVudW1cIixcclxuICAgIGVudW06IFJlcG9ydFR5cGUsXHJcbiAgfSlcclxuICByZXBvcnRUeXBlOiBSZXBvcnRUeXBlXHJcblxyXG4gIEBDb2x1bW4oe1xyXG4gICAgdHlwZTogXCJlbnVtXCIsXHJcbiAgICBlbnVtOiBSZXBvcnRTdGF0dXMsXHJcbiAgICBkZWZhdWx0OiBSZXBvcnRTdGF0dXMuR0VORVJBVElORyxcclxuICB9KVxyXG4gIHN0YXR1czogUmVwb3J0U3RhdHVzXHJcblxyXG4gIEBDb2x1bW4oeyB0eXBlOiBcInRpbWVzdGFtcFwiIH0pXHJcbiAgcmVwb3J0RGF0ZTogRGF0ZVxyXG5cclxuICBAQ29sdW1uKHsgdHlwZTogXCJ0aW1lc3RhbXBcIiB9KVxyXG4gIHN0YXJ0RGF0ZTogRGF0ZVxyXG5cclxuICBAQ29sdW1uKHsgdHlwZTogXCJ0aW1lc3RhbXBcIiB9KVxyXG4gIGVuZERhdGU6IERhdGVcclxuXHJcbiAgQENvbHVtbihcImpzb25iXCIpXHJcbiAgc3VtbWFyeTogUmVjb3JkPHN0cmluZywgYW55PlxyXG5cclxuICBAQ29sdW1uKFwianNvbmJcIilcclxuICBtZXRyaWNzOiBSZWNvcmQ8c3RyaW5nLCBhbnk+XHJcblxyXG4gIEBDb2x1bW4oXCJqc29uYlwiLCB7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgaXNzdWVzPzogUmVjb3JkPHN0cmluZywgYW55PlxyXG5cclxuICBAQ29sdW1uKFwianNvbmJcIiwgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIHJlY29tbWVuZGF0aW9ucz86IFJlY29yZDxzdHJpbmcsIGFueT5cclxuXHJcbiAgQENvbHVtbihcInRleHRcIiwgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGZpbGVQYXRoPzogc3RyaW5nXHJcblxyXG4gIEBDb2x1bW4oeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGdlbmVyYXRlZEJ5Pzogc3RyaW5nXHJcblxyXG4gIEBDcmVhdGVEYXRlQ29sdW1uKClcclxuICBjcmVhdGVkQXQ6IERhdGVcclxufVxyXG4iXSwidmVyc2lvbiI6M30=

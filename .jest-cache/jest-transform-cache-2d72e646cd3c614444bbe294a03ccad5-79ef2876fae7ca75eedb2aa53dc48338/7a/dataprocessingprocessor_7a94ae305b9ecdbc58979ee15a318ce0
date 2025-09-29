@@ -1,0 +1,45 @@
+a9ba366195639deaa87e0150df34941f
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var DataProcessingProcessor_1;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DataProcessingProcessor = void 0;
+const bull_1 = require("@nestjs/bull");
+const common_1 = require("@nestjs/common");
+let DataProcessingProcessor = DataProcessingProcessor_1 = class DataProcessingProcessor {
+    constructor(dataWarehouseService) {
+        this.dataWarehouseService = dataWarehouseService;
+        this.logger = new common_1.Logger(DataProcessingProcessor_1.name);
+    }
+    async aggregateMetrics(job) {
+        this.logger.log(`Aggregating metrics: ${job.data.granularity}`);
+        try {
+            await this.dataWarehouseService.aggregateMetrics(job.data.startTime, job.data.endTime, job.data.granularity);
+            this.logger.log(`Successfully aggregated metrics: ${job.data.granularity}`);
+        }
+        catch (error) {
+            this.logger.error(`Failed to aggregate metrics: ${error.message}`, error.stack);
+            throw error;
+        }
+    }
+};
+exports.DataProcessingProcessor = DataProcessingProcessor;
+__decorate([
+    (0, bull_1.Process)("aggregate-metrics"),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DataProcessingProcessor.prototype, "aggregateMetrics", null);
+exports.DataProcessingProcessor = DataProcessingProcessor = DataProcessingProcessor_1 = __decorate([
+    (0, bull_1.Processor)("data-processing"),
+    __metadata("design:paramtypes", [Object])
+], DataProcessingProcessor);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhbmFseXRpY1xccHJvY2Vzc29yc1xcZGF0YS1wcm9jZXNzaW5nLnByb2Nlc3Nvci50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUEsdUNBQWlEO0FBRWpELDJDQUF1QztBQUtoQyxJQUFNLHVCQUF1QiwrQkFBN0IsTUFBTSx1QkFBdUI7SUFHbEMsWUFBNkIsb0JBQTBDO1FBQTFDLHlCQUFvQixHQUFwQixvQkFBb0IsQ0FBc0I7UUFGdEQsV0FBTSxHQUFHLElBQUksZUFBTSxDQUFDLHlCQUF1QixDQUFDLElBQUksQ0FBQyxDQUFBO0lBRVEsQ0FBQztJQUdyRSxBQUFOLEtBQUssQ0FBQyxnQkFBZ0IsQ0FBQyxHQUFpRTtRQUN0RixJQUFJLENBQUMsTUFBTSxDQUFDLEdBQUcsQ0FBQyx3QkFBd0IsR0FBRyxDQUFDLElBQUksQ0FBQyxXQUFXLEVBQUUsQ0FBQyxDQUFBO1FBRS9ELElBQUksQ0FBQztZQUNILE1BQU0sSUFBSSxDQUFDLG9CQUFvQixDQUFDLGdCQUFnQixDQUFDLEdBQUcsQ0FBQyxJQUFJLENBQUMsU0FBUyxFQUFFLEdBQUcsQ0FBQyxJQUFJLENBQUMsT0FBTyxFQUFFLEdBQUcsQ0FBQyxJQUFJLENBQUMsV0FBVyxDQUFDLENBQUE7WUFDNUcsSUFBSSxDQUFDLE1BQU0sQ0FBQyxHQUFHLENBQUMsb0NBQW9DLEdBQUcsQ0FBQyxJQUFJLENBQUMsV0FBVyxFQUFFLENBQUMsQ0FBQTtRQUM3RSxDQUFDO1FBQUMsT0FBTyxLQUFLLEVBQUUsQ0FBQztZQUNmLElBQUksQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDLGdDQUFnQyxLQUFLLENBQUMsT0FBTyxFQUFFLEVBQUUsS0FBSyxDQUFDLEtBQUssQ0FBQyxDQUFBO1lBQy9FLE1BQU0sS0FBSyxDQUFBO1FBQ2IsQ0FBQztJQUNILENBQUM7Q0FDRixDQUFBO0FBakJZLDBEQUF1QjtBQU01QjtJQURMLElBQUEsY0FBTyxFQUFDLG1CQUFtQixDQUFDOzs7OytEQVc1QjtrQ0FoQlUsdUJBQXVCO0lBRG5DLElBQUEsZ0JBQVMsRUFBQyxpQkFBaUIsQ0FBQzs7R0FDaEIsdUJBQXVCLENBaUJuQyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGFuYWx5dGljXFxwcm9jZXNzb3JzXFxkYXRhLXByb2Nlc3NpbmcucHJvY2Vzc29yLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IFByb2Nlc3NvciwgUHJvY2VzcyB9IGZyb20gXCJAbmVzdGpzL2J1bGxcIlxyXG5pbXBvcnQgdHlwZSB7IEpvYiB9IGZyb20gXCJidWxsXCJcclxuaW1wb3J0IHsgTG9nZ2VyIH0gZnJvbSBcIkBuZXN0anMvY29tbW9uXCJcclxuXHJcbmltcG9ydCB0eXBlIHsgRGF0YVdhcmVob3VzZVNlcnZpY2UgfSBmcm9tIFwiLi4vc2VydmljZXMvZGF0YS13YXJlaG91c2Uuc2VydmljZVwiXHJcblxyXG5AUHJvY2Vzc29yKFwiZGF0YS1wcm9jZXNzaW5nXCIpXHJcbmV4cG9ydCBjbGFzcyBEYXRhUHJvY2Vzc2luZ1Byb2Nlc3NvciB7XHJcbiAgcHJpdmF0ZSByZWFkb25seSBsb2dnZXIgPSBuZXcgTG9nZ2VyKERhdGFQcm9jZXNzaW5nUHJvY2Vzc29yLm5hbWUpXHJcblxyXG4gIGNvbnN0cnVjdG9yKHByaXZhdGUgcmVhZG9ubHkgZGF0YVdhcmVob3VzZVNlcnZpY2U6IERhdGFXYXJlaG91c2VTZXJ2aWNlKSB7fVxyXG5cclxuICBAUHJvY2VzcyhcImFnZ3JlZ2F0ZS1tZXRyaWNzXCIpXHJcbiAgYXN5bmMgYWdncmVnYXRlTWV0cmljcyhqb2I6IEpvYjx7IHN0YXJ0VGltZTogRGF0ZTsgZW5kVGltZTogRGF0ZTsgZ3JhbnVsYXJpdHk6IHN0cmluZyB9Pikge1xyXG4gICAgdGhpcy5sb2dnZXIubG9nKGBBZ2dyZWdhdGluZyBtZXRyaWNzOiAke2pvYi5kYXRhLmdyYW51bGFyaXR5fWApXHJcblxyXG4gICAgdHJ5IHtcclxuICAgICAgYXdhaXQgdGhpcy5kYXRhV2FyZWhvdXNlU2VydmljZS5hZ2dyZWdhdGVNZXRyaWNzKGpvYi5kYXRhLnN0YXJ0VGltZSwgam9iLmRhdGEuZW5kVGltZSwgam9iLmRhdGEuZ3JhbnVsYXJpdHkpXHJcbiAgICAgIHRoaXMubG9nZ2VyLmxvZyhgU3VjY2Vzc2Z1bGx5IGFnZ3JlZ2F0ZWQgbWV0cmljczogJHtqb2IuZGF0YS5ncmFudWxhcml0eX1gKVxyXG4gICAgfSBjYXRjaCAoZXJyb3IpIHtcclxuICAgICAgdGhpcy5sb2dnZXIuZXJyb3IoYEZhaWxlZCB0byBhZ2dyZWdhdGUgbWV0cmljczogJHtlcnJvci5tZXNzYWdlfWAsIGVycm9yLnN0YWNrKVxyXG4gICAgICB0aHJvdyBlcnJvclxyXG4gICAgfVxyXG4gIH1cclxufVxyXG4iXSwidmVyc2lvbiI6M30=

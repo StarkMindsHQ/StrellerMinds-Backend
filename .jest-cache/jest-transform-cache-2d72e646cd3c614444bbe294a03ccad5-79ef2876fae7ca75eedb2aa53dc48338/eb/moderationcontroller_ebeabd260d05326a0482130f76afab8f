@@ -1,0 +1,61 @@
+640ef43ab7d1432511468e4f1e24350a
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ModerationController = void 0;
+const common_1 = require("@nestjs/common");
+const moderation_service_1 = require("./moderation.service");
+const passport_1 = require("@nestjs/passport");
+const create_moderation_action_dto_1 = require("./dto/create-moderation-action.dto");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * Controller for moderation actions and logging.
+ */
+let ModerationController = class ModerationController {
+    constructor(moderationService) {
+        this.moderationService = moderationService;
+    }
+    /**
+     * Log a moderation action performed by a moderator.
+     */
+    async logModerationAction(actionDto, req) {
+        if (!req.user) {
+            throw new Error('User not found in request'); // Handle missing user
+        }
+        return this.moderationService.logModerationAction(actionDto.action, actionDto.entityType, actionDto.entityId, req.user.id);
+    }
+};
+exports.ModerationController = ModerationController;
+__decorate([
+    (0, common_1.Post)('log'),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')) // Specify strategy
+    ,
+    (0, swagger_1.ApiOperation)({ summary: 'Log moderation action', description: 'Logs a moderation action performed by a moderator.' }),
+    (0, swagger_1.ApiBody)({ type: create_moderation_action_dto_1.ModerationActionDto }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Moderation action logged.' }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof create_moderation_action_dto_1.ModerationActionDto !== "undefined" && create_moderation_action_dto_1.ModerationActionDto) === "function" ? _b : Object, Object]),
+    __metadata("design:returntype", Promise)
+], ModerationController.prototype, "logModerationAction", null);
+exports.ModerationController = ModerationController = __decorate([
+    (0, swagger_1.ApiTags)('Moderation')
+    // Moderation Controller
+    ,
+    (0, common_1.Controller)('moderation'),
+    __metadata("design:paramtypes", [typeof (_a = typeof moderation_service_1.ModerationService !== "undefined" && moderation_service_1.ModerationService) === "function" ? _a : Object])
+], ModerationController);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtb2RlcmF0aW9uXFxtb2RlcmF0aW9uLmNvbnRyb2xsZXIudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLDJDQUF3RTtBQUN4RSw2REFBeUQ7QUFDekQsK0NBQTZDO0FBRTdDLHFGQUF5RTtBQUN6RSw2Q0FBOEU7QUFPOUU7O0dBRUc7QUFJSSxJQUFNLG9CQUFvQixHQUExQixNQUFNLG9CQUFvQjtJQUMvQixZQUE2QixpQkFBb0M7UUFBcEMsc0JBQWlCLEdBQWpCLGlCQUFpQixDQUFtQjtJQUFHLENBQUM7SUFFckU7O09BRUc7SUFNRyxBQUFOLEtBQUssQ0FBQyxtQkFBbUIsQ0FDZixTQUE4QixFQUMvQixHQUF5QjtRQUVoQyxJQUFJLENBQUMsR0FBRyxDQUFDLElBQUksRUFBRSxDQUFDO1lBQ2QsTUFBTSxJQUFJLEtBQUssQ0FBQywyQkFBMkIsQ0FBQyxDQUFDLENBQUMsc0JBQXNCO1FBQ3RFLENBQUM7UUFFRCxPQUFPLElBQUksQ0FBQyxpQkFBaUIsQ0FBQyxtQkFBbUIsQ0FDL0MsU0FBUyxDQUFDLE1BQU0sRUFDaEIsU0FBUyxDQUFDLFVBQVUsRUFDcEIsU0FBUyxDQUFDLFFBQVEsRUFDbEIsR0FBRyxDQUFDLElBQUksQ0FBQyxFQUFFLENBQ1osQ0FBQztJQUNKLENBQUM7Q0FDRixDQUFBO0FBMUJZLG9EQUFvQjtBQVd6QjtJQUxMLElBQUEsYUFBSSxFQUFDLEtBQUssQ0FBQztJQUNYLElBQUEsa0JBQVMsRUFBQyxJQUFBLG9CQUFTLEVBQUMsS0FBSyxDQUFDLENBQUMsQ0FBQyxtQkFBbUI7O0lBQy9DLElBQUEsc0JBQVksRUFBQyxFQUFFLE9BQU8sRUFBRSx1QkFBdUIsRUFBRSxXQUFXLEVBQUUsb0RBQW9ELEVBQUUsQ0FBQztJQUNySCxJQUFBLGlCQUFPLEVBQUMsRUFBRSxJQUFJLEVBQUUsa0RBQW1CLEVBQUUsQ0FBQztJQUN0QyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxNQUFNLEVBQUUsR0FBRyxFQUFFLFdBQVcsRUFBRSwyQkFBMkIsRUFBRSxDQUFDO0lBRXBFLFdBQUEsSUFBQSxhQUFJLEdBQUUsQ0FBQTtJQUNOLFdBQUEsSUFBQSxZQUFHLEdBQUUsQ0FBQTs7eURBRGEsa0RBQW1CLG9CQUFuQixrREFBbUI7OytEQWF2QzsrQkF6QlUsb0JBQW9CO0lBSGhDLElBQUEsaUJBQU8sRUFBQyxZQUFZLENBQUM7SUFDdEIsd0JBQXdCOztJQUN2QixJQUFBLG1CQUFVLEVBQUMsWUFBWSxDQUFDO3lEQUV5QixzQ0FBaUIsb0JBQWpCLHNDQUFpQjtHQUR0RCxvQkFBb0IsQ0EwQmhDIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcbW9kZXJhdGlvblxcbW9kZXJhdGlvbi5jb250cm9sbGVyLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEJvZHksIENvbnRyb2xsZXIsIFBvc3QsIFVzZUd1YXJkcywgUmVxIH0gZnJvbSAnQG5lc3Rqcy9jb21tb24nO1xyXG5pbXBvcnQgeyBNb2RlcmF0aW9uU2VydmljZSB9IGZyb20gJy4vbW9kZXJhdGlvbi5zZXJ2aWNlJztcclxuaW1wb3J0IHsgQXV0aEd1YXJkIH0gZnJvbSAnQG5lc3Rqcy9wYXNzcG9ydCc7XHJcbmltcG9ydCB7IFJlcXVlc3QgfSBmcm9tICdleHByZXNzJztcclxuaW1wb3J0IHsgTW9kZXJhdGlvbkFjdGlvbkR0byB9IGZyb20gJy4vZHRvL2NyZWF0ZS1tb2RlcmF0aW9uLWFjdGlvbi5kdG8nO1xyXG5pbXBvcnQgeyBBcGlUYWdzLCBBcGlPcGVyYXRpb24sIEFwaVJlc3BvbnNlLCBBcGlCb2R5IH0gZnJvbSAnQG5lc3Rqcy9zd2FnZ2VyJztcclxuXHJcbi8vIERlZmluZSBjdXN0b20gcmVxdWVzdCB0eXBlXHJcbmludGVyZmFjZSBBdXRoZW50aWNhdGVkUmVxdWVzdCBleHRlbmRzIFJlcXVlc3Qge1xyXG4gIHVzZXI/OiB7IGlkOiBzdHJpbmcgfTsgLy8gRW5zdXJlIFR5cGVTY3JpcHQgcmVjb2duaXplcyAndXNlcidcclxufVxyXG5cclxuLyoqXHJcbiAqIENvbnRyb2xsZXIgZm9yIG1vZGVyYXRpb24gYWN0aW9ucyBhbmQgbG9nZ2luZy5cclxuICovXHJcbkBBcGlUYWdzKCdNb2RlcmF0aW9uJylcclxuLy8gTW9kZXJhdGlvbiBDb250cm9sbGVyXHJcbkBDb250cm9sbGVyKCdtb2RlcmF0aW9uJylcclxuZXhwb3J0IGNsYXNzIE1vZGVyYXRpb25Db250cm9sbGVyIHtcclxuICBjb25zdHJ1Y3Rvcihwcml2YXRlIHJlYWRvbmx5IG1vZGVyYXRpb25TZXJ2aWNlOiBNb2RlcmF0aW9uU2VydmljZSkge31cclxuXHJcbiAgLyoqXHJcbiAgICogTG9nIGEgbW9kZXJhdGlvbiBhY3Rpb24gcGVyZm9ybWVkIGJ5IGEgbW9kZXJhdG9yLlxyXG4gICAqL1xyXG4gIEBQb3N0KCdsb2cnKVxyXG4gIEBVc2VHdWFyZHMoQXV0aEd1YXJkKCdqd3QnKSkgLy8gU3BlY2lmeSBzdHJhdGVneVxyXG4gIEBBcGlPcGVyYXRpb24oeyBzdW1tYXJ5OiAnTG9nIG1vZGVyYXRpb24gYWN0aW9uJywgZGVzY3JpcHRpb246ICdMb2dzIGEgbW9kZXJhdGlvbiBhY3Rpb24gcGVyZm9ybWVkIGJ5IGEgbW9kZXJhdG9yLicgfSlcclxuICBAQXBpQm9keSh7IHR5cGU6IE1vZGVyYXRpb25BY3Rpb25EdG8gfSlcclxuICBAQXBpUmVzcG9uc2UoeyBzdGF0dXM6IDIwMSwgZGVzY3JpcHRpb246ICdNb2RlcmF0aW9uIGFjdGlvbiBsb2dnZWQuJyB9KVxyXG4gIGFzeW5jIGxvZ01vZGVyYXRpb25BY3Rpb24oXHJcbiAgICBAQm9keSgpIGFjdGlvbkR0bzogTW9kZXJhdGlvbkFjdGlvbkR0byxcclxuICAgIEBSZXEoKSByZXE6IEF1dGhlbnRpY2F0ZWRSZXF1ZXN0LCAvLyBVc2UgdGhlIGN1c3RvbSByZXF1ZXN0IHR5cGVcclxuICApIHtcclxuICAgIGlmICghcmVxLnVzZXIpIHtcclxuICAgICAgdGhyb3cgbmV3IEVycm9yKCdVc2VyIG5vdCBmb3VuZCBpbiByZXF1ZXN0Jyk7IC8vIEhhbmRsZSBtaXNzaW5nIHVzZXJcclxuICAgIH1cclxuXHJcbiAgICByZXR1cm4gdGhpcy5tb2RlcmF0aW9uU2VydmljZS5sb2dNb2RlcmF0aW9uQWN0aW9uKFxyXG4gICAgICBhY3Rpb25EdG8uYWN0aW9uLFxyXG4gICAgICBhY3Rpb25EdG8uZW50aXR5VHlwZSxcclxuICAgICAgYWN0aW9uRHRvLmVudGl0eUlkLFxyXG4gICAgICByZXEudXNlci5pZCwgLy8gTm93IFR5cGVTY3JpcHQgd2lsbCBub3QgY29tcGxhaW5cclxuICAgICk7XHJcbiAgfVxyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

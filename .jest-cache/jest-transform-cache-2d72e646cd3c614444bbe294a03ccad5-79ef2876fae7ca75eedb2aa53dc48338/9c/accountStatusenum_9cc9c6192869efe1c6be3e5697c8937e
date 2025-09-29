@@ -1,0 +1,15 @@
+c6634cdfb2233c9daccb8ded5e0b01b4
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AccountStatus = void 0;
+/**
+ * Account deletion status enum
+ */
+var AccountStatus;
+(function (AccountStatus) {
+    AccountStatus["ACTIVE"] = "active";
+    AccountStatus["DEACTIVATED"] = "deactivated";
+    AccountStatus["PENDING_DELETION"] = "pending_deletion";
+    AccountStatus["DELETED"] = "deleted";
+})(AccountStatus || (exports.AccountStatus = AccountStatus = {}));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx1c2Vyc1xcZW51bXNcXGFjY291bnRTdGF0dXMuZW51bS50cyIsIm1hcHBpbmdzIjoiOzs7QUFBQTs7R0FFRztBQUNILElBQVksYUFLWDtBQUxELFdBQVksYUFBYTtJQUN2QixrQ0FBaUIsQ0FBQTtJQUNqQiw0Q0FBMkIsQ0FBQTtJQUMzQixzREFBcUMsQ0FBQTtJQUNyQyxvQ0FBbUIsQ0FBQTtBQUNyQixDQUFDLEVBTFcsYUFBYSw2QkFBYixhQUFhLFFBS3hCIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcdXNlcnNcXGVudW1zXFxhY2NvdW50U3RhdHVzLmVudW0udHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyoqXHJcbiAqIEFjY291bnQgZGVsZXRpb24gc3RhdHVzIGVudW1cclxuICovXHJcbmV4cG9ydCBlbnVtIEFjY291bnRTdGF0dXMge1xyXG4gIEFDVElWRSA9ICdhY3RpdmUnLFxyXG4gIERFQUNUSVZBVEVEID0gJ2RlYWN0aXZhdGVkJyxcclxuICBQRU5ESU5HX0RFTEVUSU9OID0gJ3BlbmRpbmdfZGVsZXRpb24nLFxyXG4gIERFTEVURUQgPSAnZGVsZXRlZCcsXHJcbn0iXSwidmVyc2lvbiI6M30=

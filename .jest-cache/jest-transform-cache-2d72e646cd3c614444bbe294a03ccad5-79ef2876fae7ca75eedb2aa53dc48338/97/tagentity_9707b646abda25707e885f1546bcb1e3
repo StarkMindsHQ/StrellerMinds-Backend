@@ -1,0 +1,43 @@
+bf8129b67d584fe29ee91c5524c88f18
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Tag = void 0;
+const typeorm_1 = require("typeorm");
+const course_entity_1 = require("./course.entity");
+let Tag = class Tag {
+};
+exports.Tag = Tag;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
+], Tag.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ length: 50, unique: true }),
+    __metadata("design:type", String)
+], Tag.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], Tag.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], Tag.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToMany)(() => course_entity_1.Course, (course) => course.tags),
+    __metadata("design:type", Array)
+], Tag.prototype, "courses", void 0);
+exports.Tag = Tag = __decorate([
+    (0, typeorm_1.Entity)("tags")
+], Tag);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxjb3Vyc2VzXFxlbnRpdGllc1xcdGFnLmVudGl0eS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUEscUNBQWdIO0FBQ2hILG1EQUF3QztBQUdqQyxJQUFNLEdBQUcsR0FBVCxNQUFNLEdBQUc7Q0FtQmYsQ0FBQTtBQW5CWSxrQkFBRztBQUVkO0lBREMsSUFBQSxnQ0FBc0IsRUFBQyxNQUFNLENBQUM7OytCQUNyQjtBQUdWO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsTUFBTSxFQUFFLEVBQUUsRUFBRSxNQUFNLEVBQUUsSUFBSSxFQUFFLENBQUM7O2lDQUN6QjtBQUdaO0lBREMsSUFBQSwwQkFBZ0IsR0FBRTtrREFDUixJQUFJLG9CQUFKLElBQUk7c0NBQUE7QUFHZjtJQURDLElBQUEsMEJBQWdCLEdBQUU7a0RBQ1IsSUFBSSxvQkFBSixJQUFJO3NDQUFBO0FBT2Y7SUFKQyxJQUFBLG9CQUFVLEVBQ1QsR0FBRyxFQUFFLENBQUMsc0JBQU0sRUFDWixDQUFDLE1BQU0sRUFBRSxFQUFFLENBQUMsTUFBTSxDQUFDLElBQUksQ0FDeEI7O29DQUNnQjtjQWxCTixHQUFHO0lBRGYsSUFBQSxnQkFBTSxFQUFDLE1BQU0sQ0FBQztHQUNGLEdBQUcsQ0FtQmYiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxjb3Vyc2VzXFxlbnRpdGllc1xcdGFnLmVudGl0eS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBFbnRpdHksIFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4sIENvbHVtbiwgTWFueVRvTWFueSwgQ3JlYXRlRGF0ZUNvbHVtbiwgVXBkYXRlRGF0ZUNvbHVtbiB9IGZyb20gXCJ0eXBlb3JtXCJcclxuaW1wb3J0IHsgQ291cnNlIH0gZnJvbSBcIi4vY291cnNlLmVudGl0eVwiXHJcblxyXG5ARW50aXR5KFwidGFnc1wiKVxyXG5leHBvcnQgY2xhc3MgVGFnIHtcclxuICBAUHJpbWFyeUdlbmVyYXRlZENvbHVtbihcInV1aWRcIilcclxuICBpZDogc3RyaW5nXHJcblxyXG4gIEBDb2x1bW4oeyBsZW5ndGg6IDUwLCB1bmlxdWU6IHRydWUgfSlcclxuICBuYW1lOiBzdHJpbmdcclxuXHJcbiAgQENyZWF0ZURhdGVDb2x1bW4oKVxyXG4gIGNyZWF0ZWRBdDogRGF0ZVxyXG5cclxuICBAVXBkYXRlRGF0ZUNvbHVtbigpXHJcbiAgdXBkYXRlZEF0OiBEYXRlXHJcblxyXG4gIC8vIE1hbnktdG8tTWFueSByZWxhdGlvbnNoaXBcclxuICBATWFueVRvTWFueShcclxuICAgICgpID0+IENvdXJzZSxcclxuICAgIChjb3Vyc2UpID0+IGNvdXJzZS50YWdzLFxyXG4gIClcclxuICBjb3Vyc2VzOiBDb3Vyc2VbXVxyXG59XHJcblxyXG4iXSwidmVyc2lvbiI6M30=

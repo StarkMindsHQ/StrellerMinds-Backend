@@ -1,0 +1,89 @@
+4950f5bfe3239fad94e5304b21df96f9
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DataQualityMetric = exports.MetricCategory = void 0;
+const typeorm_1 = require("typeorm");
+var MetricCategory;
+(function (MetricCategory) {
+    MetricCategory["COMPLETENESS"] = "completeness";
+    MetricCategory["ACCURACY"] = "accuracy";
+    MetricCategory["CONSISTENCY"] = "consistency";
+    MetricCategory["VALIDITY"] = "validity";
+    MetricCategory["UNIQUENESS"] = "uniqueness";
+    MetricCategory["TIMELINESS"] = "timeliness";
+    MetricCategory["OVERALL"] = "overall";
+})(MetricCategory || (exports.MetricCategory = MetricCategory = {}));
+let DataQualityMetric = class DataQualityMetric {
+};
+exports.DataQualityMetric = DataQualityMetric;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
+], DataQualityMetric.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], DataQualityMetric.prototype, "ruleId", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], DataQualityMetric.prototype, "entityType", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: "enum",
+        enum: MetricCategory,
+    }),
+    __metadata("design:type", String)
+], DataQualityMetric.prototype, "metricCategory", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], DataQualityMetric.prototype, "metricName", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal", { precision: 10, scale: 4 }),
+    __metadata("design:type", Number)
+], DataQualityMetric.prototype, "value", void 0);
+__decorate([
+    (0, typeorm_1.Column)("decimal", { precision: 10, scale: 4, nullable: true }),
+    __metadata("design:type", Number)
+], DataQualityMetric.prototype, "threshold", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], DataQualityMetric.prototype, "passed", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb", { nullable: true }),
+    __metadata("design:type", typeof (_a = typeof Record !== "undefined" && Record) === "function" ? _a : Object)
+], DataQualityMetric.prototype, "details", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb", { nullable: true }),
+    __metadata("design:type", typeof (_b = typeof Record !== "undefined" && Record) === "function" ? _b : Object)
+], DataQualityMetric.prototype, "dimensions", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp" }),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], DataQualityMetric.prototype, "timestamp", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: "1h" }),
+    __metadata("design:type", String)
+], DataQualityMetric.prototype, "granularity", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], DataQualityMetric.prototype, "createdAt", void 0);
+exports.DataQualityMetric = DataQualityMetric = __decorate([
+    (0, typeorm_1.Entity)("data_quality_metrics"),
+    (0, typeorm_1.Index)(["entityType", "metricCategory", "timestamp"]),
+    (0, typeorm_1.Index)(["ruleId", "timestamp"])
+], DataQualityMetric);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxkYXRhLXF1YWxpdHlcXGVudGl0aWVzXFxkYXRhLXF1YWxpdHktbWV0cmljLmVudGl0eS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUEscUNBQXlGO0FBRXpGLElBQVksY0FRWDtBQVJELFdBQVksY0FBYztJQUN4QiwrQ0FBNkIsQ0FBQTtJQUM3Qix1Q0FBcUIsQ0FBQTtJQUNyQiw2Q0FBMkIsQ0FBQTtJQUMzQix1Q0FBcUIsQ0FBQTtJQUNyQiwyQ0FBeUIsQ0FBQTtJQUN6QiwyQ0FBeUIsQ0FBQTtJQUN6QixxQ0FBbUIsQ0FBQTtBQUNyQixDQUFDLEVBUlcsY0FBYyw4QkFBZCxjQUFjLFFBUXpCO0FBS00sSUFBTSxpQkFBaUIsR0FBdkIsTUFBTSxpQkFBaUI7Q0EwQzdCLENBQUE7QUExQ1ksOENBQWlCO0FBRTVCO0lBREMsSUFBQSxnQ0FBc0IsRUFBQyxNQUFNLENBQUM7OzZDQUNyQjtBQUdWO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOztpREFDWjtBQUdmO0lBREMsSUFBQSxnQkFBTSxHQUFFOztxREFDUztBQU1sQjtJQUpDLElBQUEsZ0JBQU0sRUFBQztRQUNOLElBQUksRUFBRSxNQUFNO1FBQ1osSUFBSSxFQUFFLGNBQWM7S0FDckIsQ0FBQzs7eURBQzRCO0FBRzlCO0lBREMsSUFBQSxnQkFBTSxHQUFFOztxREFDUztBQUdsQjtJQURDLElBQUEsZ0JBQU0sRUFBQyxTQUFTLEVBQUUsRUFBRSxTQUFTLEVBQUUsRUFBRSxFQUFFLEtBQUssRUFBRSxDQUFDLEVBQUUsQ0FBQzs7Z0RBQ2xDO0FBR2I7SUFEQyxJQUFBLGdCQUFNLEVBQUMsU0FBUyxFQUFFLEVBQUUsU0FBUyxFQUFFLEVBQUUsRUFBRSxLQUFLLEVBQUUsQ0FBQyxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQzs7b0RBQzdDO0FBR2xCO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsT0FBTyxFQUFFLElBQUksRUFBRSxDQUFDOztpREFDWDtBQUdmO0lBREMsSUFBQSxnQkFBTSxFQUFDLE9BQU8sRUFBRSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQztrREFDMUIsTUFBTSxvQkFBTixNQUFNO2tEQUFhO0FBRzdCO0lBREMsSUFBQSxnQkFBTSxFQUFDLE9BQU8sRUFBRSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQztrREFDdkIsTUFBTSxvQkFBTixNQUFNO3FEQUFnQjtBQUduQztJQURDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLElBQUksRUFBRSxXQUFXLEVBQUUsQ0FBQztrREFDbkIsSUFBSSxvQkFBSixJQUFJO29EQUFBO0FBR2Y7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxPQUFPLEVBQUUsSUFBSSxFQUFFLENBQUM7O3NEQUNQO0FBR25CO0lBREMsSUFBQSwwQkFBZ0IsR0FBRTtrREFDUixJQUFJLG9CQUFKLElBQUk7b0RBQUE7NEJBekNKLGlCQUFpQjtJQUg3QixJQUFBLGdCQUFNLEVBQUMsc0JBQXNCLENBQUM7SUFDOUIsSUFBQSxlQUFLLEVBQUMsQ0FBQyxZQUFZLEVBQUUsZ0JBQWdCLEVBQUUsV0FBVyxDQUFDLENBQUM7SUFDcEQsSUFBQSxlQUFLLEVBQUMsQ0FBQyxRQUFRLEVBQUUsV0FBVyxDQUFDLENBQUM7R0FDbEIsaUJBQWlCLENBMEM3QiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGRhdGEtcXVhbGl0eVxcZW50aXRpZXNcXGRhdGEtcXVhbGl0eS1tZXRyaWMuZW50aXR5LnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEVudGl0eSwgUHJpbWFyeUdlbmVyYXRlZENvbHVtbiwgQ29sdW1uLCBDcmVhdGVEYXRlQ29sdW1uLCBJbmRleCB9IGZyb20gXCJ0eXBlb3JtXCJcclxuXHJcbmV4cG9ydCBlbnVtIE1ldHJpY0NhdGVnb3J5IHtcclxuICBDT01QTEVURU5FU1MgPSBcImNvbXBsZXRlbmVzc1wiLFxyXG4gIEFDQ1VSQUNZID0gXCJhY2N1cmFjeVwiLFxyXG4gIENPTlNJU1RFTkNZID0gXCJjb25zaXN0ZW5jeVwiLFxyXG4gIFZBTElESVRZID0gXCJ2YWxpZGl0eVwiLFxyXG4gIFVOSVFVRU5FU1MgPSBcInVuaXF1ZW5lc3NcIixcclxuICBUSU1FTElORVNTID0gXCJ0aW1lbGluZXNzXCIsXHJcbiAgT1ZFUkFMTCA9IFwib3ZlcmFsbFwiLFxyXG59XHJcblxyXG5ARW50aXR5KFwiZGF0YV9xdWFsaXR5X21ldHJpY3NcIilcclxuQEluZGV4KFtcImVudGl0eVR5cGVcIiwgXCJtZXRyaWNDYXRlZ29yeVwiLCBcInRpbWVzdGFtcFwiXSlcclxuQEluZGV4KFtcInJ1bGVJZFwiLCBcInRpbWVzdGFtcFwiXSlcclxuZXhwb3J0IGNsYXNzIERhdGFRdWFsaXR5TWV0cmljIHtcclxuICBAUHJpbWFyeUdlbmVyYXRlZENvbHVtbihcInV1aWRcIilcclxuICBpZDogc3RyaW5nXHJcblxyXG4gIEBDb2x1bW4oeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIHJ1bGVJZD86IHN0cmluZ1xyXG5cclxuICBAQ29sdW1uKClcclxuICBlbnRpdHlUeXBlOiBzdHJpbmdcclxuXHJcbiAgQENvbHVtbih7XHJcbiAgICB0eXBlOiBcImVudW1cIixcclxuICAgIGVudW06IE1ldHJpY0NhdGVnb3J5LFxyXG4gIH0pXHJcbiAgbWV0cmljQ2F0ZWdvcnk6IE1ldHJpY0NhdGVnb3J5XHJcblxyXG4gIEBDb2x1bW4oKVxyXG4gIG1ldHJpY05hbWU6IHN0cmluZ1xyXG5cclxuICBAQ29sdW1uKFwiZGVjaW1hbFwiLCB7IHByZWNpc2lvbjogMTAsIHNjYWxlOiA0IH0pXHJcbiAgdmFsdWU6IG51bWJlclxyXG5cclxuICBAQ29sdW1uKFwiZGVjaW1hbFwiLCB7IHByZWNpc2lvbjogMTAsIHNjYWxlOiA0LCBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIHRocmVzaG9sZD86IG51bWJlclxyXG5cclxuICBAQ29sdW1uKHsgZGVmYXVsdDogdHJ1ZSB9KVxyXG4gIHBhc3NlZDogYm9vbGVhblxyXG5cclxuICBAQ29sdW1uKFwianNvbmJcIiwgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGRldGFpbHM/OiBSZWNvcmQ8c3RyaW5nLCBhbnk+XHJcblxyXG4gIEBDb2x1bW4oXCJqc29uYlwiLCB7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgZGltZW5zaW9ucz86IFJlY29yZDxzdHJpbmcsIHN0cmluZz5cclxuXHJcbiAgQENvbHVtbih7IHR5cGU6IFwidGltZXN0YW1wXCIgfSlcclxuICB0aW1lc3RhbXA6IERhdGVcclxuXHJcbiAgQENvbHVtbih7IGRlZmF1bHQ6IFwiMWhcIiB9KVxyXG4gIGdyYW51bGFyaXR5OiBzdHJpbmdcclxuXHJcbiAgQENyZWF0ZURhdGVDb2x1bW4oKVxyXG4gIGNyZWF0ZWRBdDogRGF0ZVxyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

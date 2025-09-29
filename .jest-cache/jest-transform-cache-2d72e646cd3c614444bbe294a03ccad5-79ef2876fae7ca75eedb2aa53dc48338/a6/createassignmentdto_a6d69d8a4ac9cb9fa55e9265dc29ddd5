@@ -1,0 +1,11 @@
+cffbd708610f23d86c60116209806cbb
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateAssignmentDto = void 0;
+/**
+ * DTO for creating a new assignment.
+ */
+class CreateAssignmentDto {
+}
+exports.CreateAssignmentDto = CreateAssignmentDto;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhc3NpZ25tZW50XFxkdG9cXGNyZWF0ZS1hc3NpZ25tZW50LmR0by50cyIsIm1hcHBpbmdzIjoiOzs7QUFBQTs7R0FFRztBQUNILE1BQWEsbUJBQW1CO0NBQUc7QUFBbkMsa0RBQW1DIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcYXNzaWdubWVudFxcZHRvXFxjcmVhdGUtYXNzaWdubWVudC5kdG8udHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyoqXHJcbiAqIERUTyBmb3IgY3JlYXRpbmcgYSBuZXcgYXNzaWdubWVudC5cclxuICovXHJcbmV4cG9ydCBjbGFzcyBDcmVhdGVBc3NpZ25tZW50RHRvIHt9XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

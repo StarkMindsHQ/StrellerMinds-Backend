@@ -1,0 +1,44 @@
+db80ed7fa90a7407fc91fefcc1aa92b8
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateNotificationSettingsDto = void 0;
+const class_validator_1 = require("class-validator");
+class CreateNotificationSettingsDto {
+}
+exports.CreateNotificationSettingsDto = CreateNotificationSettingsDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateNotificationSettingsDto.prototype, "emailEnabled", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateNotificationSettingsDto.prototype, "smsEnabled", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateNotificationSettingsDto.prototype, "pushEnabled", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateNotificationSettingsDto.prototype, "frequency", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsObject)(),
+    __metadata("design:type", typeof (_a = typeof Record !== "undefined" && Record) === "function" ? _a : Object)
+], CreateNotificationSettingsDto.prototype, "rules", void 0);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx1c2VyLXByZWZlcmVuY2VzXFxkdG9zXFxjcmVhdGUtbm90aWZpY2F0aW9uLXNldHRpbmdzLmR0by50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUEscURBQTRFO0FBRTVFLE1BQWEsNkJBQTZCO0NBb0J6QztBQXBCRCxzRUFvQkM7QUFqQkM7SUFGQyxJQUFBLDRCQUFVLEdBQUU7SUFDWixJQUFBLDJCQUFTLEdBQUU7O21FQUNXO0FBSXZCO0lBRkMsSUFBQSw0QkFBVSxHQUFFO0lBQ1osSUFBQSwyQkFBUyxHQUFFOztpRUFDUztBQUlyQjtJQUZDLElBQUEsNEJBQVUsR0FBRTtJQUNaLElBQUEsMkJBQVMsR0FBRTs7a0VBQ1U7QUFJdEI7SUFGQyxJQUFBLDRCQUFVLEdBQUU7SUFDWixJQUFBLDBCQUFRLEdBQUU7O2dFQUNrQztBQUk3QztJQUZDLElBQUEsNEJBQVUsR0FBRTtJQUNaLElBQUEsMEJBQVEsR0FBRTtrREFDSCxNQUFNLG9CQUFOLE1BQU07NERBQWMiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx1c2VyLXByZWZlcmVuY2VzXFxkdG9zXFxjcmVhdGUtbm90aWZpY2F0aW9uLXNldHRpbmdzLmR0by50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBJc0Jvb2xlYW4sIElzT3B0aW9uYWwsIElzU3RyaW5nLCBJc09iamVjdCB9IGZyb20gJ2NsYXNzLXZhbGlkYXRvcic7XHJcblxyXG5leHBvcnQgY2xhc3MgQ3JlYXRlTm90aWZpY2F0aW9uU2V0dGluZ3NEdG8ge1xyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNCb29sZWFuKClcclxuICBlbWFpbEVuYWJsZWQ/OiBib29sZWFuO1xyXG5cclxuICBASXNPcHRpb25hbCgpXHJcbiAgQElzQm9vbGVhbigpXHJcbiAgc21zRW5hYmxlZD86IGJvb2xlYW47XHJcblxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNCb29sZWFuKClcclxuICBwdXNoRW5hYmxlZD86IGJvb2xlYW47XHJcblxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNTdHJpbmcoKVxyXG4gIGZyZXF1ZW5jeT86ICdpbW1lZGlhdGUnIHwgJ2RhaWx5JyB8ICd3ZWVrbHknO1xyXG5cclxuICBASXNPcHRpb25hbCgpXHJcbiAgQElzT2JqZWN0KClcclxuICBydWxlcz86IFJlY29yZDxzdHJpbmcsIGFueT47XHJcbn0gIl0sInZlcnNpb24iOjN9

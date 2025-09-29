@@ -1,0 +1,83 @@
+11d49d36c4146f5675a6a4bfc84c12f9
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d, _e;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnalyticsEvent = exports.EventType = void 0;
+const typeorm_1 = require("typeorm");
+var EventType;
+(function (EventType) {
+    EventType["USER_ACTION"] = "user_action";
+    EventType["SYSTEM_EVENT"] = "system_event";
+    EventType["BUSINESS_EVENT"] = "business_event";
+    EventType["ERROR_EVENT"] = "error_event";
+})(EventType || (exports.EventType = EventType = {}));
+let AnalyticsEvent = class AnalyticsEvent {
+};
+exports.AnalyticsEvent = AnalyticsEvent;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
+], AnalyticsEvent.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: "enum",
+        enum: EventType,
+    }),
+    __metadata("design:type", String)
+], AnalyticsEvent.prototype, "eventType", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], AnalyticsEvent.prototype, "eventName", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], AnalyticsEvent.prototype, "userId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], AnalyticsEvent.prototype, "sessionId", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb"),
+    __metadata("design:type", typeof (_a = typeof Record !== "undefined" && Record) === "function" ? _a : Object)
+], AnalyticsEvent.prototype, "properties", void 0);
+__decorate([
+    (0, typeorm_1.Column)("jsonb", { nullable: true }),
+    __metadata("design:type", typeof (_b = typeof Record !== "undefined" && Record) === "function" ? _b : Object)
+], AnalyticsEvent.prototype, "context", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "timestamp" }),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], AnalyticsEvent.prototype, "timestamp", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], AnalyticsEvent.prototype, "source", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], AnalyticsEvent.prototype, "channel", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], AnalyticsEvent.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_e = typeof Date !== "undefined" && Date) === "function" ? _e : Object)
+], AnalyticsEvent.prototype, "updatedAt", void 0);
+exports.AnalyticsEvent = AnalyticsEvent = __decorate([
+    (0, typeorm_1.Entity)("analytics_events"),
+    (0, typeorm_1.Index)(["eventType", "timestamp"]),
+    (0, typeorm_1.Index)(["userId", "timestamp"]),
+    (0, typeorm_1.Index)(["sessionId", "timestamp"])
+], AnalyticsEvent);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhbmFseXRpY1xcZW50aXRpZXNcXGFuYWx5dGljcy1ldmVudC5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHFDQUEyRztBQUUzRyxJQUFZLFNBS1g7QUFMRCxXQUFZLFNBQVM7SUFDbkIsd0NBQTJCLENBQUE7SUFDM0IsMENBQTZCLENBQUE7SUFDN0IsOENBQWlDLENBQUE7SUFDakMsd0NBQTJCLENBQUE7QUFDN0IsQ0FBQyxFQUxXLFNBQVMseUJBQVQsU0FBUyxRQUtwQjtBQU1NLElBQU0sY0FBYyxHQUFwQixNQUFNLGNBQWM7Q0F1QzFCLENBQUE7QUF2Q1ksd0NBQWM7QUFFekI7SUFEQyxJQUFBLGdDQUFzQixFQUFDLE1BQU0sQ0FBQzs7MENBQ3JCO0FBTVY7SUFKQyxJQUFBLGdCQUFNLEVBQUM7UUFDTixJQUFJLEVBQUUsTUFBTTtRQUNaLElBQUksRUFBRSxTQUFTO0tBQ2hCLENBQUM7O2lEQUNrQjtBQUdwQjtJQURDLElBQUEsZ0JBQU0sR0FBRTs7aURBQ1E7QUFHakI7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7OzhDQUNaO0FBR2Y7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7O2lEQUNUO0FBR2xCO0lBREMsSUFBQSxnQkFBTSxFQUFDLE9BQU8sQ0FBQztrREFDSixNQUFNLG9CQUFOLE1BQU07a0RBQWE7QUFHL0I7SUFEQyxJQUFBLGdCQUFNLEVBQUMsT0FBTyxFQUFFLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDO2tEQUMxQixNQUFNLG9CQUFOLE1BQU07K0NBQWE7QUFHN0I7SUFEQyxJQUFBLGdCQUFNLEVBQUMsRUFBRSxJQUFJLEVBQUUsV0FBVyxFQUFFLENBQUM7a0RBQ25CLElBQUksb0JBQUosSUFBSTtpREFBQTtBQUdmO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOzs4Q0FDWjtBQUdmO0lBREMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOzsrQ0FDWDtBQUdoQjtJQURDLElBQUEsMEJBQWdCLEdBQUU7a0RBQ1IsSUFBSSxvQkFBSixJQUFJO2lEQUFBO0FBR2Y7SUFEQyxJQUFBLDBCQUFnQixHQUFFO2tEQUNSLElBQUksb0JBQUosSUFBSTtpREFBQTt5QkF0Q0osY0FBYztJQUoxQixJQUFBLGdCQUFNLEVBQUMsa0JBQWtCLENBQUM7SUFDMUIsSUFBQSxlQUFLLEVBQUMsQ0FBQyxXQUFXLEVBQUUsV0FBVyxDQUFDLENBQUM7SUFDakMsSUFBQSxlQUFLLEVBQUMsQ0FBQyxRQUFRLEVBQUUsV0FBVyxDQUFDLENBQUM7SUFDOUIsSUFBQSxlQUFLLEVBQUMsQ0FBQyxXQUFXLEVBQUUsV0FBVyxDQUFDLENBQUM7R0FDckIsY0FBYyxDQXVDMUIiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhbmFseXRpY1xcZW50aXRpZXNcXGFuYWx5dGljcy1ldmVudC5lbnRpdHkudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgRW50aXR5LCBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uLCBDb2x1bW4sIENyZWF0ZURhdGVDb2x1bW4sIFVwZGF0ZURhdGVDb2x1bW4sIEluZGV4IH0gZnJvbSBcInR5cGVvcm1cIlxyXG5cclxuZXhwb3J0IGVudW0gRXZlbnRUeXBlIHtcclxuICBVU0VSX0FDVElPTiA9IFwidXNlcl9hY3Rpb25cIixcclxuICBTWVNURU1fRVZFTlQgPSBcInN5c3RlbV9ldmVudFwiLFxyXG4gIEJVU0lORVNTX0VWRU5UID0gXCJidXNpbmVzc19ldmVudFwiLFxyXG4gIEVSUk9SX0VWRU5UID0gXCJlcnJvcl9ldmVudFwiLFxyXG59XHJcblxyXG5ARW50aXR5KFwiYW5hbHl0aWNzX2V2ZW50c1wiKVxyXG5ASW5kZXgoW1wiZXZlbnRUeXBlXCIsIFwidGltZXN0YW1wXCJdKVxyXG5ASW5kZXgoW1widXNlcklkXCIsIFwidGltZXN0YW1wXCJdKVxyXG5ASW5kZXgoW1wic2Vzc2lvbklkXCIsIFwidGltZXN0YW1wXCJdKVxyXG5leHBvcnQgY2xhc3MgQW5hbHl0aWNzRXZlbnQge1xyXG4gIEBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uKFwidXVpZFwiKVxyXG4gIGlkOiBzdHJpbmdcclxuXHJcbiAgQENvbHVtbih7XHJcbiAgICB0eXBlOiBcImVudW1cIixcclxuICAgIGVudW06IEV2ZW50VHlwZSxcclxuICB9KVxyXG4gIGV2ZW50VHlwZTogRXZlbnRUeXBlXHJcblxyXG4gIEBDb2x1bW4oKVxyXG4gIGV2ZW50TmFtZTogc3RyaW5nXHJcblxyXG4gIEBDb2x1bW4oeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIHVzZXJJZD86IHN0cmluZ1xyXG5cclxuICBAQ29sdW1uKHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBzZXNzaW9uSWQ/OiBzdHJpbmdcclxuXHJcbiAgQENvbHVtbihcImpzb25iXCIpXHJcbiAgcHJvcGVydGllczogUmVjb3JkPHN0cmluZywgYW55PlxyXG5cclxuICBAQ29sdW1uKFwianNvbmJcIiwgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGNvbnRleHQ/OiBSZWNvcmQ8c3RyaW5nLCBhbnk+XHJcblxyXG4gIEBDb2x1bW4oeyB0eXBlOiBcInRpbWVzdGFtcFwiIH0pXHJcbiAgdGltZXN0YW1wOiBEYXRlXHJcblxyXG4gIEBDb2x1bW4oeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIHNvdXJjZT86IHN0cmluZ1xyXG5cclxuICBAQ29sdW1uKHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBjaGFubmVsPzogc3RyaW5nXHJcblxyXG4gIEBDcmVhdGVEYXRlQ29sdW1uKClcclxuICBjcmVhdGVkQXQ6IERhdGVcclxuXHJcbiAgQFVwZGF0ZURhdGVDb2x1bW4oKVxyXG4gIHVwZGF0ZWRBdDogRGF0ZVxyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

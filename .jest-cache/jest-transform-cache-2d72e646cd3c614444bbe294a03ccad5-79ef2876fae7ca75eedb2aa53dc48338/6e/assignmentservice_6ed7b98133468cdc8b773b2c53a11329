@@ -1,0 +1,51 @@
+14cfddb97a8a6c022c3e6d27ade4c956
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AssignmentService = void 0;
+const common_1 = require("@nestjs/common");
+/**
+ * AssignmentService provides assignment CRUD logic.
+ */
+let AssignmentService = class AssignmentService {
+    /**
+     * Create a new assignment.
+     */
+    create(createAssignmentDto) {
+        return 'This action adds a new assignment';
+    }
+    /**
+     * Get all assignments.
+     */
+    findAll() {
+        return `This action returns all assignment`;
+    }
+    /**
+     * Get an assignment by ID.
+     */
+    findOne(id) {
+        return `This action returns a #${id} assignment`;
+    }
+    /**
+     * Update an assignment by ID.
+     */
+    update(id, updateAssignmentDto) {
+        return `This action updates a #${id} assignment`;
+    }
+    /**
+     * Remove an assignment by ID.
+     */
+    remove(id) {
+        return `This action removes a #${id} assignment`;
+    }
+};
+exports.AssignmentService = AssignmentService;
+exports.AssignmentService = AssignmentService = __decorate([
+    (0, common_1.Injectable)()
+], AssignmentService);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhc3NpZ25tZW50XFxhc3NpZ25tZW50LnNlcnZpY2UudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7O0FBQUEsMkNBQTRDO0FBSTVDOztHQUVHO0FBRUksSUFBTSxpQkFBaUIsR0FBdkIsTUFBTSxpQkFBaUI7SUFDNUI7O09BRUc7SUFDSCxNQUFNLENBQUMsbUJBQXdDO1FBQzdDLE9BQU8sbUNBQW1DLENBQUM7SUFDN0MsQ0FBQztJQUVEOztPQUVHO0lBQ0gsT0FBTztRQUNMLE9BQU8sb0NBQW9DLENBQUM7SUFDOUMsQ0FBQztJQUVEOztPQUVHO0lBQ0gsT0FBTyxDQUFDLEVBQVU7UUFDaEIsT0FBTywwQkFBMEIsRUFBRSxhQUFhLENBQUM7SUFDbkQsQ0FBQztJQUVEOztPQUVHO0lBQ0gsTUFBTSxDQUFDLEVBQVUsRUFBRSxtQkFBd0M7UUFDekQsT0FBTywwQkFBMEIsRUFBRSxhQUFhLENBQUM7SUFDbkQsQ0FBQztJQUVEOztPQUVHO0lBQ0gsTUFBTSxDQUFDLEVBQVU7UUFDZixPQUFPLDBCQUEwQixFQUFFLGFBQWEsQ0FBQztJQUNuRCxDQUFDO0NBQ0YsQ0FBQTtBQW5DWSw4Q0FBaUI7NEJBQWpCLGlCQUFpQjtJQUQ3QixJQUFBLG1CQUFVLEdBQUU7R0FDQSxpQkFBaUIsQ0FtQzdCIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcYXNzaWdubWVudFxcYXNzaWdubWVudC5zZXJ2aWNlLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEluamVjdGFibGUgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IENyZWF0ZUFzc2lnbm1lbnREdG8gfSBmcm9tICcuL2R0by9jcmVhdGUtYXNzaWdubWVudC5kdG8nO1xyXG5pbXBvcnQgeyBVcGRhdGVBc3NpZ25tZW50RHRvIH0gZnJvbSAnLi9kdG8vdXBkYXRlLWFzc2lnbm1lbnQuZHRvJztcclxuXHJcbi8qKlxyXG4gKiBBc3NpZ25tZW50U2VydmljZSBwcm92aWRlcyBhc3NpZ25tZW50IENSVUQgbG9naWMuXHJcbiAqL1xyXG5ASW5qZWN0YWJsZSgpXHJcbmV4cG9ydCBjbGFzcyBBc3NpZ25tZW50U2VydmljZSB7XHJcbiAgLyoqXHJcbiAgICogQ3JlYXRlIGEgbmV3IGFzc2lnbm1lbnQuXHJcbiAgICovXHJcbiAgY3JlYXRlKGNyZWF0ZUFzc2lnbm1lbnREdG86IENyZWF0ZUFzc2lnbm1lbnREdG8pIHtcclxuICAgIHJldHVybiAnVGhpcyBhY3Rpb24gYWRkcyBhIG5ldyBhc3NpZ25tZW50JztcclxuICB9XHJcblxyXG4gIC8qKlxyXG4gICAqIEdldCBhbGwgYXNzaWdubWVudHMuXHJcbiAgICovXHJcbiAgZmluZEFsbCgpIHtcclxuICAgIHJldHVybiBgVGhpcyBhY3Rpb24gcmV0dXJucyBhbGwgYXNzaWdubWVudGA7XHJcbiAgfVxyXG5cclxuICAvKipcclxuICAgKiBHZXQgYW4gYXNzaWdubWVudCBieSBJRC5cclxuICAgKi9cclxuICBmaW5kT25lKGlkOiBudW1iZXIpIHtcclxuICAgIHJldHVybiBgVGhpcyBhY3Rpb24gcmV0dXJucyBhICMke2lkfSBhc3NpZ25tZW50YDtcclxuICB9XHJcblxyXG4gIC8qKlxyXG4gICAqIFVwZGF0ZSBhbiBhc3NpZ25tZW50IGJ5IElELlxyXG4gICAqL1xyXG4gIHVwZGF0ZShpZDogbnVtYmVyLCB1cGRhdGVBc3NpZ25tZW50RHRvOiBVcGRhdGVBc3NpZ25tZW50RHRvKSB7XHJcbiAgICByZXR1cm4gYFRoaXMgYWN0aW9uIHVwZGF0ZXMgYSAjJHtpZH0gYXNzaWdubWVudGA7XHJcbiAgfVxyXG5cclxuICAvKipcclxuICAgKiBSZW1vdmUgYW4gYXNzaWdubWVudCBieSBJRC5cclxuICAgKi9cclxuICByZW1vdmUoaWQ6IG51bWJlcikge1xyXG4gICAgcmV0dXJuIGBUaGlzIGFjdGlvbiByZW1vdmVzIGEgIyR7aWR9IGFzc2lnbm1lbnRgO1xyXG4gIH1cclxufVxyXG4iXSwidmVyc2lvbiI6M30=

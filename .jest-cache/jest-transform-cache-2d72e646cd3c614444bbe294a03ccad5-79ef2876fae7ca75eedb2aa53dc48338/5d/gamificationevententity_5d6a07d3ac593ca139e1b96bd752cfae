@@ -1,0 +1,43 @@
+178b587aa73898cb9a9c2f6d9b582e81
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GamificationEvent = void 0;
+const typeorm_1 = require("typeorm");
+const user_entity_1 = require("../../users/entities/user.entity");
+let GamificationEvent = class GamificationEvent {
+};
+exports.GamificationEvent = GamificationEvent;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], GamificationEvent.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { eager: true }),
+    __metadata("design:type", typeof (_a = typeof user_entity_1.User !== "undefined" && user_entity_1.User) === "function" ? _a : Object)
+], GamificationEvent.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], GamificationEvent.prototype, "eventType", void 0);
+__decorate([
+    (0, typeorm_1.Column)('json', { nullable: true }),
+    __metadata("design:type", Object)
+], GamificationEvent.prototype, "metadata", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], GamificationEvent.prototype, "timestamp", void 0);
+exports.GamificationEvent = GamificationEvent = __decorate([
+    (0, typeorm_1.Entity)('gamification_events')
+], GamificationEvent);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnYW1pZmljYXRpb25cXGVudGl0aWVzXFxnYW1pZmljYXRpb24tZXZlbnQuZW50aXR5LnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7QUFBQSxxQ0FBOEY7QUFDOUYsa0VBQXdEO0FBR2pELElBQU0saUJBQWlCLEdBQXZCLE1BQU0saUJBQWlCO0NBZTdCLENBQUE7QUFmWSw4Q0FBaUI7QUFFNUI7SUFEQyxJQUFBLGdDQUFzQixHQUFFOzs2Q0FDZDtBQUdYO0lBREMsSUFBQSxtQkFBUyxFQUFDLEdBQUcsRUFBRSxDQUFDLGtCQUFJLEVBQUUsRUFBRSxLQUFLLEVBQUUsSUFBSSxFQUFFLENBQUM7a0RBQ2pDLGtCQUFJLG9CQUFKLGtCQUFJOytDQUFDO0FBR1g7SUFEQyxJQUFBLGdCQUFNLEdBQUU7O29EQUNTO0FBR2xCO0lBREMsSUFBQSxnQkFBTSxFQUFDLE1BQU0sRUFBRSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQzs7bURBQ3JCO0FBR2Q7SUFEQyxJQUFBLDBCQUFnQixHQUFFO2tEQUNSLElBQUksb0JBQUosSUFBSTtvREFBQzs0QkFkTCxpQkFBaUI7SUFEN0IsSUFBQSxnQkFBTSxFQUFDLHFCQUFxQixDQUFDO0dBQ2pCLGlCQUFpQixDQWU3QiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGdhbWlmaWNhdGlvblxcZW50aXRpZXNcXGdhbWlmaWNhdGlvbi1ldmVudC5lbnRpdHkudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgRW50aXR5LCBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uLCBNYW55VG9PbmUsIENvbHVtbiwgQ3JlYXRlRGF0ZUNvbHVtbiB9IGZyb20gJ3R5cGVvcm0nO1xyXG5pbXBvcnQgeyBVc2VyIH0gZnJvbSAnLi4vLi4vdXNlcnMvZW50aXRpZXMvdXNlci5lbnRpdHknO1xyXG5cclxuQEVudGl0eSgnZ2FtaWZpY2F0aW9uX2V2ZW50cycpXHJcbmV4cG9ydCBjbGFzcyBHYW1pZmljYXRpb25FdmVudCB7XHJcbiAgQFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4oKVxyXG4gIGlkOiBudW1iZXI7XHJcblxyXG4gIEBNYW55VG9PbmUoKCkgPT4gVXNlciwgeyBlYWdlcjogdHJ1ZSB9KVxyXG4gIHVzZXI6IFVzZXI7XHJcblxyXG4gIEBDb2x1bW4oKVxyXG4gIGV2ZW50VHlwZTogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKCdqc29uJywgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIG1ldGFkYXRhOiBhbnk7XHJcblxyXG4gIEBDcmVhdGVEYXRlQ29sdW1uKClcclxuICB0aW1lc3RhbXA6IERhdGU7XHJcbn0gIl0sInZlcnNpb24iOjN9

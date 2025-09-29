@@ -1,0 +1,42 @@
+c1e50aabd0e20d554b7e1971484f0f77
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LessonModule = void 0;
+const common_1 = require("@nestjs/common");
+const lesson_controller_1 = require("./lesson.controller");
+const lesson_service_1 = require("./lesson.service");
+const typeorm_1 = require("@nestjs/typeorm");
+const lesson_entity_1 = require("./entity/lesson.entity");
+const course_module_entity_1 = require("../courses/entities/course-module.entity");
+const user_progress_entity_1 = require("../users/entities/user-progress.entity");
+const assignment_entity_1 = require("src/assignment/entities/assignment.entity");
+const module_entity_1 = require("src/module/entities/module.entity");
+/**
+ * Lesson module for managing lessons, their assignments, and progress.
+ */
+let LessonModule = class LessonModule {
+};
+exports.LessonModule = LessonModule;
+exports.LessonModule = LessonModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([
+                lesson_entity_1.Lesson,
+                assignment_entity_1.Assignment,
+                course_module_entity_1.CourseModule,
+                user_progress_entity_1.UserProgress,
+                module_entity_1.Module,
+            ]),
+        ],
+        controllers: [lesson_controller_1.LessonController],
+        providers: [lesson_service_1.LessonService],
+        exports: [lesson_service_1.LessonService],
+    })
+], LessonModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxsZXNzb25cXGxlc3Nvbi5tb2R1bGUudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7O0FBQUEsMkNBQXdDO0FBQ3hDLDJEQUF1RDtBQUN2RCxxREFBaUQ7QUFDakQsNkNBQWdEO0FBQ2hELDBEQUFnRDtBQUNoRCxtRkFBd0U7QUFDeEUsaUZBQXNFO0FBQ3RFLGlGQUF1RTtBQUN2RSxxRUFBMkU7QUFHM0U7O0dBRUc7QUFlSSxJQUFNLFlBQVksR0FBbEIsTUFBTSxZQUFZO0NBQUcsQ0FBQTtBQUFmLG9DQUFZO3VCQUFaLFlBQVk7SUFkeEIsSUFBQSxlQUFNLEVBQUM7UUFDTixPQUFPLEVBQUU7WUFDUCx1QkFBYSxDQUFDLFVBQVUsQ0FBQztnQkFDdkIsc0JBQU07Z0JBQ04sOEJBQVU7Z0JBQ1YsbUNBQVk7Z0JBQ1osbUNBQVk7Z0JBQ1osc0JBQVk7YUFDYixDQUFDO1NBQ0g7UUFDRCxXQUFXLEVBQUUsQ0FBQyxvQ0FBZ0IsQ0FBQztRQUMvQixTQUFTLEVBQUUsQ0FBQyw4QkFBYSxDQUFDO1FBQzFCLE9BQU8sRUFBRSxDQUFDLDhCQUFhLENBQUM7S0FDekIsQ0FBQztHQUNXLFlBQVksQ0FBRyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGxlc3NvblxcbGVzc29uLm1vZHVsZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBNb2R1bGUgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IExlc3NvbkNvbnRyb2xsZXIgfSBmcm9tICcuL2xlc3Nvbi5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgTGVzc29uU2VydmljZSB9IGZyb20gJy4vbGVzc29uLnNlcnZpY2UnO1xyXG5pbXBvcnQgeyBUeXBlT3JtTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy90eXBlb3JtJztcclxuaW1wb3J0IHsgTGVzc29uIH0gZnJvbSAnLi9lbnRpdHkvbGVzc29uLmVudGl0eSc7XHJcbmltcG9ydCB7IENvdXJzZU1vZHVsZSB9IGZyb20gJy4uL2NvdXJzZXMvZW50aXRpZXMvY291cnNlLW1vZHVsZS5lbnRpdHknO1xyXG5pbXBvcnQgeyBVc2VyUHJvZ3Jlc3MgfSBmcm9tICcuLi91c2Vycy9lbnRpdGllcy91c2VyLXByb2dyZXNzLmVudGl0eSc7XHJcbmltcG9ydCB7IEFzc2lnbm1lbnQgfSBmcm9tICdzcmMvYXNzaWdubWVudC9lbnRpdGllcy9hc3NpZ25tZW50LmVudGl0eSc7XHJcbmltcG9ydCB7IE1vZHVsZSBhcyBNb2R1bGVFbnRpdHkgfSBmcm9tICdzcmMvbW9kdWxlL2VudGl0aWVzL21vZHVsZS5lbnRpdHknO1xyXG5pbXBvcnQgeyBBcGlUYWdzIH0gZnJvbSAnQG5lc3Rqcy9zd2FnZ2VyJztcclxuXHJcbi8qKlxyXG4gKiBMZXNzb24gbW9kdWxlIGZvciBtYW5hZ2luZyBsZXNzb25zLCB0aGVpciBhc3NpZ25tZW50cywgYW5kIHByb2dyZXNzLlxyXG4gKi9cclxuQE1vZHVsZSh7XHJcbiAgaW1wb3J0czogW1xyXG4gICAgVHlwZU9ybU1vZHVsZS5mb3JGZWF0dXJlKFtcclxuICAgICAgTGVzc29uLFxyXG4gICAgICBBc3NpZ25tZW50LFxyXG4gICAgICBDb3Vyc2VNb2R1bGUsXHJcbiAgICAgIFVzZXJQcm9ncmVzcyxcclxuICAgICAgTW9kdWxlRW50aXR5LFxyXG4gICAgXSksXHJcbiAgXSxcclxuICBjb250cm9sbGVyczogW0xlc3NvbkNvbnRyb2xsZXJdLFxyXG4gIHByb3ZpZGVyczogW0xlc3NvblNlcnZpY2VdLFxyXG4gIGV4cG9ydHM6IFtMZXNzb25TZXJ2aWNlXSxcclxufSlcclxuZXhwb3J0IGNsYXNzIExlc3Nvbk1vZHVsZSB7fVxyXG4iXSwidmVyc2lvbiI6M30=

@@ -1,0 +1,91 @@
+005e95e21a20e6a4a745fa20eb87efdf
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateUserProfileDto = void 0;
+const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
+class CreateUserProfileDto {
+}
+exports.CreateUserProfileDto = CreateUserProfileDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "firstName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "lastName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "bio", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsUrl)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "avatarUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsPhoneNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "phoneNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "address", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "city", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "country", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "preferredLanguage", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "postalCode", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false }),
+    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUserProfileDto.prototype, "dateOfBirth", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: false, default: false }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateUserProfileDto.prototype, "isPublic", void 0);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx1c2VyLXByb2ZpbGVzXFxkdG9cXGNyZWF0ZS11c2VyLXByb2ZpbGUuZHRvLnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7OztBQUFBLHFEQUFxRztBQUNyRyw2Q0FBNkM7QUFFN0MsTUFBYSxvQkFBb0I7Q0E0RGhDO0FBNURELG9EQTREQztBQXhEQztJQUhDLElBQUEscUJBQVcsRUFBQyxFQUFFLFFBQVEsRUFBRSxLQUFLLEVBQUUsQ0FBQztJQUNoQyxJQUFBLDBCQUFRLEdBQUU7SUFDVixJQUFBLDRCQUFVLEdBQUU7O3VEQUNLO0FBS2xCO0lBSEMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsUUFBUSxFQUFFLEtBQUssRUFBRSxDQUFDO0lBQ2hDLElBQUEsMEJBQVEsR0FBRTtJQUNWLElBQUEsNEJBQVUsR0FBRTs7c0RBQ0k7QUFLakI7SUFIQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxRQUFRLEVBQUUsS0FBSyxFQUFFLENBQUM7SUFDaEMsSUFBQSwwQkFBUSxHQUFFO0lBQ1YsSUFBQSw0QkFBVSxHQUFFOztpREFDRDtBQUtaO0lBSEMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsUUFBUSxFQUFFLEtBQUssRUFBRSxDQUFDO0lBQ2hDLElBQUEsdUJBQUssR0FBRTtJQUNQLElBQUEsNEJBQVUsR0FBRTs7dURBQ0s7QUFLbEI7SUFIQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxRQUFRLEVBQUUsS0FBSyxFQUFFLENBQUM7SUFDaEMsSUFBQSwrQkFBYSxHQUFFO0lBQ2YsSUFBQSw0QkFBVSxHQUFFOzt5REFDTztBQUtwQjtJQUhDLElBQUEscUJBQVcsRUFBQyxFQUFFLFFBQVEsRUFBRSxLQUFLLEVBQUUsQ0FBQztJQUNoQyxJQUFBLDBCQUFRLEdBQUU7SUFDVixJQUFBLDRCQUFVLEdBQUU7O3FEQUNHO0FBS2hCO0lBSEMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsUUFBUSxFQUFFLEtBQUssRUFBRSxDQUFDO0lBQ2hDLElBQUEsMEJBQVEsR0FBRTtJQUNWLElBQUEsNEJBQVUsR0FBRTs7a0RBQ0E7QUFLYjtJQUhDLElBQUEscUJBQVcsRUFBQyxFQUFFLFFBQVEsRUFBRSxLQUFLLEVBQUUsQ0FBQztJQUNoQyxJQUFBLDBCQUFRLEdBQUU7SUFDVixJQUFBLDRCQUFVLEdBQUU7O3FEQUNHO0FBS2hCO0lBSEMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsUUFBUSxFQUFFLEtBQUssRUFBRSxDQUFDO0lBQ2hDLElBQUEsNEJBQVUsR0FBRTtJQUNaLElBQUEsMEJBQVEsR0FBRTs7K0RBQ2dCO0FBSzNCO0lBSEMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsUUFBUSxFQUFFLEtBQUssRUFBRSxDQUFDO0lBQ2hDLElBQUEsMEJBQVEsR0FBRTtJQUNWLElBQUEsNEJBQVUsR0FBRTs7d0RBQ007QUFLbkI7SUFIQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxRQUFRLEVBQUUsS0FBSyxFQUFFLENBQUM7SUFDaEMsSUFBQSw4QkFBWSxHQUFFO0lBQ2QsSUFBQSw0QkFBVSxHQUFFOzt5REFDTztBQUtwQjtJQUhDLElBQUEscUJBQVcsRUFBQyxFQUFFLFFBQVEsRUFBRSxLQUFLLEVBQUUsT0FBTyxFQUFFLEtBQUssRUFBRSxDQUFDO0lBQ2hELElBQUEsMkJBQVMsR0FBRTtJQUNYLElBQUEsNEJBQVUsR0FBRTs7c0RBQ0siLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx1c2VyLXByb2ZpbGVzXFxkdG9cXGNyZWF0ZS11c2VyLXByb2ZpbGUuZHRvLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IElzU3RyaW5nLCBJc09wdGlvbmFsLCBJc0Jvb2xlYW4sIElzRGF0ZVN0cmluZywgSXNVcmwsIElzUGhvbmVOdW1iZXIgfSBmcm9tIFwiY2xhc3MtdmFsaWRhdG9yXCJcclxuaW1wb3J0IHsgQXBpUHJvcGVydHkgfSBmcm9tIFwiQG5lc3Rqcy9zd2FnZ2VyXCJcclxuXHJcbmV4cG9ydCBjbGFzcyBDcmVhdGVVc2VyUHJvZmlsZUR0byB7XHJcbiAgQEFwaVByb3BlcnR5KHsgcmVxdWlyZWQ6IGZhbHNlIH0pXHJcbiAgQElzU3RyaW5nKClcclxuICBASXNPcHRpb25hbCgpXHJcbiAgZmlyc3ROYW1lPzogc3RyaW5nXHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IHJlcXVpcmVkOiBmYWxzZSB9KVxyXG4gIEBJc1N0cmluZygpXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIGxhc3ROYW1lPzogc3RyaW5nXHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IHJlcXVpcmVkOiBmYWxzZSB9KVxyXG4gIEBJc1N0cmluZygpXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIGJpbz86IHN0cmluZ1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyByZXF1aXJlZDogZmFsc2UgfSlcclxuICBASXNVcmwoKVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBhdmF0YXJVcmw/OiBzdHJpbmdcclxuXHJcbiAgQEFwaVByb3BlcnR5KHsgcmVxdWlyZWQ6IGZhbHNlIH0pXHJcbiAgQElzUGhvbmVOdW1iZXIoKVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBwaG9uZU51bWJlcj86IHN0cmluZ1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyByZXF1aXJlZDogZmFsc2UgfSlcclxuICBASXNTdHJpbmcoKVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBhZGRyZXNzPzogc3RyaW5nXHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IHJlcXVpcmVkOiBmYWxzZSB9KVxyXG4gIEBJc1N0cmluZygpXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIGNpdHk/OiBzdHJpbmdcclxuXHJcbiAgQEFwaVByb3BlcnR5KHsgcmVxdWlyZWQ6IGZhbHNlIH0pXHJcbiAgQElzU3RyaW5nKClcclxuICBASXNPcHRpb25hbCgpXHJcbiAgY291bnRyeT86IHN0cmluZ1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyByZXF1aXJlZDogZmFsc2UgfSlcclxuICBASXNPcHRpb25hbCgpXHJcbiAgQElzU3RyaW5nKClcclxuICBwcmVmZXJyZWRMYW5ndWFnZT86IHN0cmluZztcclxuXHJcbiAgQEFwaVByb3BlcnR5KHsgcmVxdWlyZWQ6IGZhbHNlIH0pXHJcbiAgQElzU3RyaW5nKClcclxuICBASXNPcHRpb25hbCgpXHJcbiAgcG9zdGFsQ29kZT86IHN0cmluZ1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyByZXF1aXJlZDogZmFsc2UgfSlcclxuICBASXNEYXRlU3RyaW5nKClcclxuICBASXNPcHRpb25hbCgpXHJcbiAgZGF0ZU9mQmlydGg/OiBzdHJpbmdcclxuXHJcbiAgQEFwaVByb3BlcnR5KHsgcmVxdWlyZWQ6IGZhbHNlLCBkZWZhdWx0OiBmYWxzZSB9KVxyXG4gIEBJc0Jvb2xlYW4oKVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBpc1B1YmxpYz86IGJvb2xlYW5cclxufVxyXG4iXSwidmVyc2lvbiI6M30=

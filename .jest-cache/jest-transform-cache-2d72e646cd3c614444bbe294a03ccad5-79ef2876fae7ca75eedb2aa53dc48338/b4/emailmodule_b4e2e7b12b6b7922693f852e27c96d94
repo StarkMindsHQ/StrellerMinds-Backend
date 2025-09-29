@@ -1,0 +1,75 @@
+44ee0d33f4eca4e301d4e23411c79fb5
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmailModule = void 0;
+/**
+ * EmailModule provides email sending, analytics, preference management, and tracking features.
+ *
+ * @module Email
+ */
+const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
+const bull_1 = require("@nestjs/bull");
+const typeorm_1 = require("@nestjs/typeorm");
+const email_service_1 = require("./email.service");
+const email_controller_1 = require("./email.controller");
+const email_preference_controller_1 = require("./email-preference.controller");
+const email_processor_1 = require("./email.processor");
+const email_template_entity_1 = require("./entities/email-template.entity");
+const email_log_entity_1 = require("./entities/email-log.entity");
+const email_preference_entity_1 = require("./entities/email-preference.entity");
+const analytics_controller_1 = require("./admin/analytics.controller");
+const template_controller_1 = require("./admin/template.controller");
+const template_service_1 = require("./admin/template.service");
+const test_util_1 = require("./utils/test.util");
+const preview_controller_1 = require("./admin/preview.controller");
+const mock_email_service_1 = require("./mock-email.service");
+let EmailModule = class EmailModule {
+};
+exports.EmailModule = EmailModule;
+exports.EmailModule = EmailModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            config_1.ConfigModule,
+            typeorm_1.TypeOrmModule.forFeature([email_template_entity_1.EmailTemplate, email_log_entity_1.EmailLog, email_preference_entity_1.EmailPreference]),
+            bull_1.BullModule.registerQueue({
+                name: 'email',
+            }),
+        ],
+        controllers: [
+            email_controller_1.EmailController,
+            email_preference_controller_1.EmailPreferenceController,
+            analytics_controller_1.EmailAnalyticsController,
+            template_controller_1.EmailTemplateController,
+            preview_controller_1.EmailPreviewController,
+        ],
+        providers: [
+            {
+                provide: email_service_1.EmailService,
+                useFactory: (config) => {
+                    if (config.get('NODE_ENV') === 'development' ||
+                        config.get('EMAIL_ENABLED') === 'false') {
+                        return new mock_email_service_1.MockEmailService();
+                    }
+                    // The real EmailService will be instantiated by Nest with DI for other deps
+                    return new email_service_1.EmailService(config, undefined, // emailQueue
+                    undefined, // emailTemplateRepository
+                    undefined, // emailLogRepository
+                    undefined);
+                },
+                inject: [config_1.ConfigService],
+            },
+            email_processor_1.EmailProcessor,
+            template_service_1.EmailTemplateService,
+            test_util_1.EmailTestService,
+        ],
+        exports: [email_service_1.EmailService],
+    })
+], EmailModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxlbWFpbFxcZW1haWwubW9kdWxlLnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7OztBQUFBOzs7O0dBSUc7QUFDSCwyQ0FBd0M7QUFDeEMsMkNBQTZEO0FBQzdELHVDQUEwQztBQUMxQyw2Q0FBZ0Q7QUFDaEQsbURBQStDO0FBQy9DLHlEQUFxRDtBQUNyRCwrRUFBMEU7QUFDMUUsdURBQW1EO0FBQ25ELDRFQUFpRTtBQUNqRSxrRUFBdUQ7QUFDdkQsZ0ZBQXFFO0FBQ3JFLHVFQUF3RTtBQUN4RSxxRUFBc0U7QUFDdEUsK0RBQWdFO0FBQ2hFLGlEQUFxRDtBQUNyRCxtRUFBb0U7QUFDcEUsNkRBQXdEO0FBNENqRCxJQUFNLFdBQVcsR0FBakIsTUFBTSxXQUFXO0NBQUcsQ0FBQTtBQUFkLGtDQUFXO3NCQUFYLFdBQVc7SUExQ3ZCLElBQUEsZUFBTSxFQUFDO1FBQ04sT0FBTyxFQUFFO1lBQ1AscUJBQVk7WUFDWix1QkFBYSxDQUFDLFVBQVUsQ0FBQyxDQUFDLHFDQUFhLEVBQUUsMkJBQVEsRUFBRSx5Q0FBZSxDQUFDLENBQUM7WUFDcEUsaUJBQVUsQ0FBQyxhQUFhLENBQUM7Z0JBQ3ZCLElBQUksRUFBRSxPQUFPO2FBQ2QsQ0FBQztTQUNIO1FBQ0QsV0FBVyxFQUFFO1lBQ1gsa0NBQWU7WUFDZix1REFBeUI7WUFDekIsK0NBQXdCO1lBQ3hCLDZDQUF1QjtZQUN2QiwyQ0FBc0I7U0FDdkI7UUFDRCxTQUFTLEVBQUU7WUFDVDtnQkFDRSxPQUFPLEVBQUUsNEJBQVk7Z0JBQ3JCLFVBQVUsRUFBRSxDQUFDLE1BQXFCLEVBQUUsRUFBRTtvQkFDcEMsSUFDRSxNQUFNLENBQUMsR0FBRyxDQUFDLFVBQVUsQ0FBQyxLQUFLLGFBQWE7d0JBQ3hDLE1BQU0sQ0FBQyxHQUFHLENBQUMsZUFBZSxDQUFDLEtBQUssT0FBTyxFQUN2QyxDQUFDO3dCQUNELE9BQU8sSUFBSSxxQ0FBZ0IsRUFBRSxDQUFDO29CQUNoQyxDQUFDO29CQUNELDRFQUE0RTtvQkFDNUUsT0FBTyxJQUFJLDRCQUFZLENBQ3JCLE1BQU0sRUFDTixTQUFTLEVBQUUsYUFBYTtvQkFDeEIsU0FBUyxFQUFFLDBCQUEwQjtvQkFDckMsU0FBUyxFQUFFLHFCQUFxQjtvQkFDaEMsU0FBUyxDQUNWLENBQUM7Z0JBQ0osQ0FBQztnQkFDRCxNQUFNLEVBQUUsQ0FBQyxzQkFBYSxDQUFDO2FBQ3hCO1lBQ0QsZ0NBQWM7WUFDZCx1Q0FBb0I7WUFDcEIsNEJBQWdCO1NBQ2pCO1FBQ0QsT0FBTyxFQUFFLENBQUMsNEJBQVksQ0FBQztLQUN4QixDQUFDO0dBQ1csV0FBVyxDQUFHIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcZW1haWxcXGVtYWlsLm1vZHVsZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyIvKipcclxuICogRW1haWxNb2R1bGUgcHJvdmlkZXMgZW1haWwgc2VuZGluZywgYW5hbHl0aWNzLCBwcmVmZXJlbmNlIG1hbmFnZW1lbnQsIGFuZCB0cmFja2luZyBmZWF0dXJlcy5cclxuICpcclxuICogQG1vZHVsZSBFbWFpbFxyXG4gKi9cclxuaW1wb3J0IHsgTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy9jb21tb24nO1xyXG5pbXBvcnQgeyBDb25maWdNb2R1bGUsIENvbmZpZ1NlcnZpY2UgfSBmcm9tICdAbmVzdGpzL2NvbmZpZyc7XHJcbmltcG9ydCB7IEJ1bGxNb2R1bGUgfSBmcm9tICdAbmVzdGpzL2J1bGwnO1xyXG5pbXBvcnQgeyBUeXBlT3JtTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy90eXBlb3JtJztcclxuaW1wb3J0IHsgRW1haWxTZXJ2aWNlIH0gZnJvbSAnLi9lbWFpbC5zZXJ2aWNlJztcclxuaW1wb3J0IHsgRW1haWxDb250cm9sbGVyIH0gZnJvbSAnLi9lbWFpbC5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgRW1haWxQcmVmZXJlbmNlQ29udHJvbGxlciB9IGZyb20gJy4vZW1haWwtcHJlZmVyZW5jZS5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgRW1haWxQcm9jZXNzb3IgfSBmcm9tICcuL2VtYWlsLnByb2Nlc3Nvcic7XHJcbmltcG9ydCB7IEVtYWlsVGVtcGxhdGUgfSBmcm9tICcuL2VudGl0aWVzL2VtYWlsLXRlbXBsYXRlLmVudGl0eSc7XHJcbmltcG9ydCB7IEVtYWlsTG9nIH0gZnJvbSAnLi9lbnRpdGllcy9lbWFpbC1sb2cuZW50aXR5JztcclxuaW1wb3J0IHsgRW1haWxQcmVmZXJlbmNlIH0gZnJvbSAnLi9lbnRpdGllcy9lbWFpbC1wcmVmZXJlbmNlLmVudGl0eSc7XHJcbmltcG9ydCB7IEVtYWlsQW5hbHl0aWNzQ29udHJvbGxlciB9IGZyb20gJy4vYWRtaW4vYW5hbHl0aWNzLmNvbnRyb2xsZXInO1xyXG5pbXBvcnQgeyBFbWFpbFRlbXBsYXRlQ29udHJvbGxlciB9IGZyb20gJy4vYWRtaW4vdGVtcGxhdGUuY29udHJvbGxlcic7XHJcbmltcG9ydCB7IEVtYWlsVGVtcGxhdGVTZXJ2aWNlIH0gZnJvbSAnLi9hZG1pbi90ZW1wbGF0ZS5zZXJ2aWNlJztcclxuaW1wb3J0IHsgRW1haWxUZXN0U2VydmljZSB9IGZyb20gJy4vdXRpbHMvdGVzdC51dGlsJztcclxuaW1wb3J0IHsgRW1haWxQcmV2aWV3Q29udHJvbGxlciB9IGZyb20gJy4vYWRtaW4vcHJldmlldy5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgTW9ja0VtYWlsU2VydmljZSB9IGZyb20gJy4vbW9jay1lbWFpbC5zZXJ2aWNlJztcclxuXHJcbkBNb2R1bGUoe1xyXG4gIGltcG9ydHM6IFtcclxuICAgIENvbmZpZ01vZHVsZSxcclxuICAgIFR5cGVPcm1Nb2R1bGUuZm9yRmVhdHVyZShbRW1haWxUZW1wbGF0ZSwgRW1haWxMb2csIEVtYWlsUHJlZmVyZW5jZV0pLFxyXG4gICAgQnVsbE1vZHVsZS5yZWdpc3RlclF1ZXVlKHtcclxuICAgICAgbmFtZTogJ2VtYWlsJyxcclxuICAgIH0pLFxyXG4gIF0sXHJcbiAgY29udHJvbGxlcnM6IFtcclxuICAgIEVtYWlsQ29udHJvbGxlcixcclxuICAgIEVtYWlsUHJlZmVyZW5jZUNvbnRyb2xsZXIsXHJcbiAgICBFbWFpbEFuYWx5dGljc0NvbnRyb2xsZXIsXHJcbiAgICBFbWFpbFRlbXBsYXRlQ29udHJvbGxlcixcclxuICAgIEVtYWlsUHJldmlld0NvbnRyb2xsZXIsXHJcbiAgXSxcclxuICBwcm92aWRlcnM6IFtcclxuICAgIHtcclxuICAgICAgcHJvdmlkZTogRW1haWxTZXJ2aWNlLFxyXG4gICAgICB1c2VGYWN0b3J5OiAoY29uZmlnOiBDb25maWdTZXJ2aWNlKSA9PiB7XHJcbiAgICAgICAgaWYgKFxyXG4gICAgICAgICAgY29uZmlnLmdldCgnTk9ERV9FTlYnKSA9PT0gJ2RldmVsb3BtZW50JyB8fFxyXG4gICAgICAgICAgY29uZmlnLmdldCgnRU1BSUxfRU5BQkxFRCcpID09PSAnZmFsc2UnXHJcbiAgICAgICAgKSB7XHJcbiAgICAgICAgICByZXR1cm4gbmV3IE1vY2tFbWFpbFNlcnZpY2UoKTtcclxuICAgICAgICB9XHJcbiAgICAgICAgLy8gVGhlIHJlYWwgRW1haWxTZXJ2aWNlIHdpbGwgYmUgaW5zdGFudGlhdGVkIGJ5IE5lc3Qgd2l0aCBESSBmb3Igb3RoZXIgZGVwc1xyXG4gICAgICAgIHJldHVybiBuZXcgRW1haWxTZXJ2aWNlKFxyXG4gICAgICAgICAgY29uZmlnLFxyXG4gICAgICAgICAgdW5kZWZpbmVkLCAvLyBlbWFpbFF1ZXVlXHJcbiAgICAgICAgICB1bmRlZmluZWQsIC8vIGVtYWlsVGVtcGxhdGVSZXBvc2l0b3J5XHJcbiAgICAgICAgICB1bmRlZmluZWQsIC8vIGVtYWlsTG9nUmVwb3NpdG9yeVxyXG4gICAgICAgICAgdW5kZWZpbmVkLCAvLyBlbWFpbFByZWZlcmVuY2VSZXBvc2l0b3J5XHJcbiAgICAgICAgKTtcclxuICAgICAgfSxcclxuICAgICAgaW5qZWN0OiBbQ29uZmlnU2VydmljZV0sXHJcbiAgICB9LFxyXG4gICAgRW1haWxQcm9jZXNzb3IsXHJcbiAgICBFbWFpbFRlbXBsYXRlU2VydmljZSxcclxuICAgIEVtYWlsVGVzdFNlcnZpY2UsXHJcbiAgXSxcclxuICBleHBvcnRzOiBbRW1haWxTZXJ2aWNlXSxcclxufSlcclxuZXhwb3J0IGNsYXNzIEVtYWlsTW9kdWxlIHt9XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

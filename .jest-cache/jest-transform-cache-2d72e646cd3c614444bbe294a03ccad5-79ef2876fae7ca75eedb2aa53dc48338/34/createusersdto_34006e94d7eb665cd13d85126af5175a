@@ -1,0 +1,78 @@
+d5b98dfcc33b87182e78416d1222735f
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateUsersDto = void 0;
+/**
+ * DTO for creating a new user.
+ *
+ * Used for user registration and admin user creation.
+ *
+ * All fields are documented for OpenAPI/Swagger UI.
+ */
+const swagger_1 = require("@nestjs/swagger");
+const class_validator_1 = require("class-validator");
+const userRole_enum_1 = require("../enums/userRole.enum");
+const accountStatus_enum_1 = require("../enums/accountStatus.enum");
+class CreateUsersDto {
+}
+exports.CreateUsersDto = CreateUsersDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'user@example.com', description: 'User email address' }),
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateUsersDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'StrongPassword123', minLength: 8, description: 'User password (min 8 chars)' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MinLength)(8, { message: 'Password must be at least 8 characters long' }),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateUsersDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John', description: 'First name' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateUsersDto.prototype, "firstName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Doe', description: 'Last name' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateUsersDto.prototype, "lastName", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'https://cdn.com/profile.jpg', description: 'Profile image URL (optional)' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateUsersDto.prototype, "profileImageUrl", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: 'A short bio', description: 'User biography (optional)' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateUsersDto.prototype, "bio", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: userRole_enum_1.UserRole, description: 'User role (optional)' }),
+    (0, class_validator_1.IsEnum)(userRole_enum_1.UserRole),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", typeof (_a = typeof userRole_enum_1.UserRole !== "undefined" && userRole_enum_1.UserRole) === "function" ? _a : Object)
+], CreateUsersDto.prototype, "role", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: accountStatus_enum_1.AccountStatus, description: 'Account status (optional)' }),
+    (0, class_validator_1.IsEnum)(accountStatus_enum_1.AccountStatus),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", typeof (_b = typeof accountStatus_enum_1.AccountStatus !== "undefined" && accountStatus_enum_1.AccountStatus) === "function" ? _b : Object)
+], CreateUsersDto.prototype, "status", void 0);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx1c2Vyc1xcZHRvc1xcY3JlYXRlLnVzZXJzLmR0by50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUE7Ozs7OztHQU1HO0FBQ0gsNkNBQW1FO0FBQ25FLHFEQU95QjtBQUN6QiwwREFBa0Q7QUFDbEQsb0VBQTREO0FBRTVELE1BQWEsY0FBYztDQXlDMUI7QUF6Q0Qsd0NBeUNDO0FBckNDO0lBSEMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsT0FBTyxFQUFFLGtCQUFrQixFQUFFLFdBQVcsRUFBRSxvQkFBb0IsRUFBRSxDQUFDO0lBQy9FLElBQUEseUJBQU8sR0FBRTtJQUNULElBQUEsNEJBQVUsR0FBRTs7NkNBQ0M7QUFNZDtJQUpDLElBQUEscUJBQVcsRUFBQyxFQUFFLE9BQU8sRUFBRSxtQkFBbUIsRUFBRSxTQUFTLEVBQUUsQ0FBQyxFQUFFLFdBQVcsRUFBRSw2QkFBNkIsRUFBRSxDQUFDO0lBQ3ZHLElBQUEsMEJBQVEsR0FBRTtJQUNWLElBQUEsMkJBQVMsRUFBQyxDQUFDLEVBQUUsRUFBRSxPQUFPLEVBQUUsNkNBQTZDLEVBQUUsQ0FBQztJQUN4RSxJQUFBLDRCQUFVLEdBQUU7O2dEQUNJO0FBS2pCO0lBSEMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsT0FBTyxFQUFFLE1BQU0sRUFBRSxXQUFXLEVBQUUsWUFBWSxFQUFFLENBQUM7SUFDM0QsSUFBQSwwQkFBUSxHQUFFO0lBQ1YsSUFBQSw0QkFBVSxHQUFFOztpREFDSztBQUtsQjtJQUhDLElBQUEscUJBQVcsRUFBQyxFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsV0FBVyxFQUFFLFdBQVcsRUFBRSxDQUFDO0lBQ3pELElBQUEsMEJBQVEsR0FBRTtJQUNWLElBQUEsNEJBQVUsR0FBRTs7Z0RBQ0k7QUFLakI7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsT0FBTyxFQUFFLDZCQUE2QixFQUFFLFdBQVcsRUFBRSw4QkFBOEIsRUFBRSxDQUFDO0lBQzVHLElBQUEsNEJBQVUsR0FBRTtJQUNaLElBQUEsMEJBQVEsR0FBRTs7dURBQ2M7QUFLekI7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsT0FBTyxFQUFFLGFBQWEsRUFBRSxXQUFXLEVBQUUsMkJBQTJCLEVBQUUsQ0FBQztJQUN6RixJQUFBLDBCQUFRLEdBQUU7SUFDVixJQUFBLDRCQUFVLEdBQUU7OzJDQUNBO0FBS2I7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsSUFBSSxFQUFFLHdCQUFRLEVBQUUsV0FBVyxFQUFFLHNCQUFzQixFQUFFLENBQUM7SUFDNUUsSUFBQSx3QkFBTSxFQUFDLHdCQUFRLENBQUM7SUFDaEIsSUFBQSw0QkFBVSxHQUFFO2tEQUNOLHdCQUFRLG9CQUFSLHdCQUFROzRDQUFDO0FBS2hCO0lBSEMsSUFBQSw2QkFBbUIsRUFBQyxFQUFFLElBQUksRUFBRSxrQ0FBYSxFQUFFLFdBQVcsRUFBRSwyQkFBMkIsRUFBRSxDQUFDO0lBQ3RGLElBQUEsd0JBQU0sRUFBQyxrQ0FBYSxDQUFDO0lBQ3JCLElBQUEsNEJBQVUsR0FBRTtrREFDSixrQ0FBYSxvQkFBYixrQ0FBYTs4Q0FBQyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXHVzZXJzXFxkdG9zXFxjcmVhdGUudXNlcnMuZHRvLnRzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxyXG4gKiBEVE8gZm9yIGNyZWF0aW5nIGEgbmV3IHVzZXIuXHJcbiAqXHJcbiAqIFVzZWQgZm9yIHVzZXIgcmVnaXN0cmF0aW9uIGFuZCBhZG1pbiB1c2VyIGNyZWF0aW9uLlxyXG4gKlxyXG4gKiBBbGwgZmllbGRzIGFyZSBkb2N1bWVudGVkIGZvciBPcGVuQVBJL1N3YWdnZXIgVUkuXHJcbiAqL1xyXG5pbXBvcnQgeyBBcGlQcm9wZXJ0eSwgQXBpUHJvcGVydHlPcHRpb25hbCB9IGZyb20gJ0BuZXN0anMvc3dhZ2dlcic7XHJcbmltcG9ydCB7XHJcbiAgSXNFbWFpbCxcclxuICBJc0VudW0sXHJcbiAgSXNOb3RFbXB0eSxcclxuICBJc09wdGlvbmFsLFxyXG4gIElzU3RyaW5nLFxyXG4gIE1pbkxlbmd0aCxcclxufSBmcm9tICdjbGFzcy12YWxpZGF0b3InO1xyXG5pbXBvcnQgeyBVc2VyUm9sZSB9IGZyb20gJy4uL2VudW1zL3VzZXJSb2xlLmVudW0nO1xyXG5pbXBvcnQgeyBBY2NvdW50U3RhdHVzIH0gZnJvbSAnLi4vZW51bXMvYWNjb3VudFN0YXR1cy5lbnVtJztcclxuXHJcbmV4cG9ydCBjbGFzcyBDcmVhdGVVc2Vyc0R0byB7XHJcbiAgQEFwaVByb3BlcnR5KHsgZXhhbXBsZTogJ3VzZXJAZXhhbXBsZS5jb20nLCBkZXNjcmlwdGlvbjogJ1VzZXIgZW1haWwgYWRkcmVzcycgfSlcclxuICBASXNFbWFpbCgpXHJcbiAgQElzTm90RW1wdHkoKVxyXG4gIGVtYWlsOiBzdHJpbmc7XHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IGV4YW1wbGU6ICdTdHJvbmdQYXNzd29yZDEyMycsIG1pbkxlbmd0aDogOCwgZGVzY3JpcHRpb246ICdVc2VyIHBhc3N3b3JkIChtaW4gOCBjaGFycyknIH0pXHJcbiAgQElzU3RyaW5nKClcclxuICBATWluTGVuZ3RoKDgsIHsgbWVzc2FnZTogJ1Bhc3N3b3JkIG11c3QgYmUgYXQgbGVhc3QgOCBjaGFyYWN0ZXJzIGxvbmcnIH0pXHJcbiAgQElzTm90RW1wdHkoKVxyXG4gIHBhc3N3b3JkOiBzdHJpbmc7XHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IGV4YW1wbGU6ICdKb2huJywgZGVzY3JpcHRpb246ICdGaXJzdCBuYW1lJyB9KVxyXG4gIEBJc1N0cmluZygpXHJcbiAgQElzTm90RW1wdHkoKVxyXG4gIGZpcnN0TmFtZTogc3RyaW5nO1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyBleGFtcGxlOiAnRG9lJywgZGVzY3JpcHRpb246ICdMYXN0IG5hbWUnIH0pXHJcbiAgQElzU3RyaW5nKClcclxuICBASXNOb3RFbXB0eSgpXHJcbiAgbGFzdE5hbWU6IHN0cmluZztcclxuXHJcbiAgQEFwaVByb3BlcnR5T3B0aW9uYWwoeyBleGFtcGxlOiAnaHR0cHM6Ly9jZG4uY29tL3Byb2ZpbGUuanBnJywgZGVzY3JpcHRpb246ICdQcm9maWxlIGltYWdlIFVSTCAob3B0aW9uYWwpJyB9KVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNTdHJpbmcoKVxyXG4gIHByb2ZpbGVJbWFnZVVybD86IHN0cmluZztcclxuXHJcbiAgQEFwaVByb3BlcnR5T3B0aW9uYWwoeyBleGFtcGxlOiAnQSBzaG9ydCBiaW8nLCBkZXNjcmlwdGlvbjogJ1VzZXIgYmlvZ3JhcGh5IChvcHRpb25hbCknIH0pXHJcbiAgQElzU3RyaW5nKClcclxuICBASXNPcHRpb25hbCgpXHJcbiAgYmlvPzogc3RyaW5nO1xyXG5cclxuICBAQXBpUHJvcGVydHlPcHRpb25hbCh7IGVudW06IFVzZXJSb2xlLCBkZXNjcmlwdGlvbjogJ1VzZXIgcm9sZSAob3B0aW9uYWwpJyB9KVxyXG4gIEBJc0VudW0oVXNlclJvbGUpXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIHJvbGU/OiBVc2VyUm9sZTtcclxuXHJcbiAgQEFwaVByb3BlcnR5T3B0aW9uYWwoeyBlbnVtOiBBY2NvdW50U3RhdHVzLCBkZXNjcmlwdGlvbjogJ0FjY291bnQgc3RhdHVzIChvcHRpb25hbCknIH0pXHJcbiAgQElzRW51bShBY2NvdW50U3RhdHVzKVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBzdGF0dXM/OiBBY2NvdW50U3RhdHVzO1xyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

@@ -1,0 +1,165 @@
+daddf37716bc532835f77cf31364d3f5
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d, _e;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RecommendationMetrics = exports.RecommendationAnalytics = exports.AnalyticsEventType = void 0;
+const typeorm_1 = require("typeorm");
+var AnalyticsEventType;
+(function (AnalyticsEventType) {
+    AnalyticsEventType["RECOMMENDATION_GENERATED"] = "recommendation_generated";
+    AnalyticsEventType["RECOMMENDATION_VIEWED"] = "recommendation_viewed";
+    AnalyticsEventType["RECOMMENDATION_CLICKED"] = "recommendation_clicked";
+    AnalyticsEventType["RECOMMENDATION_DISMISSED"] = "recommendation_dismissed";
+    AnalyticsEventType["RECOMMENDATION_COMPLETED"] = "recommendation_completed";
+    AnalyticsEventType["LEARNING_PATH_CREATED"] = "learning_path_created";
+    AnalyticsEventType["LEARNING_PATH_STARTED"] = "learning_path_started";
+    AnalyticsEventType["LEARNING_PATH_STEP_COMPLETED"] = "learning_path_step_completed";
+    AnalyticsEventType["LEARNING_PATH_COMPLETED"] = "learning_path_completed";
+    AnalyticsEventType["ALGORITHM_PERFORMANCE"] = "algorithm_performance";
+    AnalyticsEventType["MODEL_RETRAINED"] = "model_retrained";
+})(AnalyticsEventType || (exports.AnalyticsEventType = AnalyticsEventType = {}));
+let RecommendationAnalytics = class RecommendationAnalytics {
+};
+exports.RecommendationAnalytics = RecommendationAnalytics;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], RecommendationAnalytics.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: AnalyticsEventType,
+    }),
+    __metadata("design:type", String)
+], RecommendationAnalytics.prototype, "eventType", void 0);
+__decorate([
+    (0, typeorm_1.Column)('uuid', { nullable: true }),
+    (0, typeorm_1.Index)(),
+    __metadata("design:type", String)
+], RecommendationAnalytics.prototype, "userId", void 0);
+__decorate([
+    (0, typeorm_1.Column)('uuid', { nullable: true }),
+    __metadata("design:type", String)
+], RecommendationAnalytics.prototype, "recommendationId", void 0);
+__decorate([
+    (0, typeorm_1.Column)('uuid', { nullable: true }),
+    __metadata("design:type", String)
+], RecommendationAnalytics.prototype, "learningPathId", void 0);
+__decorate([
+    (0, typeorm_1.Column)('uuid', { nullable: true }),
+    __metadata("design:type", String)
+], RecommendationAnalytics.prototype, "courseId", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 100, nullable: true }),
+    __metadata("design:type", String)
+], RecommendationAnalytics.prototype, "algorithmVersion", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 100, nullable: true }),
+    __metadata("design:type", String)
+], RecommendationAnalytics.prototype, "modelVersion", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 5, scale: 4, nullable: true }),
+    __metadata("design:type", Number)
+], RecommendationAnalytics.prototype, "confidenceScore", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 5, scale: 4, nullable: true }),
+    __metadata("design:type", Number)
+], RecommendationAnalytics.prototype, "relevanceScore", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 5, scale: 4, nullable: true }),
+    __metadata("design:type", Number)
+], RecommendationAnalytics.prototype, "actualScore", void 0);
+__decorate([
+    (0, typeorm_1.Column)('int', { nullable: true }),
+    __metadata("design:type", Number)
+], RecommendationAnalytics.prototype, "position", void 0);
+__decorate([
+    (0, typeorm_1.Column)('int', { nullable: true }),
+    __metadata("design:type", Number)
+], RecommendationAnalytics.prototype, "totalRecommendations", void 0);
+__decorate([
+    (0, typeorm_1.Column)('jsonb', { nullable: true }),
+    __metadata("design:type", Object)
+], RecommendationAnalytics.prototype, "metadata", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], RecommendationAnalytics.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], RecommendationAnalytics.prototype, "updatedAt", void 0);
+exports.RecommendationAnalytics = RecommendationAnalytics = __decorate([
+    (0, typeorm_1.Entity)('recommendation_analytics'),
+    (0, typeorm_1.Index)(['eventType', 'createdAt']),
+    (0, typeorm_1.Index)(['userId', 'eventType']),
+    (0, typeorm_1.Index)(['algorithmVersion']),
+    (0, typeorm_1.Index)(['createdAt'])
+], RecommendationAnalytics);
+let RecommendationMetrics = class RecommendationMetrics {
+};
+exports.RecommendationMetrics = RecommendationMetrics;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], RecommendationMetrics.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)('date'),
+    (0, typeorm_1.Index)(),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], RecommendationMetrics.prototype, "date", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 100 }),
+    __metadata("design:type", String)
+], RecommendationMetrics.prototype, "metricType", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 100, nullable: true }),
+    __metadata("design:type", String)
+], RecommendationMetrics.prototype, "algorithmVersion", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 100, nullable: true }),
+    __metadata("design:type", String)
+], RecommendationMetrics.prototype, "segmentType", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { length: 100, nullable: true }),
+    __metadata("design:type", String)
+], RecommendationMetrics.prototype, "segmentValue", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 6 }),
+    __metadata("design:type", Number)
+], RecommendationMetrics.prototype, "value", void 0);
+__decorate([
+    (0, typeorm_1.Column)('int', { default: 0 }),
+    __metadata("design:type", Number)
+], RecommendationMetrics.prototype, "sampleSize", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 6, nullable: true }),
+    __metadata("design:type", Number)
+], RecommendationMetrics.prototype, "confidenceInterval", void 0);
+__decorate([
+    (0, typeorm_1.Column)('jsonb', { nullable: true }),
+    __metadata("design:type", Object)
+], RecommendationMetrics.prototype, "metadata", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], RecommendationMetrics.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_e = typeof Date !== "undefined" && Date) === "function" ? _e : Object)
+], RecommendationMetrics.prototype, "updatedAt", void 0);
+exports.RecommendationMetrics = RecommendationMetrics = __decorate([
+    (0, typeorm_1.Entity)('recommendation_metrics'),
+    (0, typeorm_1.Index)(['metricType', 'date']),
+    (0, typeorm_1.Index)(['algorithmVersion', 'date'])
+], RecommendationMetrics);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxyZWNvbW1lbmRhdGlvblxcZW50aXRpZXNcXHJlY29tbWVuZGF0aW9uLWFuYWx5dGljcy5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHFDQU9pQjtBQUVqQixJQUFZLGtCQVlYO0FBWkQsV0FBWSxrQkFBa0I7SUFDNUIsMkVBQXFELENBQUE7SUFDckQscUVBQStDLENBQUE7SUFDL0MsdUVBQWlELENBQUE7SUFDakQsMkVBQXFELENBQUE7SUFDckQsMkVBQXFELENBQUE7SUFDckQscUVBQStDLENBQUE7SUFDL0MscUVBQStDLENBQUE7SUFDL0MsbUZBQTZELENBQUE7SUFDN0QseUVBQW1ELENBQUE7SUFDbkQscUVBQStDLENBQUE7SUFDL0MseURBQW1DLENBQUE7QUFDckMsQ0FBQyxFQVpXLGtCQUFrQixrQ0FBbEIsa0JBQWtCLFFBWTdCO0FBT00sSUFBTSx1QkFBdUIsR0FBN0IsTUFBTSx1QkFBdUI7Q0F3RW5DLENBQUE7QUF4RVksMERBQXVCO0FBRWxDO0lBREMsSUFBQSxnQ0FBc0IsRUFBQyxNQUFNLENBQUM7O21EQUNwQjtBQU1YO0lBSkMsSUFBQSxnQkFBTSxFQUFDO1FBQ04sSUFBSSxFQUFFLE1BQU07UUFDWixJQUFJLEVBQUUsa0JBQWtCO0tBQ3pCLENBQUM7OzBEQUM0QjtBQUk5QjtJQUZDLElBQUEsZ0JBQU0sRUFBQyxNQUFNLEVBQUUsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7SUFDbEMsSUFBQSxlQUFLLEdBQUU7O3VEQUNRO0FBR2hCO0lBREMsSUFBQSxnQkFBTSxFQUFDLE1BQU0sRUFBRSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQzs7aUVBQ1Q7QUFHMUI7SUFEQyxJQUFBLGdCQUFNLEVBQUMsTUFBTSxFQUFFLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOzsrREFDWDtBQUd4QjtJQURDLElBQUEsZ0JBQU0sRUFB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RUFBRSxDQUFDOztvREFDakM7QUFHZDtJQURDLElBQUEsZ0JBQU0sRUFBQyxLQUFLLEVBQUUsRUFBRSxPQUFPLEVBQUUsQ0FBQyxFQUFFLENBQUM7O3lEQUNYO0FBR25CO0lBREMsSUFBQSxnQkFBTSxFQUFDLFNBQVMsRUFBRSxFQUFFLFNBQVMsRUFBRSxFQUFFLEVBQUUsS0FBSyxFQUFFLENBQUMsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7O2lFQUNuQztBQUc1QjtJQURDLElBQUEsZ0JBQU0sRUFBQyxPQUFPLEVBQUUsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7O3VEQU9sQztBQUdGO0lBREMsSUFBQSwwQkFBZ0IsR0FBRTtrREFDUixJQUFJLG9CQUFKLElBQUk7d0RBQUM7QUFHaEI7SUFEQyxJQUFBLDBCQUFnQixHQUFFO2tEQUNSLElBQUksb0JBQUosSUFBSTt3REFBQztnQ0ExQ0wscUJBQXFCO0lBSGpDLElBQUEsZ0JBQU0sRUFBQyx3QkFBd0IsQ0FBQztJQUNoQyxJQUFBLGVBQUssRUFBQyxDQUFDLFlBQVksRUFBRSxNQUFNLENBQUMsQ0FBQztJQUM3QixJQUFBLGVBQUssRUFBQyxDQUFDLGtCQUFrQixFQUFFLE1BQU0sQ0FBQyxDQUFDO0dBQ3ZCLHFCQUFxQixDQTJDakMiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxyZWNvbW1lbmRhdGlvblxcZW50aXRpZXNcXHJlY29tbWVuZGF0aW9uLWFuYWx5dGljcy5lbnRpdHkudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHtcclxuICBFbnRpdHksXHJcbiAgUHJpbWFyeUdlbmVyYXRlZENvbHVtbixcclxuICBDb2x1bW4sXHJcbiAgQ3JlYXRlRGF0ZUNvbHVtbixcclxuICBVcGRhdGVEYXRlQ29sdW1uLFxyXG4gIEluZGV4LFxyXG59IGZyb20gJ3R5cGVvcm0nO1xyXG5cclxuZXhwb3J0IGVudW0gQW5hbHl0aWNzRXZlbnRUeXBlIHtcclxuICBSRUNPTU1FTkRBVElPTl9HRU5FUkFURUQgPSAncmVjb21tZW5kYXRpb25fZ2VuZXJhdGVkJyxcclxuICBSRUNPTU1FTkRBVElPTl9WSUVXRUQgPSAncmVjb21tZW5kYXRpb25fdmlld2VkJyxcclxuICBSRUNPTU1FTkRBVElPTl9DTElDS0VEID0gJ3JlY29tbWVuZGF0aW9uX2NsaWNrZWQnLFxyXG4gIFJFQ09NTUVOREFUSU9OX0RJU01JU1NFRCA9ICdyZWNvbW1lbmRhdGlvbl9kaXNtaXNzZWQnLFxyXG4gIFJFQ09NTUVOREFUSU9OX0NPTVBMRVRFRCA9ICdyZWNvbW1lbmRhdGlvbl9jb21wbGV0ZWQnLFxyXG4gIExFQVJOSU5HX1BBVEhfQ1JFQVRFRCA9ICdsZWFybmluZ19wYXRoX2NyZWF0ZWQnLFxyXG4gIExFQVJOSU5HX1BBVEhfU1RBUlRFRCA9ICdsZWFybmluZ19wYXRoX3N0YXJ0ZWQnLFxyXG4gIExFQVJOSU5HX1BBVEhfU1RFUF9DT01QTEVURUQgPSAnbGVhcm5pbmdfcGF0aF9zdGVwX2NvbXBsZXRlZCcsXHJcbiAgTEVBUk5JTkdfUEFUSF9DT01QTEVURUQgPSAnbGVhcm5pbmdfcGF0aF9jb21wbGV0ZWQnLFxyXG4gIEFMR09SSVRITV9QRVJGT1JNQU5DRSA9ICdhbGdvcml0aG1fcGVyZm9ybWFuY2UnLFxyXG4gIE1PREVMX1JFVFJBSU5FRCA9ICdtb2RlbF9yZXRyYWluZWQnLFxyXG59XHJcblxyXG5ARW50aXR5KCdyZWNvbW1lbmRhdGlvbl9hbmFseXRpY3MnKVxyXG5ASW5kZXgoWydldmVudFR5cGUnLCAnY3JlYXRlZEF0J10pXHJcbkBJbmRleChbJ3VzZXJJZCcsICdldmVudFR5cGUnXSlcclxuQEluZGV4KFsnYWxnb3JpdGhtVmVyc2lvbiddKVxyXG5ASW5kZXgoWydjcmVhdGVkQXQnXSlcclxuZXhwb3J0IGNsYXNzIFJlY29tbWVuZGF0aW9uQW5hbHl0aWNzIHtcclxuICBAUHJpbWFyeUdlbmVyYXRlZENvbHVtbigndXVpZCcpXHJcbiAgaWQ6IHN0cmluZztcclxuXHJcbiAgQENvbHVtbih7XHJcbiAgICB0eXBlOiAnZW51bScsXHJcbiAgICBlbnVtOiBBbmFseXRpY3NFdmVudFR5cGUsXHJcbiAgfSlcclxuICBldmVudFR5cGU6IEFuYWx5dGljc0V2ZW50VHlwZTtcclxuXHJcbiAgQENvbHVtbigndXVpZCcsIHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBASW5kZXgoKVxyXG4gIHVzZXJJZD86IHN0cmluZztcclxuXHJcbiAgQENvbHVtbigndXVpZCcsIHsgbnVsbGFibGU6IHRydWUgfSlcclxuICByZWNvbW1lbmRhdGlvbklkPzogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKCd1dWlkJywgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGxlYXJuaW5nUGF0aElkPzogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKCd1dWlkJywgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGNvdXJzZUlkPzogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKCd2YXJjaGFyJywgeyBsZW5ndGg6IDEwMCwgbnVsbGFibGU6IHRydWUgfSlcclxuICBhbGdvcml0aG1WZXJzaW9uPzogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKCd2YXJjaGFyJywgeyBsZW5ndGg6IDEwMCwgbnVsbGFibGU6IHRydWUgfSlcclxuICBtb2RlbFZlcnNpb24/OiBzdHJpbmc7XHJcblxyXG4gIEBDb2x1bW4oJ2RlY2ltYWwnLCB7IHByZWNpc2lvbjogNSwgc2NhbGU6IDQsIG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgY29uZmlkZW5jZVNjb3JlPzogbnVtYmVyO1xyXG5cclxuICBAQ29sdW1uKCdkZWNpbWFsJywgeyBwcmVjaXNpb246IDUsIHNjYWxlOiA0LCBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIHJlbGV2YW5jZVNjb3JlPzogbnVtYmVyO1xyXG5cclxuICBAQ29sdW1uKCdkZWNpbWFsJywgeyBwcmVjaXNpb246IDUsIHNjYWxlOiA0LCBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGFjdHVhbFNjb3JlPzogbnVtYmVyOyAvLyBVc2VyIGZlZWRiYWNrIG9yIGltcGxpY2l0IGZlZWRiYWNrIHNjb3JlXHJcblxyXG4gIEBDb2x1bW4oJ2ludCcsIHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBwb3NpdGlvbj86IG51bWJlcjsgLy8gUG9zaXRpb24gaW4gcmVjb21tZW5kYXRpb24gbGlzdFxyXG5cclxuICBAQ29sdW1uKCdpbnQnLCB7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgdG90YWxSZWNvbW1lbmRhdGlvbnM/OiBudW1iZXI7XHJcblxyXG4gIEBDb2x1bW4oJ2pzb25iJywgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIG1ldGFkYXRhPzoge1xyXG4gICAgc2Vzc2lvbklkPzogc3RyaW5nO1xyXG4gICAgZGV2aWNlVHlwZT86IHN0cmluZztcclxuICAgIGNvbnRleHQ/OiBzdHJpbmc7XHJcbiAgICBleHBlcmltZW50R3JvdXA/OiBzdHJpbmc7XHJcbiAgICBhYlRlc3RWYXJpYW50Pzogc3RyaW5nO1xyXG4gICAgZmVhdHVyZXM/OiBSZWNvcmQ8c3RyaW5nLCBhbnk+O1xyXG4gICAgcGVyZm9ybWFuY2U/OiB7XHJcbiAgICAgIHByZWNpc2lvbj86IG51bWJlcjtcclxuICAgICAgcmVjYWxsPzogbnVtYmVyO1xyXG4gICAgICBmMVNjb3JlPzogbnVtYmVyO1xyXG4gICAgICBuZGNnPzogbnVtYmVyO1xyXG4gICAgICBjbGlja1Rocm91Z2hSYXRlPzogbnVtYmVyO1xyXG4gICAgICBjb252ZXJzaW9uUmF0ZT86IG51bWJlcjtcclxuICAgIH07XHJcbiAgICB0aW1pbmc/OiB7XHJcbiAgICAgIGdlbmVyYXRpb25UaW1lTXM/OiBudW1iZXI7XHJcbiAgICAgIG1vZGVsSW5mZXJlbmNlVGltZU1zPzogbnVtYmVyO1xyXG4gICAgICBkYXRhUmV0cmlldmFsVGltZU1zPzogbnVtYmVyO1xyXG4gICAgfTtcclxuICB9O1xyXG5cclxuICBAQ3JlYXRlRGF0ZUNvbHVtbigpXHJcbiAgY3JlYXRlZEF0OiBEYXRlO1xyXG5cclxuICBAVXBkYXRlRGF0ZUNvbHVtbigpXHJcbiAgdXBkYXRlZEF0OiBEYXRlO1xyXG59XHJcblxyXG5ARW50aXR5KCdyZWNvbW1lbmRhdGlvbl9tZXRyaWNzJylcclxuQEluZGV4KFsnbWV0cmljVHlwZScsICdkYXRlJ10pXHJcbkBJbmRleChbJ2FsZ29yaXRobVZlcnNpb24nLCAnZGF0ZSddKVxyXG5leHBvcnQgY2xhc3MgUmVjb21tZW5kYXRpb25NZXRyaWNzIHtcclxuICBAUHJpbWFyeUdlbmVyYXRlZENvbHVtbigndXVpZCcpXHJcbiAgaWQ6IHN0cmluZztcclxuXHJcbiAgQENvbHVtbignZGF0ZScpXHJcbiAgQEluZGV4KClcclxuICBkYXRlOiBEYXRlO1xyXG5cclxuICBAQ29sdW1uKCd2YXJjaGFyJywgeyBsZW5ndGg6IDEwMCB9KVxyXG4gIG1ldHJpY1R5cGU6IHN0cmluZzsgLy8gJ2N0cicsICdjb252ZXJzaW9uX3JhdGUnLCAncHJlY2lzaW9uJywgJ3JlY2FsbCcsIGV0Yy5cclxuXHJcbiAgQENvbHVtbigndmFyY2hhcicsIHsgbGVuZ3RoOiAxMDAsIG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgYWxnb3JpdGhtVmVyc2lvbj86IHN0cmluZztcclxuXHJcbiAgQENvbHVtbigndmFyY2hhcicsIHsgbGVuZ3RoOiAxMDAsIG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgc2VnbWVudFR5cGU/OiBzdHJpbmc7IC8vICdhbGxfdXNlcnMnLCAnbmV3X3VzZXJzJywgJ3JldHVybmluZ191c2VycycsIGV0Yy5cclxuXHJcbiAgQENvbHVtbigndmFyY2hhcicsIHsgbGVuZ3RoOiAxMDAsIG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgc2VnbWVudFZhbHVlPzogc3RyaW5nO1xyXG5cclxuICBAQ29sdW1uKCdkZWNpbWFsJywgeyBwcmVjaXNpb246IDEwLCBzY2FsZTogNiB9KVxyXG4gIHZhbHVlOiBudW1iZXI7XHJcblxyXG4gIEBDb2x1bW4oJ2ludCcsIHsgZGVmYXVsdDogMCB9KVxyXG4gIHNhbXBsZVNpemU6IG51bWJlcjtcclxuXHJcbiAgQENvbHVtbignZGVjaW1hbCcsIHsgcHJlY2lzaW9uOiAxMCwgc2NhbGU6IDYsIG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgY29uZmlkZW5jZUludGVydmFsPzogbnVtYmVyO1xyXG5cclxuICBAQ29sdW1uKCdqc29uYicsIHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBtZXRhZGF0YT86IHtcclxuICAgIGNhbGN1bGF0aW9uTWV0aG9kPzogc3RyaW5nO1xyXG4gICAgZmlsdGVycz86IFJlY29yZDxzdHJpbmcsIGFueT47XHJcbiAgICBhZ2dyZWdhdGlvblBlcmlvZD86IHN0cmluZztcclxuICAgIGJhc2VsaW5lPzogbnVtYmVyO1xyXG4gICAgaW1wcm92ZW1lbnQ/OiBudW1iZXI7XHJcbiAgfTtcclxuXHJcbiAgQENyZWF0ZURhdGVDb2x1bW4oKVxyXG4gIGNyZWF0ZWRBdDogRGF0ZTtcclxuXHJcbiAgQFVwZGF0ZURhdGVDb2x1bW4oKVxyXG4gIHVwZGF0ZWRBdDogRGF0ZTtcclxufVxyXG4iXSwidmVyc2lvbiI6M30=

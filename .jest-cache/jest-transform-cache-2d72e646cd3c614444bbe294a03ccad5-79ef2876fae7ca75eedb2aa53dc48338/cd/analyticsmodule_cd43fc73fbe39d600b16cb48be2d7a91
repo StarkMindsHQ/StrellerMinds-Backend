@@ -1,0 +1,56 @@
+1b33318392fc1c154c20d78d2c0f0fdb
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AnalyticsModule = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const bull_1 = require("@nestjs/bull");
+const schedule_1 = require("@nestjs/schedule");
+const analytics_controller_1 = require("./controllers/analytics.controller");
+const dashboard_controller_1 = require("./controllers/dashboard.controller");
+const reports_controller_1 = require("./controllers/reports.controller");
+const data_collection_service_1 = require("./services/data-collection.service");
+const data_processing_service_1 = require("./services/data-processing.service");
+const data_warehouse_service_1 = require("./services/data-warehouse.service");
+const business_intelligence_service_1 = require("./services/business-intelligence.service");
+const reporting_service_1 = require("./services/reporting.service");
+const real_time_analytics_service_1 = require("./services/real-time-analytics.service");
+const data_collection_processor_1 = require("./processors/data-collection.processor");
+const data_processing_processor_1 = require("./processors/data-processing.processor");
+const analytics_event_entity_1 = require("./entities/analytics-event.entity");
+const data_warehouse_metric_entity_1 = require("./entities/data-warehouse-metric.entity");
+const report_entity_1 = require("./entities/report.entity");
+const dashboard_entity_1 = require("./entities/dashboard.entity");
+const analytics_gateway_1 = require("./gateways/analytics.gateway");
+let AnalyticsModule = class AnalyticsModule {
+};
+exports.AnalyticsModule = AnalyticsModule;
+exports.AnalyticsModule = AnalyticsModule = __decorate([
+    (0, common_1.Module)({
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([analytics_event_entity_1.AnalyticsEvent, data_warehouse_metric_entity_1.DataWarehouseMetric, report_entity_1.Report, dashboard_entity_1.Dashboard]),
+            bull_1.BullModule.registerQueue({ name: "data-collection" }, { name: "data-processing" }),
+            schedule_1.ScheduleModule.forRoot(),
+        ],
+        controllers: [analytics_controller_1.AnalyticsController, dashboard_controller_1.DashboardController, reports_controller_1.ReportsController],
+        providers: [
+            data_collection_service_1.DataCollectionService,
+            data_processing_service_1.DataProcessingService,
+            data_warehouse_service_1.DataWarehouseService,
+            business_intelligence_service_1.BusinessIntelligenceService,
+            reporting_service_1.ReportingService,
+            real_time_analytics_service_1.RealTimeAnalyticsService,
+            data_collection_processor_1.DataCollectionProcessor,
+            data_processing_processor_1.DataProcessingProcessor,
+            analytics_gateway_1.AnalyticsGateway,
+        ],
+        exports: [data_collection_service_1.DataCollectionService, business_intelligence_service_1.BusinessIntelligenceService, real_time_analytics_service_1.RealTimeAnalyticsService],
+    })
+], AnalyticsModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhbmFseXRpY1xcYW5hbHl0aWNzLm1vZHVsZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7QUFBQSwyQ0FBdUM7QUFDdkMsNkNBQStDO0FBQy9DLHVDQUF5QztBQUN6QywrQ0FBaUQ7QUFFakQsNkVBQXdFO0FBQ3hFLDZFQUF3RTtBQUN4RSx5RUFBb0U7QUFFcEUsZ0ZBQTBFO0FBQzFFLGdGQUEwRTtBQUMxRSw4RUFBd0U7QUFDeEUsNEZBQXNGO0FBQ3RGLG9FQUErRDtBQUMvRCx3RkFBaUY7QUFFakYsc0ZBQWdGO0FBQ2hGLHNGQUFnRjtBQUVoRiw4RUFBa0U7QUFDbEUsMEZBQTZFO0FBQzdFLDREQUFpRDtBQUNqRCxrRUFBdUQ7QUFFdkQsb0VBQStEO0FBc0J4RCxJQUFNLGVBQWUsR0FBckIsTUFBTSxlQUFlO0NBQUcsQ0FBQTtBQUFsQiwwQ0FBZTswQkFBZixlQUFlO0lBcEIzQixJQUFBLGVBQU0sRUFBQztRQUNOLE9BQU8sRUFBRTtZQUNQLHVCQUFhLENBQUMsVUFBVSxDQUFDLENBQUMsdUNBQWMsRUFBRSxrREFBbUIsRUFBRSxzQkFBTSxFQUFFLDRCQUFTLENBQUMsQ0FBQztZQUNsRixpQkFBVSxDQUFDLGFBQWEsQ0FBQyxFQUFFLElBQUksRUFBRSxpQkFBaUIsRUFBRSxFQUFFLEVBQUUsSUFBSSxFQUFFLGlCQUFpQixFQUFFLENBQUM7WUFDbEYseUJBQWMsQ0FBQyxPQUFPLEVBQUU7U0FDekI7UUFDRCxXQUFXLEVBQUUsQ0FBQywwQ0FBbUIsRUFBRSwwQ0FBbUIsRUFBRSxzQ0FBaUIsQ0FBQztRQUMxRSxTQUFTLEVBQUU7WUFDVCwrQ0FBcUI7WUFDckIsK0NBQXFCO1lBQ3JCLDZDQUFvQjtZQUNwQiwyREFBMkI7WUFDM0Isb0NBQWdCO1lBQ2hCLHNEQUF3QjtZQUN4QixtREFBdUI7WUFDdkIsbURBQXVCO1lBQ3ZCLG9DQUFnQjtTQUNqQjtRQUNELE9BQU8sRUFBRSxDQUFDLCtDQUFxQixFQUFFLDJEQUEyQixFQUFFLHNEQUF3QixDQUFDO0tBQ3hGLENBQUM7R0FDVyxlQUFlLENBQUciLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhbmFseXRpY1xcYW5hbHl0aWNzLm1vZHVsZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBNb2R1bGUgfSBmcm9tIFwiQG5lc3Rqcy9jb21tb25cIlxyXG5pbXBvcnQgeyBUeXBlT3JtTW9kdWxlIH0gZnJvbSBcIkBuZXN0anMvdHlwZW9ybVwiXHJcbmltcG9ydCB7IEJ1bGxNb2R1bGUgfSBmcm9tIFwiQG5lc3Rqcy9idWxsXCJcclxuaW1wb3J0IHsgU2NoZWR1bGVNb2R1bGUgfSBmcm9tIFwiQG5lc3Rqcy9zY2hlZHVsZVwiXHJcblxyXG5pbXBvcnQgeyBBbmFseXRpY3NDb250cm9sbGVyIH0gZnJvbSBcIi4vY29udHJvbGxlcnMvYW5hbHl0aWNzLmNvbnRyb2xsZXJcIlxyXG5pbXBvcnQgeyBEYXNoYm9hcmRDb250cm9sbGVyIH0gZnJvbSBcIi4vY29udHJvbGxlcnMvZGFzaGJvYXJkLmNvbnRyb2xsZXJcIlxyXG5pbXBvcnQgeyBSZXBvcnRzQ29udHJvbGxlciB9IGZyb20gXCIuL2NvbnRyb2xsZXJzL3JlcG9ydHMuY29udHJvbGxlclwiXHJcblxyXG5pbXBvcnQgeyBEYXRhQ29sbGVjdGlvblNlcnZpY2UgfSBmcm9tIFwiLi9zZXJ2aWNlcy9kYXRhLWNvbGxlY3Rpb24uc2VydmljZVwiXHJcbmltcG9ydCB7IERhdGFQcm9jZXNzaW5nU2VydmljZSB9IGZyb20gXCIuL3NlcnZpY2VzL2RhdGEtcHJvY2Vzc2luZy5zZXJ2aWNlXCJcclxuaW1wb3J0IHsgRGF0YVdhcmVob3VzZVNlcnZpY2UgfSBmcm9tIFwiLi9zZXJ2aWNlcy9kYXRhLXdhcmVob3VzZS5zZXJ2aWNlXCJcclxuaW1wb3J0IHsgQnVzaW5lc3NJbnRlbGxpZ2VuY2VTZXJ2aWNlIH0gZnJvbSBcIi4vc2VydmljZXMvYnVzaW5lc3MtaW50ZWxsaWdlbmNlLnNlcnZpY2VcIlxyXG5pbXBvcnQgeyBSZXBvcnRpbmdTZXJ2aWNlIH0gZnJvbSBcIi4vc2VydmljZXMvcmVwb3J0aW5nLnNlcnZpY2VcIlxyXG5pbXBvcnQgeyBSZWFsVGltZUFuYWx5dGljc1NlcnZpY2UgfSBmcm9tIFwiLi9zZXJ2aWNlcy9yZWFsLXRpbWUtYW5hbHl0aWNzLnNlcnZpY2VcIlxyXG5cclxuaW1wb3J0IHsgRGF0YUNvbGxlY3Rpb25Qcm9jZXNzb3IgfSBmcm9tIFwiLi9wcm9jZXNzb3JzL2RhdGEtY29sbGVjdGlvbi5wcm9jZXNzb3JcIlxyXG5pbXBvcnQgeyBEYXRhUHJvY2Vzc2luZ1Byb2Nlc3NvciB9IGZyb20gXCIuL3Byb2Nlc3NvcnMvZGF0YS1wcm9jZXNzaW5nLnByb2Nlc3NvclwiXHJcblxyXG5pbXBvcnQgeyBBbmFseXRpY3NFdmVudCB9IGZyb20gXCIuL2VudGl0aWVzL2FuYWx5dGljcy1ldmVudC5lbnRpdHlcIlxyXG5pbXBvcnQgeyBEYXRhV2FyZWhvdXNlTWV0cmljIH0gZnJvbSBcIi4vZW50aXRpZXMvZGF0YS13YXJlaG91c2UtbWV0cmljLmVudGl0eVwiXHJcbmltcG9ydCB7IFJlcG9ydCB9IGZyb20gXCIuL2VudGl0aWVzL3JlcG9ydC5lbnRpdHlcIlxyXG5pbXBvcnQgeyBEYXNoYm9hcmQgfSBmcm9tIFwiLi9lbnRpdGllcy9kYXNoYm9hcmQuZW50aXR5XCJcclxuXHJcbmltcG9ydCB7IEFuYWx5dGljc0dhdGV3YXkgfSBmcm9tIFwiLi9nYXRld2F5cy9hbmFseXRpY3MuZ2F0ZXdheVwiXHJcblxyXG5ATW9kdWxlKHtcclxuICBpbXBvcnRzOiBbXHJcbiAgICBUeXBlT3JtTW9kdWxlLmZvckZlYXR1cmUoW0FuYWx5dGljc0V2ZW50LCBEYXRhV2FyZWhvdXNlTWV0cmljLCBSZXBvcnQsIERhc2hib2FyZF0pLFxyXG4gICAgQnVsbE1vZHVsZS5yZWdpc3RlclF1ZXVlKHsgbmFtZTogXCJkYXRhLWNvbGxlY3Rpb25cIiB9LCB7IG5hbWU6IFwiZGF0YS1wcm9jZXNzaW5nXCIgfSksXHJcbiAgICBTY2hlZHVsZU1vZHVsZS5mb3JSb290KCksXHJcbiAgXSxcclxuICBjb250cm9sbGVyczogW0FuYWx5dGljc0NvbnRyb2xsZXIsIERhc2hib2FyZENvbnRyb2xsZXIsIFJlcG9ydHNDb250cm9sbGVyXSxcclxuICBwcm92aWRlcnM6IFtcclxuICAgIERhdGFDb2xsZWN0aW9uU2VydmljZSxcclxuICAgIERhdGFQcm9jZXNzaW5nU2VydmljZSxcclxuICAgIERhdGFXYXJlaG91c2VTZXJ2aWNlLFxyXG4gICAgQnVzaW5lc3NJbnRlbGxpZ2VuY2VTZXJ2aWNlLFxyXG4gICAgUmVwb3J0aW5nU2VydmljZSxcclxuICAgIFJlYWxUaW1lQW5hbHl0aWNzU2VydmljZSxcclxuICAgIERhdGFDb2xsZWN0aW9uUHJvY2Vzc29yLFxyXG4gICAgRGF0YVByb2Nlc3NpbmdQcm9jZXNzb3IsXHJcbiAgICBBbmFseXRpY3NHYXRld2F5LFxyXG4gIF0sXHJcbiAgZXhwb3J0czogW0RhdGFDb2xsZWN0aW9uU2VydmljZSwgQnVzaW5lc3NJbnRlbGxpZ2VuY2VTZXJ2aWNlLCBSZWFsVGltZUFuYWx5dGljc1NlcnZpY2VdLFxyXG59KVxyXG5leHBvcnQgY2xhc3MgQW5hbHl0aWNzTW9kdWxlIHt9XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

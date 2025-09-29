@@ -1,0 +1,64 @@
+ea18cda977d74fba6db8637d591c3487
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TranslationController = void 0;
+const common_1 = require("@nestjs/common");
+const translation_service_1 = require("./translation.service");
+const translation_dto_1 = require("./translation.dto");
+const language_enum_1 = require("src/language/language.enum");
+let TranslationController = class TranslationController {
+    constructor(service) {
+        this.service = service;
+    }
+    async create(dto) {
+        return await this.service.createTranslation(dto);
+    }
+    async get(key, lang) {
+        return await this.service.getTranslation(key, lang);
+    }
+    async getBatch(keys, lang) {
+        return await this.service.translateBatch(keys, lang);
+    }
+};
+exports.TranslationController = TranslationController;
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof translation_dto_1.CreateTranslationDto !== "undefined" && translation_dto_1.CreateTranslationDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], TranslationController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('key')),
+    __param(1, (0, common_1.Query)('lang')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_c = typeof language_enum_1.Language !== "undefined" && language_enum_1.Language) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], TranslationController.prototype, "get", null);
+__decorate([
+    (0, common_1.Get)('batch'),
+    __param(0, (0, common_1.Query)('keys')),
+    __param(1, (0, common_1.Query)('lang')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Array, typeof (_d = typeof language_enum_1.Language !== "undefined" && language_enum_1.Language) === "function" ? _d : Object]),
+    __metadata("design:returntype", Promise)
+], TranslationController.prototype, "getBatch", null);
+exports.TranslationController = TranslationController = __decorate([
+    (0, common_1.Controller)('translations'),
+    __metadata("design:paramtypes", [typeof (_a = typeof translation_service_1.TranslationService !== "undefined" && translation_service_1.TranslationService) === "function" ? _a : Object])
+], TranslationController);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx0cmFuc2xhdGlvblxcdHJhbnNsYXRpb24uY29udHJvbGxlci50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsMkNBQW9FO0FBQ3BFLCtEQUEyRDtBQUMzRCx1REFBeUQ7QUFDekQsOERBQXNEO0FBRy9DLElBQU0scUJBQXFCLEdBQTNCLE1BQU0scUJBQXFCO0lBQ2hDLFlBQTZCLE9BQTJCO1FBQTNCLFlBQU8sR0FBUCxPQUFPLENBQW9CO0lBQUcsQ0FBQztJQUd0RCxBQUFOLEtBQUssQ0FBQyxNQUFNLENBQVMsR0FBeUI7UUFDNUMsT0FBTyxNQUFNLElBQUksQ0FBQyxPQUFPLENBQUMsaUJBQWlCLENBQUMsR0FBRyxDQUFDLENBQUM7SUFDbkQsQ0FBQztJQUdLLEFBQU4sS0FBSyxDQUFDLEdBQUcsQ0FBZSxHQUFXLEVBQWlCLElBQWM7UUFDaEUsT0FBTyxNQUFNLElBQUksQ0FBQyxPQUFPLENBQUMsY0FBYyxDQUFDLEdBQUcsRUFBRSxJQUFJLENBQUMsQ0FBQztJQUN0RCxDQUFDO0lBR0ssQUFBTixLQUFLLENBQUMsUUFBUSxDQUNHLElBQWMsRUFDZCxJQUFjO1FBRTdCLE9BQU8sTUFBTSxJQUFJLENBQUMsT0FBTyxDQUFDLGNBQWMsQ0FBQyxJQUFJLEVBQUUsSUFBSSxDQUFDLENBQUM7SUFDdkQsQ0FBQztDQUNGLENBQUE7QUFwQlksc0RBQXFCO0FBSTFCO0lBREwsSUFBQSxhQUFJLEdBQUU7SUFDTyxXQUFBLElBQUEsYUFBSSxHQUFFLENBQUE7O3lEQUFNLHNDQUFvQixvQkFBcEIsc0NBQW9COzttREFFN0M7QUFHSztJQURMLElBQUEsWUFBRyxHQUFFO0lBQ0ssV0FBQSxJQUFBLGNBQUssRUFBQyxLQUFLLENBQUMsQ0FBQTtJQUFlLFdBQUEsSUFBQSxjQUFLLEVBQUMsTUFBTSxDQUFDLENBQUE7O2lFQUFPLHdCQUFRLG9CQUFSLHdCQUFROztnREFFakU7QUFHSztJQURMLElBQUEsWUFBRyxFQUFDLE9BQU8sQ0FBQztJQUVWLFdBQUEsSUFBQSxjQUFLLEVBQUMsTUFBTSxDQUFDLENBQUE7SUFDYixXQUFBLElBQUEsY0FBSyxFQUFDLE1BQU0sQ0FBQyxDQUFBOztnRUFBTyx3QkFBUSxvQkFBUix3QkFBUTs7cURBRzlCO2dDQW5CVSxxQkFBcUI7SUFEakMsSUFBQSxtQkFBVSxFQUFDLGNBQWMsQ0FBQzt5REFFYSx3Q0FBa0Isb0JBQWxCLHdDQUFrQjtHQUQ3QyxxQkFBcUIsQ0FvQmpDIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcdHJhbnNsYXRpb25cXHRyYW5zbGF0aW9uLmNvbnRyb2xsZXIudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQ29udHJvbGxlciwgR2V0LCBQb3N0LCBCb2R5LCBRdWVyeSB9IGZyb20gJ0BuZXN0anMvY29tbW9uJztcclxuaW1wb3J0IHsgVHJhbnNsYXRpb25TZXJ2aWNlIH0gZnJvbSAnLi90cmFuc2xhdGlvbi5zZXJ2aWNlJztcclxuaW1wb3J0IHsgQ3JlYXRlVHJhbnNsYXRpb25EdG8gfSBmcm9tICcuL3RyYW5zbGF0aW9uLmR0byc7XHJcbmltcG9ydCB7IExhbmd1YWdlIH0gZnJvbSAnc3JjL2xhbmd1YWdlL2xhbmd1YWdlLmVudW0nO1xyXG5cclxuQENvbnRyb2xsZXIoJ3RyYW5zbGF0aW9ucycpXHJcbmV4cG9ydCBjbGFzcyBUcmFuc2xhdGlvbkNvbnRyb2xsZXIge1xyXG4gIGNvbnN0cnVjdG9yKHByaXZhdGUgcmVhZG9ubHkgc2VydmljZTogVHJhbnNsYXRpb25TZXJ2aWNlKSB7fVxyXG5cclxuICBAUG9zdCgpXHJcbiAgYXN5bmMgY3JlYXRlKEBCb2R5KCkgZHRvOiBDcmVhdGVUcmFuc2xhdGlvbkR0bykge1xyXG4gICAgcmV0dXJuIGF3YWl0IHRoaXMuc2VydmljZS5jcmVhdGVUcmFuc2xhdGlvbihkdG8pO1xyXG4gIH1cclxuXHJcbiAgQEdldCgpXHJcbiAgYXN5bmMgZ2V0KEBRdWVyeSgna2V5Jykga2V5OiBzdHJpbmcsIEBRdWVyeSgnbGFuZycpIGxhbmc6IExhbmd1YWdlKSB7XHJcbiAgICByZXR1cm4gYXdhaXQgdGhpcy5zZXJ2aWNlLmdldFRyYW5zbGF0aW9uKGtleSwgbGFuZyk7XHJcbiAgfVxyXG5cclxuICBAR2V0KCdiYXRjaCcpXHJcbiAgYXN5bmMgZ2V0QmF0Y2goXHJcbiAgICBAUXVlcnkoJ2tleXMnKSBrZXlzOiBzdHJpbmdbXSxcclxuICAgIEBRdWVyeSgnbGFuZycpIGxhbmc6IExhbmd1YWdlXHJcbiAgKSB7XHJcbiAgICByZXR1cm4gYXdhaXQgdGhpcy5zZXJ2aWNlLnRyYW5zbGF0ZUJhdGNoKGtleXMsIGxhbmcpO1xyXG4gIH1cclxufVxyXG4iXSwidmVyc2lvbiI6M30=

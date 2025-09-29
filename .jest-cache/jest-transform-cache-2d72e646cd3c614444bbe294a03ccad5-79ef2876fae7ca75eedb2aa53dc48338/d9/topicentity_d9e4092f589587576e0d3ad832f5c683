@@ -1,0 +1,42 @@
+42a993359e247b7671d4e58786d519ba
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Topic = void 0;
+/* eslint-disable prettier/prettier */
+const swagger_1 = require("@nestjs/swagger");
+const typeorm_1 = require("typeorm");
+const thread_entity_1 = require("src/thread/thread.entity");
+/**
+ * Entity representing a discussion topic.
+ */
+let Topic = class Topic {
+};
+exports.Topic = Topic;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Unique topic ID', example: 1 }),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], Topic.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Name of the topic', example: 'API Documentation' }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Topic.prototype, "name", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Threads under this topic', type: () => [thread_entity_1.Thread] }),
+    (0, typeorm_1.OneToMany)(() => thread_entity_1.Thread, (thread) => thread.topic),
+    __metadata("design:type", Array)
+], Topic.prototype, "threads", void 0);
+exports.Topic = Topic = __decorate([
+    (0, typeorm_1.Entity)('topics')
+], Topic);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx0b3BpY1xcdG9waWMuZW50aXR5LnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7OztBQUFBLHNDQUFzQztBQUN0Qyw2Q0FBOEM7QUFDOUMscUNBQTRFO0FBQzVFLDREQUFrRDtBQUVsRDs7R0FFRztBQUVJLElBQU0sS0FBSyxHQUFYLE1BQU0sS0FBSztDQWVqQixDQUFBO0FBZlksc0JBQUs7QUFJaEI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsaUJBQWlCLEVBQUUsT0FBTyxFQUFFLENBQUMsRUFBRSxDQUFDO0lBQzNELElBQUEsZ0NBQXNCLEdBQUU7O2lDQUNkO0FBS1g7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsbUJBQW1CLEVBQUUsT0FBTyxFQUFFLG1CQUFtQixFQUFFLENBQUM7SUFDL0UsSUFBQSxnQkFBTSxHQUFFOzttQ0FDSTtBQUtiO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLDBCQUEwQixFQUFFLElBQUksRUFBRSxHQUFHLEVBQUUsQ0FBQyxDQUFDLHNCQUFNLENBQUMsRUFBRSxDQUFDO0lBQzlFLElBQUEsbUJBQVMsRUFBQyxHQUFHLEVBQUUsQ0FBQyxzQkFBTSxFQUFFLENBQUMsTUFBTSxFQUFFLEVBQUUsQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDOztzQ0FDaEM7Z0JBZFAsS0FBSztJQURqQixJQUFBLGdCQUFNLEVBQUMsUUFBUSxDQUFDO0dBQ0osS0FBSyxDQWVqQiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXHRvcGljXFx0b3BpYy5lbnRpdHkudHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyogZXNsaW50LWRpc2FibGUgcHJldHRpZXIvcHJldHRpZXIgKi9cclxuaW1wb3J0IHsgQXBpUHJvcGVydHkgfSBmcm9tICdAbmVzdGpzL3N3YWdnZXInO1xyXG5pbXBvcnQgeyBFbnRpdHksIFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4sIENvbHVtbiwgT25lVG9NYW55IH0gZnJvbSAndHlwZW9ybSc7XHJcbmltcG9ydCB7IFRocmVhZCB9IGZyb20gJ3NyYy90aHJlYWQvdGhyZWFkLmVudGl0eSc7XHJcblxyXG4vKipcclxuICogRW50aXR5IHJlcHJlc2VudGluZyBhIGRpc2N1c3Npb24gdG9waWMuXHJcbiAqL1xyXG5ARW50aXR5KCd0b3BpY3MnKVxyXG5leHBvcnQgY2xhc3MgVG9waWMge1xyXG4gIC8qKiBVbmlxdWUgdG9waWMgSUQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ1VuaXF1ZSB0b3BpYyBJRCcsIGV4YW1wbGU6IDEgfSlcclxuICBAUHJpbWFyeUdlbmVyYXRlZENvbHVtbigpXHJcbiAgaWQ6IG51bWJlcjtcclxuXHJcbiAgLyoqIE5hbWUgb2YgdGhlIHRvcGljICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdOYW1lIG9mIHRoZSB0b3BpYycsIGV4YW1wbGU6ICdBUEkgRG9jdW1lbnRhdGlvbicgfSlcclxuICBAQ29sdW1uKClcclxuICBuYW1lOiBzdHJpbmc7XHJcblxyXG4gIC8qKiBUaHJlYWRzIHVuZGVyIHRoaXMgdG9waWMgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ1RocmVhZHMgdW5kZXIgdGhpcyB0b3BpYycsIHR5cGU6ICgpID0+IFtUaHJlYWRdIH0pXHJcbiAgQE9uZVRvTWFueSgoKSA9PiBUaHJlYWQsICh0aHJlYWQpID0+IHRocmVhZC50b3BpYylcclxuICB0aHJlYWRzOiBUaHJlYWRbXTtcclxufVxyXG4iXSwidmVyc2lvbiI6M30=

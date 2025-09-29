@@ -1,0 +1,31 @@
+f063d9d5a3484b1bff4a41358523161c
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CertificateModule = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const certificate_entity_1 = require("./entity/certificate.entity");
+const certificate_service_1 = require("./certificate.service");
+const certificate_controller_1 = require("./certificate.controller");
+/**
+ * CertificateModule provides certificate management features.
+ *
+ * @module Certificate
+ */
+let CertificateModule = class CertificateModule {
+};
+exports.CertificateModule = CertificateModule;
+exports.CertificateModule = CertificateModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([certificate_entity_1.Certificate])],
+        controllers: [certificate_controller_1.CertificatesController],
+        providers: [certificate_service_1.CertificatesService],
+    })
+], CertificateModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxjZXJ0aWZpY2F0ZVxcY2VydGlmaWNhdGUubW9kdWxlLnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7OztBQUFBLDJDQUF3QztBQUN4Qyw2Q0FBZ0Q7QUFDaEQsb0VBQTBEO0FBQzFELCtEQUE0RDtBQUM1RCxxRUFBa0U7QUFFbEU7Ozs7R0FJRztBQU1JLElBQU0saUJBQWlCLEdBQXZCLE1BQU0saUJBQWlCO0NBQUcsQ0FBQTtBQUFwQiw4Q0FBaUI7NEJBQWpCLGlCQUFpQjtJQUw3QixJQUFBLGVBQU0sRUFBQztRQUNOLE9BQU8sRUFBRSxDQUFDLHVCQUFhLENBQUMsVUFBVSxDQUFDLENBQUMsZ0NBQVcsQ0FBQyxDQUFDLENBQUM7UUFDbEQsV0FBVyxFQUFFLENBQUMsK0NBQXNCLENBQUM7UUFDckMsU0FBUyxFQUFFLENBQUMseUNBQW1CLENBQUM7S0FDakMsQ0FBQztHQUNXLGlCQUFpQixDQUFHIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcY2VydGlmaWNhdGVcXGNlcnRpZmljYXRlLm1vZHVsZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBNb2R1bGUgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IFR5cGVPcm1Nb2R1bGUgfSBmcm9tICdAbmVzdGpzL3R5cGVvcm0nO1xyXG5pbXBvcnQgeyBDZXJ0aWZpY2F0ZSB9IGZyb20gJy4vZW50aXR5L2NlcnRpZmljYXRlLmVudGl0eSc7XHJcbmltcG9ydCB7IENlcnRpZmljYXRlc1NlcnZpY2UgfSBmcm9tICcuL2NlcnRpZmljYXRlLnNlcnZpY2UnO1xyXG5pbXBvcnQgeyBDZXJ0aWZpY2F0ZXNDb250cm9sbGVyIH0gZnJvbSAnLi9jZXJ0aWZpY2F0ZS5jb250cm9sbGVyJztcclxuXHJcbi8qKlxyXG4gKiBDZXJ0aWZpY2F0ZU1vZHVsZSBwcm92aWRlcyBjZXJ0aWZpY2F0ZSBtYW5hZ2VtZW50IGZlYXR1cmVzLlxyXG4gKlxyXG4gKiBAbW9kdWxlIENlcnRpZmljYXRlXHJcbiAqL1xyXG5ATW9kdWxlKHtcclxuICBpbXBvcnRzOiBbVHlwZU9ybU1vZHVsZS5mb3JGZWF0dXJlKFtDZXJ0aWZpY2F0ZV0pXSxcclxuICBjb250cm9sbGVyczogW0NlcnRpZmljYXRlc0NvbnRyb2xsZXJdLFxyXG4gIHByb3ZpZGVyczogW0NlcnRpZmljYXRlc1NlcnZpY2VdLFxyXG59KVxyXG5leHBvcnQgY2xhc3MgQ2VydGlmaWNhdGVNb2R1bGUge31cclxuIl0sInZlcnNpb24iOjN9

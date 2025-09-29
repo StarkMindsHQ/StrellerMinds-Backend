@@ -1,0 +1,68 @@
+a82abe08449e28303928360a541d0421
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GdprService = void 0;
+const common_1 = require("@nestjs/common");
+const consent_service_1 = require("./consent.service");
+const data_export_service_1 = require("./data-export.service");
+const data_deletion_service_1 = require("./data-deletion.service");
+/**
+ * GdprService provides logic for user consent, data export, and deletion requests.
+ */
+let GdprService = class GdprService {
+    constructor(consentService, dataExportService, dataDeletionService) {
+        this.consentService = consentService;
+        this.dataExportService = dataExportService;
+        this.dataDeletionService = dataDeletionService;
+    }
+    /**
+     * Get the consent service instance.
+     */
+    getConsentService() {
+        return this.consentService;
+    }
+    /**
+     * Get the data export service instance.
+     */
+    getDataExportService() {
+        return this.dataExportService;
+    }
+    /**
+     * Get the data deletion service instance.
+     */
+    getDataDeletionService() {
+        return this.dataDeletionService;
+    }
+    /**
+     * Generate a compliance report for a user.
+     * @param userId - User ID
+     * @returns Compliance report object
+     */
+    async generateComplianceReport(userId) {
+        const consents = await this.consentService.getUserConsents(userId);
+        const deletionRequests = await this.dataDeletionService.getDeletionRequests(userId);
+        return {
+            userId,
+            generatedAt: new Date().toISOString(),
+            consents: consents.length,
+            activeDeletionRequests: deletionRequests.filter((r) => r.status === 'pending' || r.status === 'in_progress').length,
+            completedDeletionRequests: deletionRequests.filter((r) => r.status === 'completed').length,
+        };
+    }
+};
+exports.GdprService = GdprService;
+exports.GdprService = GdprService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof consent_service_1.ConsentService !== "undefined" && consent_service_1.ConsentService) === "function" ? _a : Object, typeof (_b = typeof data_export_service_1.DataExportService !== "undefined" && data_export_service_1.DataExportService) === "function" ? _b : Object, typeof (_c = typeof data_deletion_service_1.DataDeletionService !== "undefined" && data_deletion_service_1.DataDeletionService) === "function" ? _c : Object])
+], GdprService);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnZHByXFxnZHByLnNlcnZpY2UudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLDJDQUE0QztBQUM1Qyx1REFBbUQ7QUFDbkQsK0RBQTBEO0FBQzFELG1FQUE4RDtBQUU5RDs7R0FFRztBQUVJLElBQU0sV0FBVyxHQUFqQixNQUFNLFdBQVc7SUFDdEIsWUFDVSxjQUE4QixFQUM5QixpQkFBb0MsRUFDcEMsbUJBQXdDO1FBRnhDLG1CQUFjLEdBQWQsY0FBYyxDQUFnQjtRQUM5QixzQkFBaUIsR0FBakIsaUJBQWlCLENBQW1CO1FBQ3BDLHdCQUFtQixHQUFuQixtQkFBbUIsQ0FBcUI7SUFDL0MsQ0FBQztJQUVKOztPQUVHO0lBQ0gsaUJBQWlCO1FBQ2YsT0FBTyxJQUFJLENBQUMsY0FBYyxDQUFDO0lBQzdCLENBQUM7SUFFRDs7T0FFRztJQUNILG9CQUFvQjtRQUNsQixPQUFPLElBQUksQ0FBQyxpQkFBaUIsQ0FBQztJQUNoQyxDQUFDO0lBRUQ7O09BRUc7SUFDSCxzQkFBc0I7UUFDcEIsT0FBTyxJQUFJLENBQUMsbUJBQW1CLENBQUM7SUFDbEMsQ0FBQztJQUVEOzs7O09BSUc7SUFDSCxLQUFLLENBQUMsd0JBQXdCLENBQUMsTUFBYztRQUMzQyxNQUFNLFFBQVEsR0FBRyxNQUFNLElBQUksQ0FBQyxjQUFjLENBQUMsZUFBZSxDQUFDLE1BQU0sQ0FBQyxDQUFDO1FBQ25FLE1BQU0sZ0JBQWdCLEdBQ3BCLE1BQU0sSUFBSSxDQUFDLG1CQUFtQixDQUFDLG1CQUFtQixDQUFDLE1BQU0sQ0FBQyxDQUFDO1FBRTdELE9BQU87WUFDTCxNQUFNO1lBQ04sV0FBVyxFQUFFLElBQUksSUFBSSxFQUFFLENBQUMsV0FBVyxFQUFFO1lBQ3JDLFFBQVEsRUFBRSxRQUFRLENBQUMsTUFBTTtZQUN6QixzQkFBc0IsRUFBRSxnQkFBZ0IsQ0FBQyxNQUFNLENBQzdDLENBQUMsQ0FBQyxFQUFFLEVBQUUsQ0FBQyxDQUFDLENBQUMsTUFBTSxLQUFLLFNBQVMsSUFBSSxDQUFDLENBQUMsTUFBTSxLQUFLLGFBQWEsQ0FDNUQsQ0FBQyxNQUFNO1lBQ1IseUJBQXlCLEVBQUUsZ0JBQWdCLENBQUMsTUFBTSxDQUNoRCxDQUFDLENBQUMsRUFBRSxFQUFFLENBQUMsQ0FBQyxDQUFDLE1BQU0sS0FBSyxXQUFXLENBQ2hDLENBQUMsTUFBTTtTQUNULENBQUM7SUFDSixDQUFDO0NBQ0YsQ0FBQTtBQWxEWSxrQ0FBVztzQkFBWCxXQUFXO0lBRHZCLElBQUEsbUJBQVUsR0FBRTt5REFHZSxnQ0FBYyxvQkFBZCxnQ0FBYyxvREFDWCx1Q0FBaUIsb0JBQWpCLHVDQUFpQixvREFDZiwyQ0FBbUIsb0JBQW5CLDJDQUFtQjtHQUp2QyxXQUFXLENBa0R2QiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGdkcHJcXGdkcHIuc2VydmljZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBJbmplY3RhYmxlIH0gZnJvbSAnQG5lc3Rqcy9jb21tb24nO1xyXG5pbXBvcnQgeyBDb25zZW50U2VydmljZSB9IGZyb20gJy4vY29uc2VudC5zZXJ2aWNlJztcclxuaW1wb3J0IHsgRGF0YUV4cG9ydFNlcnZpY2UgfSBmcm9tICcuL2RhdGEtZXhwb3J0LnNlcnZpY2UnO1xyXG5pbXBvcnQgeyBEYXRhRGVsZXRpb25TZXJ2aWNlIH0gZnJvbSAnLi9kYXRhLWRlbGV0aW9uLnNlcnZpY2UnO1xyXG5cclxuLyoqXHJcbiAqIEdkcHJTZXJ2aWNlIHByb3ZpZGVzIGxvZ2ljIGZvciB1c2VyIGNvbnNlbnQsIGRhdGEgZXhwb3J0LCBhbmQgZGVsZXRpb24gcmVxdWVzdHMuXHJcbiAqL1xyXG5ASW5qZWN0YWJsZSgpXHJcbmV4cG9ydCBjbGFzcyBHZHByU2VydmljZSB7XHJcbiAgY29uc3RydWN0b3IoXHJcbiAgICBwcml2YXRlIGNvbnNlbnRTZXJ2aWNlOiBDb25zZW50U2VydmljZSxcclxuICAgIHByaXZhdGUgZGF0YUV4cG9ydFNlcnZpY2U6IERhdGFFeHBvcnRTZXJ2aWNlLFxyXG4gICAgcHJpdmF0ZSBkYXRhRGVsZXRpb25TZXJ2aWNlOiBEYXRhRGVsZXRpb25TZXJ2aWNlLFxyXG4gICkge31cclxuXHJcbiAgLyoqXHJcbiAgICogR2V0IHRoZSBjb25zZW50IHNlcnZpY2UgaW5zdGFuY2UuXHJcbiAgICovXHJcbiAgZ2V0Q29uc2VudFNlcnZpY2UoKSB7XHJcbiAgICByZXR1cm4gdGhpcy5jb25zZW50U2VydmljZTtcclxuICB9XHJcblxyXG4gIC8qKlxyXG4gICAqIEdldCB0aGUgZGF0YSBleHBvcnQgc2VydmljZSBpbnN0YW5jZS5cclxuICAgKi9cclxuICBnZXREYXRhRXhwb3J0U2VydmljZSgpIHtcclxuICAgIHJldHVybiB0aGlzLmRhdGFFeHBvcnRTZXJ2aWNlO1xyXG4gIH1cclxuXHJcbiAgLyoqXHJcbiAgICogR2V0IHRoZSBkYXRhIGRlbGV0aW9uIHNlcnZpY2UgaW5zdGFuY2UuXHJcbiAgICovXHJcbiAgZ2V0RGF0YURlbGV0aW9uU2VydmljZSgpIHtcclxuICAgIHJldHVybiB0aGlzLmRhdGFEZWxldGlvblNlcnZpY2U7XHJcbiAgfVxyXG5cclxuICAvKipcclxuICAgKiBHZW5lcmF0ZSBhIGNvbXBsaWFuY2UgcmVwb3J0IGZvciBhIHVzZXIuXHJcbiAgICogQHBhcmFtIHVzZXJJZCAtIFVzZXIgSURcclxuICAgKiBAcmV0dXJucyBDb21wbGlhbmNlIHJlcG9ydCBvYmplY3RcclxuICAgKi9cclxuICBhc3luYyBnZW5lcmF0ZUNvbXBsaWFuY2VSZXBvcnQodXNlcklkOiBzdHJpbmcpOiBQcm9taXNlPGFueT4ge1xyXG4gICAgY29uc3QgY29uc2VudHMgPSBhd2FpdCB0aGlzLmNvbnNlbnRTZXJ2aWNlLmdldFVzZXJDb25zZW50cyh1c2VySWQpO1xyXG4gICAgY29uc3QgZGVsZXRpb25SZXF1ZXN0cyA9XHJcbiAgICAgIGF3YWl0IHRoaXMuZGF0YURlbGV0aW9uU2VydmljZS5nZXREZWxldGlvblJlcXVlc3RzKHVzZXJJZCk7XHJcblxyXG4gICAgcmV0dXJuIHtcclxuICAgICAgdXNlcklkLFxyXG4gICAgICBnZW5lcmF0ZWRBdDogbmV3IERhdGUoKS50b0lTT1N0cmluZygpLFxyXG4gICAgICBjb25zZW50czogY29uc2VudHMubGVuZ3RoLFxyXG4gICAgICBhY3RpdmVEZWxldGlvblJlcXVlc3RzOiBkZWxldGlvblJlcXVlc3RzLmZpbHRlcihcclxuICAgICAgICAocikgPT4gci5zdGF0dXMgPT09ICdwZW5kaW5nJyB8fCByLnN0YXR1cyA9PT0gJ2luX3Byb2dyZXNzJyxcclxuICAgICAgKS5sZW5ndGgsXHJcbiAgICAgIGNvbXBsZXRlZERlbGV0aW9uUmVxdWVzdHM6IGRlbGV0aW9uUmVxdWVzdHMuZmlsdGVyKFxyXG4gICAgICAgIChyKSA9PiByLnN0YXR1cyA9PT0gJ2NvbXBsZXRlZCcsXHJcbiAgICAgICkubGVuZ3RoLFxyXG4gICAgfTtcclxuICB9XHJcbn1cclxuIl0sInZlcnNpb24iOjN9

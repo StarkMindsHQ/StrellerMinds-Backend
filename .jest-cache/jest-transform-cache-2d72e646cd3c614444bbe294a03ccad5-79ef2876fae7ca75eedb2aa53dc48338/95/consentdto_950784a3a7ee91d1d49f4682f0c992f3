@@ -1,0 +1,76 @@
+bdffca4423264ee642d0a2fc70e22852
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d, _e;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ConsentPreferencesDto = exports.UpdateConsentDto = void 0;
+const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
+const user_consent_entity_1 = require("../entities/user-consent.entity");
+/**
+ * DTO for updating a user's consent.
+ */
+class UpdateConsentDto {
+}
+exports.UpdateConsentDto = UpdateConsentDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ enum: user_consent_entity_1.ConsentType, description: 'Consent type' }),
+    (0, class_validator_1.IsEnum)(user_consent_entity_1.ConsentType),
+    __metadata("design:type", typeof (_a = typeof user_consent_entity_1.ConsentType !== "undefined" && user_consent_entity_1.ConsentType) === "function" ? _a : Object)
+], UpdateConsentDto.prototype, "consentType", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ enum: user_consent_entity_1.ConsentStatus, description: 'Consent status' }),
+    (0, class_validator_1.IsEnum)(user_consent_entity_1.ConsentStatus),
+    __metadata("design:type", typeof (_b = typeof user_consent_entity_1.ConsentStatus !== "undefined" && user_consent_entity_1.ConsentStatus) === "function" ? _b : Object)
+], UpdateConsentDto.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Purpose of consent' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateConsentDto.prototype, "purpose", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Legal basis for consent' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateConsentDto.prototype, "legalBasis", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Expiry date for consent', type: String, format: 'date-time' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsDateString)(),
+    __metadata("design:type", String)
+], UpdateConsentDto.prototype, "expiresAt", void 0);
+/**
+ * DTO for updating consent preferences.
+ */
+class ConsentPreferencesDto {
+}
+exports.ConsentPreferencesDto = ConsentPreferencesDto;
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: user_consent_entity_1.ConsentStatus, description: 'Marketing consent status' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(user_consent_entity_1.ConsentStatus),
+    __metadata("design:type", typeof (_c = typeof user_consent_entity_1.ConsentStatus !== "undefined" && user_consent_entity_1.ConsentStatus) === "function" ? _c : Object)
+], ConsentPreferencesDto.prototype, "marketing", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: user_consent_entity_1.ConsentStatus, description: 'Analytics consent status' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(user_consent_entity_1.ConsentStatus),
+    __metadata("design:type", typeof (_d = typeof user_consent_entity_1.ConsentStatus !== "undefined" && user_consent_entity_1.ConsentStatus) === "function" ? _d : Object)
+], ConsentPreferencesDto.prototype, "analytics", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: user_consent_entity_1.ConsentStatus, description: 'Functional consent status' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(user_consent_entity_1.ConsentStatus),
+    __metadata("design:type", typeof (_e = typeof user_consent_entity_1.ConsentStatus !== "undefined" && user_consent_entity_1.ConsentStatus) === "function" ? _e : Object)
+], ConsentPreferencesDto.prototype, "functional", void 0);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnZHByXFxkdG9cXGNvbnNlbnQuZHRvLnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7QUFBQSxxREFBNkU7QUFDN0UsNkNBQW1FO0FBQ25FLHlFQUE2RTtBQUU3RTs7R0FFRztBQUNILE1BQWEsZ0JBQWdCO0NBNEI1QjtBQTVCRCw0Q0E0QkM7QUF4QkM7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxJQUFJLEVBQUUsaUNBQVcsRUFBRSxXQUFXLEVBQUUsY0FBYyxFQUFFLENBQUM7SUFDL0QsSUFBQSx3QkFBTSxFQUFDLGlDQUFXLENBQUM7a0RBQ1AsaUNBQVcsb0JBQVgsaUNBQVc7cURBQUM7QUFLekI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxJQUFJLEVBQUUsbUNBQWEsRUFBRSxXQUFXLEVBQUUsZ0JBQWdCLEVBQUUsQ0FBQztJQUNuRSxJQUFBLHdCQUFNLEVBQUMsbUNBQWEsQ0FBQztrREFDZCxtQ0FBYSxvQkFBYixtQ0FBYTtnREFBQztBQU10QjtJQUhDLElBQUEsNkJBQW1CLEVBQUMsRUFBRSxXQUFXLEVBQUUsb0JBQW9CLEVBQUUsQ0FBQztJQUMxRCxJQUFBLDRCQUFVLEdBQUU7SUFDWixJQUFBLDBCQUFRLEdBQUU7O2lEQUNNO0FBTWpCO0lBSEMsSUFBQSw2QkFBbUIsRUFBQyxFQUFFLFdBQVcsRUFBRSx5QkFBeUIsRUFBRSxDQUFDO0lBQy9ELElBQUEsNEJBQVUsR0FBRTtJQUNaLElBQUEsMEJBQVEsR0FBRTs7b0RBQ1M7QUFNcEI7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsV0FBVyxFQUFFLHlCQUF5QixFQUFFLElBQUksRUFBRSxNQUFNLEVBQUUsTUFBTSxFQUFFLFdBQVcsRUFBRSxDQUFDO0lBQ2xHLElBQUEsNEJBQVUsR0FBRTtJQUNaLElBQUEsOEJBQVksR0FBRTs7bURBQ0k7QUFHckI7O0dBRUc7QUFDSCxNQUFhLHFCQUFxQjtDQWtCakM7QUFsQkQsc0RBa0JDO0FBYkM7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsSUFBSSxFQUFFLG1DQUFhLEVBQUUsV0FBVyxFQUFFLDBCQUEwQixFQUFFLENBQUM7SUFDckYsSUFBQSw0QkFBVSxHQUFFO0lBQ1osSUFBQSx3QkFBTSxFQUFDLG1DQUFhLENBQUM7a0RBQ1YsbUNBQWEsb0JBQWIsbUNBQWE7d0RBQUM7QUFNMUI7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsSUFBSSxFQUFFLG1DQUFhLEVBQUUsV0FBVyxFQUFFLDBCQUEwQixFQUFFLENBQUM7SUFDckYsSUFBQSw0QkFBVSxHQUFFO0lBQ1osSUFBQSx3QkFBTSxFQUFDLG1DQUFhLENBQUM7a0RBQ1YsbUNBQWEsb0JBQWIsbUNBQWE7d0RBQUM7QUFNMUI7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsSUFBSSxFQUFFLG1DQUFhLEVBQUUsV0FBVyxFQUFFLDJCQUEyQixFQUFFLENBQUM7SUFDdEYsSUFBQSw0QkFBVSxHQUFFO0lBQ1osSUFBQSx3QkFBTSxFQUFDLG1DQUFhLENBQUM7a0RBQ1QsbUNBQWEsb0JBQWIsbUNBQWE7eURBQUMiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnZHByXFxkdG9cXGNvbnNlbnQuZHRvLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IElzRW51bSwgSXNPcHRpb25hbCwgSXNTdHJpbmcsIElzRGF0ZVN0cmluZyB9IGZyb20gJ2NsYXNzLXZhbGlkYXRvcic7XHJcbmltcG9ydCB7IEFwaVByb3BlcnR5LCBBcGlQcm9wZXJ0eU9wdGlvbmFsIH0gZnJvbSAnQG5lc3Rqcy9zd2FnZ2VyJztcclxuaW1wb3J0IHsgQ29uc2VudFR5cGUsIENvbnNlbnRTdGF0dXMgfSBmcm9tICcuLi9lbnRpdGllcy91c2VyLWNvbnNlbnQuZW50aXR5JztcclxuXHJcbi8qKlxyXG4gKiBEVE8gZm9yIHVwZGF0aW5nIGEgdXNlcidzIGNvbnNlbnQuXHJcbiAqL1xyXG5leHBvcnQgY2xhc3MgVXBkYXRlQ29uc2VudER0byB7XHJcbiAgLyoqIENvbnNlbnQgdHlwZSAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGVudW06IENvbnNlbnRUeXBlLCBkZXNjcmlwdGlvbjogJ0NvbnNlbnQgdHlwZScgfSlcclxuICBASXNFbnVtKENvbnNlbnRUeXBlKVxyXG4gIGNvbnNlbnRUeXBlOiBDb25zZW50VHlwZTtcclxuXHJcbiAgLyoqIENvbnNlbnQgc3RhdHVzICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZW51bTogQ29uc2VudFN0YXR1cywgZGVzY3JpcHRpb246ICdDb25zZW50IHN0YXR1cycgfSlcclxuICBASXNFbnVtKENvbnNlbnRTdGF0dXMpXHJcbiAgc3RhdHVzOiBDb25zZW50U3RhdHVzO1xyXG5cclxuICAvKiogUHVycG9zZSBvZiBjb25zZW50IChvcHRpb25hbCkgKi9cclxuICBAQXBpUHJvcGVydHlPcHRpb25hbCh7IGRlc2NyaXB0aW9uOiAnUHVycG9zZSBvZiBjb25zZW50JyB9KVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNTdHJpbmcoKVxyXG4gIHB1cnBvc2U/OiBzdHJpbmc7XHJcblxyXG4gIC8qKiBMZWdhbCBiYXNpcyBmb3IgY29uc2VudCAob3B0aW9uYWwpICovXHJcbiAgQEFwaVByb3BlcnR5T3B0aW9uYWwoeyBkZXNjcmlwdGlvbjogJ0xlZ2FsIGJhc2lzIGZvciBjb25zZW50JyB9KVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNTdHJpbmcoKVxyXG4gIGxlZ2FsQmFzaXM/OiBzdHJpbmc7XHJcblxyXG4gIC8qKiBFeHBpcnkgZGF0ZSBmb3IgY29uc2VudCAob3B0aW9uYWwpICovXHJcbiAgQEFwaVByb3BlcnR5T3B0aW9uYWwoeyBkZXNjcmlwdGlvbjogJ0V4cGlyeSBkYXRlIGZvciBjb25zZW50JywgdHlwZTogU3RyaW5nLCBmb3JtYXQ6ICdkYXRlLXRpbWUnIH0pXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIEBJc0RhdGVTdHJpbmcoKVxyXG4gIGV4cGlyZXNBdD86IHN0cmluZztcclxufVxyXG5cclxuLyoqXHJcbiAqIERUTyBmb3IgdXBkYXRpbmcgY29uc2VudCBwcmVmZXJlbmNlcy5cclxuICovXHJcbmV4cG9ydCBjbGFzcyBDb25zZW50UHJlZmVyZW5jZXNEdG8ge1xyXG4gIC8qKiBNYXJrZXRpbmcgY29uc2VudCBzdGF0dXMgKG9wdGlvbmFsKSAqL1xyXG4gIEBBcGlQcm9wZXJ0eU9wdGlvbmFsKHsgZW51bTogQ29uc2VudFN0YXR1cywgZGVzY3JpcHRpb246ICdNYXJrZXRpbmcgY29uc2VudCBzdGF0dXMnIH0pXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIEBJc0VudW0oQ29uc2VudFN0YXR1cylcclxuICBtYXJrZXRpbmc/OiBDb25zZW50U3RhdHVzO1xyXG5cclxuICAvKiogQW5hbHl0aWNzIGNvbnNlbnQgc3RhdHVzIChvcHRpb25hbCkgKi9cclxuICBAQXBpUHJvcGVydHlPcHRpb25hbCh7IGVudW06IENvbnNlbnRTdGF0dXMsIGRlc2NyaXB0aW9uOiAnQW5hbHl0aWNzIGNvbnNlbnQgc3RhdHVzJyB9KVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNFbnVtKENvbnNlbnRTdGF0dXMpXHJcbiAgYW5hbHl0aWNzPzogQ29uc2VudFN0YXR1cztcclxuXHJcbiAgLyoqIEZ1bmN0aW9uYWwgY29uc2VudCBzdGF0dXMgKG9wdGlvbmFsKSAqL1xyXG4gIEBBcGlQcm9wZXJ0eU9wdGlvbmFsKHsgZW51bTogQ29uc2VudFN0YXR1cywgZGVzY3JpcHRpb246ICdGdW5jdGlvbmFsIGNvbnNlbnQgc3RhdHVzJyB9KVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNFbnVtKENvbnNlbnRTdGF0dXMpXHJcbiAgZnVuY3Rpb25hbD86IENvbnNlbnRTdGF0dXM7XHJcbn1cclxuIl0sInZlcnNpb24iOjN9

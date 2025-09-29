@@ -1,0 +1,12 @@
+8d231e6e14579fd3fb8b92c5e5a627e0
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Role = void 0;
+/* eslint-disable prettier/prettier */
+var Role;
+(function (Role) {
+    Role["Admin"] = "admin";
+    Role["Instructor"] = "instructor";
+    Role["Student"] = "student";
+})(Role || (exports.Role = Role = {}));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxyb2xlXFxyb2xlcy5lbnVtLnRzIiwibWFwcGluZ3MiOiI7OztBQUFBLHNDQUFzQztBQUN0QyxJQUFZLElBSVg7QUFKRCxXQUFZLElBQUk7SUFDZCx1QkFBZSxDQUFBO0lBQ2YsaUNBQXlCLENBQUE7SUFDekIsMkJBQW1CLENBQUE7QUFDckIsQ0FBQyxFQUpXLElBQUksb0JBQUosSUFBSSxRQUlmIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xccm9sZVxccm9sZXMuZW51bS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyIvKiBlc2xpbnQtZGlzYWJsZSBwcmV0dGllci9wcmV0dGllciAqL1xyXG5leHBvcnQgZW51bSBSb2xlIHtcclxuICBBZG1pbiA9ICdhZG1pbicsXHJcbiAgSW5zdHJ1Y3RvciA9ICdpbnN0cnVjdG9yJyxcclxuICBTdHVkZW50ID0gJ3N0dWRlbnQnLFxyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

@@ -1,0 +1,39 @@
+600bc2350d71558be8910e791938d226
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateSubmissionDto = void 0;
+// src/submission/dto/create-submission.dto.ts
+const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * DTO for creating a new submission.
+ */
+class CreateSubmissionDto {
+}
+exports.CreateSubmissionDto = CreateSubmissionDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Student ID', example: 'uuid-student' }),
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateSubmissionDto.prototype, "studentId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Assignment ID', example: 'uuid-assignment' }),
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateSubmissionDto.prototype, "assignmentId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Text content of the submission', example: 'My answer...' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateSubmissionDto.prototype, "textContent", void 0);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxzdWJtaXNzaW9uXFxkdG9zXFxjcmVhdGVTdWJtaXNzaW9uLmR0by50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7QUFBQSw4Q0FBOEM7QUFDOUMscURBQTJFO0FBQzNFLDZDQUFtRTtBQUVuRTs7R0FFRztBQUNILE1BQWEsbUJBQW1CO0NBZ0IvQjtBQWhCRCxrREFnQkM7QUFaQztJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxZQUFZLEVBQUUsT0FBTyxFQUFFLGNBQWMsRUFBRSxDQUFDO0lBQ25FLElBQUEsd0JBQU0sR0FBRTs7c0RBQ1M7QUFLbEI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsZUFBZSxFQUFFLE9BQU8sRUFBRSxpQkFBaUIsRUFBRSxDQUFDO0lBQ3pFLElBQUEsd0JBQU0sR0FBRTs7eURBQ1k7QUFNckI7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsV0FBVyxFQUFFLGdDQUFnQyxFQUFFLE9BQU8sRUFBRSxjQUFjLEVBQUUsQ0FBQztJQUMvRixJQUFBLDRCQUFVLEdBQUU7SUFDWixJQUFBLDBCQUFRLEdBQUU7O3dEQUNVIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcc3VibWlzc2lvblxcZHRvc1xcY3JlYXRlU3VibWlzc2lvbi5kdG8udHMiXSwic291cmNlc0NvbnRlbnQiOlsiLy8gc3JjL3N1Ym1pc3Npb24vZHRvL2NyZWF0ZS1zdWJtaXNzaW9uLmR0by50c1xyXG5pbXBvcnQgeyBJc05vdEVtcHR5LCBJc09wdGlvbmFsLCBJc1VVSUQsIElzU3RyaW5nIH0gZnJvbSAnY2xhc3MtdmFsaWRhdG9yJztcclxuaW1wb3J0IHsgQXBpUHJvcGVydHksIEFwaVByb3BlcnR5T3B0aW9uYWwgfSBmcm9tICdAbmVzdGpzL3N3YWdnZXInO1xyXG5cclxuLyoqXHJcbiAqIERUTyBmb3IgY3JlYXRpbmcgYSBuZXcgc3VibWlzc2lvbi5cclxuICovXHJcbmV4cG9ydCBjbGFzcyBDcmVhdGVTdWJtaXNzaW9uRHRvIHtcclxuICAvKiogU3R1ZGVudCBJRCAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnU3R1ZGVudCBJRCcsIGV4YW1wbGU6ICd1dWlkLXN0dWRlbnQnIH0pXHJcbiAgQElzVVVJRCgpXHJcbiAgc3R1ZGVudElkOiBzdHJpbmc7XHJcblxyXG4gIC8qKiBBc3NpZ25tZW50IElEICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdBc3NpZ25tZW50IElEJywgZXhhbXBsZTogJ3V1aWQtYXNzaWdubWVudCcgfSlcclxuICBASXNVVUlEKClcclxuICBhc3NpZ25tZW50SWQ6IHN0cmluZztcclxuXHJcbiAgLyoqIFRleHQgY29udGVudCBvZiB0aGUgc3VibWlzc2lvbiAqL1xyXG4gIEBBcGlQcm9wZXJ0eU9wdGlvbmFsKHsgZGVzY3JpcHRpb246ICdUZXh0IGNvbnRlbnQgb2YgdGhlIHN1Ym1pc3Npb24nLCBleGFtcGxlOiAnTXkgYW5zd2VyLi4uJyB9KVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNTdHJpbmcoKVxyXG4gIHRleHRDb250ZW50Pzogc3RyaW5nO1xyXG59Il0sInZlcnNpb24iOjN9

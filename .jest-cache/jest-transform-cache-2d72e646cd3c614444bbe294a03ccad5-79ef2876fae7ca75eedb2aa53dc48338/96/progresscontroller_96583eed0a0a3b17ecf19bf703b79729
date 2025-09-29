@@ -1,0 +1,72 @@
+76138acd38b51849910ac3efad001b76
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProgressController = void 0;
+const common_1 = require("@nestjs/common");
+const progress_service_1 = require("./progress.service");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * Controller for user progress tracking endpoints.
+ */
+let ProgressController = class ProgressController {
+    constructor(progressService) {
+        this.progressService = progressService;
+    }
+    /**
+     * Mark a lesson as completed for a user.
+     */
+    completeLesson(userId, lessonId) {
+        this.progressService.completeLesson(userId, lessonId);
+        return { message: 'Lesson marked as completed' };
+    }
+    /**
+     * Get progress data for a user.
+     */
+    getUserProgress(userId, totalLessons) {
+        return this.progressService.getProgressData(userId, totalLessons);
+    }
+};
+exports.ProgressController = ProgressController;
+__decorate([
+    (0, common_1.Post)(':userId/complete/:lessonId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Complete lesson', description: 'Mark a lesson as completed for a user.' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'User ID' }),
+    (0, swagger_1.ApiParam)({ name: 'lessonId', description: 'Lesson ID' }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Lesson marked as completed.' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Param)('lessonId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:returntype", void 0)
+], ProgressController.prototype, "completeLesson", null);
+__decorate([
+    (0, common_1.Get)(':userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get user progress', description: 'Get progress data for a user.' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'User ID' }),
+    (0, swagger_1.ApiQuery)({ name: 'totalLessons', description: 'Total number of lessons', required: true }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User progress data.' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Query)('totalLessons')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:returntype", void 0)
+], ProgressController.prototype, "getUserProgress", null);
+exports.ProgressController = ProgressController = __decorate([
+    (0, swagger_1.ApiTags)('Progress'),
+    (0, common_1.Controller)('progress'),
+    __metadata("design:paramtypes", [typeof (_a = typeof progress_service_1.ProgressService !== "undefined" && progress_service_1.ProgressService) === "function" ? _a : Object])
+], ProgressController);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxwcm9ncmVzc1xccHJvZ3Jlc3MuY29udHJvbGxlci50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsMkNBQXFFO0FBQ3JFLHlEQUFxRDtBQUNyRCw2Q0FBeUY7QUFFekY7O0dBRUc7QUFHSSxJQUFNLGtCQUFrQixHQUF4QixNQUFNLGtCQUFrQjtJQUMzQixZQUE2QixlQUFnQztRQUFoQyxvQkFBZSxHQUFmLGVBQWUsQ0FBaUI7SUFBRyxDQUFDO0lBRWpFOztPQUVHO0lBTUgsY0FBYyxDQUNPLE1BQWMsRUFDWixRQUFnQjtRQUVuQyxJQUFJLENBQUMsZUFBZSxDQUFDLGNBQWMsQ0FBQyxNQUFNLEVBQUUsUUFBUSxDQUFDLENBQUM7UUFDdEQsT0FBTyxFQUFFLE9BQU8sRUFBRSw0QkFBNEIsRUFBRSxDQUFDO0lBQ3JELENBQUM7SUFFRDs7T0FFRztJQU1ILGVBQWUsQ0FDTSxNQUFjLEVBQ1IsWUFBb0I7UUFFM0MsT0FBTyxJQUFJLENBQUMsZUFBZSxDQUFDLGVBQWUsQ0FBQyxNQUFNLEVBQUUsWUFBWSxDQUFDLENBQUM7SUFDdEUsQ0FBQztDQUNKLENBQUE7QUFqQ1ksZ0RBQWtCO0FBVzNCO0lBTEMsSUFBQSxhQUFJLEVBQUMsNEJBQTRCLENBQUM7SUFDbEMsSUFBQSxzQkFBWSxFQUFDLEVBQUUsT0FBTyxFQUFFLGlCQUFpQixFQUFFLFdBQVcsRUFBRSx3Q0FBd0MsRUFBRSxDQUFDO0lBQ25HLElBQUEsa0JBQVEsRUFBQyxFQUFFLElBQUksRUFBRSxRQUFRLEVBQUUsV0FBVyxFQUFFLFNBQVMsRUFBRSxDQUFDO0lBQ3BELElBQUEsa0JBQVEsRUFBQyxFQUFFLElBQUksRUFBRSxVQUFVLEVBQUUsV0FBVyxFQUFFLFdBQVcsRUFBRSxDQUFDO0lBQ3hELElBQUEscUJBQVcsRUFBQyxFQUFFLE1BQU0sRUFBRSxHQUFHLEVBQUUsV0FBVyxFQUFFLDZCQUE2QixFQUFFLENBQUM7SUFFcEUsV0FBQSxJQUFBLGNBQUssRUFBQyxRQUFRLENBQUMsQ0FBQTtJQUNmLFdBQUEsSUFBQSxjQUFLLEVBQUMsVUFBVSxDQUFDLENBQUE7Ozs7d0RBSXJCO0FBVUQ7SUFMQyxJQUFBLFlBQUcsRUFBQyxTQUFTLENBQUM7SUFDZCxJQUFBLHNCQUFZLEVBQUMsRUFBRSxPQUFPLEVBQUUsbUJBQW1CLEVBQUUsV0FBVyxFQUFFLCtCQUErQixFQUFFLENBQUM7SUFDNUYsSUFBQSxrQkFBUSxFQUFDLEVBQUUsSUFBSSxFQUFFLFFBQVEsRUFBRSxXQUFXLEVBQUUsU0FBUyxFQUFFLENBQUM7SUFDcEQsSUFBQSxrQkFBUSxFQUFDLEVBQUUsSUFBSSxFQUFFLGNBQWMsRUFBRSxXQUFXLEVBQUUseUJBQXlCLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDO0lBQzFGLElBQUEscUJBQVcsRUFBQyxFQUFFLE1BQU0sRUFBRSxHQUFHLEVBQUUsV0FBVyxFQUFFLHFCQUFxQixFQUFFLENBQUM7SUFFNUQsV0FBQSxJQUFBLGNBQUssRUFBQyxRQUFRLENBQUMsQ0FBQTtJQUNmLFdBQUEsSUFBQSxjQUFLLEVBQUMsY0FBYyxDQUFDLENBQUE7Ozs7eURBR3pCOzZCQWhDUSxrQkFBa0I7SUFGOUIsSUFBQSxpQkFBTyxFQUFDLFVBQVUsQ0FBQztJQUNuQixJQUFBLG1CQUFVLEVBQUMsVUFBVSxDQUFDO3lEQUUyQixrQ0FBZSxvQkFBZixrQ0FBZTtHQURwRCxrQkFBa0IsQ0FpQzlCIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xccHJvZ3Jlc3NcXHByb2dyZXNzLmNvbnRyb2xsZXIudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQ29udHJvbGxlciwgR2V0LCBQb3N0LCBQYXJhbSwgUXVlcnkgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IFByb2dyZXNzU2VydmljZSB9IGZyb20gJy4vcHJvZ3Jlc3Muc2VydmljZSc7XHJcbmltcG9ydCB7IEFwaVRhZ3MsIEFwaU9wZXJhdGlvbiwgQXBpUmVzcG9uc2UsIEFwaVBhcmFtLCBBcGlRdWVyeSB9IGZyb20gJ0BuZXN0anMvc3dhZ2dlcic7XHJcblxyXG4vKipcclxuICogQ29udHJvbGxlciBmb3IgdXNlciBwcm9ncmVzcyB0cmFja2luZyBlbmRwb2ludHMuXHJcbiAqL1xyXG5AQXBpVGFncygnUHJvZ3Jlc3MnKVxyXG5AQ29udHJvbGxlcigncHJvZ3Jlc3MnKVxyXG5leHBvcnQgY2xhc3MgUHJvZ3Jlc3NDb250cm9sbGVyIHtcclxuICAgIGNvbnN0cnVjdG9yKHByaXZhdGUgcmVhZG9ubHkgcHJvZ3Jlc3NTZXJ2aWNlOiBQcm9ncmVzc1NlcnZpY2UpIHt9XHJcblxyXG4gICAgLyoqXHJcbiAgICAgKiBNYXJrIGEgbGVzc29uIGFzIGNvbXBsZXRlZCBmb3IgYSB1c2VyLlxyXG4gICAgICovXHJcbiAgICBAUG9zdCgnOnVzZXJJZC9jb21wbGV0ZS86bGVzc29uSWQnKVxyXG4gICAgQEFwaU9wZXJhdGlvbih7IHN1bW1hcnk6ICdDb21wbGV0ZSBsZXNzb24nLCBkZXNjcmlwdGlvbjogJ01hcmsgYSBsZXNzb24gYXMgY29tcGxldGVkIGZvciBhIHVzZXIuJyB9KVxyXG4gICAgQEFwaVBhcmFtKHsgbmFtZTogJ3VzZXJJZCcsIGRlc2NyaXB0aW9uOiAnVXNlciBJRCcgfSlcclxuICAgIEBBcGlQYXJhbSh7IG5hbWU6ICdsZXNzb25JZCcsIGRlc2NyaXB0aW9uOiAnTGVzc29uIElEJyB9KVxyXG4gICAgQEFwaVJlc3BvbnNlKHsgc3RhdHVzOiAyMDEsIGRlc2NyaXB0aW9uOiAnTGVzc29uIG1hcmtlZCBhcyBjb21wbGV0ZWQuJyB9KVxyXG4gICAgY29tcGxldGVMZXNzb24oXHJcbiAgICAgICAgQFBhcmFtKCd1c2VySWQnKSB1c2VySWQ6IG51bWJlcixcclxuICAgICAgICBAUGFyYW0oJ2xlc3NvbklkJykgbGVzc29uSWQ6IG51bWJlclxyXG4gICAgKSB7XHJcbiAgICAgICAgdGhpcy5wcm9ncmVzc1NlcnZpY2UuY29tcGxldGVMZXNzb24odXNlcklkLCBsZXNzb25JZCk7XHJcbiAgICAgICAgcmV0dXJuIHsgbWVzc2FnZTogJ0xlc3NvbiBtYXJrZWQgYXMgY29tcGxldGVkJyB9O1xyXG4gICAgfVxyXG5cclxuICAgIC8qKlxyXG4gICAgICogR2V0IHByb2dyZXNzIGRhdGEgZm9yIGEgdXNlci5cclxuICAgICAqL1xyXG4gICAgQEdldCgnOnVzZXJJZCcpXHJcbiAgICBAQXBpT3BlcmF0aW9uKHsgc3VtbWFyeTogJ0dldCB1c2VyIHByb2dyZXNzJywgZGVzY3JpcHRpb246ICdHZXQgcHJvZ3Jlc3MgZGF0YSBmb3IgYSB1c2VyLicgfSlcclxuICAgIEBBcGlQYXJhbSh7IG5hbWU6ICd1c2VySWQnLCBkZXNjcmlwdGlvbjogJ1VzZXIgSUQnIH0pXHJcbiAgICBAQXBpUXVlcnkoeyBuYW1lOiAndG90YWxMZXNzb25zJywgZGVzY3JpcHRpb246ICdUb3RhbCBudW1iZXIgb2YgbGVzc29ucycsIHJlcXVpcmVkOiB0cnVlIH0pXHJcbiAgICBAQXBpUmVzcG9uc2UoeyBzdGF0dXM6IDIwMCwgZGVzY3JpcHRpb246ICdVc2VyIHByb2dyZXNzIGRhdGEuJyB9KVxyXG4gICAgZ2V0VXNlclByb2dyZXNzKFxyXG4gICAgICAgIEBQYXJhbSgndXNlcklkJykgdXNlcklkOiBudW1iZXIsXHJcbiAgICAgICAgQFF1ZXJ5KCd0b3RhbExlc3NvbnMnKSB0b3RhbExlc3NvbnM6IG51bWJlclxyXG4gICAgKSB7XHJcbiAgICAgICAgcmV0dXJuIHRoaXMucHJvZ3Jlc3NTZXJ2aWNlLmdldFByb2dyZXNzRGF0YSh1c2VySWQsIHRvdGFsTGVzc29ucyk7XHJcbiAgICB9XHJcbn1cclxuIl0sInZlcnNpb24iOjN9

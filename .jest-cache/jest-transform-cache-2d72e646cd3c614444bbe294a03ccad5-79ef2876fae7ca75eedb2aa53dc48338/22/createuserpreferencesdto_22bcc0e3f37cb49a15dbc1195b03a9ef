@@ -1,0 +1,63 @@
+35a0fe62191cd9f943b46fffae993a9f
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateUserPreferencesDto = void 0;
+const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
+const create_notification_settings_dto_1 = require("./create-notification-settings.dto");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * DTO for creating or updating user preferences.
+ */
+class CreateUserPreferencesDto {
+}
+exports.CreateUserPreferencesDto = CreateUserPreferencesDto;
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Learning customization options',
+        type: 'object',
+        example: {
+            preferredTopics: ['math', 'science'],
+            learningPace: 'medium',
+            learningGoals: 'Finish algebra course',
+        },
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsObject)(),
+    __metadata("design:type", Object)
+], CreateUserPreferencesDto.prototype, "learningCustomization", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Notification settings',
+        type: () => create_notification_settings_dto_1.CreateNotificationSettingsDto,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => create_notification_settings_dto_1.CreateNotificationSettingsDto),
+    __metadata("design:type", typeof (_a = typeof create_notification_settings_dto_1.CreateNotificationSettingsDto !== "undefined" && create_notification_settings_dto_1.CreateNotificationSettingsDto) === "function" ? _a : Object)
+], CreateUserPreferencesDto.prototype, "notificationSettings", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Personalization data',
+        type: 'object',
+        example: {
+            theme: 'dark',
+            language: 'en',
+            accessibility: ['high-contrast'],
+        },
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsObject)(),
+    __metadata("design:type", Object)
+], CreateUserPreferencesDto.prototype, "personalizationData", void 0);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx1c2VyLXByZWZlcmVuY2VzXFxkdG9zXFxjcmVhdGUtdXNlci1wcmVmZXJlbmNlcy5kdG8udHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHFEQUEwRjtBQUMxRix5REFBeUM7QUFDekMseUZBQW1GO0FBQ25GLDZDQUFzRDtBQUV0RDs7R0FFRztBQUNILE1BQWEsd0JBQXdCO0NBOENwQztBQTlDRCw0REE4Q0M7QUFqQ0M7SUFYQyxJQUFBLDZCQUFtQixFQUFDO1FBQ25CLFdBQVcsRUFBRSxnQ0FBZ0M7UUFDN0MsSUFBSSxFQUFFLFFBQVE7UUFDZCxPQUFPLEVBQUU7WUFDUCxlQUFlLEVBQUUsQ0FBQyxNQUFNLEVBQUUsU0FBUyxDQUFDO1lBQ3BDLFlBQVksRUFBRSxRQUFRO1lBQ3RCLGFBQWEsRUFBRSx1QkFBdUI7U0FDdkM7S0FDRixDQUFDO0lBQ0QsSUFBQSw0QkFBVSxHQUFFO0lBQ1osSUFBQSwwQkFBUSxHQUFFOzt1RUFLVDtBQVVGO0lBUEMsSUFBQSw2QkFBbUIsRUFBQztRQUNuQixXQUFXLEVBQUUsdUJBQXVCO1FBQ3BDLElBQUksRUFBRSxHQUFHLEVBQUUsQ0FBQyxnRUFBNkI7S0FDMUMsQ0FBQztJQUNELElBQUEsNEJBQVUsR0FBRTtJQUNaLElBQUEsZ0NBQWMsR0FBRTtJQUNoQixJQUFBLHdCQUFJLEVBQUMsR0FBRyxFQUFFLENBQUMsZ0VBQTZCLENBQUM7a0RBQ25CLGdFQUE2QixvQkFBN0IsZ0VBQTZCO3NFQUFDO0FBY3JEO0lBWEMsSUFBQSw2QkFBbUIsRUFBQztRQUNuQixXQUFXLEVBQUUsc0JBQXNCO1FBQ25DLElBQUksRUFBRSxRQUFRO1FBQ2QsT0FBTyxFQUFFO1lBQ1AsS0FBSyxFQUFFLE1BQU07WUFDYixRQUFRLEVBQUUsSUFBSTtZQUNkLGFBQWEsRUFBRSxDQUFDLGVBQWUsQ0FBQztTQUNqQztLQUNGLENBQUM7SUFDRCxJQUFBLDRCQUFVLEdBQUU7SUFDWixJQUFBLDBCQUFRLEdBQUU7O3FFQUtUIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcdXNlci1wcmVmZXJlbmNlc1xcZHRvc1xcY3JlYXRlLXVzZXItcHJlZmVyZW5jZXMuZHRvLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IElzT3B0aW9uYWwsIElzU3RyaW5nLCBJc0FycmF5LCBJc09iamVjdCwgVmFsaWRhdGVOZXN0ZWQgfSBmcm9tICdjbGFzcy12YWxpZGF0b3InO1xyXG5pbXBvcnQgeyBUeXBlIH0gZnJvbSAnY2xhc3MtdHJhbnNmb3JtZXInO1xyXG5pbXBvcnQgeyBDcmVhdGVOb3RpZmljYXRpb25TZXR0aW5nc0R0byB9IGZyb20gJy4vY3JlYXRlLW5vdGlmaWNhdGlvbi1zZXR0aW5ncy5kdG8nO1xyXG5pbXBvcnQgeyBBcGlQcm9wZXJ0eU9wdGlvbmFsIH0gZnJvbSAnQG5lc3Rqcy9zd2FnZ2VyJztcclxuXHJcbi8qKlxyXG4gKiBEVE8gZm9yIGNyZWF0aW5nIG9yIHVwZGF0aW5nIHVzZXIgcHJlZmVyZW5jZXMuXHJcbiAqL1xyXG5leHBvcnQgY2xhc3MgQ3JlYXRlVXNlclByZWZlcmVuY2VzRHRvIHtcclxuICAvKiogTGVhcm5pbmcgY3VzdG9taXphdGlvbiBvcHRpb25zICovXHJcbiAgQEFwaVByb3BlcnR5T3B0aW9uYWwoe1xyXG4gICAgZGVzY3JpcHRpb246ICdMZWFybmluZyBjdXN0b21pemF0aW9uIG9wdGlvbnMnLFxyXG4gICAgdHlwZTogJ29iamVjdCcsXHJcbiAgICBleGFtcGxlOiB7XHJcbiAgICAgIHByZWZlcnJlZFRvcGljczogWydtYXRoJywgJ3NjaWVuY2UnXSxcclxuICAgICAgbGVhcm5pbmdQYWNlOiAnbWVkaXVtJyxcclxuICAgICAgbGVhcm5pbmdHb2FsczogJ0ZpbmlzaCBhbGdlYnJhIGNvdXJzZScsXHJcbiAgICB9LFxyXG4gIH0pXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIEBJc09iamVjdCgpXHJcbiAgbGVhcm5pbmdDdXN0b21pemF0aW9uPzoge1xyXG4gICAgcHJlZmVycmVkVG9waWNzPzogc3RyaW5nW107XHJcbiAgICBsZWFybmluZ1BhY2U/OiAnc2xvdycgfCAnbWVkaXVtJyB8ICdmYXN0JztcclxuICAgIGxlYXJuaW5nR29hbHM/OiBzdHJpbmc7XHJcbiAgfTtcclxuXHJcbiAgLyoqIE5vdGlmaWNhdGlvbiBzZXR0aW5ncyAqL1xyXG4gIEBBcGlQcm9wZXJ0eU9wdGlvbmFsKHtcclxuICAgIGRlc2NyaXB0aW9uOiAnTm90aWZpY2F0aW9uIHNldHRpbmdzJyxcclxuICAgIHR5cGU6ICgpID0+IENyZWF0ZU5vdGlmaWNhdGlvblNldHRpbmdzRHRvLFxyXG4gIH0pXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIEBWYWxpZGF0ZU5lc3RlZCgpXHJcbiAgQFR5cGUoKCkgPT4gQ3JlYXRlTm90aWZpY2F0aW9uU2V0dGluZ3NEdG8pXHJcbiAgbm90aWZpY2F0aW9uU2V0dGluZ3M/OiBDcmVhdGVOb3RpZmljYXRpb25TZXR0aW5nc0R0bztcclxuXHJcbiAgLyoqIFBlcnNvbmFsaXphdGlvbiBkYXRhICovXHJcbiAgQEFwaVByb3BlcnR5T3B0aW9uYWwoe1xyXG4gICAgZGVzY3JpcHRpb246ICdQZXJzb25hbGl6YXRpb24gZGF0YScsXHJcbiAgICB0eXBlOiAnb2JqZWN0JyxcclxuICAgIGV4YW1wbGU6IHtcclxuICAgICAgdGhlbWU6ICdkYXJrJyxcclxuICAgICAgbGFuZ3VhZ2U6ICdlbicsXHJcbiAgICAgIGFjY2Vzc2liaWxpdHk6IFsnaGlnaC1jb250cmFzdCddLFxyXG4gICAgfSxcclxuICB9KVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNPYmplY3QoKVxyXG4gIHBlcnNvbmFsaXphdGlvbkRhdGE/OiB7XHJcbiAgICB0aGVtZT86IHN0cmluZztcclxuICAgIGxhbmd1YWdlPzogc3RyaW5nO1xyXG4gICAgYWNjZXNzaWJpbGl0eT86IHN0cmluZ1tdO1xyXG4gIH07XHJcbn0iXSwidmVyc2lvbiI6M30=

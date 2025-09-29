@@ -1,0 +1,35 @@
+150a748ac8e3f40146d74c962dc2727c
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EthSignatureStrategy = void 0;
+// src/verification/strategies/eth-signature.strategy.ts
+const common_1 = require("@nestjs/common");
+const ethers_1 = require("ethers");
+let EthSignatureStrategy = class EthSignatureStrategy {
+    async verify(signature) {
+        const message = 'Verify credential ownership';
+        const address = '0xYourExpectedAddress';
+        try {
+            const recoveredAddress = (0, ethers_1.verifyMessage)(message, signature);
+            const isValid = recoveredAddress.toLowerCase() === address.toLowerCase();
+            return {
+                verified: isValid,
+                recoveredAddress,
+            };
+        }
+        catch (error) {
+            throw new Error('Invalid Ethereum signature');
+        }
+    }
+};
+exports.EthSignatureStrategy = EthSignatureStrategy;
+exports.EthSignatureStrategy = EthSignatureStrategy = __decorate([
+    (0, common_1.Injectable)()
+], EthSignatureStrategy);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx2ZXJpZmljYXRpb25cXHN0cmF0ZWdpZXNcXGV0aC1zaWduYXR1cmUuc3RyYXRlZ3kudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7O0FBQUEsd0RBQXdEO0FBQ3hELDJDQUE0QztBQUM1QyxtQ0FBdUM7QUFHaEMsSUFBTSxvQkFBb0IsR0FBMUIsTUFBTSxvQkFBb0I7SUFDL0IsS0FBSyxDQUFDLE1BQU0sQ0FBQyxTQUFpQjtRQUM1QixNQUFNLE9BQU8sR0FBRyw2QkFBNkIsQ0FBQztRQUM5QyxNQUFNLE9BQU8sR0FBRyx1QkFBdUIsQ0FBQztRQUV4QyxJQUFJLENBQUM7WUFDSCxNQUFNLGdCQUFnQixHQUFHLElBQUEsc0JBQWEsRUFBQyxPQUFPLEVBQUUsU0FBUyxDQUFDLENBQUM7WUFDM0QsTUFBTSxPQUFPLEdBQUcsZ0JBQWdCLENBQUMsV0FBVyxFQUFFLEtBQUssT0FBTyxDQUFDLFdBQVcsRUFBRSxDQUFDO1lBRXpFLE9BQU87Z0JBQ0wsUUFBUSxFQUFFLE9BQU87Z0JBQ2pCLGdCQUFnQjthQUNqQixDQUFDO1FBQ0osQ0FBQztRQUFDLE9BQU8sS0FBSyxFQUFFLENBQUM7WUFDZixNQUFNLElBQUksS0FBSyxDQUFDLDRCQUE0QixDQUFDLENBQUM7UUFDaEQsQ0FBQztJQUNILENBQUM7Q0FDRixDQUFBO0FBakJZLG9EQUFvQjsrQkFBcEIsb0JBQW9CO0lBRGhDLElBQUEsbUJBQVUsR0FBRTtHQUNBLG9CQUFvQixDQWlCaEMiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx2ZXJpZmljYXRpb25cXHN0cmF0ZWdpZXNcXGV0aC1zaWduYXR1cmUuc3RyYXRlZ3kudHMiXSwic291cmNlc0NvbnRlbnQiOlsiLy8gc3JjL3ZlcmlmaWNhdGlvbi9zdHJhdGVnaWVzL2V0aC1zaWduYXR1cmUuc3RyYXRlZ3kudHNcclxuaW1wb3J0IHsgSW5qZWN0YWJsZSB9IGZyb20gJ0BuZXN0anMvY29tbW9uJztcclxuaW1wb3J0IHsgdmVyaWZ5TWVzc2FnZSB9IGZyb20gJ2V0aGVycyc7XHJcblxyXG5ASW5qZWN0YWJsZSgpXHJcbmV4cG9ydCBjbGFzcyBFdGhTaWduYXR1cmVTdHJhdGVneSB7XHJcbiAgYXN5bmMgdmVyaWZ5KHNpZ25hdHVyZTogc3RyaW5nKTogUHJvbWlzZTxhbnk+IHtcclxuICAgIGNvbnN0IG1lc3NhZ2UgPSAnVmVyaWZ5IGNyZWRlbnRpYWwgb3duZXJzaGlwJztcclxuICAgIGNvbnN0IGFkZHJlc3MgPSAnMHhZb3VyRXhwZWN0ZWRBZGRyZXNzJztcclxuXHJcbiAgICB0cnkge1xyXG4gICAgICBjb25zdCByZWNvdmVyZWRBZGRyZXNzID0gdmVyaWZ5TWVzc2FnZShtZXNzYWdlLCBzaWduYXR1cmUpO1xyXG4gICAgICBjb25zdCBpc1ZhbGlkID0gcmVjb3ZlcmVkQWRkcmVzcy50b0xvd2VyQ2FzZSgpID09PSBhZGRyZXNzLnRvTG93ZXJDYXNlKCk7XHJcblxyXG4gICAgICByZXR1cm4ge1xyXG4gICAgICAgIHZlcmlmaWVkOiBpc1ZhbGlkLFxyXG4gICAgICAgIHJlY292ZXJlZEFkZHJlc3MsXHJcbiAgICAgIH07XHJcbiAgICB9IGNhdGNoIChlcnJvcikge1xyXG4gICAgICB0aHJvdyBuZXcgRXJyb3IoJ0ludmFsaWQgRXRoZXJldW0gc2lnbmF0dXJlJyk7XHJcbiAgICB9XHJcbiAgfVxyXG59Il0sInZlcnNpb24iOjN9

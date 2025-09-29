@@ -1,0 +1,93 @@
+71145de9434c6e6461bd381f70388f37
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var ProgressService_1;
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProgressService = void 0;
+const common_1 = require("@nestjs/common");
+const achievement_service_1 = require("../gamification/services/achievement.service");
+const reward_service_1 = require("../gamification/services/reward.service");
+const user_entity_1 = require("../users/entities/user.entity");
+const typeorm_1 = require("typeorm");
+const typeorm_2 = require("@nestjs/typeorm");
+/**
+ * Service for tracking and calculating user lesson progress.
+ */
+let ProgressService = ProgressService_1 = class ProgressService {
+    constructor(achievementService, rewardService, userRepository) {
+        this.achievementService = achievementService;
+        this.rewardService = rewardService;
+        this.userRepository = userRepository;
+        this.userProgress = new Map();
+        this.logger = new common_1.Logger(ProgressService_1.name);
+    }
+    /**
+   * Mark a lesson as completed for a user.
+   * @param userId - The ID of the user.
+   * @param lessonId - The ID of the lesson to be marked as completed.
+   */
+    async completeLesson(userId, lessonId) {
+        if (!this.userProgress.has(userId)) {
+            this.userProgress.set(userId, new Set());
+        }
+        this.userProgress.get(userId).add(lessonId);
+        // Gamification logic: unlock achievements and grant rewards
+        try {
+            const user = await this.userRepository.findOneBy({ id: String(userId) });
+            if (!user)
+                throw new common_1.NotFoundException('User not found');
+            // Example: unlock an achievement for completing a lesson
+            await this.achievementService.unlockAchievement(user, 1);
+            // Example: grant a reward for completing a lesson
+            await this.rewardService.grantReward(user, 1);
+        }
+        catch (error) {
+            this.logger.error('Gamification error on lesson completion', error.stack);
+        }
+    }
+    /**
+     * Get the completion percentage of lessons for a user.
+     * @param userId - The ID of the user.
+     * @param totalLessons - The total number of lessons available.
+     * @returns The completion percentage as a number.
+     */
+    getCompletionPercentage(userId, totalLessons) {
+        if (!this.userProgress.has(userId))
+            return 0;
+        return (this.userProgress.get(userId).size / totalLessons) * 100;
+    }
+    /**
+     * Get the progress data for a user, including completed lessons and completion percentage.
+     * @param userId - The ID of the user.
+     * @param totalLessons - The total number of lessons available.
+     * @returns An object containing the user's ID, an array of completed lessons, and the completion percentage.
+     */
+    getProgressData(userId, totalLessons) {
+        return {
+            userId,
+            completedLessons: Array.from(this.userProgress.get(userId) || []),
+            completionPercentage: this.getCompletionPercentage(userId, totalLessons),
+        };
+    }
+};
+exports.ProgressService = ProgressService;
+exports.ProgressService = ProgressService = ProgressService_1 = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)((0, common_1.forwardRef)(() => achievement_service_1.AchievementService))),
+    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => reward_service_1.RewardService))),
+    __param(2, (0, typeorm_2.InjectRepository)(user_entity_1.User)),
+    __metadata("design:paramtypes", [typeof (_a = typeof achievement_service_1.AchievementService !== "undefined" && achievement_service_1.AchievementService) === "function" ? _a : Object, typeof (_b = typeof reward_service_1.RewardService !== "undefined" && reward_service_1.RewardService) === "function" ? _b : Object, typeof (_c = typeof typeorm_1.Repository !== "undefined" && typeorm_1.Repository) === "function" ? _c : Object])
+], ProgressService);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxwcm9ncmVzc1xccHJvZ3Jlc3Muc2VydmljZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLDJDQUEyRjtBQUMzRixzRkFBa0Y7QUFDbEYsNEVBQXdFO0FBQ3hFLCtEQUFxRDtBQUNyRCxxQ0FBcUM7QUFDckMsNkNBQW1EO0FBRW5EOztHQUVHO0FBR0ksSUFBTSxlQUFlLHVCQUFyQixNQUFNLGVBQWU7SUFJeEIsWUFDa0Qsa0JBQXVELEVBQzVELGFBQTZDLEVBQzlELGNBQWlEO1FBRlYsdUJBQWtCLEdBQWxCLGtCQUFrQixDQUFvQjtRQUMzQyxrQkFBYSxHQUFiLGFBQWEsQ0FBZTtRQUM3QyxtQkFBYyxHQUFkLGNBQWMsQ0FBa0I7UUFOckUsaUJBQVksR0FBRyxJQUFJLEdBQUcsRUFBdUIsQ0FBQztRQUNyQyxXQUFNLEdBQUcsSUFBSSxlQUFNLENBQUMsaUJBQWUsQ0FBQyxJQUFJLENBQUMsQ0FBQztJQU14RCxDQUFDO0lBRUY7Ozs7S0FJQztJQUVILEtBQUssQ0FBQyxjQUFjLENBQUMsTUFBYyxFQUFFLFFBQWdCO1FBRWpELElBQUksQ0FBQyxJQUFJLENBQUMsWUFBWSxDQUFDLEdBQUcsQ0FBQyxNQUFNLENBQUMsRUFBRSxDQUFDO1lBQ2pDLElBQUksQ0FBQyxZQUFZLENBQUMsR0FBRyxDQUFDLE1BQU0sRUFBRSxJQUFJLEdBQUcsRUFBRSxDQUFDLENBQUM7UUFDN0MsQ0FBQztRQUNELElBQUksQ0FBQyxZQUFZLENBQUMsR0FBRyxDQUFDLE1BQU0sQ0FBQyxDQUFDLEdBQUcsQ0FBQyxRQUFRLENBQUMsQ0FBQztRQUU1Qyw0REFBNEQ7UUFDNUQsSUFBSSxDQUFDO1lBQ0QsTUFBTSxJQUFJLEdBQUcsTUFBTSxJQUFJLENBQUMsY0FBYyxDQUFDLFNBQVMsQ0FBQyxFQUFFLEVBQUUsRUFBRSxNQUFNLENBQUMsTUFBTSxDQUFDLEVBQUUsQ0FBQyxDQUFDO1lBQ3pFLElBQUksQ0FBQyxJQUFJO2dCQUFFLE1BQU0sSUFBSSwwQkFBaUIsQ0FBQyxnQkFBZ0IsQ0FBQyxDQUFDO1lBQ3pELHlEQUF5RDtZQUN6RCxNQUFNLElBQUksQ0FBQyxrQkFBa0IsQ0FBQyxpQkFBaUIsQ0FBQyxJQUFJLEVBQUUsQ0FBQyxDQUFDLENBQUM7WUFDekQsa0RBQWtEO1lBQ2xELE1BQU0sSUFBSSxDQUFDLGFBQWEsQ0FBQyxXQUFXLENBQUMsSUFBSSxFQUFFLENBQUMsQ0FBQyxDQUFDO1FBQ2xELENBQUM7UUFBQyxPQUFPLEtBQUssRUFBRSxDQUFDO1lBQ2IsSUFBSSxDQUFDLE1BQU0sQ0FBQyxLQUFLLENBQUMseUNBQXlDLEVBQUUsS0FBSyxDQUFDLEtBQUssQ0FBQyxDQUFDO1FBQzlFLENBQUM7SUFDTCxDQUFDO0lBRUQ7Ozs7O09BS0c7SUFDSCx1QkFBdUIsQ0FBQyxNQUFjLEVBQUUsWUFBb0I7UUFDeEQsSUFBSSxDQUFDLElBQUksQ0FBQyxZQUFZLENBQUMsR0FBRyxDQUFDLE1BQU0sQ0FBQztZQUFFLE9BQU8sQ0FBQyxDQUFDO1FBQzdDLE9BQU8sQ0FBQyxJQUFJLENBQUMsWUFBWSxDQUFDLEdBQUcsQ0FBQyxNQUFNLENBQUMsQ0FBQyxJQUFJLEdBQUcsWUFBWSxDQUFDLEdBQUcsR0FBRyxDQUFDO0lBQ3JFLENBQUM7SUFFRDs7Ozs7T0FLRztJQUNILGVBQWUsQ0FBQyxNQUFjLEVBQUUsWUFBb0I7UUFDaEQsT0FBTztZQUNILE1BQU07WUFDTixnQkFBZ0IsRUFBRSxLQUFLLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxZQUFZLENBQUMsR0FBRyxDQUFDLE1BQU0sQ0FBQyxJQUFJLEVBQUUsQ0FBQztZQUNqRSxvQkFBb0IsRUFBRSxJQUFJLENBQUMsdUJBQXVCLENBQUMsTUFBTSxFQUFFLFlBQVksQ0FBQztTQUMzRSxDQUFDO0lBQ04sQ0FBQztDQUNKLENBQUE7QUE1RFksMENBQWU7MEJBQWYsZUFBZTtJQUQzQixJQUFBLG1CQUFVLEdBQUU7SUFNSixXQUFBLElBQUEsZUFBTSxFQUFDLElBQUEsbUJBQVUsRUFBQyxHQUFHLEVBQUUsQ0FBQyx3Q0FBa0IsQ0FBQyxDQUFDLENBQUE7SUFDNUMsV0FBQSxJQUFBLGVBQU0sRUFBQyxJQUFBLG1CQUFVLEVBQUMsR0FBRyxFQUFFLENBQUMsOEJBQWEsQ0FBQyxDQUFDLENBQUE7SUFDdkMsV0FBQSxJQUFBLDBCQUFnQixFQUFDLGtCQUFJLENBQUMsQ0FBQTt5REFGNEQsd0NBQWtCLG9CQUFsQix3Q0FBa0Isb0RBQzVCLDhCQUFhLG9CQUFiLDhCQUFhLG9EQUM3QixvQkFBVSxvQkFBVixvQkFBVTtHQVA5RCxlQUFlLENBNEQzQiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXHByb2dyZXNzXFxwcm9ncmVzcy5zZXJ2aWNlLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEluamVjdGFibGUsIEluamVjdCwgZm9yd2FyZFJlZiwgTG9nZ2VyLCBOb3RGb3VuZEV4Y2VwdGlvbiB9IGZyb20gJ0BuZXN0anMvY29tbW9uJztcclxuaW1wb3J0IHsgQWNoaWV2ZW1lbnRTZXJ2aWNlIH0gZnJvbSAnLi4vZ2FtaWZpY2F0aW9uL3NlcnZpY2VzL2FjaGlldmVtZW50LnNlcnZpY2UnO1xyXG5pbXBvcnQgeyBSZXdhcmRTZXJ2aWNlIH0gZnJvbSAnLi4vZ2FtaWZpY2F0aW9uL3NlcnZpY2VzL3Jld2FyZC5zZXJ2aWNlJztcclxuaW1wb3J0IHsgVXNlciB9IGZyb20gJy4uL3VzZXJzL2VudGl0aWVzL3VzZXIuZW50aXR5JztcclxuaW1wb3J0IHsgUmVwb3NpdG9yeSB9IGZyb20gJ3R5cGVvcm0nO1xyXG5pbXBvcnQgeyBJbmplY3RSZXBvc2l0b3J5IH0gZnJvbSAnQG5lc3Rqcy90eXBlb3JtJztcclxuXHJcbi8qKlxyXG4gKiBTZXJ2aWNlIGZvciB0cmFja2luZyBhbmQgY2FsY3VsYXRpbmcgdXNlciBsZXNzb24gcHJvZ3Jlc3MuXHJcbiAqL1xyXG5cclxuQEluamVjdGFibGUoKVxyXG5leHBvcnQgY2xhc3MgUHJvZ3Jlc3NTZXJ2aWNlIHtcclxuICAgIHByaXZhdGUgdXNlclByb2dyZXNzID0gbmV3IE1hcDxudW1iZXIsIFNldDxudW1iZXI+PigpO1xyXG4gICAgcHJpdmF0ZSByZWFkb25seSBsb2dnZXIgPSBuZXcgTG9nZ2VyKFByb2dyZXNzU2VydmljZS5uYW1lKTtcclxuXHJcbiAgICBjb25zdHJ1Y3RvcihcclxuICAgICAgICBASW5qZWN0KGZvcndhcmRSZWYoKCkgPT4gQWNoaWV2ZW1lbnRTZXJ2aWNlKSkgcHJpdmF0ZSByZWFkb25seSBhY2hpZXZlbWVudFNlcnZpY2U6IEFjaGlldmVtZW50U2VydmljZSxcclxuICAgICAgICBASW5qZWN0KGZvcndhcmRSZWYoKCkgPT4gUmV3YXJkU2VydmljZSkpIHByaXZhdGUgcmVhZG9ubHkgcmV3YXJkU2VydmljZTogUmV3YXJkU2VydmljZSxcclxuICAgICAgICBASW5qZWN0UmVwb3NpdG9yeShVc2VyKSBwcml2YXRlIHJlYWRvbmx5IHVzZXJSZXBvc2l0b3J5OiBSZXBvc2l0b3J5PFVzZXI+LFxyXG4gICAgKSB7fVxyXG4gICAgXHJcbiAgICAgIC8qKlxyXG4gICAgICogTWFyayBhIGxlc3NvbiBhcyBjb21wbGV0ZWQgZm9yIGEgdXNlci5cclxuICAgICAqIEBwYXJhbSB1c2VySWQgLSBUaGUgSUQgb2YgdGhlIHVzZXIuXHJcbiAgICAgKiBAcGFyYW0gbGVzc29uSWQgLSBUaGUgSUQgb2YgdGhlIGxlc3NvbiB0byBiZSBtYXJrZWQgYXMgY29tcGxldGVkLlxyXG4gICAgICovXHJcbiAgXHJcbiAgICBhc3luYyBjb21wbGV0ZUxlc3Nvbih1c2VySWQ6IG51bWJlciwgbGVzc29uSWQ6IG51bWJlcikge1xyXG5cclxuICAgICAgICBpZiAoIXRoaXMudXNlclByb2dyZXNzLmhhcyh1c2VySWQpKSB7XHJcbiAgICAgICAgICAgIHRoaXMudXNlclByb2dyZXNzLnNldCh1c2VySWQsIG5ldyBTZXQoKSk7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIHRoaXMudXNlclByb2dyZXNzLmdldCh1c2VySWQpLmFkZChsZXNzb25JZCk7XHJcblxyXG4gICAgICAgIC8vIEdhbWlmaWNhdGlvbiBsb2dpYzogdW5sb2NrIGFjaGlldmVtZW50cyBhbmQgZ3JhbnQgcmV3YXJkc1xyXG4gICAgICAgIHRyeSB7XHJcbiAgICAgICAgICAgIGNvbnN0IHVzZXIgPSBhd2FpdCB0aGlzLnVzZXJSZXBvc2l0b3J5LmZpbmRPbmVCeSh7IGlkOiBTdHJpbmcodXNlcklkKSB9KTtcclxuICAgICAgICAgICAgaWYgKCF1c2VyKSB0aHJvdyBuZXcgTm90Rm91bmRFeGNlcHRpb24oJ1VzZXIgbm90IGZvdW5kJyk7XHJcbiAgICAgICAgICAgIC8vIEV4YW1wbGU6IHVubG9jayBhbiBhY2hpZXZlbWVudCBmb3IgY29tcGxldGluZyBhIGxlc3NvblxyXG4gICAgICAgICAgICBhd2FpdCB0aGlzLmFjaGlldmVtZW50U2VydmljZS51bmxvY2tBY2hpZXZlbWVudCh1c2VyLCAxKTsgXHJcbiAgICAgICAgICAgIC8vIEV4YW1wbGU6IGdyYW50IGEgcmV3YXJkIGZvciBjb21wbGV0aW5nIGEgbGVzc29uXHJcbiAgICAgICAgICAgIGF3YWl0IHRoaXMucmV3YXJkU2VydmljZS5ncmFudFJld2FyZCh1c2VyLCAxKTsgXHJcbiAgICAgICAgfSBjYXRjaCAoZXJyb3IpIHtcclxuICAgICAgICAgICAgdGhpcy5sb2dnZXIuZXJyb3IoJ0dhbWlmaWNhdGlvbiBlcnJvciBvbiBsZXNzb24gY29tcGxldGlvbicsIGVycm9yLnN0YWNrKTtcclxuICAgICAgICB9XHJcbiAgICB9XHJcblxyXG4gICAgLyoqXHJcbiAgICAgKiBHZXQgdGhlIGNvbXBsZXRpb24gcGVyY2VudGFnZSBvZiBsZXNzb25zIGZvciBhIHVzZXIuXHJcbiAgICAgKiBAcGFyYW0gdXNlcklkIC0gVGhlIElEIG9mIHRoZSB1c2VyLlxyXG4gICAgICogQHBhcmFtIHRvdGFsTGVzc29ucyAtIFRoZSB0b3RhbCBudW1iZXIgb2YgbGVzc29ucyBhdmFpbGFibGUuXHJcbiAgICAgKiBAcmV0dXJucyBUaGUgY29tcGxldGlvbiBwZXJjZW50YWdlIGFzIGEgbnVtYmVyLlxyXG4gICAgICovXHJcbiAgICBnZXRDb21wbGV0aW9uUGVyY2VudGFnZSh1c2VySWQ6IG51bWJlciwgdG90YWxMZXNzb25zOiBudW1iZXIpOiBudW1iZXIge1xyXG4gICAgICAgIGlmICghdGhpcy51c2VyUHJvZ3Jlc3MuaGFzKHVzZXJJZCkpIHJldHVybiAwO1xyXG4gICAgICAgIHJldHVybiAodGhpcy51c2VyUHJvZ3Jlc3MuZ2V0KHVzZXJJZCkuc2l6ZSAvIHRvdGFsTGVzc29ucykgKiAxMDA7XHJcbiAgICB9XHJcblxyXG4gICAgLyoqXHJcbiAgICAgKiBHZXQgdGhlIHByb2dyZXNzIGRhdGEgZm9yIGEgdXNlciwgaW5jbHVkaW5nIGNvbXBsZXRlZCBsZXNzb25zIGFuZCBjb21wbGV0aW9uIHBlcmNlbnRhZ2UuXHJcbiAgICAgKiBAcGFyYW0gdXNlcklkIC0gVGhlIElEIG9mIHRoZSB1c2VyLlxyXG4gICAgICogQHBhcmFtIHRvdGFsTGVzc29ucyAtIFRoZSB0b3RhbCBudW1iZXIgb2YgbGVzc29ucyBhdmFpbGFibGUuXHJcbiAgICAgKiBAcmV0dXJucyBBbiBvYmplY3QgY29udGFpbmluZyB0aGUgdXNlcidzIElELCBhbiBhcnJheSBvZiBjb21wbGV0ZWQgbGVzc29ucywgYW5kIHRoZSBjb21wbGV0aW9uIHBlcmNlbnRhZ2UuXHJcbiAgICAgKi9cclxuICAgIGdldFByb2dyZXNzRGF0YSh1c2VySWQ6IG51bWJlciwgdG90YWxMZXNzb25zOiBudW1iZXIpIHtcclxuICAgICAgICByZXR1cm4ge1xyXG4gICAgICAgICAgICB1c2VySWQsXHJcbiAgICAgICAgICAgIGNvbXBsZXRlZExlc3NvbnM6IEFycmF5LmZyb20odGhpcy51c2VyUHJvZ3Jlc3MuZ2V0KHVzZXJJZCkgfHwgW10pLFxyXG4gICAgICAgICAgICBjb21wbGV0aW9uUGVyY2VudGFnZTogdGhpcy5nZXRDb21wbGV0aW9uUGVyY2VudGFnZSh1c2VySWQsIHRvdGFsTGVzc29ucyksXHJcbiAgICAgICAgfTtcclxuICAgIH1cclxufVxyXG4iXSwidmVyc2lvbiI6M30=

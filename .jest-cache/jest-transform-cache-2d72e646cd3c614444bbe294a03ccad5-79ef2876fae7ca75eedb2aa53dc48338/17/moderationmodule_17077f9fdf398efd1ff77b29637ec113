@@ -1,0 +1,32 @@
+f46a0c639e6768e467ea671025d33049
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ModerationModule = void 0;
+const common_1 = require("@nestjs/common");
+const moderation_service_1 = require("./moderation.service");
+const moderation_controller_1 = require("./moderation.controller");
+const typeorm_1 = require("@nestjs/typeorm");
+const forum_moderation_logs_entity_1 = require("./entities/forum-moderation-logs.entity");
+const thread_entity_1 = require("src/thread/thread.entity");
+const reply_entity_1 = require("src/reply/reply.entity");
+/**
+ * Moderation module for managing forum moderation actions and logs.
+ */
+let ModerationModule = class ModerationModule {
+};
+exports.ModerationModule = ModerationModule;
+exports.ModerationModule = ModerationModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([forum_moderation_logs_entity_1.ModerationLog, thread_entity_1.Thread, reply_entity_1.Reply])],
+        controllers: [moderation_controller_1.ModerationController],
+        providers: [moderation_service_1.ModerationService],
+        exports: [moderation_service_1.ModerationService],
+    })
+], ModerationModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtb2RlcmF0aW9uXFxtb2RlcmF0aW9uLm1vZHVsZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7QUFBQSwyQ0FBd0M7QUFDeEMsNkRBQXlEO0FBQ3pELG1FQUErRDtBQUMvRCw2Q0FBZ0Q7QUFDaEQsMEZBQXdFO0FBRXhFLDREQUFrRDtBQUNsRCx5REFBK0M7QUFFL0M7O0dBRUc7QUFPSSxJQUFNLGdCQUFnQixHQUF0QixNQUFNLGdCQUFnQjtDQUFHLENBQUE7QUFBbkIsNENBQWdCOzJCQUFoQixnQkFBZ0I7SUFONUIsSUFBQSxlQUFNLEVBQUM7UUFDTixPQUFPLEVBQUUsQ0FBQyx1QkFBYSxDQUFDLFVBQVUsQ0FBQyxDQUFDLDRDQUFhLEVBQUUsc0JBQU0sRUFBRSxvQkFBSyxDQUFDLENBQUMsQ0FBQztRQUNuRSxXQUFXLEVBQUUsQ0FBQyw0Q0FBb0IsQ0FBQztRQUNuQyxTQUFTLEVBQUUsQ0FBQyxzQ0FBaUIsQ0FBQztRQUM5QixPQUFPLEVBQUUsQ0FBQyxzQ0FBaUIsQ0FBQztLQUM3QixDQUFDO0dBQ1csZ0JBQWdCLENBQUciLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtb2RlcmF0aW9uXFxtb2RlcmF0aW9uLm1vZHVsZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBNb2R1bGUgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IE1vZGVyYXRpb25TZXJ2aWNlIH0gZnJvbSAnLi9tb2RlcmF0aW9uLnNlcnZpY2UnO1xyXG5pbXBvcnQgeyBNb2RlcmF0aW9uQ29udHJvbGxlciB9IGZyb20gJy4vbW9kZXJhdGlvbi5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgVHlwZU9ybU1vZHVsZSB9IGZyb20gJ0BuZXN0anMvdHlwZW9ybSc7XHJcbmltcG9ydCB7IE1vZGVyYXRpb25Mb2cgfSBmcm9tICcuL2VudGl0aWVzL2ZvcnVtLW1vZGVyYXRpb24tbG9ncy5lbnRpdHknO1xyXG5pbXBvcnQgeyBBcGlUYWdzIH0gZnJvbSAnQG5lc3Rqcy9zd2FnZ2VyJztcclxuaW1wb3J0IHsgVGhyZWFkIH0gZnJvbSAnc3JjL3RocmVhZC90aHJlYWQuZW50aXR5JztcclxuaW1wb3J0IHsgUmVwbHkgfSBmcm9tICdzcmMvcmVwbHkvcmVwbHkuZW50aXR5JztcclxuXHJcbi8qKlxyXG4gKiBNb2RlcmF0aW9uIG1vZHVsZSBmb3IgbWFuYWdpbmcgZm9ydW0gbW9kZXJhdGlvbiBhY3Rpb25zIGFuZCBsb2dzLlxyXG4gKi9cclxuQE1vZHVsZSh7IFxyXG4gIGltcG9ydHM6IFtUeXBlT3JtTW9kdWxlLmZvckZlYXR1cmUoW01vZGVyYXRpb25Mb2csIFRocmVhZCwgUmVwbHldKV0sXHJcbiAgY29udHJvbGxlcnM6IFtNb2RlcmF0aW9uQ29udHJvbGxlcl0sXHJcbiAgcHJvdmlkZXJzOiBbTW9kZXJhdGlvblNlcnZpY2VdLFxyXG4gIGV4cG9ydHM6IFtNb2RlcmF0aW9uU2VydmljZV0sXHJcbn0pXHJcbmV4cG9ydCBjbGFzcyBNb2RlcmF0aW9uTW9kdWxlIHt9XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

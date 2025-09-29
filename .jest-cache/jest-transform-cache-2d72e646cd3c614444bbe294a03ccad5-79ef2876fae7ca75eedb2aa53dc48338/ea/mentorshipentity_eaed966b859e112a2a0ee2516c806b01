@@ -1,0 +1,68 @@
+3ea143cc38b88f903171f4b178cdad59
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Mentorship = void 0;
+const typeorm_1 = require("typeorm");
+const user_entity_1 = require("../../users/entities/user.entity");
+const mentorship_session_entity_1 = require("./mentorship-session.entity");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * Entity representing a mentorship relationship between a mentor and mentee.
+ */
+let Mentorship = class Mentorship {
+};
+exports.Mentorship = Mentorship;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Unique mentorship ID', example: 'uuid-mentorship' }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], Mentorship.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Mentor user', type: () => user_entity_1.User }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { nullable: false, eager: true }),
+    __metadata("design:type", typeof (_a = typeof user_entity_1.User !== "undefined" && user_entity_1.User) === "function" ? _a : Object)
+], Mentorship.prototype, "mentor", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Mentee user', type: () => user_entity_1.User }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { nullable: false, eager: true }),
+    __metadata("design:type", typeof (_b = typeof user_entity_1.User !== "undefined" && user_entity_1.User) === "function" ? _b : Object)
+], Mentorship.prototype, "mentee", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Status', enum: ['active', 'completed', 'cancelled'], default: 'active' }),
+    (0, typeorm_1.Column)({ default: 'active' }),
+    __metadata("design:type", String)
+], Mentorship.prototype, "status", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Mentorship goals', required: false }),
+    (0, typeorm_1.Column)({ type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], Mentorship.prototype, "goals", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Creation date' }),
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], Mentorship.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Last update date' }),
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", typeof (_d = typeof Date !== "undefined" && Date) === "function" ? _d : Object)
+], Mentorship.prototype, "updatedAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Sessions', type: () => [mentorship_session_entity_1.MentorshipSession] }),
+    (0, typeorm_1.OneToMany)(() => mentorship_session_entity_1.MentorshipSession, (session) => session.mentorship),
+    __metadata("design:type", Array)
+], Mentorship.prototype, "sessions", void 0);
+exports.Mentorship = Mentorship = __decorate([
+    (0, typeorm_1.Entity)('mentorships')
+], Mentorship);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtZW50b3JzaGlwXFxlbnRpdGllc1xcbWVudG9yc2hpcC5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHFDQUEySDtBQUMzSCxrRUFBd0Q7QUFDeEQsMkVBQWdFO0FBQ2hFLDZDQUE4QztBQUU5Qzs7R0FFRztBQUVJLElBQU0sVUFBVSxHQUFoQixNQUFNLFVBQVU7Q0F3Q3RCLENBQUE7QUF4Q1ksZ0NBQVU7QUFJckI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsc0JBQXNCLEVBQUUsT0FBTyxFQUFFLGlCQUFpQixFQUFFLENBQUM7SUFDaEYsSUFBQSxnQ0FBc0IsRUFBQyxNQUFNLENBQUM7O3NDQUNwQjtBQUtYO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLGFBQWEsRUFBRSxJQUFJLEVBQUUsR0FBRyxFQUFFLENBQUMsa0JBQUksRUFBRSxDQUFDO0lBQzdELElBQUEsbUJBQVMsRUFBQyxHQUFHLEVBQUUsQ0FBQyxrQkFBSSxFQUFFLEVBQUUsUUFBUSxFQUFFLEtBQUssRUFBRSxLQUFLLEVBQUUsSUFBSSxFQUFFLENBQUM7a0RBQ2hELGtCQUFJLG9CQUFKLGtCQUFJOzBDQUFDO0FBS2I7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsYUFBYSxFQUFFLElBQUksRUFBRSxHQUFHLEVBQUUsQ0FBQyxrQkFBSSxFQUFFLENBQUM7SUFDN0QsSUFBQSxtQkFBUyxFQUFDLEdBQUcsRUFBRSxDQUFDLGtCQUFJLEVBQUUsRUFBRSxRQUFRLEVBQUUsS0FBSyxFQUFFLEtBQUssRUFBRSxJQUFJLEVBQUUsQ0FBQztrREFDaEQsa0JBQUksb0JBQUosa0JBQUk7MENBQUM7QUFLYjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUMsUUFBUSxFQUFFLFdBQVcsRUFBRSxXQUFXLENBQUMsRUFBRSxPQUFPLEVBQUUsUUFBUSxFQUFFLENBQUM7SUFDckcsSUFBQSxnQkFBTSxFQUFDLEVBQUUsT0FBTyxFQUFFLFFBQVEsRUFBRSxDQUFDOzswQ0FDZTtBQUs3QztJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSxrQkFBa0IsRUFBRSxRQUFRLEVBQUUsS0FBSyxFQUFFLENBQUM7SUFDakUsSUFBQSxnQkFBTSxFQUFDLEVBQUUsSUFBSSxFQUFFLE1BQU0sRUFBRSxRQUFRLEVBQUUsSUFBSSxFQUFFLENBQUM7O3lDQUMzQjtBQUtkO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLGVBQWUsRUFBRSxDQUFDO0lBQzdDLElBQUEsMEJBQWdCLEdBQUU7a0RBQ1IsSUFBSSxvQkFBSixJQUFJOzZDQUFDO0FBS2hCO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLGtCQUFrQixFQUFFLENBQUM7SUFDaEQsSUFBQSwwQkFBZ0IsR0FBRTtrREFDUixJQUFJLG9CQUFKLElBQUk7NkNBQUM7QUFLaEI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsVUFBVSxFQUFFLElBQUksRUFBRSxHQUFHLEVBQUUsQ0FBQyxDQUFDLDZDQUFpQixDQUFDLEVBQUUsQ0FBQztJQUN6RSxJQUFBLG1CQUFTLEVBQUMsR0FBRyxFQUFFLENBQUMsNkNBQWlCLEVBQUUsQ0FBQyxPQUFPLEVBQUUsRUFBRSxDQUFDLE9BQU8sQ0FBQyxVQUFVLENBQUM7OzRDQUN0QztxQkF2Q25CLFVBQVU7SUFEdEIsSUFBQSxnQkFBTSxFQUFDLGFBQWEsQ0FBQztHQUNULFVBQVUsQ0F3Q3RCIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcbWVudG9yc2hpcFxcZW50aXRpZXNcXG1lbnRvcnNoaXAuZW50aXR5LnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEVudGl0eSwgUHJpbWFyeUdlbmVyYXRlZENvbHVtbiwgQ29sdW1uLCBNYW55VG9PbmUsIE9uZVRvTWFueSwgQ3JlYXRlRGF0ZUNvbHVtbiwgVXBkYXRlRGF0ZUNvbHVtbiB9IGZyb20gJ3R5cGVvcm0nO1xyXG5pbXBvcnQgeyBVc2VyIH0gZnJvbSAnLi4vLi4vdXNlcnMvZW50aXRpZXMvdXNlci5lbnRpdHknO1xyXG5pbXBvcnQgeyBNZW50b3JzaGlwU2Vzc2lvbiB9IGZyb20gJy4vbWVudG9yc2hpcC1zZXNzaW9uLmVudGl0eSc7XHJcbmltcG9ydCB7IEFwaVByb3BlcnR5IH0gZnJvbSAnQG5lc3Rqcy9zd2FnZ2VyJztcclxuXHJcbi8qKlxyXG4gKiBFbnRpdHkgcmVwcmVzZW50aW5nIGEgbWVudG9yc2hpcCByZWxhdGlvbnNoaXAgYmV0d2VlbiBhIG1lbnRvciBhbmQgbWVudGVlLlxyXG4gKi9cclxuQEVudGl0eSgnbWVudG9yc2hpcHMnKVxyXG5leHBvcnQgY2xhc3MgTWVudG9yc2hpcCB7XHJcbiAgLyoqIFVuaXF1ZSBtZW50b3JzaGlwIElEICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdVbmlxdWUgbWVudG9yc2hpcCBJRCcsIGV4YW1wbGU6ICd1dWlkLW1lbnRvcnNoaXAnIH0pXHJcbiAgQFByaW1hcnlHZW5lcmF0ZWRDb2x1bW4oJ3V1aWQnKVxyXG4gIGlkOiBzdHJpbmc7XHJcblxyXG4gIC8qKiBNZW50b3IgdXNlciAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnTWVudG9yIHVzZXInLCB0eXBlOiAoKSA9PiBVc2VyIH0pXHJcbiAgQE1hbnlUb09uZSgoKSA9PiBVc2VyLCB7IG51bGxhYmxlOiBmYWxzZSwgZWFnZXI6IHRydWUgfSlcclxuICBtZW50b3I6IFVzZXI7XHJcblxyXG4gIC8qKiBNZW50ZWUgdXNlciAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnTWVudGVlIHVzZXInLCB0eXBlOiAoKSA9PiBVc2VyIH0pXHJcbiAgQE1hbnlUb09uZSgoKSA9PiBVc2VyLCB7IG51bGxhYmxlOiBmYWxzZSwgZWFnZXI6IHRydWUgfSlcclxuICBtZW50ZWU6IFVzZXI7XHJcblxyXG4gIC8qKiBTdGF0dXMgb2YgdGhlIG1lbnRvcnNoaXAgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ1N0YXR1cycsIGVudW06IFsnYWN0aXZlJywgJ2NvbXBsZXRlZCcsICdjYW5jZWxsZWQnXSwgZGVmYXVsdDogJ2FjdGl2ZScgfSlcclxuICBAQ29sdW1uKHsgZGVmYXVsdDogJ2FjdGl2ZScgfSlcclxuICBzdGF0dXM6ICdhY3RpdmUnIHwgJ2NvbXBsZXRlZCcgfCAnY2FuY2VsbGVkJztcclxuXHJcbiAgLyoqIE1lbnRvcnNoaXAgZ29hbHMgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ01lbnRvcnNoaXAgZ29hbHMnLCByZXF1aXJlZDogZmFsc2UgfSlcclxuICBAQ29sdW1uKHsgdHlwZTogJ3RleHQnLCBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIGdvYWxzOiBzdHJpbmc7XHJcblxyXG4gIC8qKiBEYXRlIG1lbnRvcnNoaXAgd2FzIGNyZWF0ZWQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0NyZWF0aW9uIGRhdGUnIH0pXHJcbiAgQENyZWF0ZURhdGVDb2x1bW4oKVxyXG4gIGNyZWF0ZWRBdDogRGF0ZTtcclxuXHJcbiAgLyoqIERhdGUgbWVudG9yc2hpcCB3YXMgbGFzdCB1cGRhdGVkICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdMYXN0IHVwZGF0ZSBkYXRlJyB9KVxyXG4gIEBVcGRhdGVEYXRlQ29sdW1uKClcclxuICB1cGRhdGVkQXQ6IERhdGU7XHJcblxyXG4gIC8qKiBTZXNzaW9ucyBhc3NvY2lhdGVkIHdpdGggdGhpcyBtZW50b3JzaGlwICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdTZXNzaW9ucycsIHR5cGU6ICgpID0+IFtNZW50b3JzaGlwU2Vzc2lvbl0gfSlcclxuICBAT25lVG9NYW55KCgpID0+IE1lbnRvcnNoaXBTZXNzaW9uLCAoc2Vzc2lvbikgPT4gc2Vzc2lvbi5tZW50b3JzaGlwKVxyXG4gIHNlc3Npb25zOiBNZW50b3JzaGlwU2Vzc2lvbltdO1xyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

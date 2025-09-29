@@ -1,0 +1,92 @@
+7cfdfe0ff2798a963ccd965759e5be92
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.User = void 0;
+const typeorm_1 = require("typeorm");
+const graphql_1 = require("@nestjs/graphql");
+const post_entity_1 = require("../../post/entities/post.entity");
+let User = class User {
+    // Computed fields
+    get fullName() {
+        return `${this.firstName} ${this.lastName}`;
+    }
+    get postsCount() {
+        return this.posts?.length || 0;
+    }
+};
+exports.User = User;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    (0, graphql_1.Field)(() => graphql_1.ID),
+    __metadata("design:type", String)
+], User.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ unique: true }),
+    (0, graphql_1.Field)(),
+    __metadata("design:type", String)
+], User.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, graphql_1.Field)(),
+    __metadata("design:type", String)
+], User.prototype, "firstName", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    (0, graphql_1.Field)(),
+    __metadata("design:type", String)
+], User.prototype, "lastName", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "avatar", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: true }),
+    (0, graphql_1.Field)(),
+    __metadata("design:type", Boolean)
+], User.prototype, "isActive", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "jsonb", nullable: true }),
+    (0, graphql_1.Field)(() => String, { nullable: true }),
+    __metadata("design:type", typeof (_a = typeof Record !== "undefined" && Record) === "function" ? _a : Object)
+], User.prototype, "metadata", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => post_entity_1.Post, (post) => post.author),
+    (0, graphql_1.Field)(() => [post_entity_1.Post]),
+    __metadata("design:type", Array)
+], User.prototype, "posts", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    (0, graphql_1.Field)(),
+    __metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], User.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    (0, graphql_1.Field)(),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], User.prototype, "updatedAt", void 0);
+__decorate([
+    (0, graphql_1.Field)(),
+    __metadata("design:type", String),
+    __metadata("design:paramtypes", [])
+], User.prototype, "fullName", null);
+__decorate([
+    (0, graphql_1.Field)(),
+    __metadata("design:type", Number),
+    __metadata("design:paramtypes", [])
+], User.prototype, "postsCount", null);
+exports.User = User = __decorate([
+    (0, typeorm_1.Entity)("users"),
+    (0, graphql_1.ObjectType)()
+], User);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxncmFwaHFsXFxtb2R1bGVzXFx1c2VyXFxlbnRpdGllc1xcdXNlci5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHFDQUErRztBQUMvRyw2Q0FBdUQ7QUFFdkQsaUVBQXNEO0FBSS9DLElBQU0sSUFBSSxHQUFWLE1BQU0sSUFBSTtJQTRDZixrQkFBa0I7SUFDbEIsSUFDSSxRQUFRO1FBQ1YsT0FBTyxHQUFHLElBQUksQ0FBQyxTQUFTLElBQUksSUFBSSxDQUFDLFFBQVEsRUFBRSxDQUFBO0lBQzdDLENBQUM7SUFFRCxJQUNJLFVBQVU7UUFDWixPQUFPLElBQUksQ0FBQyxLQUFLLEVBQUUsTUFBTSxJQUFJLENBQUMsQ0FBQTtJQUNoQyxDQUFDO0NBQ0YsQ0FBQTtBQXREWSxvQkFBSTtBQUdmO0lBRkMsSUFBQSxnQ0FBc0IsRUFBQyxNQUFNLENBQUM7SUFDOUIsSUFBQSxlQUFLLEVBQUMsR0FBRyxFQUFFLENBQUMsWUFBRSxDQUFDOztnQ0FDTjtBQUlWO0lBRkMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsTUFBTSxFQUFFLElBQUksRUFBRSxDQUFDO0lBQ3hCLElBQUEsZUFBSyxHQUFFOzttQ0FDSztBQUliO0lBRkMsSUFBQSxnQkFBTSxHQUFFO0lBQ1IsSUFBQSxlQUFLLEdBQUU7O3VDQUNTO0FBSWpCO0lBRkMsSUFBQSxnQkFBTSxHQUFFO0lBQ1IsSUFBQSxlQUFLLEdBQUU7O3NDQUNRO0FBSWhCO0lBRkMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDO0lBQzFCLElBQUEsZUFBSyxFQUFDLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDOztvQ0FDWDtBQUlmO0lBRkMsSUFBQSxnQkFBTSxFQUFDLEVBQUUsT0FBTyxFQUFFLElBQUksRUFBRSxDQUFDO0lBQ3pCLElBQUEsZUFBSyxHQUFFOztzQ0FDUztBQUlqQjtJQUZDLElBQUEsZ0JBQU0sRUFBQyxFQUFFLElBQUksRUFBRSxPQUFPLEVBQUUsUUFBUSxFQUFFLElBQUksRUFBRSxDQUFDO0lBQ3pDLElBQUEsZUFBSyxFQUFDLEdBQUcsRUFBRSxDQUFDLE1BQU0sRUFBRSxFQUFFLFFBQVEsRUFBRSxJQUFJLEVBQUUsQ0FBQztrREFDN0IsTUFBTSxvQkFBTixNQUFNO3NDQUFhO0FBTzlCO0lBTEMsSUFBQSxtQkFBUyxFQUNSLEdBQUcsRUFBRSxDQUFDLGtCQUFJLEVBQ1YsQ0FBQyxJQUFJLEVBQUUsRUFBRSxDQUFDLElBQUksQ0FBQyxNQUFNLENBQ3RCO0lBQ0EsSUFBQSxlQUFLLEVBQUMsR0FBRyxFQUFFLENBQUMsQ0FBQyxrQkFBSSxDQUFDLENBQUM7O21DQUNQO0FBSWI7SUFGQyxJQUFBLDBCQUFnQixHQUFFO0lBQ2xCLElBQUEsZUFBSyxHQUFFO2tEQUNHLElBQUksb0JBQUosSUFBSTt1Q0FBQTtBQUlmO0lBRkMsSUFBQSwwQkFBZ0IsR0FBRTtJQUNsQixJQUFBLGVBQUssR0FBRTtrREFDRyxJQUFJLG9CQUFKLElBQUk7dUNBQUE7QUFHZjtJQUFDLElBQUEsZUFBSyxHQUFFOzs7b0NBR1A7QUFFRDtJQUFDLElBQUEsZUFBSyxHQUFFOzs7c0NBR1A7ZUFyRFUsSUFBSTtJQUZoQixJQUFBLGdCQUFNLEVBQUMsT0FBTyxDQUFDO0lBQ2YsSUFBQSxvQkFBVSxHQUFFO0dBQ0EsSUFBSSxDQXNEaEIiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxncmFwaHFsXFxtb2R1bGVzXFx1c2VyXFxlbnRpdGllc1xcdXNlci5lbnRpdHkudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgRW50aXR5LCBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uLCBDb2x1bW4sIE9uZVRvTWFueSwgQ3JlYXRlRGF0ZUNvbHVtbiwgVXBkYXRlRGF0ZUNvbHVtbiB9IGZyb20gXCJ0eXBlb3JtXCJcclxuaW1wb3J0IHsgT2JqZWN0VHlwZSwgRmllbGQsIElEIH0gZnJvbSBcIkBuZXN0anMvZ3JhcGhxbFwiXHJcblxyXG5pbXBvcnQgeyBQb3N0IH0gZnJvbSBcIi4uLy4uL3Bvc3QvZW50aXRpZXMvcG9zdC5lbnRpdHlcIlxyXG5cclxuQEVudGl0eShcInVzZXJzXCIpXHJcbkBPYmplY3RUeXBlKClcclxuZXhwb3J0IGNsYXNzIFVzZXIge1xyXG4gIEBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uKFwidXVpZFwiKVxyXG4gIEBGaWVsZCgoKSA9PiBJRClcclxuICBpZDogc3RyaW5nXHJcblxyXG4gIEBDb2x1bW4oeyB1bmlxdWU6IHRydWUgfSlcclxuICBARmllbGQoKVxyXG4gIGVtYWlsOiBzdHJpbmdcclxuXHJcbiAgQENvbHVtbigpXHJcbiAgQEZpZWxkKClcclxuICBmaXJzdE5hbWU6IHN0cmluZ1xyXG5cclxuICBAQ29sdW1uKClcclxuICBARmllbGQoKVxyXG4gIGxhc3ROYW1lOiBzdHJpbmdcclxuXHJcbiAgQENvbHVtbih7IG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgQEZpZWxkKHsgbnVsbGFibGU6IHRydWUgfSlcclxuICBhdmF0YXI/OiBzdHJpbmdcclxuXHJcbiAgQENvbHVtbih7IGRlZmF1bHQ6IHRydWUgfSlcclxuICBARmllbGQoKVxyXG4gIGlzQWN0aXZlOiBib29sZWFuXHJcblxyXG4gIEBDb2x1bW4oeyB0eXBlOiBcImpzb25iXCIsIG51bGxhYmxlOiB0cnVlIH0pXHJcbiAgQEZpZWxkKCgpID0+IFN0cmluZywgeyBudWxsYWJsZTogdHJ1ZSB9KVxyXG4gIG1ldGFkYXRhPzogUmVjb3JkPHN0cmluZywgYW55PlxyXG5cclxuICBAT25lVG9NYW55KFxyXG4gICAgKCkgPT4gUG9zdCxcclxuICAgIChwb3N0KSA9PiBwb3N0LmF1dGhvcixcclxuICApXHJcbiAgQEZpZWxkKCgpID0+IFtQb3N0XSlcclxuICBwb3N0czogUG9zdFtdXHJcblxyXG4gIEBDcmVhdGVEYXRlQ29sdW1uKClcclxuICBARmllbGQoKVxyXG4gIGNyZWF0ZWRBdDogRGF0ZVxyXG5cclxuICBAVXBkYXRlRGF0ZUNvbHVtbigpXHJcbiAgQEZpZWxkKClcclxuICB1cGRhdGVkQXQ6IERhdGVcclxuXHJcbiAgLy8gQ29tcHV0ZWQgZmllbGRzXHJcbiAgQEZpZWxkKClcclxuICBnZXQgZnVsbE5hbWUoKTogc3RyaW5nIHtcclxuICAgIHJldHVybiBgJHt0aGlzLmZpcnN0TmFtZX0gJHt0aGlzLmxhc3ROYW1lfWBcclxuICB9XHJcblxyXG4gIEBGaWVsZCgpXHJcbiAgZ2V0IHBvc3RzQ291bnQoKTogbnVtYmVyIHtcclxuICAgIHJldHVybiB0aGlzLnBvc3RzPy5sZW5ndGggfHwgMFxyXG4gIH1cclxufVxyXG4iXSwidmVyc2lvbiI6M30=

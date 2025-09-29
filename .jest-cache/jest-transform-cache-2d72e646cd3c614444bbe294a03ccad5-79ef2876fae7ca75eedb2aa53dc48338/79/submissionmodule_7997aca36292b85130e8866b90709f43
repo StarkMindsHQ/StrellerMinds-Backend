@@ -1,0 +1,27 @@
+e09a5e464ec1cd59bc622476722a85d2
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SubmissionModule = void 0;
+const common_1 = require("@nestjs/common");
+const submission_controller_1 = require("./submission.controller");
+const submission_service_1 = require("./provider/submission.service");
+const typeorm_1 = require("@nestjs/typeorm");
+const submission_entity_1 = require("./submission.entity");
+let SubmissionModule = class SubmissionModule {
+};
+exports.SubmissionModule = SubmissionModule;
+exports.SubmissionModule = SubmissionModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([submission_entity_1.Submission])],
+        controllers: [submission_controller_1.SubmissionController],
+        providers: [submission_service_1.SubmissionService],
+        exports: [submission_service_1.SubmissionService],
+    })
+], SubmissionModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxzdWJtaXNzaW9uXFxzdWJtaXNzaW9uLm1vZHVsZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7QUFBQSwyQ0FBd0M7QUFDeEMsbUVBQStEO0FBQy9ELHNFQUFrRTtBQUNsRSw2Q0FBZ0Q7QUFDaEQsMkRBQWlEO0FBUTFDLElBQU0sZ0JBQWdCLEdBQXRCLE1BQU0sZ0JBQWdCO0NBQUcsQ0FBQTtBQUFuQiw0Q0FBZ0I7MkJBQWhCLGdCQUFnQjtJQU41QixJQUFBLGVBQU0sRUFBQztRQUNOLE9BQU8sRUFBRSxDQUFDLHVCQUFhLENBQUMsVUFBVSxDQUFDLENBQUMsOEJBQVUsQ0FBQyxDQUFDLENBQUM7UUFDakQsV0FBVyxFQUFFLENBQUMsNENBQW9CLENBQUM7UUFDbkMsU0FBUyxFQUFFLENBQUMsc0NBQWlCLENBQUM7UUFDOUIsT0FBTyxFQUFFLENBQUMsc0NBQWlCLENBQUM7S0FDN0IsQ0FBQztHQUNXLGdCQUFnQixDQUFHIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcc3VibWlzc2lvblxcc3VibWlzc2lvbi5tb2R1bGUudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy9jb21tb24nO1xyXG5pbXBvcnQgeyBTdWJtaXNzaW9uQ29udHJvbGxlciB9IGZyb20gJy4vc3VibWlzc2lvbi5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgU3VibWlzc2lvblNlcnZpY2UgfSBmcm9tICcuL3Byb3ZpZGVyL3N1Ym1pc3Npb24uc2VydmljZSc7XHJcbmltcG9ydCB7IFR5cGVPcm1Nb2R1bGUgfSBmcm9tICdAbmVzdGpzL3R5cGVvcm0nO1xyXG5pbXBvcnQgeyBTdWJtaXNzaW9uIH0gZnJvbSAnLi9zdWJtaXNzaW9uLmVudGl0eSc7XHJcblxyXG5ATW9kdWxlKHtcclxuICBpbXBvcnRzOiBbVHlwZU9ybU1vZHVsZS5mb3JGZWF0dXJlKFtTdWJtaXNzaW9uXSldLFxyXG4gIGNvbnRyb2xsZXJzOiBbU3VibWlzc2lvbkNvbnRyb2xsZXJdLFxyXG4gIHByb3ZpZGVyczogW1N1Ym1pc3Npb25TZXJ2aWNlXSxcclxuICBleHBvcnRzOiBbU3VibWlzc2lvblNlcnZpY2VdLFxyXG59KVxyXG5leHBvcnQgY2xhc3MgU3VibWlzc2lvbk1vZHVsZSB7fVxyXG4iXSwidmVyc2lvbiI6M30=

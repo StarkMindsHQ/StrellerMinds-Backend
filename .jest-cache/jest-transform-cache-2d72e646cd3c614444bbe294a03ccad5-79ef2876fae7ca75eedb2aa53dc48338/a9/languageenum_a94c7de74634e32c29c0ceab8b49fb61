@@ -1,0 +1,12 @@
+21a466181685cd7f6359956c39aa9807
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Language = void 0;
+var Language;
+(function (Language) {
+    Language["EN"] = "en";
+    Language["FR"] = "fr";
+    Language["ES"] = "es";
+    Language["DE"] = "de";
+})(Language || (exports.Language = Language = {}));
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxsYW5ndWFnZVxcbGFuZ3VhZ2UuZW51bS50cyIsIm1hcHBpbmdzIjoiOzs7QUFBQSxJQUFZLFFBS1g7QUFMRCxXQUFZLFFBQVE7SUFDbEIscUJBQVMsQ0FBQTtJQUNULHFCQUFTLENBQUE7SUFDVCxxQkFBUyxDQUFBO0lBQ1QscUJBQVMsQ0FBQTtBQUNYLENBQUMsRUFMVyxRQUFRLHdCQUFSLFFBQVEsUUFLbkIiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxsYW5ndWFnZVxcbGFuZ3VhZ2UuZW51bS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZW51bSBMYW5ndWFnZSB7XHJcbiAgRU4gPSAnZW4nLFxyXG4gIEZSID0gJ2ZyJyxcclxuICBFUyA9ICdlcycsXHJcbiAgREUgPSAnZGUnLFxyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

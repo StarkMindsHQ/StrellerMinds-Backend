@@ -1,0 +1,67 @@
+a7747e3467c5b54e39f47dcc3e596af5
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmailTestService = void 0;
+const common_1 = require("@nestjs/common");
+const email_service_1 = require("../email.service");
+let EmailTestService = class EmailTestService {
+    constructor(emailService) {
+        this.emailService = emailService;
+    }
+    async testTemplate(templateName, testEmail, context) {
+        return this.emailService.sendEmail({
+            to: testEmail,
+            subject: `TEST: ${templateName}`,
+            templateName,
+            context,
+            // Add a header to indicate this is a test email
+            skipTracking: true,
+        });
+    }
+    async validateTemplate(templateName, context) {
+        try {
+            // Get the template and try to compile it with the provided context
+            const template = await this.emailService.getTemplate(templateName);
+            const handlebars = require('handlebars');
+            handlebars.compile(template)(context);
+            return { valid: true };
+        }
+        catch (error) {
+            return {
+                valid: false,
+                errors: [error.message],
+            };
+        }
+    }
+    async generatePreview(templateName, context) {
+        try {
+            // Get the template and compile it with the provided context
+            const template = await this.emailService.getTemplate(templateName);
+            const handlebars = require('handlebars');
+            const compiledTemplate = handlebars.compile(template);
+            return compiledTemplate(context);
+        }
+        catch (error) {
+            return `<div style="color: red; padding: 20px; border: 1px solid red;">
+        <h3>Error Rendering Template</h3>
+        <p>${error.message}</p>
+      </div>`;
+        }
+    }
+};
+exports.EmailTestService = EmailTestService;
+exports.EmailTestService = EmailTestService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof email_service_1.EmailService !== "undefined" && email_service_1.EmailService) === "function" ? _a : Object])
+], EmailTestService);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxlbWFpbFxcdXRpbHNcXHRlc3QudXRpbC50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUEsMkNBQTRDO0FBQzVDLG9EQUFnRDtBQUd6QyxJQUFNLGdCQUFnQixHQUF0QixNQUFNLGdCQUFnQjtJQUMzQixZQUE2QixZQUEwQjtRQUExQixpQkFBWSxHQUFaLFlBQVksQ0FBYztJQUFHLENBQUM7SUFFM0QsS0FBSyxDQUFDLFlBQVksQ0FDaEIsWUFBb0IsRUFDcEIsU0FBaUIsRUFDakIsT0FBNEI7UUFFNUIsT0FBTyxJQUFJLENBQUMsWUFBWSxDQUFDLFNBQVMsQ0FBQztZQUNqQyxFQUFFLEVBQUUsU0FBUztZQUNiLE9BQU8sRUFBRSxTQUFTLFlBQVksRUFBRTtZQUNoQyxZQUFZO1lBQ1osT0FBTztZQUNQLGdEQUFnRDtZQUNoRCxZQUFZLEVBQUUsSUFBSTtTQUNuQixDQUFDLENBQUM7SUFDTCxDQUFDO0lBRUQsS0FBSyxDQUFDLGdCQUFnQixDQUNwQixZQUFvQixFQUNwQixPQUE0QjtRQUU1QixJQUFJLENBQUM7WUFDSCxtRUFBbUU7WUFDbkUsTUFBTSxRQUFRLEdBQUcsTUFBTSxJQUFJLENBQUMsWUFBWSxDQUFDLFdBQVcsQ0FBQyxZQUFZLENBQUMsQ0FBQztZQUNuRSxNQUFNLFVBQVUsR0FBRyxPQUFPLENBQUMsWUFBWSxDQUFDLENBQUM7WUFDekMsVUFBVSxDQUFDLE9BQU8sQ0FBQyxRQUFRLENBQUMsQ0FBQyxPQUFPLENBQUMsQ0FBQztZQUV0QyxPQUFPLEVBQUUsS0FBSyxFQUFFLElBQUksRUFBRSxDQUFDO1FBQ3pCLENBQUM7UUFBQyxPQUFPLEtBQUssRUFBRSxDQUFDO1lBQ2YsT0FBTztnQkFDTCxLQUFLLEVBQUUsS0FBSztnQkFDWixNQUFNLEVBQUUsQ0FBQyxLQUFLLENBQUMsT0FBTyxDQUFDO2FBQ3hCLENBQUM7UUFDSixDQUFDO0lBQ0gsQ0FBQztJQUVELEtBQUssQ0FBQyxlQUFlLENBQ25CLFlBQW9CLEVBQ3BCLE9BQTRCO1FBRTVCLElBQUksQ0FBQztZQUNILDREQUE0RDtZQUM1RCxNQUFNLFFBQVEsR0FBRyxNQUFNLElBQUksQ0FBQyxZQUFZLENBQUMsV0FBVyxDQUFDLFlBQVksQ0FBQyxDQUFDO1lBQ25FLE1BQU0sVUFBVSxHQUFHLE9BQU8sQ0FBQyxZQUFZLENBQUMsQ0FBQztZQUN6QyxNQUFNLGdCQUFnQixHQUFHLFVBQVUsQ0FBQyxPQUFPLENBQUMsUUFBUSxDQUFDLENBQUM7WUFFdEQsT0FBTyxnQkFBZ0IsQ0FBQyxPQUFPLENBQUMsQ0FBQztRQUNuQyxDQUFDO1FBQUMsT0FBTyxLQUFLLEVBQUUsQ0FBQztZQUNmLE9BQU87O2FBRUEsS0FBSyxDQUFDLE9BQU87YUFDYixDQUFDO1FBQ1YsQ0FBQztJQUNILENBQUM7Q0FDRixDQUFBO0FBdkRZLDRDQUFnQjsyQkFBaEIsZ0JBQWdCO0lBRDVCLElBQUEsbUJBQVUsR0FBRTt5REFFZ0MsNEJBQVksb0JBQVosNEJBQVk7R0FENUMsZ0JBQWdCLENBdUQ1QiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGVtYWlsXFx1dGlsc1xcdGVzdC51dGlsLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEluamVjdGFibGUgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IEVtYWlsU2VydmljZSB9IGZyb20gJy4uL2VtYWlsLnNlcnZpY2UnO1xyXG5cclxuQEluamVjdGFibGUoKVxyXG5leHBvcnQgY2xhc3MgRW1haWxUZXN0U2VydmljZSB7XHJcbiAgY29uc3RydWN0b3IocHJpdmF0ZSByZWFkb25seSBlbWFpbFNlcnZpY2U6IEVtYWlsU2VydmljZSkge31cclxuXHJcbiAgYXN5bmMgdGVzdFRlbXBsYXRlKFxyXG4gICAgdGVtcGxhdGVOYW1lOiBzdHJpbmcsXHJcbiAgICB0ZXN0RW1haWw6IHN0cmluZyxcclxuICAgIGNvbnRleHQ6IFJlY29yZDxzdHJpbmcsIGFueT4sXHJcbiAgKTogUHJvbWlzZTxib29sZWFuPiB7XHJcbiAgICByZXR1cm4gdGhpcy5lbWFpbFNlcnZpY2Uuc2VuZEVtYWlsKHtcclxuICAgICAgdG86IHRlc3RFbWFpbCxcclxuICAgICAgc3ViamVjdDogYFRFU1Q6ICR7dGVtcGxhdGVOYW1lfWAsXHJcbiAgICAgIHRlbXBsYXRlTmFtZSxcclxuICAgICAgY29udGV4dCxcclxuICAgICAgLy8gQWRkIGEgaGVhZGVyIHRvIGluZGljYXRlIHRoaXMgaXMgYSB0ZXN0IGVtYWlsXHJcbiAgICAgIHNraXBUcmFja2luZzogdHJ1ZSxcclxuICAgIH0pO1xyXG4gIH1cclxuXHJcbiAgYXN5bmMgdmFsaWRhdGVUZW1wbGF0ZShcclxuICAgIHRlbXBsYXRlTmFtZTogc3RyaW5nLFxyXG4gICAgY29udGV4dDogUmVjb3JkPHN0cmluZywgYW55PixcclxuICApOiBQcm9taXNlPHsgdmFsaWQ6IGJvb2xlYW47IGVycm9ycz86IHN0cmluZ1tdIH0+IHtcclxuICAgIHRyeSB7XHJcbiAgICAgIC8vIEdldCB0aGUgdGVtcGxhdGUgYW5kIHRyeSB0byBjb21waWxlIGl0IHdpdGggdGhlIHByb3ZpZGVkIGNvbnRleHRcclxuICAgICAgY29uc3QgdGVtcGxhdGUgPSBhd2FpdCB0aGlzLmVtYWlsU2VydmljZS5nZXRUZW1wbGF0ZSh0ZW1wbGF0ZU5hbWUpO1xyXG4gICAgICBjb25zdCBoYW5kbGViYXJzID0gcmVxdWlyZSgnaGFuZGxlYmFycycpO1xyXG4gICAgICBoYW5kbGViYXJzLmNvbXBpbGUodGVtcGxhdGUpKGNvbnRleHQpO1xyXG5cclxuICAgICAgcmV0dXJuIHsgdmFsaWQ6IHRydWUgfTtcclxuICAgIH0gY2F0Y2ggKGVycm9yKSB7XHJcbiAgICAgIHJldHVybiB7XHJcbiAgICAgICAgdmFsaWQ6IGZhbHNlLFxyXG4gICAgICAgIGVycm9yczogW2Vycm9yLm1lc3NhZ2VdLFxyXG4gICAgICB9O1xyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgYXN5bmMgZ2VuZXJhdGVQcmV2aWV3KFxyXG4gICAgdGVtcGxhdGVOYW1lOiBzdHJpbmcsXHJcbiAgICBjb250ZXh0OiBSZWNvcmQ8c3RyaW5nLCBhbnk+LFxyXG4gICk6IFByb21pc2U8c3RyaW5nPiB7XHJcbiAgICB0cnkge1xyXG4gICAgICAvLyBHZXQgdGhlIHRlbXBsYXRlIGFuZCBjb21waWxlIGl0IHdpdGggdGhlIHByb3ZpZGVkIGNvbnRleHRcclxuICAgICAgY29uc3QgdGVtcGxhdGUgPSBhd2FpdCB0aGlzLmVtYWlsU2VydmljZS5nZXRUZW1wbGF0ZSh0ZW1wbGF0ZU5hbWUpO1xyXG4gICAgICBjb25zdCBoYW5kbGViYXJzID0gcmVxdWlyZSgnaGFuZGxlYmFycycpO1xyXG4gICAgICBjb25zdCBjb21waWxlZFRlbXBsYXRlID0gaGFuZGxlYmFycy5jb21waWxlKHRlbXBsYXRlKTtcclxuXHJcbiAgICAgIHJldHVybiBjb21waWxlZFRlbXBsYXRlKGNvbnRleHQpO1xyXG4gICAgfSBjYXRjaCAoZXJyb3IpIHtcclxuICAgICAgcmV0dXJuIGA8ZGl2IHN0eWxlPVwiY29sb3I6IHJlZDsgcGFkZGluZzogMjBweDsgYm9yZGVyOiAxcHggc29saWQgcmVkO1wiPlxyXG4gICAgICAgIDxoMz5FcnJvciBSZW5kZXJpbmcgVGVtcGxhdGU8L2gzPlxyXG4gICAgICAgIDxwPiR7ZXJyb3IubWVzc2FnZX08L3A+XHJcbiAgICAgIDwvZGl2PmA7XHJcbiAgICB9XHJcbiAgfVxyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

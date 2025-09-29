@@ -1,0 +1,44 @@
+44ee2786705188dc319d1cdab0282d6b
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RegisterDto = void 0;
+const swagger_1 = require("@nestjs/swagger");
+const class_validator_1 = require("class-validator");
+/**
+ * DTO for user registration.
+ */
+class RegisterDto {
+}
+exports.RegisterDto = RegisterDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'user@example.com', description: 'User email address' }),
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'StrongPassword123', description: 'User password' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'John', required: false, description: 'First name (optional)' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "firstName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Doe', required: false, description: 'Last name (optional)' }),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "lastName", void 0);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhdXRoXFxkdG9cXHJlZ2lzdGVyLmR0by50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7QUFBQSw2Q0FBOEM7QUFDOUMscURBQWdFO0FBRWhFOztHQUVHO0FBQ0gsTUFBYSxXQUFXO0NBa0J2QjtBQWxCRCxrQ0FrQkM7QUFkQztJQUhDLElBQUEscUJBQVcsRUFBQyxFQUFFLE9BQU8sRUFBRSxrQkFBa0IsRUFBRSxXQUFXLEVBQUUsb0JBQW9CLEVBQUUsQ0FBQztJQUMvRSxJQUFBLHlCQUFPLEdBQUU7SUFDVCxJQUFBLDRCQUFVLEdBQUU7OzBDQUNDO0FBS2Q7SUFIQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxPQUFPLEVBQUUsbUJBQW1CLEVBQUUsV0FBVyxFQUFFLGVBQWUsRUFBRSxDQUFDO0lBQzNFLElBQUEsMEJBQVEsR0FBRTtJQUNWLElBQUEsNEJBQVUsR0FBRTs7NkNBQ0k7QUFJakI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxPQUFPLEVBQUUsTUFBTSxFQUFFLFFBQVEsRUFBRSxLQUFLLEVBQUUsV0FBVyxFQUFFLHVCQUF1QixFQUFFLENBQUM7SUFDdkYsSUFBQSwwQkFBUSxHQUFFOzs4Q0FDUTtBQUluQjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsUUFBUSxFQUFFLEtBQUssRUFBRSxXQUFXLEVBQUUsc0JBQXNCLEVBQUUsQ0FBQztJQUNyRixJQUFBLDBCQUFRLEdBQUU7OzZDQUNPIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcYXV0aFxcZHRvXFxyZWdpc3Rlci5kdG8udHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQXBpUHJvcGVydHkgfSBmcm9tICdAbmVzdGpzL3N3YWdnZXInO1xyXG5pbXBvcnQgeyBJc0VtYWlsLCBJc05vdEVtcHR5LCBJc1N0cmluZyB9IGZyb20gJ2NsYXNzLXZhbGlkYXRvcic7XHJcblxyXG4vKipcclxuICogRFRPIGZvciB1c2VyIHJlZ2lzdHJhdGlvbi5cclxuICovXHJcbmV4cG9ydCBjbGFzcyBSZWdpc3RlckR0byB7XHJcbiAgQEFwaVByb3BlcnR5KHsgZXhhbXBsZTogJ3VzZXJAZXhhbXBsZS5jb20nLCBkZXNjcmlwdGlvbjogJ1VzZXIgZW1haWwgYWRkcmVzcycgfSlcclxuICBASXNFbWFpbCgpXHJcbiAgQElzTm90RW1wdHkoKVxyXG4gIGVtYWlsOiBzdHJpbmc7XHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IGV4YW1wbGU6ICdTdHJvbmdQYXNzd29yZDEyMycsIGRlc2NyaXB0aW9uOiAnVXNlciBwYXNzd29yZCcgfSlcclxuICBASXNTdHJpbmcoKVxyXG4gIEBJc05vdEVtcHR5KClcclxuICBwYXNzd29yZDogc3RyaW5nO1xyXG5cclxuICBAQXBpUHJvcGVydHkoeyBleGFtcGxlOiAnSm9obicsIHJlcXVpcmVkOiBmYWxzZSwgZGVzY3JpcHRpb246ICdGaXJzdCBuYW1lIChvcHRpb25hbCknIH0pXHJcbiAgQElzU3RyaW5nKClcclxuICBmaXJzdE5hbWU/OiBzdHJpbmc7XHJcblxyXG4gIEBBcGlQcm9wZXJ0eSh7IGV4YW1wbGU6ICdEb2UnLCByZXF1aXJlZDogZmFsc2UsIGRlc2NyaXB0aW9uOiAnTGFzdCBuYW1lIChvcHRpb25hbCknIH0pXHJcbiAgQElzU3RyaW5nKClcclxuICBsYXN0TmFtZT86IHN0cmluZztcclxufVxyXG5cclxuIl0sInZlcnNpb24iOjN9

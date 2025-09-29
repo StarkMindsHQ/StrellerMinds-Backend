@@ -1,0 +1,127 @@
+97cdfc4c9681fb034b42fc0635f5befc
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var BackupVerificationService_1;
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BackupVerificationService = void 0;
+/* eslint-disable prettier/prettier */
+const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
+const child_process_1 = require("child_process");
+const util_1 = require("util");
+const fs = __importStar(require("fs/promises"));
+const execAsync = (0, util_1.promisify)(child_process_1.exec);
+let BackupVerificationService = BackupVerificationService_1 = class BackupVerificationService {
+    constructor(configService) {
+        this.configService = configService;
+        this.logger = new common_1.Logger(BackupVerificationService_1.name);
+        this.dbConfig = {
+            host: this.configService.get('database.host'),
+            port: this.configService.get('database.port'),
+            username: this.configService.get('database.user'),
+            password: this.configService.get('database.password'),
+            database: this.configService.get('database.name'),
+        };
+    }
+    async verifyDatabaseBackup(backupPath) {
+        try {
+            // Check if file exists and is not empty
+            const stats = await fs.stat(backupPath);
+            if (stats.size === 0) {
+                this.logger.error(`Backup file is empty: ${backupPath}`);
+                return false;
+            }
+            // Verify SQL syntax by doing a dry run
+            const testDbName = `${this.dbConfig.database}_backup_test`;
+            const env = { ...process.env, PGPASSWORD: this.dbConfig.password };
+            try {
+                // Create test database
+                await execAsync(`createdb -h ${this.dbConfig.host} -p ${this.dbConfig.port} -U ${this.dbConfig.username} ${testDbName}`, { env });
+                // Try to restore backup to test database
+                await execAsync(`psql -h ${this.dbConfig.host} -p ${this.dbConfig.port} -U ${this.dbConfig.username} -d ${testDbName} -f "${backupPath}" --quiet`, { env });
+                // Verify some basic tables exist
+                const { stdout } = await execAsync(`psql -h ${this.dbConfig.host} -p ${this.dbConfig.port} -U ${this.dbConfig.username} -d ${testDbName} -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';"`, { env });
+                const tableCount = parseInt(stdout.trim());
+                if (tableCount === 0) {
+                    this.logger.error('Backup verification failed: No tables found');
+                    return false;
+                }
+                this.logger.log(`Backup verification successful: ${tableCount} tables restored`);
+                return true;
+            }
+            finally {
+                // Clean up test database
+                try {
+                    await execAsync(`dropdb -h ${this.dbConfig.host} -p ${this.dbConfig.port} -U ${this.dbConfig.username} ${testDbName}`, { env });
+                }
+                catch (cleanupError) {
+                    this.logger.warn(`Failed to cleanup test database: ${cleanupError.message}`);
+                }
+            }
+        }
+        catch (error) {
+            this.logger.error(`Backup verification failed: ${error.message}`, error.stack);
+            return false;
+        }
+    }
+    async verifyApplicationDataBackup(backupPath) {
+        try {
+            // Check if tar.gz file is valid
+            await execAsync(`tar -tzf "${backupPath}" > /dev/null`);
+            this.logger.log(`Application data backup verification successful: ${backupPath}`);
+            return true;
+        }
+        catch (error) {
+            this.logger.error(`Application data backup verification failed: ${error.message}`);
+            return false;
+        }
+    }
+};
+exports.BackupVerificationService = BackupVerificationService;
+exports.BackupVerificationService = BackupVerificationService = BackupVerificationService_1 = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
+], BackupVerificationService);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxiYWNrdXBcXGJhY2t1cC12ZXJpZmljYXRpb24uc2VydmljZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLHNDQUFzQztBQUN0QywyQ0FBb0Q7QUFDcEQsMkNBQStDO0FBQy9DLGlEQUFxQztBQUNyQywrQkFBaUM7QUFDakMsZ0RBQWtDO0FBRWxDLE1BQU0sU0FBUyxHQUFHLElBQUEsZ0JBQVMsRUFBQyxvQkFBSSxDQUFDLENBQUM7QUFHM0IsSUFBTSx5QkFBeUIsaUNBQS9CLE1BQU0seUJBQXlCO0lBSXBDLFlBQTZCLGFBQTRCO1FBQTVCLGtCQUFhLEdBQWIsYUFBYSxDQUFlO1FBSHhDLFdBQU0sR0FBRyxJQUFJLGVBQU0sQ0FBQywyQkFBeUIsQ0FBQyxJQUFJLENBQUMsQ0FBQztRQUluRSxJQUFJLENBQUMsUUFBUSxHQUFHO1lBQ2QsSUFBSSxFQUFFLElBQUksQ0FBQyxhQUFhLENBQUMsR0FBRyxDQUFTLGVBQWUsQ0FBQztZQUNyRCxJQUFJLEVBQUUsSUFBSSxDQUFDLGFBQWEsQ0FBQyxHQUFHLENBQVMsZUFBZSxDQUFDO1lBQ3JELFFBQVEsRUFBRSxJQUFJLENBQUMsYUFBYSxDQUFDLEdBQUcsQ0FBUyxlQUFlLENBQUM7WUFDekQsUUFBUSxFQUFFLElBQUksQ0FBQyxhQUFhLENBQUMsR0FBRyxDQUFTLG1CQUFtQixDQUFDO1lBQzdELFFBQVEsRUFBRSxJQUFJLENBQUMsYUFBYSxDQUFDLEdBQUcsQ0FBUyxlQUFlLENBQUM7U0FDMUQsQ0FBQztJQUNKLENBQUM7SUFFRCxLQUFLLENBQUMsb0JBQW9CLENBQUMsVUFBa0I7UUFDM0MsSUFBSSxDQUFDO1lBQ0gsd0NBQXdDO1lBQ3hDLE1BQU0sS0FBSyxHQUFHLE1BQU0sRUFBRSxDQUFDLElBQUksQ0FBQyxVQUFVLENBQUMsQ0FBQztZQUN4QyxJQUFJLEtBQUssQ0FBQyxJQUFJLEtBQUssQ0FBQyxFQUFFLENBQUM7Z0JBQ3JCLElBQUksQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDLHlCQUF5QixVQUFVLEVBQUUsQ0FBQyxDQUFDO2dCQUN6RCxPQUFPLEtBQUssQ0FBQztZQUNmLENBQUM7WUFFRCx1Q0FBdUM7WUFDdkMsTUFBTSxVQUFVLEdBQUcsR0FBRyxJQUFJLENBQUMsUUFBUSxDQUFDLFFBQVEsY0FBYyxDQUFDO1lBQzNELE1BQU0sR0FBRyxHQUFHLEVBQUUsR0FBRyxPQUFPLENBQUMsR0FBRyxFQUFFLFVBQVUsRUFBRSxJQUFJLENBQUMsUUFBUSxDQUFDLFFBQVEsRUFBRSxDQUFDO1lBRW5FLElBQUksQ0FBQztnQkFDSCx1QkFBdUI7Z0JBQ3ZCLE1BQU0sU0FBUyxDQUNiLGVBQWUsSUFBSSxDQUFDLFFBQVEsQ0FBQyxJQUFJLE9BQU8sSUFBSSxDQUFDLFFBQVEsQ0FBQyxJQUFJLE9BQU8sSUFBSSxDQUFDLFFBQVEsQ0FBQyxRQUFRLElBQUksVUFBVSxFQUFFLEVBQ3ZHLEVBQUUsR0FBRyxFQUFFLENBQ1IsQ0FBQztnQkFFRix5Q0FBeUM7Z0JBQ3pDLE1BQU0sU0FBUyxDQUNiLFdBQVcsSUFBSSxDQUFDLFFBQVEsQ0FBQyxJQUFJLE9BQU8sSUFBSSxDQUFDLFFBQVEsQ0FBQyxJQUFJLE9BQU8sSUFBSSxDQUFDLFFBQVEsQ0FBQyxRQUFRLE9BQU8sVUFBVSxRQUFRLFVBQVUsV0FBVyxFQUNqSSxFQUFFLEdBQUcsRUFBRSxDQUNSLENBQUM7Z0JBRUYsaUNBQWlDO2dCQUNqQyxNQUFNLEVBQUUsTUFBTSxFQUFFLEdBQUcsTUFBTSxTQUFTLENBQ2hDLFdBQVcsSUFBSSxDQUFDLFFBQVEsQ0FBQyxJQUFJLE9BQU8sSUFBSSxDQUFDLFFBQVEsQ0FBQyxJQUFJLE9BQU8sSUFBSSxDQUFDLFFBQVEsQ0FBQyxRQUFRLE9BQU8sVUFBVSx3RkFBd0YsRUFDNUwsRUFBRSxHQUFHLEVBQUUsQ0FDUixDQUFDO2dCQUVGLE1BQU0sVUFBVSxHQUFHLFFBQVEsQ0FBQyxNQUFNLENBQUMsSUFBSSxFQUFFLENBQUMsQ0FBQztnQkFDM0MsSUFBSSxVQUFVLEtBQUssQ0FBQyxFQUFFLENBQUM7b0JBQ3JCLElBQUksQ0FBQyxNQUFNLENBQUMsS0FBSyxDQUFDLDZDQUE2QyxDQUFDLENBQUM7b0JBQ2pFLE9BQU8sS0FBSyxDQUFDO2dCQUNmLENBQUM7Z0JBRUQsSUFBSSxDQUFDLE1BQU0sQ0FBQyxHQUFHLENBQ2IsbUNBQW1DLFVBQVUsa0JBQWtCLENBQ2hFLENBQUM7Z0JBQ0YsT0FBTyxJQUFJLENBQUM7WUFDZCxDQUFDO29CQUFTLENBQUM7Z0JBQ1QseUJBQXlCO2dCQUN6QixJQUFJLENBQUM7b0JBQ0gsTUFBTSxTQUFTLENBQ2IsYUFBYSxJQUFJLENBQUMsUUFBUSxDQUFDLElBQUksT0FBTyxJQUFJLENBQUMsUUFBUSxDQUFDLElBQUksT0FBTyxJQUFJLENBQUMsUUFBUSxDQUFDLFFBQVEsSUFBSSxVQUFVLEVBQUUsRUFDckcsRUFBRSxHQUFHLEVBQUUsQ0FDUixDQUFDO2dCQUNKLENBQUM7Z0JBQUMsT0FBTyxZQUFZLEVBQUUsQ0FBQztvQkFDdEIsSUFBSSxDQUFDLE1BQU0sQ0FBQyxJQUFJLENBQ2Qsb0NBQW9DLFlBQVksQ0FBQyxPQUFPLEVBQUUsQ0FDM0QsQ0FBQztnQkFDSixDQUFDO1lBQ0gsQ0FBQztRQUNILENBQUM7UUFBQyxPQUFPLEtBQUssRUFBRSxDQUFDO1lBQ2YsSUFBSSxDQUFDLE1BQU0sQ0FBQyxLQUFLLENBQ2YsK0JBQStCLEtBQUssQ0FBQyxPQUFPLEVBQUUsRUFDOUMsS0FBSyxDQUFDLEtBQUssQ0FDWixDQUFDO1lBQ0YsT0FBTyxLQUFLLENBQUM7UUFDZixDQUFDO0lBQ0gsQ0FBQztJQUVELEtBQUssQ0FBQywyQkFBMkIsQ0FBQyxVQUFrQjtRQUNsRCxJQUFJLENBQUM7WUFDSCxnQ0FBZ0M7WUFDaEMsTUFBTSxTQUFTLENBQUMsYUFBYSxVQUFVLGVBQWUsQ0FBQyxDQUFDO1lBQ3hELElBQUksQ0FBQyxNQUFNLENBQUMsR0FBRyxDQUNiLG9EQUFvRCxVQUFVLEVBQUUsQ0FDakUsQ0FBQztZQUNGLE9BQU8sSUFBSSxDQUFDO1FBQ2QsQ0FBQztRQUFDLE9BQU8sS0FBSyxFQUFFLENBQUM7WUFDZixJQUFJLENBQUMsTUFBTSxDQUFDLEtBQUssQ0FDZixnREFBZ0QsS0FBSyxDQUFDLE9BQU8sRUFBRSxDQUNoRSxDQUFDO1lBQ0YsT0FBTyxLQUFLLENBQUM7UUFDZixDQUFDO0lBQ0gsQ0FBQztDQUNGLENBQUE7QUE3RlksOERBQXlCO29DQUF6Qix5QkFBeUI7SUFEckMsSUFBQSxtQkFBVSxHQUFFO3lEQUtpQyxzQkFBYSxvQkFBYixzQkFBYTtHQUo5Qyx5QkFBeUIsQ0E2RnJDIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcYmFja3VwXFxiYWNrdXAtdmVyaWZpY2F0aW9uLnNlcnZpY2UudHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyogZXNsaW50LWRpc2FibGUgcHJldHRpZXIvcHJldHRpZXIgKi9cclxuaW1wb3J0IHsgSW5qZWN0YWJsZSwgTG9nZ2VyIH0gZnJvbSAnQG5lc3Rqcy9jb21tb24nO1xyXG5pbXBvcnQgeyBDb25maWdTZXJ2aWNlIH0gZnJvbSAnQG5lc3Rqcy9jb25maWcnO1xyXG5pbXBvcnQgeyBleGVjIH0gZnJvbSAnY2hpbGRfcHJvY2Vzcyc7XHJcbmltcG9ydCB7IHByb21pc2lmeSB9IGZyb20gJ3V0aWwnO1xyXG5pbXBvcnQgKiBhcyBmcyBmcm9tICdmcy9wcm9taXNlcyc7XHJcblxyXG5jb25zdCBleGVjQXN5bmMgPSBwcm9taXNpZnkoZXhlYyk7XHJcblxyXG5ASW5qZWN0YWJsZSgpXHJcbmV4cG9ydCBjbGFzcyBCYWNrdXBWZXJpZmljYXRpb25TZXJ2aWNlIHtcclxuICBwcml2YXRlIHJlYWRvbmx5IGxvZ2dlciA9IG5ldyBMb2dnZXIoQmFja3VwVmVyaWZpY2F0aW9uU2VydmljZS5uYW1lKTtcclxuICBwcml2YXRlIHJlYWRvbmx5IGRiQ29uZmlnOiBhbnk7XHJcblxyXG4gIGNvbnN0cnVjdG9yKHByaXZhdGUgcmVhZG9ubHkgY29uZmlnU2VydmljZTogQ29uZmlnU2VydmljZSkge1xyXG4gICAgdGhpcy5kYkNvbmZpZyA9IHtcclxuICAgICAgaG9zdDogdGhpcy5jb25maWdTZXJ2aWNlLmdldDxzdHJpbmc+KCdkYXRhYmFzZS5ob3N0JyksXHJcbiAgICAgIHBvcnQ6IHRoaXMuY29uZmlnU2VydmljZS5nZXQ8bnVtYmVyPignZGF0YWJhc2UucG9ydCcpLFxyXG4gICAgICB1c2VybmFtZTogdGhpcy5jb25maWdTZXJ2aWNlLmdldDxzdHJpbmc+KCdkYXRhYmFzZS51c2VyJyksXHJcbiAgICAgIHBhc3N3b3JkOiB0aGlzLmNvbmZpZ1NlcnZpY2UuZ2V0PHN0cmluZz4oJ2RhdGFiYXNlLnBhc3N3b3JkJyksXHJcbiAgICAgIGRhdGFiYXNlOiB0aGlzLmNvbmZpZ1NlcnZpY2UuZ2V0PHN0cmluZz4oJ2RhdGFiYXNlLm5hbWUnKSxcclxuICAgIH07XHJcbiAgfVxyXG5cclxuICBhc3luYyB2ZXJpZnlEYXRhYmFzZUJhY2t1cChiYWNrdXBQYXRoOiBzdHJpbmcpOiBQcm9taXNlPGJvb2xlYW4+IHtcclxuICAgIHRyeSB7XHJcbiAgICAgIC8vIENoZWNrIGlmIGZpbGUgZXhpc3RzIGFuZCBpcyBub3QgZW1wdHlcclxuICAgICAgY29uc3Qgc3RhdHMgPSBhd2FpdCBmcy5zdGF0KGJhY2t1cFBhdGgpO1xyXG4gICAgICBpZiAoc3RhdHMuc2l6ZSA9PT0gMCkge1xyXG4gICAgICAgIHRoaXMubG9nZ2VyLmVycm9yKGBCYWNrdXAgZmlsZSBpcyBlbXB0eTogJHtiYWNrdXBQYXRofWApO1xyXG4gICAgICAgIHJldHVybiBmYWxzZTtcclxuICAgICAgfVxyXG5cclxuICAgICAgLy8gVmVyaWZ5IFNRTCBzeW50YXggYnkgZG9pbmcgYSBkcnkgcnVuXHJcbiAgICAgIGNvbnN0IHRlc3REYk5hbWUgPSBgJHt0aGlzLmRiQ29uZmlnLmRhdGFiYXNlfV9iYWNrdXBfdGVzdGA7XHJcbiAgICAgIGNvbnN0IGVudiA9IHsgLi4ucHJvY2Vzcy5lbnYsIFBHUEFTU1dPUkQ6IHRoaXMuZGJDb25maWcucGFzc3dvcmQgfTtcclxuXHJcbiAgICAgIHRyeSB7XHJcbiAgICAgICAgLy8gQ3JlYXRlIHRlc3QgZGF0YWJhc2VcclxuICAgICAgICBhd2FpdCBleGVjQXN5bmMoXHJcbiAgICAgICAgICBgY3JlYXRlZGIgLWggJHt0aGlzLmRiQ29uZmlnLmhvc3R9IC1wICR7dGhpcy5kYkNvbmZpZy5wb3J0fSAtVSAke3RoaXMuZGJDb25maWcudXNlcm5hbWV9ICR7dGVzdERiTmFtZX1gLFxyXG4gICAgICAgICAgeyBlbnYgfSxcclxuICAgICAgICApO1xyXG5cclxuICAgICAgICAvLyBUcnkgdG8gcmVzdG9yZSBiYWNrdXAgdG8gdGVzdCBkYXRhYmFzZVxyXG4gICAgICAgIGF3YWl0IGV4ZWNBc3luYyhcclxuICAgICAgICAgIGBwc3FsIC1oICR7dGhpcy5kYkNvbmZpZy5ob3N0fSAtcCAke3RoaXMuZGJDb25maWcucG9ydH0gLVUgJHt0aGlzLmRiQ29uZmlnLnVzZXJuYW1lfSAtZCAke3Rlc3REYk5hbWV9IC1mIFwiJHtiYWNrdXBQYXRofVwiIC0tcXVpZXRgLFxyXG4gICAgICAgICAgeyBlbnYgfSxcclxuICAgICAgICApO1xyXG5cclxuICAgICAgICAvLyBWZXJpZnkgc29tZSBiYXNpYyB0YWJsZXMgZXhpc3RcclxuICAgICAgICBjb25zdCB7IHN0ZG91dCB9ID0gYXdhaXQgZXhlY0FzeW5jKFxyXG4gICAgICAgICAgYHBzcWwgLWggJHt0aGlzLmRiQ29uZmlnLmhvc3R9IC1wICR7dGhpcy5kYkNvbmZpZy5wb3J0fSAtVSAke3RoaXMuZGJDb25maWcudXNlcm5hbWV9IC1kICR7dGVzdERiTmFtZX0gLXQgLWMgXCJTRUxFQ1QgQ09VTlQoKikgRlJPTSBpbmZvcm1hdGlvbl9zY2hlbWEudGFibGVzIFdIRVJFIHRhYmxlX3NjaGVtYSA9ICdwdWJsaWMnO1wiYCxcclxuICAgICAgICAgIHsgZW52IH0sXHJcbiAgICAgICAgKTtcclxuXHJcbiAgICAgICAgY29uc3QgdGFibGVDb3VudCA9IHBhcnNlSW50KHN0ZG91dC50cmltKCkpO1xyXG4gICAgICAgIGlmICh0YWJsZUNvdW50ID09PSAwKSB7XHJcbiAgICAgICAgICB0aGlzLmxvZ2dlci5lcnJvcignQmFja3VwIHZlcmlmaWNhdGlvbiBmYWlsZWQ6IE5vIHRhYmxlcyBmb3VuZCcpO1xyXG4gICAgICAgICAgcmV0dXJuIGZhbHNlO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgdGhpcy5sb2dnZXIubG9nKFxyXG4gICAgICAgICAgYEJhY2t1cCB2ZXJpZmljYXRpb24gc3VjY2Vzc2Z1bDogJHt0YWJsZUNvdW50fSB0YWJsZXMgcmVzdG9yZWRgLFxyXG4gICAgICAgICk7XHJcbiAgICAgICAgcmV0dXJuIHRydWU7XHJcbiAgICAgIH0gZmluYWxseSB7XHJcbiAgICAgICAgLy8gQ2xlYW4gdXAgdGVzdCBkYXRhYmFzZVxyXG4gICAgICAgIHRyeSB7XHJcbiAgICAgICAgICBhd2FpdCBleGVjQXN5bmMoXHJcbiAgICAgICAgICAgIGBkcm9wZGIgLWggJHt0aGlzLmRiQ29uZmlnLmhvc3R9IC1wICR7dGhpcy5kYkNvbmZpZy5wb3J0fSAtVSAke3RoaXMuZGJDb25maWcudXNlcm5hbWV9ICR7dGVzdERiTmFtZX1gLFxyXG4gICAgICAgICAgICB7IGVudiB9LFxyXG4gICAgICAgICAgKTtcclxuICAgICAgICB9IGNhdGNoIChjbGVhbnVwRXJyb3IpIHtcclxuICAgICAgICAgIHRoaXMubG9nZ2VyLndhcm4oXHJcbiAgICAgICAgICAgIGBGYWlsZWQgdG8gY2xlYW51cCB0ZXN0IGRhdGFiYXNlOiAke2NsZWFudXBFcnJvci5tZXNzYWdlfWAsXHJcbiAgICAgICAgICApO1xyXG4gICAgICAgIH1cclxuICAgICAgfVxyXG4gICAgfSBjYXRjaCAoZXJyb3IpIHtcclxuICAgICAgdGhpcy5sb2dnZXIuZXJyb3IoXHJcbiAgICAgICAgYEJhY2t1cCB2ZXJpZmljYXRpb24gZmFpbGVkOiAke2Vycm9yLm1lc3NhZ2V9YCxcclxuICAgICAgICBlcnJvci5zdGFjayxcclxuICAgICAgKTtcclxuICAgICAgcmV0dXJuIGZhbHNlO1xyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgYXN5bmMgdmVyaWZ5QXBwbGljYXRpb25EYXRhQmFja3VwKGJhY2t1cFBhdGg6IHN0cmluZyk6IFByb21pc2U8Ym9vbGVhbj4ge1xyXG4gICAgdHJ5IHtcclxuICAgICAgLy8gQ2hlY2sgaWYgdGFyLmd6IGZpbGUgaXMgdmFsaWRcclxuICAgICAgYXdhaXQgZXhlY0FzeW5jKGB0YXIgLXR6ZiBcIiR7YmFja3VwUGF0aH1cIiA+IC9kZXYvbnVsbGApO1xyXG4gICAgICB0aGlzLmxvZ2dlci5sb2coXHJcbiAgICAgICAgYEFwcGxpY2F0aW9uIGRhdGEgYmFja3VwIHZlcmlmaWNhdGlvbiBzdWNjZXNzZnVsOiAke2JhY2t1cFBhdGh9YCxcclxuICAgICAgKTtcclxuICAgICAgcmV0dXJuIHRydWU7XHJcbiAgICB9IGNhdGNoIChlcnJvcikge1xyXG4gICAgICB0aGlzLmxvZ2dlci5lcnJvcihcclxuICAgICAgICBgQXBwbGljYXRpb24gZGF0YSBiYWNrdXAgdmVyaWZpY2F0aW9uIGZhaWxlZDogJHtlcnJvci5tZXNzYWdlfWAsXHJcbiAgICAgICk7XHJcbiAgICAgIHJldHVybiBmYWxzZTtcclxuICAgIH1cclxuICB9XHJcbn1cclxuIl0sInZlcnNpb24iOjN9

@@ -1,0 +1,32 @@
+f6677a0747efc379a7123a854477a470
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MentorshipModule = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const mentorship_entity_1 = require("./entities/mentorship.entity");
+const mentorship_session_entity_1 = require("./entities/mentorship-session.entity");
+const mentorship_service_1 = require("./mentorship.service");
+const mentorship_controller_1 = require("./mentorship.controller");
+const user_entity_1 = require("../users/entities/user.entity");
+/**
+ * Mentorship module for managing mentorships, sessions, and analytics.
+ */
+let MentorshipModule = class MentorshipModule {
+};
+exports.MentorshipModule = MentorshipModule;
+exports.MentorshipModule = MentorshipModule = __decorate([
+    (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([mentorship_entity_1.Mentorship, mentorship_session_entity_1.MentorshipSession, user_entity_1.User])],
+        providers: [mentorship_service_1.MentorshipService],
+        controllers: [mentorship_controller_1.MentorshipController],
+        exports: [mentorship_service_1.MentorshipService],
+    })
+], MentorshipModule);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxtZW50b3JzaGlwXFxtZW50b3JzaGlwLm1vZHVsZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7QUFBQSwyQ0FBd0M7QUFDeEMsNkNBQWdEO0FBQ2hELG9FQUEwRDtBQUMxRCxvRkFBeUU7QUFDekUsNkRBQXlEO0FBQ3pELG1FQUErRDtBQUMvRCwrREFBcUQ7QUFHckQ7O0dBRUc7QUFPSSxJQUFNLGdCQUFnQixHQUF0QixNQUFNLGdCQUFnQjtDQUFHLENBQUE7QUFBbkIsNENBQWdCOzJCQUFoQixnQkFBZ0I7SUFONUIsSUFBQSxlQUFNLEVBQUM7UUFDTixPQUFPLEVBQUUsQ0FBQyx1QkFBYSxDQUFDLFVBQVUsQ0FBQyxDQUFDLDhCQUFVLEVBQUUsNkNBQWlCLEVBQUUsa0JBQUksQ0FBQyxDQUFDLENBQUM7UUFDMUUsU0FBUyxFQUFFLENBQUMsc0NBQWlCLENBQUM7UUFDOUIsV0FBVyxFQUFFLENBQUMsNENBQW9CLENBQUM7UUFDbkMsT0FBTyxFQUFFLENBQUMsc0NBQWlCLENBQUM7S0FDN0IsQ0FBQztHQUNXLGdCQUFnQixDQUFHIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcbWVudG9yc2hpcFxcbWVudG9yc2hpcC5tb2R1bGUudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy9jb21tb24nO1xyXG5pbXBvcnQgeyBUeXBlT3JtTW9kdWxlIH0gZnJvbSAnQG5lc3Rqcy90eXBlb3JtJztcclxuaW1wb3J0IHsgTWVudG9yc2hpcCB9IGZyb20gJy4vZW50aXRpZXMvbWVudG9yc2hpcC5lbnRpdHknO1xyXG5pbXBvcnQgeyBNZW50b3JzaGlwU2Vzc2lvbiB9IGZyb20gJy4vZW50aXRpZXMvbWVudG9yc2hpcC1zZXNzaW9uLmVudGl0eSc7XHJcbmltcG9ydCB7IE1lbnRvcnNoaXBTZXJ2aWNlIH0gZnJvbSAnLi9tZW50b3JzaGlwLnNlcnZpY2UnO1xyXG5pbXBvcnQgeyBNZW50b3JzaGlwQ29udHJvbGxlciB9IGZyb20gJy4vbWVudG9yc2hpcC5jb250cm9sbGVyJztcclxuaW1wb3J0IHsgVXNlciB9IGZyb20gJy4uL3VzZXJzL2VudGl0aWVzL3VzZXIuZW50aXR5JztcclxuaW1wb3J0IHsgQXBpVGFncyB9IGZyb20gJ0BuZXN0anMvc3dhZ2dlcic7XHJcblxyXG4vKipcclxuICogTWVudG9yc2hpcCBtb2R1bGUgZm9yIG1hbmFnaW5nIG1lbnRvcnNoaXBzLCBzZXNzaW9ucywgYW5kIGFuYWx5dGljcy5cclxuICovXHJcbkBNb2R1bGUoe1xyXG4gIGltcG9ydHM6IFtUeXBlT3JtTW9kdWxlLmZvckZlYXR1cmUoW01lbnRvcnNoaXAsIE1lbnRvcnNoaXBTZXNzaW9uLCBVc2VyXSldLFxyXG4gIHByb3ZpZGVyczogW01lbnRvcnNoaXBTZXJ2aWNlXSxcclxuICBjb250cm9sbGVyczogW01lbnRvcnNoaXBDb250cm9sbGVyXSxcclxuICBleHBvcnRzOiBbTWVudG9yc2hpcFNlcnZpY2VdLFxyXG59KVxyXG5leHBvcnQgY2xhc3MgTWVudG9yc2hpcE1vZHVsZSB7fVxyXG4iXSwidmVyc2lvbiI6M30=

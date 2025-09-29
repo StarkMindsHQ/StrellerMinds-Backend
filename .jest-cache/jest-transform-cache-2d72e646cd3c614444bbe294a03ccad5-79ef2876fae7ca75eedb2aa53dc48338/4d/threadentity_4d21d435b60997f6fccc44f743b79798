@@ -1,0 +1,70 @@
+ba1dd0963ef140d4933c865cc042c342
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Thread = void 0;
+/* eslint-disable prettier/prettier */
+const swagger_1 = require("@nestjs/swagger");
+const typeorm_1 = require("typeorm");
+const topic_entity_1 = require("src/topic/topic.entity");
+const user_entity_1 = require("../users/entities/user.entity");
+const reply_entity_1 = require("src/reply/reply.entity");
+/**
+ * Entity representing a discussion thread within a topic.
+ */
+let Thread = class Thread {
+};
+exports.Thread = Thread;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Unique thread ID', example: 1 }),
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], Thread.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Topic to which this thread belongs', type: () => topic_entity_1.Topic }),
+    (0, typeorm_1.ManyToOne)(() => topic_entity_1.Topic, (topic) => topic.threads),
+    __metadata("design:type", typeof (_a = typeof topic_entity_1.Topic !== "undefined" && topic_entity_1.Topic) === "function" ? _a : Object)
+], Thread.prototype, "topic", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Author of the thread', type: () => user_entity_1.User }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User),
+    __metadata("design:type", typeof (_b = typeof user_entity_1.User !== "undefined" && user_entity_1.User) === "function" ? _b : Object)
+], Thread.prototype, "author", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Title of the thread', example: 'How to use OpenAPI with NestJS?' }),
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Thread.prototype, "title", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Content of the thread', example: 'Can someone explain how to document APIs with Swagger in NestJS?' }),
+    (0, typeorm_1.Column)('text'),
+    __metadata("design:type", String)
+], Thread.prototype, "content", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Whether the thread is open for replies', example: true }),
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], Thread.prototype, "isOpen", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Date/time when the thread was created', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' }),
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], Thread.prototype, "createdAt", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Replies to this thread', type: () => [reply_entity_1.Reply] }),
+    (0, typeorm_1.OneToMany)(() => reply_entity_1.Reply, (reply) => reply.thread),
+    __metadata("design:type", Array)
+], Thread.prototype, "replies", void 0);
+exports.Thread = Thread = __decorate([
+    (0, typeorm_1.Entity)('threads')
+], Thread);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx0aHJlYWRcXHRocmVhZC5lbnRpdHkudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7OztBQUFBLHNDQUFzQztBQUN0Qyw2Q0FBOEM7QUFDOUMscUNBT2lCO0FBQ2pCLHlEQUErQztBQUMvQywrREFBcUQ7QUFDckQseURBQStDO0FBRS9DOztHQUVHO0FBRUksSUFBTSxNQUFNLEdBQVosTUFBTSxNQUFNO0NBd0NsQixDQUFBO0FBeENZLHdCQUFNO0FBSWpCO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLGtCQUFrQixFQUFFLE9BQU8sRUFBRSxDQUFDLEVBQUUsQ0FBQztJQUM1RCxJQUFBLGdDQUFzQixHQUFFOztrQ0FDZDtBQUtYO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLG9DQUFvQyxFQUFFLElBQUksRUFBRSxHQUFHLEVBQUUsQ0FBQyxvQkFBSyxFQUFFLENBQUM7SUFDckYsSUFBQSxtQkFBUyxFQUFDLEdBQUcsRUFBRSxDQUFDLG9CQUFLLEVBQUUsQ0FBQyxLQUFLLEVBQUUsRUFBRSxDQUFDLEtBQUssQ0FBQyxPQUFPLENBQUM7a0RBQzFDLG9CQUFLLG9CQUFMLG9CQUFLO3FDQUFDO0FBS2I7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsc0JBQXNCLEVBQUUsSUFBSSxFQUFFLEdBQUcsRUFBRSxDQUFDLGtCQUFJLEVBQUUsQ0FBQztJQUN0RSxJQUFBLG1CQUFTLEVBQUMsR0FBRyxFQUFFLENBQUMsa0JBQUksQ0FBQztrREFDZCxrQkFBSSxvQkFBSixrQkFBSTtzQ0FBQztBQUtiO0lBRkMsSUFBQSxxQkFBVyxFQUFDLEVBQUUsV0FBVyxFQUFFLHFCQUFxQixFQUFFLE9BQU8sRUFBRSxpQ0FBaUMsRUFBRSxDQUFDO0lBQy9GLElBQUEsZ0JBQU0sR0FBRTs7cUNBQ0s7QUFLZDtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSx1QkFBdUIsRUFBRSxPQUFPLEVBQUUsa0VBQWtFLEVBQUUsQ0FBQztJQUNsSSxJQUFBLGdCQUFNLEVBQUMsTUFBTSxDQUFDOzt1Q0FDQztBQUtoQjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSx3Q0FBd0MsRUFBRSxPQUFPLEVBQUUsSUFBSSxFQUFFLENBQUM7SUFDckYsSUFBQSxnQkFBTSxFQUFDLEVBQUUsT0FBTyxFQUFFLElBQUksRUFBRSxDQUFDOztzQ0FDVjtBQUtoQjtJQUZDLElBQUEscUJBQVcsRUFBQyxFQUFFLFdBQVcsRUFBRSx1Q0FBdUMsRUFBRSxJQUFJLEVBQUUsTUFBTSxFQUFFLE1BQU0sRUFBRSxXQUFXLEVBQUUsT0FBTyxFQUFFLHNCQUFzQixFQUFFLENBQUM7SUFDekksSUFBQSwwQkFBZ0IsR0FBRTtrREFDUixJQUFJLG9CQUFKLElBQUk7eUNBQUM7QUFLaEI7SUFGQyxJQUFBLHFCQUFXLEVBQUMsRUFBRSxXQUFXLEVBQUUsd0JBQXdCLEVBQUUsSUFBSSxFQUFFLEdBQUcsRUFBRSxDQUFDLENBQUMsb0JBQUssQ0FBQyxFQUFFLENBQUM7SUFDM0UsSUFBQSxtQkFBUyxFQUFDLEdBQUcsRUFBRSxDQUFDLG9CQUFLLEVBQUUsQ0FBQyxLQUFZLEVBQUUsRUFBRSxDQUFDLEtBQUssQ0FBQyxNQUFNLENBQUM7O3VDQUN0QztpQkF2Q04sTUFBTTtJQURsQixJQUFBLGdCQUFNLEVBQUMsU0FBUyxDQUFDO0dBQ0wsTUFBTSxDQXdDbEIiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFx0aHJlYWRcXHRocmVhZC5lbnRpdHkudHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyogZXNsaW50LWRpc2FibGUgcHJldHRpZXIvcHJldHRpZXIgKi9cclxuaW1wb3J0IHsgQXBpUHJvcGVydHkgfSBmcm9tICdAbmVzdGpzL3N3YWdnZXInO1xyXG5pbXBvcnQge1xyXG4gIEVudGl0eSxcclxuICBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uLFxyXG4gIENvbHVtbixcclxuICBNYW55VG9PbmUsXHJcbiAgT25lVG9NYW55LFxyXG4gIENyZWF0ZURhdGVDb2x1bW4sXHJcbn0gZnJvbSAndHlwZW9ybSc7XHJcbmltcG9ydCB7IFRvcGljIH0gZnJvbSAnc3JjL3RvcGljL3RvcGljLmVudGl0eSc7XHJcbmltcG9ydCB7IFVzZXIgfSBmcm9tICcuLi91c2Vycy9lbnRpdGllcy91c2VyLmVudGl0eSc7XHJcbmltcG9ydCB7IFJlcGx5IH0gZnJvbSAnc3JjL3JlcGx5L3JlcGx5LmVudGl0eSc7XHJcblxyXG4vKipcclxuICogRW50aXR5IHJlcHJlc2VudGluZyBhIGRpc2N1c3Npb24gdGhyZWFkIHdpdGhpbiBhIHRvcGljLlxyXG4gKi9cclxuQEVudGl0eSgndGhyZWFkcycpXHJcbmV4cG9ydCBjbGFzcyBUaHJlYWQge1xyXG4gIC8qKiBVbmlxdWUgdGhyZWFkIElEICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdVbmlxdWUgdGhyZWFkIElEJywgZXhhbXBsZTogMSB9KVxyXG4gIEBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uKClcclxuICBpZDogbnVtYmVyO1xyXG5cclxuICAvKiogVG9waWMgdG8gd2hpY2ggdGhpcyB0aHJlYWQgYmVsb25ncyAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnVG9waWMgdG8gd2hpY2ggdGhpcyB0aHJlYWQgYmVsb25ncycsIHR5cGU6ICgpID0+IFRvcGljIH0pXHJcbiAgQE1hbnlUb09uZSgoKSA9PiBUb3BpYywgKHRvcGljKSA9PiB0b3BpYy50aHJlYWRzKVxyXG4gIHRvcGljOiBUb3BpYztcclxuXHJcbiAgLyoqIEF1dGhvciBvZiB0aGUgdGhyZWFkICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdBdXRob3Igb2YgdGhlIHRocmVhZCcsIHR5cGU6ICgpID0+IFVzZXIgfSlcclxuICBATWFueVRvT25lKCgpID0+IFVzZXIpXHJcbiAgYXV0aG9yOiBVc2VyO1xyXG5cclxuICAvKiogVGl0bGUgb2YgdGhlIHRocmVhZCAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnVGl0bGUgb2YgdGhlIHRocmVhZCcsIGV4YW1wbGU6ICdIb3cgdG8gdXNlIE9wZW5BUEkgd2l0aCBOZXN0SlM/JyB9KVxyXG4gIEBDb2x1bW4oKVxyXG4gIHRpdGxlOiBzdHJpbmc7XHJcblxyXG4gIC8qKiBDb250ZW50IG9mIHRoZSB0aHJlYWQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0NvbnRlbnQgb2YgdGhlIHRocmVhZCcsIGV4YW1wbGU6ICdDYW4gc29tZW9uZSBleHBsYWluIGhvdyB0byBkb2N1bWVudCBBUElzIHdpdGggU3dhZ2dlciBpbiBOZXN0SlM/JyB9KVxyXG4gIEBDb2x1bW4oJ3RleHQnKVxyXG4gIGNvbnRlbnQ6IHN0cmluZztcclxuXHJcbiAgLyoqIFdoZXRoZXIgdGhlIHRocmVhZCBpcyBvcGVuIGZvciByZXBsaWVzICovXHJcbiAgQEFwaVByb3BlcnR5KHsgZGVzY3JpcHRpb246ICdXaGV0aGVyIHRoZSB0aHJlYWQgaXMgb3BlbiBmb3IgcmVwbGllcycsIGV4YW1wbGU6IHRydWUgfSlcclxuICBAQ29sdW1uKHsgZGVmYXVsdDogdHJ1ZSB9KVxyXG4gIGlzT3BlbjogYm9vbGVhbjtcclxuXHJcbiAgLyoqIERhdGUvdGltZSB3aGVuIHRoZSB0aHJlYWQgd2FzIGNyZWF0ZWQgKi9cclxuICBAQXBpUHJvcGVydHkoeyBkZXNjcmlwdGlvbjogJ0RhdGUvdGltZSB3aGVuIHRoZSB0aHJlYWQgd2FzIGNyZWF0ZWQnLCB0eXBlOiBTdHJpbmcsIGZvcm1hdDogJ2RhdGUtdGltZScsIGV4YW1wbGU6ICcyMDI1LTA2LTI5VDEyOjAwOjAwWicgfSlcclxuICBAQ3JlYXRlRGF0ZUNvbHVtbigpXHJcbiAgY3JlYXRlZEF0OiBEYXRlO1xyXG5cclxuICAvKiogUmVwbGllcyB0byB0aGlzIHRocmVhZCAqL1xyXG4gIEBBcGlQcm9wZXJ0eSh7IGRlc2NyaXB0aW9uOiAnUmVwbGllcyB0byB0aGlzIHRocmVhZCcsIHR5cGU6ICgpID0+IFtSZXBseV0gfSlcclxuICBAT25lVG9NYW55KCgpID0+IFJlcGx5LCAocmVwbHk6IFJlcGx5KSA9PiByZXBseS50aHJlYWQpXHJcbiAgcmVwbGllczogUmVwbHlbXTtcclxufVxyXG4iXSwidmVyc2lvbiI6M30=

@@ -42,27 +42,25 @@ import { VersionController } from './modules/version/version.controller';
 import { apiVersionConfig } from './config/api-version.config';
 import { VersionHeaderMiddleware } from './common/middleware/version-header.middleware';
 import { PaymentModule } from './payment/payment.module';
+import { CmsModule } from './cms/cms.module';
+import { StellarService } from './blockchain/stellar/stellar.service';
+
 
 const ENV = process.env.NODE_ENV;;
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('ENV:', ENV);
 
-@Module({
-  imports: [
-    ThrottlerModule.forRoot({
-      ttl: 60, // 60 seconds
-      limit: 100,
-    }),
-    // Global Config
-    ScheduleModule.forRoot(),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: !ENV ? '.env' : `.env.${ENV.trim()}`,
-      load: [databaseConfig, () => ({ api: apiVersionConfig })],
-    }),
+const SKIP_DB = process.env.SKIP_DB === 'true';
 
-    // Database
-    TypeOrmModule.forRootAsync({
+// Choose DB module based on environment: use in-memory sqlite when SKIP_DB=true to avoid external DB connection during CI/spec generation
+const dbModule = SKIP_DB
+  ? TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: ':memory:',
+      autoLoadEntities: true,
+      synchronize: false,
+    })
+  : TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
@@ -86,7 +84,26 @@ console.log('ENV:', ENV);
         retryAttempts: configService.get<number>('database.retryAttempts'),
         retryDelay: configService.get<number>('database.retryDelay'),
       }),
+    });
+
+@Module({
+  imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60, // 60 seconds
+        limit: 100,
+      },
+    ]),
+    // Global Config
+    ScheduleModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: !ENV ? '.env' : `.env.${ENV.trim()}`,
+      load: [databaseConfig, () => ({ api: apiVersionConfig })],
     }),
+
+    // Database
+    dbModule,
     UsersModule,
     CoursesModule,
     AuthModule,

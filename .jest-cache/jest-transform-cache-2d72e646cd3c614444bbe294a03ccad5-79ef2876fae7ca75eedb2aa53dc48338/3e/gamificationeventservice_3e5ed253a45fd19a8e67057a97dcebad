@@ -1,0 +1,43 @@
+ca609b84ca17e15e3a95edfa51c0e14a
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GamificationEventService = void 0;
+const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const gamification_event_entity_1 = require("../entities/gamification-event.entity");
+let GamificationEventService = class GamificationEventService {
+    constructor(eventRepo) {
+        this.eventRepo = eventRepo;
+    }
+    async logEvent(user, eventType, metadata) {
+        const event = this.eventRepo.create({ user, eventType, metadata });
+        return this.eventRepo.save(event);
+    }
+    async getEvents(eventType) {
+        if (eventType) {
+            return this.eventRepo.find({ where: { eventType }, relations: ['user'] });
+        }
+        return this.eventRepo.find({ relations: ['user'] });
+    }
+};
+exports.GamificationEventService = GamificationEventService;
+exports.GamificationEventService = GamificationEventService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, typeorm_1.InjectRepository)(gamification_event_entity_1.GamificationEvent)),
+    __metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object])
+], GamificationEventService);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnYW1pZmljYXRpb25cXHNlcnZpY2VzXFxnYW1pZmljYXRpb24tZXZlbnQuc2VydmljZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7O0FBQUEsMkNBQTRDO0FBQzVDLDZDQUFtRDtBQUNuRCxxQ0FBcUM7QUFDckMscUZBQTBFO0FBSW5FLElBQU0sd0JBQXdCLEdBQTlCLE1BQU0sd0JBQXdCO0lBQ25DLFlBRVUsU0FBd0M7UUFBeEMsY0FBUyxHQUFULFNBQVMsQ0FBK0I7SUFDL0MsQ0FBQztJQUVKLEtBQUssQ0FBQyxRQUFRLENBQUMsSUFBVSxFQUFFLFNBQWlCLEVBQUUsUUFBYztRQUMxRCxNQUFNLEtBQUssR0FBRyxJQUFJLENBQUMsU0FBUyxDQUFDLE1BQU0sQ0FBQyxFQUFFLElBQUksRUFBRSxTQUFTLEVBQUUsUUFBUSxFQUFFLENBQUMsQ0FBQztRQUNuRSxPQUFPLElBQUksQ0FBQyxTQUFTLENBQUMsSUFBSSxDQUFDLEtBQUssQ0FBQyxDQUFDO0lBQ3BDLENBQUM7SUFFRCxLQUFLLENBQUMsU0FBUyxDQUFDLFNBQWtCO1FBQ2hDLElBQUksU0FBUyxFQUFFLENBQUM7WUFDZCxPQUFPLElBQUksQ0FBQyxTQUFTLENBQUMsSUFBSSxDQUFDLEVBQUUsS0FBSyxFQUFFLEVBQUUsU0FBUyxFQUFFLEVBQUUsU0FBUyxFQUFFLENBQUMsTUFBTSxDQUFDLEVBQUUsQ0FBQyxDQUFDO1FBQzVFLENBQUM7UUFDRCxPQUFPLElBQUksQ0FBQyxTQUFTLENBQUMsSUFBSSxDQUFDLEVBQUUsU0FBUyxFQUFFLENBQUMsTUFBTSxDQUFDLEVBQUUsQ0FBQyxDQUFDO0lBQ3RELENBQUM7Q0FDRixDQUFBO0FBakJZLDREQUF3QjttQ0FBeEIsd0JBQXdCO0lBRHBDLElBQUEsbUJBQVUsR0FBRTtJQUdSLFdBQUEsSUFBQSwwQkFBZ0IsRUFBQyw2Q0FBaUIsQ0FBQyxDQUFBO3lEQUNqQixvQkFBVSxvQkFBVixvQkFBVTtHQUhwQix3QkFBd0IsQ0FpQnBDIiwibmFtZXMiOltdLCJzb3VyY2VzIjpbIkM6XFxVc2Vyc1xcZy1la29oXFxEZXNrdG9wXFxTdHJlbGxlck1pbmRzLUJhY2tlbmRcXHNyY1xcZ2FtaWZpY2F0aW9uXFxzZXJ2aWNlc1xcZ2FtaWZpY2F0aW9uLWV2ZW50LnNlcnZpY2UudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgSW5qZWN0YWJsZSB9IGZyb20gJ0BuZXN0anMvY29tbW9uJztcclxuaW1wb3J0IHsgSW5qZWN0UmVwb3NpdG9yeSB9IGZyb20gJ0BuZXN0anMvdHlwZW9ybSc7XHJcbmltcG9ydCB7IFJlcG9zaXRvcnkgfSBmcm9tICd0eXBlb3JtJztcclxuaW1wb3J0IHsgR2FtaWZpY2F0aW9uRXZlbnQgfSBmcm9tICcuLi9lbnRpdGllcy9nYW1pZmljYXRpb24tZXZlbnQuZW50aXR5JztcclxuaW1wb3J0IHsgVXNlciB9IGZyb20gJy4uLy4uL3VzZXJzL2VudGl0aWVzL3VzZXIuZW50aXR5JztcclxuXHJcbkBJbmplY3RhYmxlKClcclxuZXhwb3J0IGNsYXNzIEdhbWlmaWNhdGlvbkV2ZW50U2VydmljZSB7XHJcbiAgY29uc3RydWN0b3IoXHJcbiAgICBASW5qZWN0UmVwb3NpdG9yeShHYW1pZmljYXRpb25FdmVudClcclxuICAgIHByaXZhdGUgZXZlbnRSZXBvOiBSZXBvc2l0b3J5PEdhbWlmaWNhdGlvbkV2ZW50PixcclxuICApIHt9XHJcblxyXG4gIGFzeW5jIGxvZ0V2ZW50KHVzZXI6IFVzZXIsIGV2ZW50VHlwZTogc3RyaW5nLCBtZXRhZGF0YT86IGFueSk6IFByb21pc2U8R2FtaWZpY2F0aW9uRXZlbnQ+IHtcclxuICAgIGNvbnN0IGV2ZW50ID0gdGhpcy5ldmVudFJlcG8uY3JlYXRlKHsgdXNlciwgZXZlbnRUeXBlLCBtZXRhZGF0YSB9KTtcclxuICAgIHJldHVybiB0aGlzLmV2ZW50UmVwby5zYXZlKGV2ZW50KTtcclxuICB9XHJcblxyXG4gIGFzeW5jIGdldEV2ZW50cyhldmVudFR5cGU/OiBzdHJpbmcpOiBQcm9taXNlPEdhbWlmaWNhdGlvbkV2ZW50W10+IHtcclxuICAgIGlmIChldmVudFR5cGUpIHtcclxuICAgICAgcmV0dXJuIHRoaXMuZXZlbnRSZXBvLmZpbmQoeyB3aGVyZTogeyBldmVudFR5cGUgfSwgcmVsYXRpb25zOiBbJ3VzZXInXSB9KTtcclxuICAgIH1cclxuICAgIHJldHVybiB0aGlzLmV2ZW50UmVwby5maW5kKHsgcmVsYXRpb25zOiBbJ3VzZXInXSB9KTtcclxuICB9XHJcbn0gIl0sInZlcnNpb24iOjN9

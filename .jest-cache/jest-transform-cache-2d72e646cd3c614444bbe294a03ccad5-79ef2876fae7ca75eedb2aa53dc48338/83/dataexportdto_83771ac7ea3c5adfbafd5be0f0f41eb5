@@ -1,0 +1,54 @@
+cf1004ea28bcd7c47168947ec951256a
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DataExportRequestDto = exports.ExportFormat = void 0;
+const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
+/**
+ * Enum for export format options.
+ */
+var ExportFormat;
+(function (ExportFormat) {
+    ExportFormat["JSON"] = "json";
+    ExportFormat["CSV"] = "csv";
+    ExportFormat["XML"] = "xml";
+})(ExportFormat || (exports.ExportFormat = ExportFormat = {}));
+/**
+ * DTO for requesting a data export.
+ */
+class DataExportRequestDto {
+    constructor() {
+        /** Export format (optional) */
+        this.format = ExportFormat.JSON;
+    }
+}
+exports.DataExportRequestDto = DataExportRequestDto;
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Data types to export', type: [String] }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsString)({ each: true }),
+    __metadata("design:type", Array)
+], DataExportRequestDto.prototype, "dataTypes", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ enum: ExportFormat, description: 'Export format', default: ExportFormat.JSON }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEnum)(ExportFormat),
+    __metadata("design:type", String)
+], DataExportRequestDto.prototype, "format", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Reason for export' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], DataExportRequestDto.prototype, "reason", void 0);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnZHByXFxkdG9cXGRhdGEtZXhwb3J0LmR0by50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7QUFBQSxxREFBd0U7QUFDeEUsNkNBQW1FO0FBRW5FOztHQUVHO0FBQ0gsSUFBWSxZQUlYO0FBSkQsV0FBWSxZQUFZO0lBQ3RCLDZCQUFhLENBQUE7SUFDYiwyQkFBVyxDQUFBO0lBQ1gsMkJBQVcsQ0FBQTtBQUNiLENBQUMsRUFKVyxZQUFZLDRCQUFaLFlBQVksUUFJdkI7QUFFRDs7R0FFRztBQUNILE1BQWEsb0JBQW9CO0lBQWpDO1FBUUUsK0JBQStCO1FBSS9CLFdBQU0sR0FBa0IsWUFBWSxDQUFDLElBQUksQ0FBQztJQU81QyxDQUFDO0NBQUE7QUFuQkQsb0RBbUJDO0FBYkM7SUFKQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsV0FBVyxFQUFFLHNCQUFzQixFQUFFLElBQUksRUFBRSxDQUFDLE1BQU0sQ0FBQyxFQUFFLENBQUM7SUFDNUUsSUFBQSw0QkFBVSxHQUFFO0lBQ1osSUFBQSx5QkFBTyxHQUFFO0lBQ1QsSUFBQSwwQkFBUSxFQUFDLEVBQUUsSUFBSSxFQUFFLElBQUksRUFBRSxDQUFDOzt1REFDSjtBQU1yQjtJQUhDLElBQUEsNkJBQW1CLEVBQUMsRUFBRSxJQUFJLEVBQUUsWUFBWSxFQUFFLFdBQVcsRUFBRSxlQUFlLEVBQUUsT0FBTyxFQUFFLFlBQVksQ0FBQyxJQUFJLEVBQUUsQ0FBQztJQUNyRyxJQUFBLDRCQUFVLEdBQUU7SUFDWixJQUFBLHdCQUFNLEVBQUMsWUFBWSxDQUFDOztvREFDcUI7QUFNMUM7SUFIQyxJQUFBLDZCQUFtQixFQUFDLEVBQUUsV0FBVyxFQUFFLG1CQUFtQixFQUFFLENBQUM7SUFDekQsSUFBQSw0QkFBVSxHQUFFO0lBQ1osSUFBQSwwQkFBUSxHQUFFOztvREFDSyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGdkcHJcXGR0b1xcZGF0YS1leHBvcnQuZHRvLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IElzT3B0aW9uYWwsIElzQXJyYXksIElzU3RyaW5nLCBJc0VudW0gfSBmcm9tICdjbGFzcy12YWxpZGF0b3InO1xyXG5pbXBvcnQgeyBBcGlQcm9wZXJ0eU9wdGlvbmFsLCBBcGlQcm9wZXJ0eSB9IGZyb20gJ0BuZXN0anMvc3dhZ2dlcic7XHJcblxyXG4vKipcclxuICogRW51bSBmb3IgZXhwb3J0IGZvcm1hdCBvcHRpb25zLlxyXG4gKi9cclxuZXhwb3J0IGVudW0gRXhwb3J0Rm9ybWF0IHtcclxuICBKU09OID0gJ2pzb24nLFxyXG4gIENTViA9ICdjc3YnLFxyXG4gIFhNTCA9ICd4bWwnLFxyXG59XHJcblxyXG4vKipcclxuICogRFRPIGZvciByZXF1ZXN0aW5nIGEgZGF0YSBleHBvcnQuXHJcbiAqL1xyXG5leHBvcnQgY2xhc3MgRGF0YUV4cG9ydFJlcXVlc3REdG8ge1xyXG4gIC8qKiBEYXRhIHR5cGVzIHRvIGV4cG9ydCAob3B0aW9uYWwpICovXHJcbiAgQEFwaVByb3BlcnR5T3B0aW9uYWwoeyBkZXNjcmlwdGlvbjogJ0RhdGEgdHlwZXMgdG8gZXhwb3J0JywgdHlwZTogW1N0cmluZ10gfSlcclxuICBASXNPcHRpb25hbCgpXHJcbiAgQElzQXJyYXkoKVxyXG4gIEBJc1N0cmluZyh7IGVhY2g6IHRydWUgfSlcclxuICBkYXRhVHlwZXM/OiBzdHJpbmdbXTtcclxuXHJcbiAgLyoqIEV4cG9ydCBmb3JtYXQgKG9wdGlvbmFsKSAqL1xyXG4gIEBBcGlQcm9wZXJ0eU9wdGlvbmFsKHsgZW51bTogRXhwb3J0Rm9ybWF0LCBkZXNjcmlwdGlvbjogJ0V4cG9ydCBmb3JtYXQnLCBkZWZhdWx0OiBFeHBvcnRGb3JtYXQuSlNPTiB9KVxyXG4gIEBJc09wdGlvbmFsKClcclxuICBASXNFbnVtKEV4cG9ydEZvcm1hdClcclxuICBmb3JtYXQ/OiBFeHBvcnRGb3JtYXQgPSBFeHBvcnRGb3JtYXQuSlNPTjtcclxuXHJcbiAgLyoqIFJlYXNvbiBmb3IgZXhwb3J0IChvcHRpb25hbCkgKi9cclxuICBAQXBpUHJvcGVydHlPcHRpb25hbCh7IGRlc2NyaXB0aW9uOiAnUmVhc29uIGZvciBleHBvcnQnIH0pXHJcbiAgQElzT3B0aW9uYWwoKVxyXG4gIEBJc1N0cmluZygpXHJcbiAgcmVhc29uPzogc3RyaW5nO1xyXG59XHJcbiJdLCJ2ZXJzaW9uIjozfQ==

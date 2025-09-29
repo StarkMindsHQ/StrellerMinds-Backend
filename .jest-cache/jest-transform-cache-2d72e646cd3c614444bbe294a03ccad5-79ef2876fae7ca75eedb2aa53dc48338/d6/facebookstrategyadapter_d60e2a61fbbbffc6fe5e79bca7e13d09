@@ -1,0 +1,30 @@
+332e4a74fd00c9e26afed2180586939d
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FacebookOAuthAdapter = void 0;
+const common_1 = require("@nestjs/common");
+let FacebookOAuthAdapter = class FacebookOAuthAdapter {
+    constructor() {
+        this.name = 'facebook';
+    }
+    async validate(credentials) {
+        return credentials;
+    }
+    async login(user) {
+        return user;
+    }
+    async register(credentials) {
+        return credentials;
+    }
+};
+exports.FacebookOAuthAdapter = FacebookOAuthAdapter;
+exports.FacebookOAuthAdapter = FacebookOAuthAdapter = __decorate([
+    (0, common_1.Injectable)()
+], FacebookOAuthAdapter);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxhdXRoXFxhZGFwdGVyc1xcZmFjZWJvb2suc3RyYXRlZ3kuYWRhcHRlci50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7QUFBQSwyQ0FBNEM7QUFJckMsSUFBTSxvQkFBb0IsR0FBMUIsTUFBTSxvQkFBb0I7SUFBMUI7UUFDTCxTQUFJLEdBQUcsVUFBVSxDQUFDO0lBYXBCLENBQUM7SUFYQyxLQUFLLENBQUMsUUFBUSxDQUFDLFdBQWdCO1FBQzdCLE9BQU8sV0FBVyxDQUFDO0lBQ3JCLENBQUM7SUFFRCxLQUFLLENBQUMsS0FBSyxDQUFDLElBQVM7UUFDbkIsT0FBTyxJQUFJLENBQUM7SUFDZCxDQUFDO0lBRUQsS0FBSyxDQUFDLFFBQVEsQ0FBRSxXQUFnQjtRQUM5QixPQUFPLFdBQVcsQ0FBQztJQUNyQixDQUFDO0NBQ0YsQ0FBQTtBQWRZLG9EQUFvQjsrQkFBcEIsb0JBQW9CO0lBRGhDLElBQUEsbUJBQVUsR0FBRTtHQUNBLG9CQUFvQixDQWNoQyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGF1dGhcXGFkYXB0ZXJzXFxmYWNlYm9vay5zdHJhdGVneS5hZGFwdGVyLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEluamVjdGFibGUgfSBmcm9tICdAbmVzdGpzL2NvbW1vbic7XHJcbmltcG9ydCB7IElBdXRoU3RyYXRlZ3kgfSBmcm9tICcuLi9zdHJhdGVnaWVzL2F1dGgtc3RyYXRlZ3kuaW50ZXJmYWNlJztcclxuXHJcbkBJbmplY3RhYmxlKClcclxuZXhwb3J0IGNsYXNzIEZhY2Vib29rT0F1dGhBZGFwdGVyIGltcGxlbWVudHMgSUF1dGhTdHJhdGVneSB7XHJcbiAgbmFtZSA9ICdmYWNlYm9vayc7XHJcblxyXG4gIGFzeW5jIHZhbGlkYXRlKGNyZWRlbnRpYWxzOiBhbnkpOiBQcm9taXNlPGFueT4ge1xyXG4gICAgcmV0dXJuIGNyZWRlbnRpYWxzO1xyXG4gIH1cclxuXHJcbiAgYXN5bmMgbG9naW4odXNlcjogYW55KTogUHJvbWlzZTxhbnk+IHtcclxuICAgIHJldHVybiB1c2VyO1xyXG4gIH1cclxuXHJcbiAgYXN5bmMgcmVnaXN0ZXI/KGNyZWRlbnRpYWxzOiBhbnkpOiBQcm9taXNlPGFueT4ge1xyXG4gICAgcmV0dXJuIGNyZWRlbnRpYWxzO1xyXG4gIH1cclxufVxyXG4iXSwidmVyc2lvbiI6M30=

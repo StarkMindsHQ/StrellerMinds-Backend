@@ -1,0 +1,41 @@
+cffc329931e01795888c224886253839
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserAchievement = void 0;
+const typeorm_1 = require("typeorm");
+const user_entity_1 = require("../../users/entities/user.entity");
+const achievement_entity_1 = require("./achievement.entity");
+let UserAchievement = class UserAchievement {
+};
+exports.UserAchievement = UserAchievement;
+__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    __metadata("design:type", Number)
+], UserAchievement.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { eager: true }),
+    __metadata("design:type", typeof (_a = typeof user_entity_1.User !== "undefined" && user_entity_1.User) === "function" ? _a : Object)
+], UserAchievement.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => achievement_entity_1.Achievement, { eager: true }),
+    __metadata("design:type", typeof (_b = typeof achievement_entity_1.Achievement !== "undefined" && achievement_entity_1.Achievement) === "function" ? _b : Object)
+], UserAchievement.prototype, "achievement", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", typeof (_c = typeof Date !== "undefined" && Date) === "function" ? _c : Object)
+], UserAchievement.prototype, "dateUnlocked", void 0);
+exports.UserAchievement = UserAchievement = __decorate([
+    (0, typeorm_1.Entity)('user_achievements'),
+    (0, typeorm_1.Unique)(['user', 'achievement'])
+], UserAchievement);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnYW1pZmljYXRpb25cXGVudGl0aWVzXFx1c2VyLWFjaGlldmVtZW50LmVudGl0eS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7O0FBQUEscUNBQThGO0FBQzlGLGtFQUF3RDtBQUN4RCw2REFBbUQ7QUFJNUMsSUFBTSxlQUFlLEdBQXJCLE1BQU0sZUFBZTtDQVkzQixDQUFBO0FBWlksMENBQWU7QUFFMUI7SUFEQyxJQUFBLGdDQUFzQixHQUFFOzsyQ0FDZDtBQUdYO0lBREMsSUFBQSxtQkFBUyxFQUFDLEdBQUcsRUFBRSxDQUFDLGtCQUFJLEVBQUUsRUFBRSxLQUFLLEVBQUUsSUFBSSxFQUFFLENBQUM7a0RBQ2pDLGtCQUFJLG9CQUFKLGtCQUFJOzZDQUFDO0FBR1g7SUFEQyxJQUFBLG1CQUFTLEVBQUMsR0FBRyxFQUFFLENBQUMsZ0NBQVcsRUFBRSxFQUFFLEtBQUssRUFBRSxJQUFJLEVBQUUsQ0FBQztrREFDakMsZ0NBQVcsb0JBQVgsZ0NBQVc7b0RBQUM7QUFHekI7SUFEQyxJQUFBLDBCQUFnQixHQUFFO2tEQUNMLElBQUksb0JBQUosSUFBSTtxREFBQzswQkFYUixlQUFlO0lBRjNCLElBQUEsZ0JBQU0sRUFBQyxtQkFBbUIsQ0FBQztJQUMzQixJQUFBLGdCQUFNLEVBQUMsQ0FBQyxNQUFNLEVBQUUsYUFBYSxDQUFDLENBQUM7R0FDbkIsZUFBZSxDQVkzQiIsIm5hbWVzIjpbXSwic291cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGdhbWlmaWNhdGlvblxcZW50aXRpZXNcXHVzZXItYWNoaWV2ZW1lbnQuZW50aXR5LnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEVudGl0eSwgUHJpbWFyeUdlbmVyYXRlZENvbHVtbiwgTWFueVRvT25lLCBDcmVhdGVEYXRlQ29sdW1uLCBVbmlxdWUgfSBmcm9tICd0eXBlb3JtJztcclxuaW1wb3J0IHsgVXNlciB9IGZyb20gJy4uLy4uL3VzZXJzL2VudGl0aWVzL3VzZXIuZW50aXR5JztcclxuaW1wb3J0IHsgQWNoaWV2ZW1lbnQgfSBmcm9tICcuL2FjaGlldmVtZW50LmVudGl0eSc7XHJcblxyXG5ARW50aXR5KCd1c2VyX2FjaGlldmVtZW50cycpXHJcbkBVbmlxdWUoWyd1c2VyJywgJ2FjaGlldmVtZW50J10pXHJcbmV4cG9ydCBjbGFzcyBVc2VyQWNoaWV2ZW1lbnQge1xyXG4gIEBQcmltYXJ5R2VuZXJhdGVkQ29sdW1uKClcclxuICBpZDogbnVtYmVyO1xyXG5cclxuICBATWFueVRvT25lKCgpID0+IFVzZXIsIHsgZWFnZXI6IHRydWUgfSlcclxuICB1c2VyOiBVc2VyO1xyXG5cclxuICBATWFueVRvT25lKCgpID0+IEFjaGlldmVtZW50LCB7IGVhZ2VyOiB0cnVlIH0pXHJcbiAgYWNoaWV2ZW1lbnQ6IEFjaGlldmVtZW50O1xyXG5cclxuICBAQ3JlYXRlRGF0ZUNvbHVtbigpXHJcbiAgZGF0ZVVubG9ja2VkOiBEYXRlO1xyXG59ICJdLCJ2ZXJzaW9uIjozfQ==

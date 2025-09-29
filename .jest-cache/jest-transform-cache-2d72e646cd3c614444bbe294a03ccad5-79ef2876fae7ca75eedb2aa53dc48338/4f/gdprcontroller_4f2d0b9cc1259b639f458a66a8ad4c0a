@@ -1,0 +1,150 @@
+2b49ecda02229dc4bb144b3e14fe5628
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a, _b, _c, _d, _e;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GdprController = void 0;
+/**
+ * GdprController handles endpoints for user consent, data export, and deletion requests.
+ */
+const common_1 = require("@nestjs/common");
+const swagger_1 = require("@nestjs/swagger");
+const gdpr_service_1 = require("./gdpr.service");
+const consent_dto_1 = require("./dto/consent.dto");
+const data_export_dto_1 = require("./dto/data-export.dto");
+const deletion_request_dto_1 = require("./dto/deletion-request.dto");
+let GdprController = class GdprController {
+    constructor(gdprService) {
+        this.gdprService = gdprService;
+    }
+    // ==================== CONSENT ENDPOINTS ====================
+    /**
+     * Get user consents by user ID.
+     */
+    async getUserConsents(userId) {
+        return this.gdprService.getConsentService().getUserConsents(userId);
+    }
+    /**
+     * Update user consent by user ID.
+     */
+    async updateConsent(userId, updateConsentDto) {
+        return this.gdprService
+            .getConsentService()
+            .updateConsent(userId, updateConsentDto);
+    }
+    /**
+     * Update user consent preferences by user ID.
+     */
+    async updateConsentPreferences(userId, preferences) {
+        return this.gdprService
+            .getConsentService()
+            .updateConsentPreferences(userId, preferences);
+    }
+    /**
+     * Withdraw all consents for a user.
+     */
+    async withdrawAllConsents(userId) {
+        await this.gdprService.getConsentService().withdrawAllConsents(userId);
+    }
+    // ==================== DATA EXPORT ENDPOINTS ====================
+    /**
+     * Request data export for a user.
+     */
+    async exportUserData(userId, dataExportRequestDto) {
+        return this.gdprService.getDataExportService().exportUserData(userId, dataExportRequestDto);
+    }
+    // ==================== DELETION REQUEST ENDPOINTS ====================
+    /**
+     * Create a deletion request for a user.
+     */
+    async createDeletionRequest(userId, createDeletionRequestDto) {
+        return this.gdprService.getDataDeletionService().createDeletionRequest(userId, createDeletionRequestDto);
+    }
+};
+exports.GdprController = GdprController;
+__decorate([
+    (0, common_1.Get)('consents/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get user consents' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'User ID' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User consents retrieved' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], GdprController.prototype, "getUserConsents", null);
+__decorate([
+    (0, common_1.Put)('consents/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update user consent' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'User ID' }),
+    (0, swagger_1.ApiBody)({ type: consent_dto_1.UpdateConsentDto }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User consent updated' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_b = typeof consent_dto_1.UpdateConsentDto !== "undefined" && consent_dto_1.UpdateConsentDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], GdprController.prototype, "updateConsent", null);
+__decorate([
+    (0, common_1.Put)('consents/:userId/preferences'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update user consent preferences' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'User ID' }),
+    (0, swagger_1.ApiBody)({ type: consent_dto_1.ConsentPreferencesDto }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User consent preferences updated' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_c = typeof consent_dto_1.ConsentPreferencesDto !== "undefined" && consent_dto_1.ConsentPreferencesDto) === "function" ? _c : Object]),
+    __metadata("design:returntype", Promise)
+], GdprController.prototype, "updateConsentPreferences", null);
+__decorate([
+    (0, common_1.Post)('consents/:userId/withdraw-all'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
+    (0, swagger_1.ApiOperation)({ summary: 'Withdraw all consents' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'User ID' }),
+    (0, swagger_1.ApiResponse)({ status: 204, description: 'All consents withdrawn' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], GdprController.prototype, "withdrawAllConsents", null);
+__decorate([
+    (0, common_1.Post)('export/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Request data export' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'User ID' }),
+    (0, swagger_1.ApiBody)({ type: data_export_dto_1.DataExportRequestDto }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Data export requested' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_d = typeof data_export_dto_1.DataExportRequestDto !== "undefined" && data_export_dto_1.DataExportRequestDto) === "function" ? _d : Object]),
+    __metadata("design:returntype", Promise)
+], GdprController.prototype, "exportUserData", null);
+__decorate([
+    (0, common_1.Post)('deletion/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Create deletion request' }),
+    (0, swagger_1.ApiParam)({ name: 'userId', description: 'User ID' }),
+    (0, swagger_1.ApiBody)({ type: deletion_request_dto_1.CreateDeletionRequestDto }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'Deletion request created' }),
+    __param(0, (0, common_1.Param)('userId')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, typeof (_e = typeof deletion_request_dto_1.CreateDeletionRequestDto !== "undefined" && deletion_request_dto_1.CreateDeletionRequestDto) === "function" ? _e : Object]),
+    __metadata("design:returntype", Promise)
+], GdprController.prototype, "createDeletionRequest", null);
+exports.GdprController = GdprController = __decorate([
+    (0, swagger_1.ApiTags)('GDPR'),
+    (0, common_1.Controller)('gdpr'),
+    __metadata("design:paramtypes", [typeof (_a = typeof gdpr_service_1.GdprService !== "undefined" && gdpr_service_1.GdprService) === "function" ? _a : Object])
+], GdprController);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiQzpcXFVzZXJzXFxnLWVrb2hcXERlc2t0b3BcXFN0cmVsbGVyTWluZHMtQmFja2VuZFxcc3JjXFxnZHByXFxnZHByLmNvbnRyb2xsZXIudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7OztBQUFBOztHQUVHO0FBQ0gsMkNBV3dCO0FBQ3hCLDZDQUF3RjtBQUV4RixpREFBNkM7QUFDN0MsbURBQTRFO0FBQzVFLDJEQUE2RDtBQUM3RCxxRUFBc0U7QUFJL0QsSUFBTSxjQUFjLEdBQXBCLE1BQU0sY0FBYztJQUN6QixZQUFvQixXQUF3QjtRQUF4QixnQkFBVyxHQUFYLFdBQVcsQ0FBYTtJQUFHLENBQUM7SUFFaEQsOERBQThEO0lBQzlEOztPQUVHO0lBS0csQUFBTixLQUFLLENBQUMsZUFBZSxDQUFrQixNQUFjO1FBQ25ELE9BQU8sSUFBSSxDQUFDLFdBQVcsQ0FBQyxpQkFBaUIsRUFBRSxDQUFDLGVBQWUsQ0FBQyxNQUFNLENBQUMsQ0FBQztJQUN0RSxDQUFDO0lBRUQ7O09BRUc7SUFNRyxBQUFOLEtBQUssQ0FBQyxhQUFhLENBQ0EsTUFBYyxFQUN2QixnQkFBa0M7UUFFMUMsT0FBTyxJQUFJLENBQUMsV0FBVzthQUNwQixpQkFBaUIsRUFBRTthQUNuQixhQUFhLENBQUMsTUFBTSxFQUFFLGdCQUFnQixDQUFDLENBQUM7SUFDN0MsQ0FBQztJQUVEOztPQUVHO0lBTUcsQUFBTixLQUFLLENBQUMsd0JBQXdCLENBQ1gsTUFBYyxFQUN2QixXQUFrQztRQUUxQyxPQUFPLElBQUksQ0FBQyxXQUFXO2FBQ3BCLGlCQUFpQixFQUFFO2FBQ25CLHdCQUF3QixDQUFDLE1BQU0sRUFBRSxXQUFXLENBQUMsQ0FBQztJQUNuRCxDQUFDO0lBRUQ7O09BRUc7SUFNRyxBQUFOLEtBQUssQ0FBQyxtQkFBbUIsQ0FBa0IsTUFBYztRQUN2RCxNQUFNLElBQUksQ0FBQyxXQUFXLENBQUMsaUJBQWlCLEVBQUUsQ0FBQyxtQkFBbUIsQ0FBQyxNQUFNLENBQUMsQ0FBQztJQUN6RSxDQUFDO0lBRUQsa0VBQWtF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cmNlcyI6WyJDOlxcVXNlcnNcXGctZWtvaFxcRGVza3RvcFxcU3RyZWxsZXJNaW5kcy1CYWNrZW5kXFxzcmNcXGdkcHJcXGdkcHIuY29udHJvbGxlci50cyJdLCJzb3VyY2VzQ29udGVudCI6WyIvKipcclxuICogR2RwckNvbnRyb2xsZXIgaGFuZGxlcyBlbmRwb2ludHMgZm9yIHVzZXIgY29uc2VudCwgZGF0YSBleHBvcnQsIGFuZCBkZWxldGlvbiByZXF1ZXN0cy5cclxuICovXHJcbmltcG9ydCB7XHJcbiAgQ29udHJvbGxlcixcclxuICBHZXQsXHJcbiAgUG9zdCxcclxuICBQdXQsXHJcbiAgQm9keSxcclxuICBQYXJhbSxcclxuICBSZXEsXHJcbiAgUmVzLFxyXG4gIEh0dHBDb2RlLFxyXG4gIEh0dHBTdGF0dXMsXHJcbn0gZnJvbSAnQG5lc3Rqcy9jb21tb24nO1xyXG5pbXBvcnQgeyBBcGlUYWdzLCBBcGlPcGVyYXRpb24sIEFwaVJlc3BvbnNlLCBBcGlQYXJhbSwgQXBpQm9keSB9IGZyb20gJ0BuZXN0anMvc3dhZ2dlcic7XHJcbmltcG9ydCB7IFJlcXVlc3QsIFJlc3BvbnNlIH0gZnJvbSAnZXhwcmVzcyc7XHJcbmltcG9ydCB7IEdkcHJTZXJ2aWNlIH0gZnJvbSAnLi9nZHByLnNlcnZpY2UnO1xyXG5pbXBvcnQgeyBVcGRhdGVDb25zZW50RHRvLCBDb25zZW50UHJlZmVyZW5jZXNEdG8gfSBmcm9tICcuL2R0by9jb25zZW50LmR0byc7XHJcbmltcG9ydCB7IERhdGFFeHBvcnRSZXF1ZXN0RHRvIH0gZnJvbSAnLi9kdG8vZGF0YS1leHBvcnQuZHRvJztcclxuaW1wb3J0IHsgQ3JlYXRlRGVsZXRpb25SZXF1ZXN0RHRvIH0gZnJvbSAnLi9kdG8vZGVsZXRpb24tcmVxdWVzdC5kdG8nO1xyXG5cclxuQEFwaVRhZ3MoJ0dEUFInKVxyXG5AQ29udHJvbGxlcignZ2RwcicpXHJcbmV4cG9ydCBjbGFzcyBHZHByQ29udHJvbGxlciB7XHJcbiAgY29uc3RydWN0b3IocHJpdmF0ZSBnZHByU2VydmljZTogR2RwclNlcnZpY2UpIHt9XHJcblxyXG4gIC8vID09PT09PT09PT09PT09PT09PT09IENPTlNFTlQgRU5EUE9JTlRTID09PT09PT09PT09PT09PT09PT09XHJcbiAgLyoqXHJcbiAgICogR2V0IHVzZXIgY29uc2VudHMgYnkgdXNlciBJRC5cclxuICAgKi9cclxuICBAR2V0KCdjb25zZW50cy86dXNlcklkJylcclxuICBAQXBpT3BlcmF0aW9uKHsgc3VtbWFyeTogJ0dldCB1c2VyIGNvbnNlbnRzJyB9KVxyXG4gIEBBcGlQYXJhbSh7IG5hbWU6ICd1c2VySWQnLCBkZXNjcmlwdGlvbjogJ1VzZXIgSUQnIH0pXHJcbiAgQEFwaVJlc3BvbnNlKHsgc3RhdHVzOiAyMDAsIGRlc2NyaXB0aW9uOiAnVXNlciBjb25zZW50cyByZXRyaWV2ZWQnIH0pXHJcbiAgYXN5bmMgZ2V0VXNlckNvbnNlbnRzKEBQYXJhbSgndXNlcklkJykgdXNlcklkOiBzdHJpbmcpIHtcclxuICAgIHJldHVybiB0aGlzLmdkcHJTZXJ2aWNlLmdldENvbnNlbnRTZXJ2aWNlKCkuZ2V0VXNlckNvbnNlbnRzKHVzZXJJZCk7XHJcbiAgfVxyXG5cclxuICAvKipcclxuICAgKiBVcGRhdGUgdXNlciBjb25zZW50IGJ5IHVzZXIgSUQuXHJcbiAgICovXHJcbiAgQFB1dCgnY29uc2VudHMvOnVzZXJJZCcpXHJcbiAgQEFwaU9wZXJhdGlvbih7IHN1bW1hcnk6ICdVcGRhdGUgdXNlciBjb25zZW50JyB9KVxyXG4gIEBBcGlQYXJhbSh7IG5hbWU6ICd1c2VySWQnLCBkZXNjcmlwdGlvbjogJ1VzZXIgSUQnIH0pXHJcbiAgQEFwaUJvZHkoeyB0eXBlOiBVcGRhdGVDb25zZW50RHRvIH0pXHJcbiAgQEFwaVJlc3BvbnNlKHsgc3RhdHVzOiAyMDAsIGRlc2NyaXB0aW9uOiAnVXNlciBjb25zZW50IHVwZGF0ZWQnIH0pXHJcbiAgYXN5bmMgdXBkYXRlQ29uc2VudChcclxuICAgIEBQYXJhbSgndXNlcklkJykgdXNlcklkOiBzdHJpbmcsXHJcbiAgICBAQm9keSgpIHVwZGF0ZUNvbnNlbnREdG86IFVwZGF0ZUNvbnNlbnREdG8sXHJcbiAgKSB7XHJcbiAgICByZXR1cm4gdGhpcy5nZHByU2VydmljZVxyXG4gICAgICAuZ2V0Q29uc2VudFNlcnZpY2UoKVxyXG4gICAgICAudXBkYXRlQ29uc2VudCh1c2VySWQsIHVwZGF0ZUNvbnNlbnREdG8pO1xyXG4gIH1cclxuXHJcbiAgLyoqXHJcbiAgICogVXBkYXRlIHVzZXIgY29uc2VudCBwcmVmZXJlbmNlcyBieSB1c2VyIElELlxyXG4gICAqL1xyXG4gIEBQdXQoJ2NvbnNlbnRzLzp1c2VySWQvcHJlZmVyZW5jZXMnKVxyXG4gIEBBcGlPcGVyYXRpb24oeyBzdW1tYXJ5OiAnVXBkYXRlIHVzZXIgY29uc2VudCBwcmVmZXJlbmNlcycgfSlcclxuICBAQXBpUGFyYW0oeyBuYW1lOiAndXNlcklkJywgZGVzY3JpcHRpb246ICdVc2VyIElEJyB9KVxyXG4gIEBBcGlCb2R5KHsgdHlwZTogQ29uc2VudFByZWZlcmVuY2VzRHRvIH0pXHJcbiAgQEFwaVJlc3BvbnNlKHsgc3RhdHVzOiAyMDAsIGRlc2NyaXB0aW9uOiAnVXNlciBjb25zZW50IHByZWZlcmVuY2VzIHVwZGF0ZWQnIH0pXHJcbiAgYXN5bmMgdXBkYXRlQ29uc2VudFByZWZlcmVuY2VzKFxyXG4gICAgQFBhcmFtKCd1c2VySWQnKSB1c2VySWQ6IHN0cmluZyxcclxuICAgIEBCb2R5KCkgcHJlZmVyZW5jZXM6IENvbnNlbnRQcmVmZXJlbmNlc0R0byxcclxuICApIHtcclxuICAgIHJldHVybiB0aGlzLmdkcHJTZXJ2aWNlXHJcbiAgICAgIC5nZXRDb25zZW50U2VydmljZSgpXHJcbiAgICAgIC51cGRhdGVDb25zZW50UHJlZmVyZW5jZXModXNlcklkLCBwcmVmZXJlbmNlcyk7XHJcbiAgfVxyXG5cclxuICAvKipcclxuICAgKiBXaXRoZHJhdyBhbGwgY29uc2VudHMgZm9yIGEgdXNlci5cclxuICAgKi9cclxuICBAUG9zdCgnY29uc2VudHMvOnVzZXJJZC93aXRoZHJhdy1hbGwnKVxyXG4gIEBIdHRwQ29kZShIdHRwU3RhdHVzLk5PX0NPTlRFTlQpXHJcbiAgQEFwaU9wZXJhdGlvbih7IHN1bW1hcnk6ICdXaXRoZHJhdyBhbGwgY29uc2VudHMnIH0pXHJcbiAgQEFwaVBhcmFtKHsgbmFtZTogJ3VzZXJJZCcsIGRlc2NyaXB0aW9uOiAnVXNlciBJRCcgfSlcclxuICBAQXBpUmVzcG9uc2UoeyBzdGF0dXM6IDIwNCwgZGVzY3JpcHRpb246ICdBbGwgY29uc2VudHMgd2l0aGRyYXduJyB9KVxyXG4gIGFzeW5jIHdpdGhkcmF3QWxsQ29uc2VudHMoQFBhcmFtKCd1c2VySWQnKSB1c2VySWQ6IHN0cmluZykge1xyXG4gICAgYXdhaXQgdGhpcy5nZHByU2VydmljZS5nZXRDb25zZW50U2VydmljZSgpLndpdGhkcmF3QWxsQ29uc2VudHModXNlcklkKTtcclxuICB9XHJcblxyXG4gIC8vID09PT09PT09PT09PT09PT09PT09IERBVEEgRVhQT1JUIEVORFBPSU5UUyA9PT09PT09PT09PT09PT09PT09PVxyXG4gIC8qKlxyXG4gICAqIFJlcXVlc3QgZGF0YSBleHBvcnQgZm9yIGEgdXNlci5cclxuICAgKi9cclxuICBAUG9zdCgnZXhwb3J0Lzp1c2VySWQnKVxyXG4gIEBBcGlPcGVyYXRpb24oeyBzdW1tYXJ5OiAnUmVxdWVzdCBkYXRhIGV4cG9ydCcgfSlcclxuICBAQXBpUGFyYW0oeyBuYW1lOiAndXNlcklkJywgZGVzY3JpcHRpb246ICdVc2VyIElEJyB9KVxyXG4gIEBBcGlCb2R5KHsgdHlwZTogRGF0YUV4cG9ydFJlcXVlc3REdG8gfSlcclxuICBAQXBpUmVzcG9uc2UoeyBzdGF0dXM6IDIwMCwgZGVzY3JpcHRpb246ICdEYXRhIGV4cG9ydCByZXF1ZXN0ZWQnIH0pXHJcbiAgYXN5bmMgZXhwb3J0VXNlckRhdGEoXHJcbiAgICBAUGFyYW0oJ3VzZXJJZCcpIHVzZXJJZDogc3RyaW5nLFxyXG4gICAgQEJvZHkoKSBkYXRhRXhwb3J0UmVxdWVzdER0bzogRGF0YUV4cG9ydFJlcXVlc3REdG8sXHJcbiAgKSB7XHJcbiAgICByZXR1cm4gdGhpcy5nZHByU2VydmljZS5nZXREYXRhRXhwb3J0U2VydmljZSgpLmV4cG9ydFVzZXJEYXRhKHVzZXJJZCwgZGF0YUV4cG9ydFJlcXVlc3REdG8pO1xyXG4gIH1cclxuXHJcbiAgLy8gPT09PT09PT09PT09PT09PT09PT0gREVMRVRJT04gUkVRVUVTVCBFTkRQT0lOVFMgPT09PT09PT09PT09PT09PT09PT1cclxuICAvKipcclxuICAgKiBDcmVhdGUgYSBkZWxldGlvbiByZXF1ZXN0IGZvciBhIHVzZXIuXHJcbiAgICovXHJcbiAgQFBvc3QoJ2RlbGV0aW9uLzp1c2VySWQnKVxyXG4gIEBBcGlPcGVyYXRpb24oeyBzdW1tYXJ5OiAnQ3JlYXRlIGRlbGV0aW9uIHJlcXVlc3QnIH0pXHJcbiAgQEFwaVBhcmFtKHsgbmFtZTogJ3VzZXJJZCcsIGRlc2NyaXB0aW9uOiAnVXNlciBJRCcgfSlcclxuICBAQXBpQm9keSh7IHR5cGU6IENyZWF0ZURlbGV0aW9uUmVxdWVzdER0byB9KVxyXG4gIEBBcGlSZXNwb25zZSh7IHN0YXR1czogMjAxLCBkZXNjcmlwdGlvbjogJ0RlbGV0aW9uIHJlcXVlc3QgY3JlYXRlZCcgfSlcclxuICBhc3luYyBjcmVhdGVEZWxldGlvblJlcXVlc3QoXHJcbiAgICBAUGFyYW0oJ3VzZXJJZCcpIHVzZXJJZDogc3RyaW5nLFxyXG4gICAgQEJvZHkoKSBjcmVhdGVEZWxldGlvblJlcXVlc3REdG86IENyZWF0ZURlbGV0aW9uUmVxdWVzdER0byxcclxuICApIHtcclxuICAgIHJldHVybiB0aGlzLmdkcHJTZXJ2aWNlLmdldERhdGFEZWxldGlvblNlcnZpY2UoKS5jcmVhdGVEZWxldGlvblJlcXVlc3QodXNlcklkLCBjcmVhdGVEZWxldGlvblJlcXVlc3REdG8pO1xyXG4gIH1cclxufVxyXG4iXSwidmVyc2lvbiI6M30=
