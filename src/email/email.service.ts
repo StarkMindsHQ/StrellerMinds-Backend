@@ -86,13 +86,7 @@ export class EmailService {
         this.logger.log(`User ${options.to} has opted out of ${options.templateName} emails`);
         return false;
       }
-      await this.emailQueue.add('send', options, {
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 5000,
-        },
-      });
+      await this.emailQueue.add('send', options);
       return true;
     } catch (error) {
       this.logger.error(`Failed to queue email: ${error.message}`, error.stack);
