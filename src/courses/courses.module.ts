@@ -32,6 +32,7 @@ import { BillingModule } from '../billing/billing.module';
       CourseReview,
       User,
       Lesson,
+      UserElectiveCourse
     ]),
     UsersModule,
     EmailModule,
