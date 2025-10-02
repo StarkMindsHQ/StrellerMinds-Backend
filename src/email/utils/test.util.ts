@@ -39,10 +39,7 @@ export class EmailTestService {
     }
   }
 
-  async generatePreview(
-    templateName: string,
-    context: Record<string, any>,
-  ): Promise<string> {
+  async generatePreview(templateName: string, context: Record<string, any>): Promise<string> {
     try {
       // Get the template and compile it with the provided context
       const template = await this.emailService.getTemplate(templateName);

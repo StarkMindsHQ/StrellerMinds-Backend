@@ -1,5 +1,20 @@
 import { applyDecorators, SetMetadata } from '@nestjs/common';
-import { IsNotEmpty, IsEmail, IsString, IsNumber, IsDate, IsOptional, ValidateNested, IsEnum, IsUUID, IsBoolean, Min, Max, Length, Matches } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsEmail,
+  IsString,
+  IsNumber,
+  IsDate,
+  IsOptional,
+  ValidateNested,
+  IsEnum,
+  IsUUID,
+  IsBoolean,
+  Min,
+  Max,
+  Length,
+  Matches,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
 // Metadata keys for data quality rules
@@ -46,7 +61,10 @@ export function DataQualityEntity(entityType: string) {
 }
 
 // Completeness decorators
-export function RequiredField(message?: string, severity: DataQualitySeverity = DataQualitySeverity.HIGH) {
+export function RequiredField(
+  message?: string,
+  severity: DataQualitySeverity = DataQualitySeverity.HIGH,
+) {
   return applyDecorators(
     IsNotEmpty({ message: message || 'Field is required' }),
     DataQualityRule({
@@ -54,7 +72,7 @@ export function RequiredField(message?: string, severity: DataQualitySeverity = 
       severity,
       threshold: 100,
       message: message || 'Field must not be empty',
-    })
+    }),
   );
 }
 
@@ -71,11 +89,15 @@ export function ValidEmail(severity: DataQualitySeverity = DataQualitySeverity.H
       severity,
       threshold: 100,
       message: 'Email format is invalid',
-    })
+    }),
   );
 }
 
-export function ValidString(minLength?: number, maxLength?: number, severity: DataQualitySeverity = DataQualitySeverity.MEDIUM) {
+export function ValidString(
+  minLength?: number,
+  maxLength?: number,
+  severity: DataQualitySeverity = DataQualitySeverity.MEDIUM,
+) {
   const decorators = [
     IsString({ message: 'Must be a string' }),
     DataQualityRule({
@@ -83,19 +105,25 @@ export function ValidString(minLength?: number, maxLength?: number, severity: Da
       severity,
       threshold: 100,
       message: 'String format is invalid',
-    })
+    }),
   ];
 
   if (minLength !== undefined || maxLength !== undefined) {
-    decorators.push(Length(minLength || 0, maxLength || 1000, {
-      message: `String length must be between ${minLength || 0} and ${maxLength || 1000} characters`
-    }));
+    decorators.push(
+      Length(minLength || 0, maxLength || 1000, {
+        message: `String length must be between ${minLength || 0} and ${maxLength || 1000} characters`,
+      }),
+    );
   }
 
   return applyDecorators(...decorators);
 }
 
-export function ValidNumber(min?: number, max?: number, severity: DataQualitySeverity = DataQualitySeverity.MEDIUM) {
+export function ValidNumber(
+  min?: number,
+  max?: number,
+  severity: DataQualitySeverity = DataQualitySeverity.MEDIUM,
+) {
   const decorators = [
     IsNumber({}, { message: 'Must be a number' }),
     DataQualityRule({
@@ -103,7 +131,7 @@ export function ValidNumber(min?: number, max?: number, severity: DataQualitySev
       severity,
       threshold: 100,
       message: 'Number format is invalid',
-    })
+    }),
   ];
 
   if (min !== undefined) {
@@ -121,13 +149,13 @@ export function ValidDate(severity: DataQualitySeverity = DataQualitySeverity.ME
   return applyDecorators(
     IsDate({ message: 'Must be a valid date' }),
     Type(() => Date),
-    Transform(({ value }) => value instanceof Date ? value : new Date(value)),
+    Transform(({ value }) => (value instanceof Date ? value : new Date(value))),
     DataQualityRule({
       ruleType: DataQualityRuleType.ACCURACY,
       severity,
       threshold: 100,
       message: 'Date format is invalid',
-    })
+    }),
   );
 }
 
@@ -139,7 +167,7 @@ export function ValidUUID(severity: DataQualitySeverity = DataQualitySeverity.HI
       severity,
       threshold: 100,
       message: 'UUID format is invalid',
-    })
+    }),
   );
 }
 
@@ -151,12 +179,16 @@ export function ValidBoolean(severity: DataQualitySeverity = DataQualitySeverity
       severity,
       threshold: 100,
       message: 'Boolean format is invalid',
-    })
+    }),
   );
 }
 
 // Pattern matching decorator
-export function ValidPattern(pattern: RegExp, message?: string, severity: DataQualitySeverity = DataQualitySeverity.MEDIUM) {
+export function ValidPattern(
+  pattern: RegExp,
+  message?: string,
+  severity: DataQualitySeverity = DataQualitySeverity.MEDIUM,
+) {
   return applyDecorators(
     Matches(pattern, { message: message || 'Does not match required pattern' }),
     DataQualityRule({
@@ -165,12 +197,15 @@ export function ValidPattern(pattern: RegExp, message?: string, severity: DataQu
       threshold: 100,
       message: message || 'Pattern validation failed',
       conditions: { pattern: pattern.source },
-    })
+    }),
   );
 }
 
 // Enum validation decorator
-export function ValidEnum<T>(enumObject: T, severity: DataQualitySeverity = DataQualitySeverity.MEDIUM) {
+export function ValidEnum<T>(
+  enumObject: T,
+  severity: DataQualitySeverity = DataQualitySeverity.MEDIUM,
+) {
   return applyDecorators(
     IsEnum(enumObject, { message: 'Must be a valid enum value' }),
     DataQualityRule({
@@ -179,12 +214,15 @@ export function ValidEnum<T>(enumObject: T, severity: DataQualitySeverity = Data
       threshold: 100,
       message: 'Enum validation failed',
       conditions: { allowedValues: Object.values(enumObject as any) },
-    })
+    }),
   );
 }
 
 // Uniqueness decorator (for use with custom validation)
-export function UniqueField(scope?: string[], severity: DataQualitySeverity = DataQualitySeverity.HIGH) {
+export function UniqueField(
+  scope?: string[],
+  severity: DataQualitySeverity = DataQualitySeverity.HIGH,
+) {
   return DataQualityRule({
     ruleType: DataQualityRuleType.UNIQUENESS,
     severity,
@@ -195,7 +233,10 @@ export function UniqueField(scope?: string[], severity: DataQualitySeverity = Da
 }
 
 // Timeliness decorator
-export function TimelyField(maxAgeHours: number, severity: DataQualitySeverity = DataQualitySeverity.MEDIUM) {
+export function TimelyField(
+  maxAgeHours: number,
+  severity: DataQualitySeverity = DataQualitySeverity.MEDIUM,
+) {
   return DataQualityRule({
     ruleType: DataQualityRuleType.TIMELINESS,
     severity,
@@ -206,18 +247,24 @@ export function TimelyField(maxAgeHours: number, severity: DataQualitySeverity =
 }
 
 // Consistency decorators
-export function ConsistentWith(relatedField: string, operator: 'equals' | 'greater_than' | 'less_than' = 'equals', severity: DataQualitySeverity = DataQualitySeverity.MEDIUM) {
+export function ConsistentWith(
+  relatedField: string,
+  operator: 'equals' | 'greater_than' | 'less_than' = 'equals',
+  severity: DataQualitySeverity = DataQualitySeverity.MEDIUM,
+) {
   return DataQualityRule({
     ruleType: DataQualityRuleType.CONSISTENCY,
     severity,
     threshold: 100,
     message: `Field must be consistent with ${relatedField}`,
     conditions: {
-      rules: [{
-        field1: 'current_field',
-        field2: relatedField,
-        operator,
-      }],
+      rules: [
+        {
+          field1: 'current_field',
+          field2: relatedField,
+          operator,
+        },
+      ],
     },
   });
 }
@@ -231,7 +278,7 @@ export function ValidNested(severity: DataQualitySeverity = DataQualitySeverity.
       severity,
       threshold: 100,
       message: 'Nested object validation failed',
-    })
+    }),
   );
 }
 
@@ -246,13 +293,14 @@ export function ValidPhoneNumber(severity: DataQualitySeverity = DataQualitySeve
       threshold: 100,
       message: 'Phone number format is invalid',
       conditions: { pattern: phonePattern.source },
-    })
+    }),
   );
 }
 
 // URL validation
 export function ValidURL(severity: DataQualitySeverity = DataQualitySeverity.MEDIUM) {
-  const urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+  const urlPattern =
+    /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
   return applyDecorators(
     Matches(urlPattern, { message: 'Must be a valid URL' }),
     DataQualityRule({
@@ -261,13 +309,14 @@ export function ValidURL(severity: DataQualitySeverity = DataQualitySeverity.MED
       threshold: 100,
       message: 'URL format is invalid',
       conditions: { pattern: urlPattern.source },
-    })
+    }),
   );
 }
 
 // Credit card validation
 export function ValidCreditCard(severity: DataQualitySeverity = DataQualitySeverity.HIGH) {
-  const ccPattern = /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})$/;
+  const ccPattern =
+    /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3[0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})$/;
   return applyDecorators(
     Matches(ccPattern, { message: 'Must be a valid credit card number' }),
     DataQualityRule({
@@ -276,7 +325,7 @@ export function ValidCreditCard(severity: DataQualitySeverity = DataQualitySever
       threshold: 100,
       message: 'Credit card format is invalid',
       conditions: { pattern: ccPattern.source },
-    })
+    }),
   );
 }
 
@@ -291,13 +340,14 @@ export function ValidSSN(severity: DataQualitySeverity = DataQualitySeverity.CRI
       threshold: 100,
       message: 'SSN format is invalid',
       conditions: { pattern: ssnPattern.source },
-    })
+    }),
   );
 }
 
 // IP Address validation
 export function ValidIPAddress(severity: DataQualitySeverity = DataQualitySeverity.MEDIUM) {
-  const ipPattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  const ipPattern =
+    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   return applyDecorators(
     Matches(ipPattern, { message: 'Must be a valid IP address' }),
     DataQualityRule({
@@ -306,6 +356,6 @@ export function ValidIPAddress(severity: DataQualitySeverity = DataQualitySeveri
       threshold: 100,
       message: 'IP address format is invalid',
       conditions: { pattern: ipPattern.source },
-    })
+    }),
   );
 }

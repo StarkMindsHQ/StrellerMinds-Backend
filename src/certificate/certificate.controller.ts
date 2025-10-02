@@ -5,16 +5,8 @@ import { Controller } from '@nestjs/common';
 import { CreateCertificateDto } from './dto/create-certificate.dto';
 import { Certificate } from './entity/certificate.entity';
 import { CertificatesService } from './certificate.service';
-import {
-  Delete,
-  Get,
-  Post,
-  Put,
-} from '@nestjs/common/decorators/http/request-mapping.decorator';
-import {
-  Body,
-  Param,
-} from '@nestjs/common/decorators/http/route-params.decorator';
+import { Delete, Get, Post, Put } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { Body, Param } from '@nestjs/common/decorators/http/route-params.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('certificates')
@@ -27,9 +19,7 @@ export class CertificatesController {
   @ApiBody({ type: CreateCertificateDto })
   @ApiResponse({ status: 201, description: 'Certificate created.' })
   @Post()
-  async create(
-    @Body() createCertificateDto: CreateCertificateDto,
-  ): Promise<Certificate> {
+  async create(@Body() createCertificateDto: CreateCertificateDto): Promise<Certificate> {
     return this.certificatesService.create(createCertificateDto);
   }
 

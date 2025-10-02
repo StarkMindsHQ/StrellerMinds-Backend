@@ -34,28 +34,33 @@ All API errors follow this JSON structure:
 ## Error Codes
 
 ### Authentication & Authorization
+
 - `UNAUTHORIZED`: Authentication required (401)
 - `INVALID_CREDENTIALS`: Invalid login credentials (401)
 - `TOKEN_EXPIRED`: JWT token has expired (401)
 - `FORBIDDEN`: Insufficient permissions (403)
 
 ### Resource Errors
+
 - `NOT_FOUND`: Requested resource doesn't exist (404)
 - `ALREADY_EXISTS`: Resource creation conflicts with existing data (409)
 - `CONFLICT`: Request conflicts with current state (409)
 
 ### Validation Errors
+
 - `INVALID_INPUT`: Generic validation error (400)
 - `MISSING_REQUIRED_FIELD`: Required field is missing (400)
 - `INVALID_FORMAT`: Field format is invalid (400)
 
 ### Business Logic Errors
+
 - `INSUFFICIENT_FUNDS`: Not enough funds for transaction (400)
 - `PAYMENT_FAILED`: Payment processing failed (400)
 - `COURSE_NOT_AVAILABLE`: Requested course is unavailable (400)
 - `ENROLLMENT_CLOSED`: Course enrollment period ended (400)
 
 ### System Errors
+
 - `INTERNAL_ERROR`: Unhandled server error (500)
 - `SERVICE_UNAVAILABLE`: Service temporarily down (503)
 - `DATABASE_ERROR`: Database operation failed (500)
@@ -74,29 +79,21 @@ Error messages support multiple languages. Set the `Accept-Language` header to r
 
 ```typescript
 // Using CustomException
-throw new CustomException(
-  ErrorCode.NOT_FOUND,
-  'User not found',
-  HttpStatus.NOT_FOUND
-);
+throw new CustomException(ErrorCode.NOT_FOUND, 'User not found', HttpStatus.NOT_FOUND);
 
 // With validation details
-throw new CustomException(
-  ErrorCode.INVALID_INPUT,
-  'Validation failed',
-  HttpStatus.BAD_REQUEST,
-  [
-    {
-      field: 'email',
-      message: 'Invalid email format'
-    }
-  ]
-);
+throw new CustomException(ErrorCode.INVALID_INPUT, 'Validation failed', HttpStatus.BAD_REQUEST, [
+  {
+    field: 'email',
+    message: 'Invalid email format',
+  },
+]);
 ```
 
 ### Sample Error Responses
 
 #### 404 Not Found
+
 ```json
 {
   "errorCode": "NOT_FOUND",
@@ -108,6 +105,7 @@ throw new CustomException(
 ```
 
 #### 400 Validation Error
+
 ```json
 {
   "errorCode": "INVALID_INPUT",

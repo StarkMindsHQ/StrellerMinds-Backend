@@ -39,21 +39,33 @@ export class CredentialHistoryQueryDto {
   credentialType?: string;
 
   /** Start date for issued credentials (ISO8601) */
-  @ApiPropertyOptional({ description: 'Start date for issued credentials', type: String, format: 'date-time' })
+  @ApiPropertyOptional({
+    description: 'Start date for issued credentials',
+    type: String,
+    format: 'date-time',
+  })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
   startDate?: Date;
 
   /** End date for issued credentials (ISO8601) */
-  @ApiPropertyOptional({ description: 'End date for issued credentials', type: String, format: 'date-time' })
+  @ApiPropertyOptional({
+    description: 'End date for issued credentials',
+    type: String,
+    format: 'date-time',
+  })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
   endDate?: Date;
 
   /** Credential status filter */
-  @ApiPropertyOptional({ enum: CredentialStatus, description: 'Credential status filter', default: CredentialStatus.ALL })
+  @ApiPropertyOptional({
+    enum: CredentialStatus,
+    description: 'Credential status filter',
+    default: CredentialStatus.ALL,
+  })
   @IsOptional()
   @IsEnum(CredentialStatus)
   status?: CredentialStatus = CredentialStatus.ALL;

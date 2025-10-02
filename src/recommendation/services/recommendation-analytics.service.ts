@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RecommendationAnalytics, AnalyticsEventType } from '../entities/recommendation-analytics.entity';
+import {
+  RecommendationAnalytics,
+  AnalyticsEventType,
+} from '../entities/recommendation-analytics.entity';
 import { RecommendationMetrics } from '../entities/recommendation-analytics.entity';
 import { Recommendation } from '../entities/recommendation.entity';
 
@@ -44,12 +47,15 @@ interface RecommendationMetricsReport {
   clickThroughRate: number;
   conversionRate: number;
   averageRating: number;
-  algorithmPerformance: Record<string, {
-    count: number;
-    ctr: number;
-    avgRating: number;
-    avgGenerationTime: number;
-  }>;
+  algorithmPerformance: Record<
+    string,
+    {
+      count: number;
+      ctr: number;
+      avgRating: number;
+      avgGenerationTime: number;
+    }
+  >;
   topPerformingReasons: Array<{
     reason: string;
     count: number;
@@ -97,8 +103,9 @@ export class RecommendationAnalyticsService {
       // Update metrics
       await this.updateGenerationMetrics(event);
 
-      this.logger.log(`Tracked recommendation generation for user ${event.userId}: ${event.recommendationIds.length} recommendations`);
-
+      this.logger.log(
+        `Tracked recommendation generation for user ${event.userId}: ${event.recommendationIds.length} recommendations`,
+      );
     } catch (error) {
       this.logger.error('Error tracking recommendation generation:', error);
     }
@@ -123,8 +130,9 @@ export class RecommendationAnalyticsService {
       // Update metrics
       await this.updateInteractionMetrics(event);
 
-      this.logger.log(`Tracked recommendation interaction: ${event.interactionType} for recommendation ${event.recommendationId}`);
-
+      this.logger.log(
+        `Tracked recommendation interaction: ${event.interactionType} for recommendation ${event.recommendationId}`,
+      );
     } catch (error) {
       this.logger.error('Error tracking recommendation interaction:', error);
     }
@@ -150,8 +158,9 @@ export class RecommendationAnalyticsService {
       // Update metrics
       await this.updateFeedbackMetrics(event);
 
-      this.logger.log(`Tracked recommendation feedback: score ${event.score} for recommendation ${event.recommendationId}`);
-
+      this.logger.log(
+        `Tracked recommendation feedback: score ${event.score} for recommendation ${event.recommendationId}`,
+      );
     } catch (error) {
       this.logger.error('Error tracking recommendation feedback:', error);
     }
@@ -180,7 +189,7 @@ export class RecommendationAnalyticsService {
     }
 
     if (query.algorithmVersion) {
-      queryBuilder.andWhere('analytics.metadata ->> \'algorithmVersion\' = :algorithmVersion', {
+      queryBuilder.andWhere("analytics.metadata ->> 'algorithmVersion' = :algorithmVersion", {
         algorithmVersion: query.algorithmVersion,
       });
     }
@@ -201,7 +210,10 @@ export class RecommendationAnalyticsService {
   /**
    * Generate comprehensive metrics report
    */
-  async generateMetricsReport(startDate: Date, endDate: Date): Promise<RecommendationMetricsReport> {
+  async generateMetricsReport(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<RecommendationMetricsReport> {
     try {
       // Get basic counts
       const totalRecommendations = await this.analyticsRepository.count({
@@ -219,7 +231,8 @@ export class RecommendationAnalyticsService {
       });
 
       // Calculate click-through rate
-      const clickThroughRate = totalRecommendations > 0 ? totalInteractions / totalRecommendations : 0;
+      const clickThroughRate =
+        totalRecommendations > 0 ? totalInteractions / totalRecommendations : 0;
 
       // Get conversion data (enrollments from recommendations)
       const conversions = await this.analyticsRepository.count({
@@ -234,8 +247,10 @@ export class RecommendationAnalyticsService {
       // Calculate average rating from feedback
       const feedbackData = await this.analyticsRepository
         .createQueryBuilder('analytics')
-        .select('AVG(CAST(analytics.metadata ->> \'score\' AS FLOAT))', 'avgRating')
-        .where('analytics.eventType = :eventType', { eventType: AnalyticsEventType.FEEDBACK_PROVIDED })
+        .select("AVG(CAST(analytics.metadata ->> 'score' AS FLOAT))", 'avgRating')
+        .where('analytics.eventType = :eventType', {
+          eventType: AnalyticsEventType.FEEDBACK_PROVIDED,
+        })
         .andWhere('analytics.createdAt >= :startDate', { startDate })
         .andWhere('analytics.createdAt <= :endDate', { endDate })
         .getRawOne();
@@ -261,7 +276,6 @@ export class RecommendationAnalyticsService {
         topPerformingReasons,
         userEngagement,
       };
-
     } catch (error) {
       this.logger.error('Error generating metrics report:', error);
       throw error;
@@ -297,7 +311,10 @@ export class RecommendationAnalyticsService {
   /**
    * Get user-specific analytics
    */
-  async getUserAnalytics(userId: string, days: number = 30): Promise<{
+  async getUserAnalytics(
+    userId: string,
+    days: number = 30,
+  ): Promise<{
     totalRecommendationsReceived: number;
     totalInteractions: number;
     averageFeedbackScore: number;
@@ -315,21 +332,23 @@ export class RecommendationAnalyticsService {
     });
 
     const totalRecommendationsReceived = userAnalytics.filter(
-      a => a.eventType === AnalyticsEventType.RECOMMENDATION_GENERATED
+      (a) => a.eventType === AnalyticsEventType.RECOMMENDATION_GENERATED,
     ).length;
 
     const totalInteractions = userAnalytics.filter(
-      a => a.eventType === AnalyticsEventType.RECOMMENDATION_CLICKED
+      (a) => a.eventType === AnalyticsEventType.RECOMMENDATION_CLICKED,
     ).length;
 
     // Calculate average feedback score
     const feedbackEvents = userAnalytics.filter(
-      a => a.eventType === AnalyticsEventType.FEEDBACK_PROVIDED
+      (a) => a.eventType === AnalyticsEventType.FEEDBACK_PROVIDED,
     );
-    
-    const averageFeedbackScore = feedbackEvents.length > 0
-      ? feedbackEvents.reduce((sum, event) => sum + (event.metadata?.score || 0), 0) / feedbackEvents.length
-      : 0;
+
+    const averageFeedbackScore =
+      feedbackEvents.length > 0
+        ? feedbackEvents.reduce((sum, event) => sum + (event.metadata?.score || 0), 0) /
+          feedbackEvents.length
+        : 0;
 
     // Get top recommendation reasons from user's recommendations
     const recommendations = await this.recommendationRepository.find({
@@ -339,7 +358,7 @@ export class RecommendationAnalyticsService {
     });
 
     const reasonCounts = new Map<string, number>();
-    recommendations.forEach(rec => {
+    recommendations.forEach((rec) => {
       const reason = rec.reason;
       reasonCounts.set(reason, (reasonCounts.get(reason) || 0) + 1);
     });
@@ -366,7 +385,7 @@ export class RecommendationAnalyticsService {
    */
   private async updateGenerationMetrics(event: RecommendationGenerationEvent): Promise<void> {
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    
+
     let metrics = await this.metricsRepository.findOne({
       where: { date, algorithmVersion: event.algorithmVersion },
     });
@@ -384,14 +403,15 @@ export class RecommendationAnalyticsService {
     }
 
     metrics.totalRecommendations += event.recommendationIds.length;
-    
+
     // Update average generation time
     const currentAvg = metrics.averageGenerationTime || 0;
     const currentCount = metrics.totalRecommendations - event.recommendationIds.length;
-    const newAvg = currentCount > 0 
-      ? (currentAvg * currentCount + event.generationTimeMs) / metrics.totalRecommendations
-      : event.generationTimeMs;
-    
+    const newAvg =
+      currentCount > 0
+        ? (currentAvg * currentCount + event.generationTimeMs) / metrics.totalRecommendations
+        : event.generationTimeMs;
+
     metrics.averageGenerationTime = newAvg;
 
     await this.metricsRepository.save(metrics);
@@ -410,7 +430,7 @@ export class RecommendationAnalyticsService {
 
     const algorithmVersion = recommendation.metadata?.algorithmUsed || 'unknown';
     const date = new Date().toISOString().split('T')[0];
-    
+
     let metrics = await this.metricsRepository.findOne({
       where: { date, algorithmVersion },
     });
@@ -449,7 +469,7 @@ export class RecommendationAnalyticsService {
 
     const algorithmVersion = recommendation.metadata?.algorithmUsed || 'unknown';
     const date = new Date().toISOString().split('T')[0];
-    
+
     let metrics = await this.metricsRepository.findOne({
       where: { date, algorithmVersion },
     });
@@ -469,10 +489,11 @@ export class RecommendationAnalyticsService {
     // Update average rating
     const currentAvg = metrics.averageRating || 0;
     const currentCount = metrics.totalFeedback;
-    const newAvg = currentCount > 0 
-      ? (currentAvg * currentCount + event.score) / (currentCount + 1)
-      : event.score;
-    
+    const newAvg =
+      currentCount > 0
+        ? (currentAvg * currentCount + event.score) / (currentCount + 1)
+        : event.score;
+
     metrics.averageRating = newAvg;
     metrics.totalFeedback += 1;
 
@@ -484,20 +505,25 @@ export class RecommendationAnalyticsService {
    */
   private mapInteractionTypeToEventType(interactionType: string): AnalyticsEventType {
     const mapping = {
-      'view': AnalyticsEventType.RECOMMENDATION_VIEWED,
-      'click': AnalyticsEventType.RECOMMENDATION_CLICKED,
-      'dismiss': AnalyticsEventType.RECOMMENDATION_DISMISSED,
-      'enroll': AnalyticsEventType.RECOMMENDATION_CONVERTED,
-      'start': AnalyticsEventType.RECOMMENDATION_CONVERTED,
+      view: AnalyticsEventType.RECOMMENDATION_VIEWED,
+      click: AnalyticsEventType.RECOMMENDATION_CLICKED,
+      dismiss: AnalyticsEventType.RECOMMENDATION_DISMISSED,
+      enroll: AnalyticsEventType.RECOMMENDATION_CONVERTED,
+      start: AnalyticsEventType.RECOMMENDATION_CONVERTED,
     };
 
-    return mapping[interactionType as keyof typeof mapping] || AnalyticsEventType.RECOMMENDATION_VIEWED;
+    return (
+      mapping[interactionType as keyof typeof mapping] || AnalyticsEventType.RECOMMENDATION_VIEWED
+    );
   }
 
   /**
    * Get algorithm performance metrics
    */
-  private async getAlgorithmPerformance(startDate: Date, endDate: Date): Promise<Record<string, any>> {
+  private async getAlgorithmPerformance(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Record<string, any>> {
     const metrics = await this.metricsRepository
       .createQueryBuilder('metrics')
       .where('metrics.date >= :startDate', { startDate: startDate.toISOString().split('T')[0] })
@@ -506,9 +532,9 @@ export class RecommendationAnalyticsService {
 
     const performance: Record<string, any> = {};
 
-    metrics.forEach(metric => {
+    metrics.forEach((metric) => {
       const algorithm = metric.algorithmVersion;
-      
+
       if (!performance[algorithm]) {
         performance[algorithm] = {
           count: 0,
@@ -519,9 +545,8 @@ export class RecommendationAnalyticsService {
       }
 
       performance[algorithm].count += metric.totalRecommendations;
-      performance[algorithm].ctr = metric.totalRecommendations > 0 
-        ? metric.totalClicks / metric.totalRecommendations 
-        : 0;
+      performance[algorithm].ctr =
+        metric.totalRecommendations > 0 ? metric.totalClicks / metric.totalRecommendations : 0;
       performance[algorithm].avgRating = metric.averageRating;
       performance[algorithm].avgGenerationTime = metric.averageGenerationTime;
     });
@@ -555,8 +580,10 @@ export class RecommendationAnalyticsService {
 
     const avgRecommendations = await this.analyticsRepository
       .createQueryBuilder('analytics')
-      .select('AVG(CAST(analytics.metadata ->> \'count\' AS INTEGER))', 'avg')
-      .where('analytics.eventType = :eventType', { eventType: AnalyticsEventType.RECOMMENDATION_GENERATED })
+      .select("AVG(CAST(analytics.metadata ->> 'count' AS INTEGER))", 'avg')
+      .where('analytics.eventType = :eventType', {
+        eventType: AnalyticsEventType.RECOMMENDATION_GENERATED,
+      })
       .andWhere('analytics.createdAt >= :startDate', { startDate })
       .andWhere('analytics.createdAt <= :endDate', { endDate })
       .getRawOne();
@@ -571,16 +598,21 @@ export class RecommendationAnalyticsService {
     return {
       activeUsers: parseInt(activeUsers?.count || '0'),
       avgRecommendationsPerUser: parseFloat(avgRecommendations?.avg || '0'),
-      avgInteractionsPerUser: parseInt(activeUsers?.count || '0') > 0 
-        ? totalInteractions / parseInt(activeUsers.count)
-        : 0,
+      avgInteractionsPerUser:
+        parseInt(activeUsers?.count || '0') > 0
+          ? totalInteractions / parseInt(activeUsers.count)
+          : 0,
     };
   }
 
   /**
    * Generate engagement trend for a user
    */
-  private async generateEngagementTrend(userId: string, startDate: Date, endDate: Date): Promise<Array<any>> {
+  private async generateEngagementTrend(
+    userId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Array<any>> {
     const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     const trend = [];
 

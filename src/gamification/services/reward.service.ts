@@ -40,4 +40,4 @@ export class RewardService {
   async getUserRewards(user: User): Promise<UserReward[]> {
     return this.userRewardRepo.find({ where: { user: { id: user.id } }, relations: ['reward'] });
   }
-} 
+}

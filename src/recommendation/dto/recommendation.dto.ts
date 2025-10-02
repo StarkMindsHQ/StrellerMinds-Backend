@@ -1,7 +1,22 @@
-import { IsEnum, IsOptional, IsString, IsNumber, IsArray, IsUUID, IsBoolean, Min, Max, ValidateNested } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsArray,
+  IsUUID,
+  IsBoolean,
+  Min,
+  Max,
+  ValidateNested,
+} from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { RecommendationType, RecommendationReason, RecommendationStatus } from '../entities/recommendation.entity';
+import {
+  RecommendationType,
+  RecommendationReason,
+  RecommendationStatus,
+} from '../entities/recommendation.entity';
 
 export class CreateRecommendationDto {
   @ApiProperty({ description: 'User ID for the recommendation' })
@@ -168,7 +183,10 @@ export class GetRecommendationsQueryDto {
   @IsBoolean()
   includeExpired?: boolean = false;
 
-  @ApiPropertyOptional({ description: 'Sort by field', enum: ['createdAt', 'confidenceScore', 'relevanceScore', 'priority'] })
+  @ApiPropertyOptional({
+    description: 'Sort by field',
+    enum: ['createdAt', 'confidenceScore', 'relevanceScore', 'priority'],
+  })
   @IsOptional()
   @IsString()
   sortBy?: 'createdAt' | 'confidenceScore' | 'relevanceScore' | 'priority' = 'createdAt';

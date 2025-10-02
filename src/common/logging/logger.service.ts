@@ -155,7 +155,7 @@ export class LoggerService {
   child(additionalContext: LogContext): LoggerService {
     const childLogger = new LoggerService(this.configService);
     childLogger.setContext(this.context);
-    
+
     // Override the log method to include additional context
     const originalLog = childLogger.log.bind(childLogger);
     childLogger.log = (level: string, message: string, context?: LogContext) => {

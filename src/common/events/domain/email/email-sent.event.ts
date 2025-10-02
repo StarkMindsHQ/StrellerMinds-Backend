@@ -26,15 +26,10 @@ export class EmailSentEvent extends DomainEvent {
     private readonly payload: EmailSentPayload,
     metadata: Partial<DomainEventMetadata> = {},
   ) {
-    super(
-      payload.emailId,
-      'Email',
-      1,
-      {
-        ...metadata,
-        correlationId: metadata.correlationId,
-      },
-    );
+    super(payload.emailId, 'Email', 1, {
+      ...metadata,
+      correlationId: metadata.correlationId,
+    });
   }
 
   getPayload(): EmailSentPayload {

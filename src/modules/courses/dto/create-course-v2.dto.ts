@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 enum CourseDifficulty {
   BEGINNER = 'beginner',
   INTERMEDIATE = 'intermediate',
-  ADVANCED = 'advanced'
+  ADVANCED = 'advanced',
 }
 
 export class CreateCourseDtoV2 {
@@ -51,4 +51,3 @@ export class CreateCourseDtoV2 {
   @IsString({ each: true })
   prerequisites?: string[];
 }
-

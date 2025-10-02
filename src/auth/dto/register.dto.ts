@@ -23,4 +23,3 @@ export class RegisterDto {
   @IsString()
   lastName?: string;
 }
-

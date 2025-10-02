@@ -2,7 +2,7 @@
 
 /**
  * Accessibility Audit Script for StrellerMinds
- * 
+ *
  * This script performs automated accessibility testing using multiple tools
  * and generates a comprehensive report.
  */
@@ -20,10 +20,10 @@ class AccessibilityAuditor {
         criticalIssues: 0,
         highIssues: 0,
         mediumIssues: 0,
-        lowIssues: 0
+        lowIssues: 0,
       },
       tools: {},
-      recommendations: []
+      recommendations: [],
     };
   }
 
@@ -36,16 +36,15 @@ class AccessibilityAuditor {
       await this.runLighthouseAudit();
       await this.runPa11yAudit();
       await this.checkCodePatterns();
-      
+
       // Generate recommendations
       this.generateRecommendations();
-      
+
       // Create report
       this.generateReport();
-      
+
       console.log('✅ Accessibility audit completed successfully!');
       console.log(`📊 Report saved to: ${this.getReportPath()}`);
-      
     } catch (error) {
       console.error('❌ Accessibility audit failed:', error.message);
       process.exit(1);
@@ -54,7 +53,7 @@ class AccessibilityAuditor {
 
   async runAxeAudit() {
     console.log('🔧 Running axe-core audit...');
-    
+
     try {
       // This would typically run against a running application
       // For now, we'll simulate the structure
@@ -67,27 +66,27 @@ class AccessibilityAuditor {
             nodes: [
               {
                 target: ['.btn-primary'],
-                failureSummary: 'Fix any of the following: Element has insufficient color contrast'
-              }
-            ]
-          }
+                failureSummary: 'Fix any of the following: Element has insufficient color contrast',
+              },
+            ],
+          },
         ],
         passes: [
           {
             id: 'aria-labels',
-            description: 'ARIA labels are properly implemented'
-          }
-        ]
+            description: 'ARIA labels are properly implemented',
+          },
+        ],
       };
 
       this.results.tools.axe = {
         violations: axeResults.violations.length,
         passes: axeResults.passes.length,
-        details: axeResults
+        details: axeResults,
       };
 
       // Update summary
-      axeResults.violations.forEach(violation => {
+      axeResults.violations.forEach((violation) => {
         this.results.summary.totalIssues++;
         switch (violation.impact) {
           case 'critical':
@@ -106,7 +105,6 @@ class AccessibilityAuditor {
       });
 
       console.log(`   ✓ Found ${axeResults.violations.length} violations`);
-      
     } catch (error) {
       console.log(`   ⚠️  axe-core audit failed: ${error.message}`);
     }
@@ -114,27 +112,31 @@ class AccessibilityAuditor {
 
   async runLighthouseAudit() {
     console.log('🔧 Running Lighthouse accessibility audit...');
-    
+
     try {
       // Simulate Lighthouse results
       const lighthouseResults = {
         accessibility: {
           score: 0.85,
           audits: {
-            'color-contrast': { score: 0.8, title: 'Background and foreground colors have sufficient contrast ratio' },
+            'color-contrast': {
+              score: 0.8,
+              title: 'Background and foreground colors have sufficient contrast ratio',
+            },
             'aria-labels': { score: 1.0, title: 'ARIA elements have accessible names' },
-            'keyboard': { score: 0.9, title: 'Interactive elements are keyboard accessible' }
-          }
-        }
+            keyboard: { score: 0.9, title: 'Interactive elements are keyboard accessible' },
+          },
+        },
       };
 
       this.results.tools.lighthouse = {
         accessibilityScore: lighthouseResults.accessibility.score,
-        audits: lighthouseResults.accessibility.audits
+        audits: lighthouseResults.accessibility.audits,
       };
 
-      console.log(`   ✓ Accessibility score: ${(lighthouseResults.accessibility.score * 100).toFixed(1)}%`);
-      
+      console.log(
+        `   ✓ Accessibility score: ${(lighthouseResults.accessibility.score * 100).toFixed(1)}%`,
+      );
     } catch (error) {
       console.log(`   ⚠️  Lighthouse audit failed: ${error.message}`);
     }
@@ -142,7 +144,7 @@ class AccessibilityAuditor {
 
   async runPa11yAudit() {
     console.log('🔧 Running Pa11y audit...');
-    
+
     try {
       // Simulate Pa11y results
       const pa11yResults = [
@@ -150,17 +152,16 @@ class AccessibilityAuditor {
           type: 'error',
           code: 'WCAG2AA.Principle1.Guideline1_4.1_4_3.G18.Fail',
           message: 'This element has insufficient contrast at this conformance level.',
-          selector: '.btn-secondary'
-        }
+          selector: '.btn-secondary',
+        },
       ];
 
       this.results.tools.pa11y = {
         issues: pa11yResults.length,
-        details: pa11yResults
+        details: pa11yResults,
       };
 
       console.log(`   ✓ Found ${pa11yResults.length} issues`);
-      
     } catch (error) {
       console.log(`   ⚠️  Pa11y audit failed: ${error.message}`);
     }
@@ -168,38 +169,39 @@ class AccessibilityAuditor {
 
   async checkCodePatterns() {
     console.log('🔧 Checking code patterns for accessibility...');
-    
+
     const patterns = [
       {
         name: 'Missing alt attributes',
         pattern: /<img(?![^>]*alt=)/g,
         severity: 'high',
-        description: 'Images without alt attributes are not accessible to screen readers'
+        description: 'Images without alt attributes are not accessible to screen readers',
       },
       {
         name: 'Missing form labels',
-        pattern: /<input(?![^>]*aria-label)(?![^>]*aria-labelledby)(?![^>]*id="[^"]*"[^>]*<label[^>]*for="[^"]*")/g,
+        pattern:
+          /<input(?![^>]*aria-label)(?![^>]*aria-labelledby)(?![^>]*id="[^"]*"[^>]*<label[^>]*for="[^"]*")/g,
         severity: 'high',
-        description: 'Form inputs without proper labels are not accessible'
+        description: 'Form inputs without proper labels are not accessible',
       },
       {
         name: 'Generic link text',
         pattern: /<a[^>]*>(click here|read more|more|here)<\/a>/gi,
         severity: 'medium',
-        description: 'Generic link text is not descriptive for screen reader users'
-      }
+        description: 'Generic link text is not descriptive for screen reader users',
+      },
     ];
 
     const codePatternResults = [];
-    
+
     // This would scan actual source files in a real implementation
-    patterns.forEach(pattern => {
+    patterns.forEach((pattern) => {
       // Simulate finding issues
       if (pattern.name === 'Generic link text') {
         codePatternResults.push({
           ...pattern,
           occurrences: 2,
-          files: ['src/components/CourseCard.tsx', 'src/pages/CourseCatalog.tsx']
+          files: ['src/components/CourseCard.tsx', 'src/pages/CourseCatalog.tsx'],
         });
       }
     });
@@ -207,15 +209,17 @@ class AccessibilityAuditor {
     this.results.tools.codePatterns = {
       patternsChecked: patterns.length,
       issuesFound: codePatternResults.length,
-      details: codePatternResults
+      details: codePatternResults,
     };
 
-    console.log(`   ✓ Checked ${patterns.length} patterns, found ${codePatternResults.length} issues`);
+    console.log(
+      `   ✓ Checked ${patterns.length} patterns, found ${codePatternResults.length} issues`,
+    );
   }
 
   generateRecommendations() {
     console.log('💡 Generating accessibility recommendations...');
-    
+
     const recommendations = [];
 
     // Based on audit results, generate specific recommendations
@@ -223,12 +227,13 @@ class AccessibilityAuditor {
       recommendations.push({
         priority: 'critical',
         title: 'Fix Critical Accessibility Issues',
-        description: 'Address critical accessibility violations that prevent users from accessing content.',
+        description:
+          'Address critical accessibility violations that prevent users from accessing content.',
         actions: [
           'Review and fix color contrast issues',
           'Add missing alt text to images',
-          'Ensure all interactive elements are keyboard accessible'
-        ]
+          'Ensure all interactive elements are keyboard accessible',
+        ],
       });
     }
 
@@ -240,8 +245,8 @@ class AccessibilityAuditor {
         actions: [
           'Review Lighthouse accessibility report',
           'Fix color contrast ratios',
-          'Improve ARIA implementation'
-        ]
+          'Improve ARIA implementation',
+        ],
       });
     }
 
@@ -252,8 +257,8 @@ class AccessibilityAuditor {
       actions: [
         'Add axe-core tests to Jest test suite',
         'Set up Lighthouse CI for pull requests',
-        'Create accessibility testing guidelines for developers'
-      ]
+        'Create accessibility testing guidelines for developers',
+      ],
     });
 
     recommendations.push({
@@ -263,8 +268,8 @@ class AccessibilityAuditor {
       actions: [
         'Add skip navigation links',
         'Implement focus management for single-page applications',
-        'Provide alternative text for complex images and charts'
-      ]
+        'Provide alternative text for complex images and charts',
+      ],
     });
 
     this.results.recommendations = recommendations;
@@ -278,8 +283,8 @@ class AccessibilityAuditor {
         auditVersion: '1.0.0',
         platform: 'StrellerMinds',
         environment: process.env.NODE_ENV || 'development',
-        guidelines: 'WCAG 2.1 AA'
-      }
+        guidelines: 'WCAG 2.1 AA',
+      },
     };
 
     // Save JSON report
@@ -348,18 +353,22 @@ class AccessibilityAuditor {
     </div>
 
     <h2>Recommendations</h2>
-    ${data.recommendations.map(rec => `
+    ${data.recommendations
+      .map(
+        (rec) => `
         <div class="recommendation ${rec.priority}">
             <h3>${rec.title}</h3>
             <p>${rec.description}</p>
             <div class="actions">
                 <strong>Actions:</strong>
                 <ul>
-                    ${rec.actions.map(action => `<li>${action}</li>`).join('')}
+                    ${rec.actions.map((action) => `<li>${action}</li>`).join('')}
                 </ul>
             </div>
         </div>
-    `).join('')}
+    `,
+      )
+      .join('')}
 
     <h2>Tool Results</h2>
     <pre>${JSON.stringify(data.tools, null, 2)}</pre>
@@ -375,7 +384,7 @@ class AccessibilityAuditor {
     console.log(`High: ${this.results.summary.highIssues}`);
     console.log(`Medium: ${this.results.summary.mediumIssues}`);
     console.log(`Low: ${this.results.summary.lowIssues}`);
-    
+
     if (this.results.summary.criticalIssues > 0) {
       console.log('\n⚠️  Critical issues found! Please address immediately.');
     } else if (this.results.summary.totalIssues === 0) {

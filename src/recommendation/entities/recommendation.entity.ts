@@ -151,8 +151,6 @@ export class Recommendation {
   }
 
   get ageInDays(): number {
-    return Math.floor(
-      (Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    return Math.floor((Date.now() - this.createdAt.getTime()) / (1000 * 60 * 60 * 24));
   }
 }

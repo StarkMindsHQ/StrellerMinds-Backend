@@ -1,14 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Index } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing an email log entry.
  */
-@Entity("email_logs")
+@Entity('email_logs')
 export class EmailLog {
   /** Unique ID for the email log entry */
   @ApiProperty({ description: 'Unique ID for the email log entry', example: 'uuid-v4' })
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   /** Recipient email address */
@@ -34,10 +41,14 @@ export class EmailLog {
   messageId: string;
 
   /** Email status */
-  @ApiProperty({ description: 'Email status', enum: ['sent', 'failed', 'opened', 'clicked'], example: 'sent' })
+  @ApiProperty({
+    description: 'Email status',
+    enum: ['sent', 'failed', 'opened', 'clicked'],
+    example: 'sent',
+  })
   @Column()
   @Index()
-  status: "sent" | "failed" | "opened" | "clicked";
+  status: 'sent' | 'failed' | 'opened' | 'clicked';
 
   /** Error message (optional) */
   @ApiPropertyOptional({ description: 'Error message', example: 'SMTP connection failed' })
@@ -45,28 +56,51 @@ export class EmailLog {
   error: string;
 
   /** Date/time when the email was created */
-  @ApiProperty({ description: 'Date/time when the email was created', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the email was created',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   @CreateDateColumn()
   @Index()
   createdAt: Date;
 
   /** Date/time when the email was opened (optional) */
-  @ApiPropertyOptional({ description: 'Date/time when the email was opened', type: String, format: 'date-time', example: '2025-06-29T12:05:00Z' })
+  @ApiPropertyOptional({
+    description: 'Date/time when the email was opened',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:05:00Z',
+  })
   @Column({ nullable: true })
   openedAt: Date;
 
   /** Date/time when the email was clicked (optional) */
-  @ApiPropertyOptional({ description: 'Date/time when the email was clicked', type: String, format: 'date-time', example: '2025-06-29T12:10:00Z' })
+  @ApiPropertyOptional({
+    description: 'Date/time when the email was clicked',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:10:00Z',
+  })
   @Column({ nullable: true })
   clickedAt: Date;
 
   /** Additional metadata (optional) */
-  @ApiPropertyOptional({ description: 'Additional metadata', type: 'object', example: { ip: '127.0.0.1' } })
-  @Column({ nullable: true, type: "jsonb" })
+  @ApiPropertyOptional({
+    description: 'Additional metadata',
+    type: 'object',
+    example: { ip: '127.0.0.1' },
+  })
+  @Column({ nullable: true, type: 'jsonb' })
   metadata: Record<string, any>;
 
   /** First opened timestamp */
-  @ApiPropertyOptional({ description: 'First time the email was opened', type: String, format: 'date-time' })
+  @ApiPropertyOptional({
+    description: 'First time the email was opened',
+    type: String,
+    format: 'date-time',
+  })
   @Column({ type: 'timestamp', nullable: true })
   @Index()
   firstOpenedAt: Date | null;
@@ -77,7 +111,11 @@ export class EmailLog {
   openCount: number;
 
   /** First clicked timestamp */
-  @ApiPropertyOptional({ description: 'First time a link was clicked', type: String, format: 'date-time' })
+  @ApiPropertyOptional({
+    description: 'First time a link was clicked',
+    type: String,
+    format: 'date-time',
+  })
   @Column({ type: 'timestamp', nullable: true })
   @Index()
   firstClickedAt: Date | null;
@@ -88,9 +126,18 @@ export class EmailLog {
   clickCount: number;
 
   /** Click events history */
-  @ApiPropertyOptional({ description: 'Array of click events', type: 'array', example: [{ clickedAt: '2025-06-29T12:10:00Z', url: 'https://example.com' }] })
+  @ApiPropertyOptional({
+    description: 'Array of click events',
+    type: 'array',
+    example: [{ clickedAt: '2025-06-29T12:10:00Z', url: 'https://example.com' }],
+  })
   @Column({ type: 'jsonb', nullable: true })
-  clickEvents: Array<{ clickedAt: string; url: string; userAgent?: string; ipAddress?: string }> | null;
+  clickEvents: Array<{
+    clickedAt: string;
+    url: string;
+    userAgent?: string;
+    ipAddress?: string;
+  }> | null;
 
   /** Whether tracking is enabled for this email */
   @ApiPropertyOptional({ description: 'Tracking enabled for this email', example: true })
@@ -105,8 +152,11 @@ export class EmailLog {
   trackingToken: string | null;
 
   /** When the log was last updated */
-  @ApiPropertyOptional({ description: 'Date/time when the email log was last updated', type: String, format: 'date-time' })
+  @ApiPropertyOptional({
+    description: 'Date/time when the email log was last updated',
+    type: String,
+    format: 'date-time',
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 }
-

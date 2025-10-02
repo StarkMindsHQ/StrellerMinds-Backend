@@ -2,7 +2,7 @@
 
 /**
  * Pact Contract Testing Setup Script
- * 
+ *
  * This script helps set up Pact contract testing environment
  * and provides utilities for managing contracts and broker integration.
  */
@@ -27,13 +27,13 @@ class PactSetup {
 
     // Create necessary directories
     this.createDirectories();
-    
+
     // Check dependencies
     this.checkDependencies();
-    
+
     // Validate configuration
     this.validateConfiguration();
-    
+
     // Run initial tests
     this.runInitialTests();
 
@@ -50,10 +50,10 @@ class PactSetup {
    */
   createDirectories() {
     console.log('📁 Creating directories...');
-    
+
     const dirs = [this.pactsDir, this.logsDir];
-    
-    dirs.forEach(dir => {
+
+    dirs.forEach((dir) => {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
         console.log(`   ✓ Created: ${dir}`);
@@ -68,22 +68,19 @@ class PactSetup {
    */
   checkDependencies() {
     console.log('\n🔍 Checking dependencies...');
-    
-    const requiredPackages = [
-      '@pact-foundation/pact',
-      '@pact-foundation/pact-node'
-    ];
+
+    const requiredPackages = ['@pact-foundation/pact', '@pact-foundation/pact-node'];
 
     const packageJson = JSON.parse(
-      fs.readFileSync(path.join(this.projectRoot, 'package.json'), 'utf8')
+      fs.readFileSync(path.join(this.projectRoot, 'package.json'), 'utf8'),
     );
 
     const allDeps = {
       ...packageJson.dependencies,
-      ...packageJson.devDependencies
+      ...packageJson.devDependencies,
     };
 
-    requiredPackages.forEach(pkg => {
+    requiredPackages.forEach((pkg) => {
       if (allDeps[pkg]) {
         console.log(`   ✓ ${pkg}: ${allDeps[pkg]}`);
       } else {
@@ -98,16 +95,16 @@ class PactSetup {
    */
   validateConfiguration() {
     console.log('\n⚙️  Validating configuration...');
-    
+
     // Check for .env file
     const envFile = path.join(this.projectRoot, '.env');
     if (fs.existsSync(envFile)) {
       console.log('   ✓ .env file exists');
-      
+
       const envContent = fs.readFileSync(envFile, 'utf8');
       const requiredVars = ['PACT_BROKER_URL', 'PACT_BROKER_TOKEN'];
-      
-      requiredVars.forEach(varName => {
+
+      requiredVars.forEach((varName) => {
         if (envContent.includes(varName)) {
           console.log(`   ✓ ${varName} is configured`);
         } else {
@@ -129,11 +126,12 @@ class PactSetup {
 
     // Check contract test files
     if (fs.existsSync(this.contractsDir)) {
-      const contractFiles = fs.readdirSync(this.contractsDir)
-        .filter(file => file.endsWith('.pact.test.ts'));
-      
+      const contractFiles = fs
+        .readdirSync(this.contractsDir)
+        .filter((file) => file.endsWith('.pact.test.ts'));
+
       console.log(`   ✓ Found ${contractFiles.length} contract test files:`);
-      contractFiles.forEach(file => {
+      contractFiles.forEach((file) => {
         console.log(`     - ${file}`);
       });
     } else {
@@ -146,17 +144,17 @@ class PactSetup {
    */
   runInitialTests() {
     console.log('\n🧪 Running initial contract tests...');
-    
+
     try {
       // Check if Jest is available
       execSync('npx jest --version', { stdio: 'pipe' });
       console.log('   ✓ Jest is available');
-      
+
       // Try to run contract tests
       console.log('   🔄 Running contract tests...');
-      execSync('npm run test:contract', { 
+      execSync('npm run test:contract', {
         stdio: 'pipe',
-        cwd: this.projectRoot 
+        cwd: this.projectRoot,
       });
       console.log('   ✓ Contract tests passed');
     } catch (error) {
@@ -170,20 +168,20 @@ class PactSetup {
    */
   cleanup() {
     console.log('🧹 Cleaning up Pact artifacts...');
-    
+
     const dirs = [this.pactsDir, this.logsDir];
-    
-    dirs.forEach(dir => {
+
+    dirs.forEach((dir) => {
       if (fs.existsSync(dir)) {
         const files = fs.readdirSync(dir);
-        files.forEach(file => {
+        files.forEach((file) => {
           const filePath = path.join(dir, file);
           fs.unlinkSync(filePath);
           console.log(`   ✓ Removed: ${filePath}`);
         });
       }
     });
-    
+
     console.log('✅ Cleanup completed');
   }
 
@@ -192,11 +190,11 @@ class PactSetup {
    */
   validateContracts() {
     console.log('🔍 Validating contracts against broker...');
-    
+
     try {
       execSync('npm run pact:can-i-deploy', {
         stdio: 'inherit',
-        cwd: this.projectRoot
+        cwd: this.projectRoot,
       });
       console.log('✅ Contracts validation passed');
     } catch (error) {
@@ -210,11 +208,11 @@ class PactSetup {
    */
   publishContracts() {
     console.log('📤 Publishing contracts to broker...');
-    
+
     try {
       execSync('npm run pact:publish', {
         stdio: 'inherit',
-        cwd: this.projectRoot
+        cwd: this.projectRoot,
       });
       console.log('✅ Contracts published successfully');
     } catch (error) {

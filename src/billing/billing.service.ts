@@ -37,13 +37,22 @@ export class BillingService {
     priceIdOverride?: string;
   }) {
     const user = await this.usersService.findOne(params.userId);
-    const customerId = await this.ensureStripeCustomer(user.id, user.email, `${user.firstName} ${user.lastName}`);
+    const customerId = await this.ensureStripeCustomer(
+      user.id,
+      user.email,
+      `${user.firstName} ${user.lastName}`,
+    );
 
-    const tierKey = (typeof params.plan === 'string' ? params.plan : String(params.plan)) as TierKey;
+    const tierKey = (
+      typeof params.plan === 'string' ? params.plan : String(params.plan)
+    ) as TierKey;
     const tier = TIERS[tierKey] || TIERS.premium;
 
-    const priceId = params.priceIdOverride || (params.billingCycle === BillingCycle.YEARLY ? tier.priceIdYearly : tier.priceIdMonthly);
-    if (!priceId) throw new BadRequestException('No Stripe price configured for selected plan/cycle');
+    const priceId =
+      params.priceIdOverride ||
+      (params.billingCycle === BillingCycle.YEARLY ? tier.priceIdYearly : tier.priceIdMonthly);
+    if (!priceId)
+      throw new BadRequestException('No Stripe price configured for selected plan/cycle');
 
     const subscription = await this.subscriptionService.createSubscription({
       userId: user.id,
@@ -67,13 +76,26 @@ export class BillingService {
       entityType: 'Subscription',
       entityId: subscription.id,
       performedBy: user.id,
-      details: { plan: tierKey, billingCycle: params.billingCycle, customerId, seats: params.seats },
+      details: {
+        plan: tierKey,
+        billingCycle: params.billingCycle,
+        customerId,
+        seats: params.seats,
+      },
     });
     return subscription;
   }
 
-  async cancelSubscription(params: { subscriptionId: string; cancelAtPeriodEnd?: boolean; reason?: string }) {
-    const sub = await this.subscriptionService.cancelSubscription(params.subscriptionId, params.cancelAtPeriodEnd ?? true, params.reason);
+  async cancelSubscription(params: {
+    subscriptionId: string;
+    cancelAtPeriodEnd?: boolean;
+    reason?: string;
+  }) {
+    const sub = await this.subscriptionService.cancelSubscription(
+      params.subscriptionId,
+      params.cancelAtPeriodEnd ?? true,
+      params.reason,
+    );
     await this.auditLogService.createLog({
       action: 'SUBSCRIPTION_CANCELLED',
       entityType: 'Subscription',
@@ -87,8 +109,14 @@ export class BillingService {
   async createPortalSession(userId: string, returnUrl?: string) {
     const user = await this.usersService.findOne(userId);
     if (!user.stripeCustomerId) throw new BadRequestException('User not linked to Stripe');
-    const url = returnUrl || this.config.get<string>('BILLING_PORTAL_RETURN_URL') || 'https://app.strellerminds.com/account/billing';
-    const session = await this.stripeService.createBillingPortalSession({ customerId: user.stripeCustomerId, returnUrl: url });
+    const url =
+      returnUrl ||
+      this.config.get<string>('BILLING_PORTAL_RETURN_URL') ||
+      'https://app.strellerminds.com/account/billing';
+    const session = await this.stripeService.createBillingPortalSession({
+      customerId: user.stripeCustomerId,
+      returnUrl: url,
+    });
     await this.auditLogService.createLog({
       action: 'BILLING_PORTAL_SESSION_CREATED',
       entityType: 'User',

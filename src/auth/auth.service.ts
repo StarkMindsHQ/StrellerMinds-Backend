@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  BadRequestException,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, Inject } from '@nestjs/common';
 import { IAuthStrategy } from './strategies/auth-strategy.interface';
 import { AuthResponseDto } from './dto/auth-response.dto';
 

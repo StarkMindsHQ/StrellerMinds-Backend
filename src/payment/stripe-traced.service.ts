@@ -62,7 +62,7 @@ export class StripeTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           const paymentIntent = await this.stripe.paymentIntents.create({
             amount: dto.amount,
             currency: dto.currency,
@@ -75,7 +75,7 @@ export class StripeTracedService {
           });
 
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'payment.intent.id': paymentIntent.id,
             'payment.intent.status': paymentIntent.status,
@@ -97,13 +97,13 @@ export class StripeTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error('Failed to create payment intent', {
             error: error.message,
             amount: dto.amount,
             currency: dto.currency,
           });
-          
+
           throw error;
         }
       },
@@ -131,7 +131,7 @@ export class StripeTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           const subscription = await this.stripe.subscriptions.create({
             customer: dto.customerId,
             items: [{ price: dto.priceId }],
@@ -141,7 +141,7 @@ export class StripeTracedService {
           });
 
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'subscription.id': subscription.id,
             'subscription.status': subscription.status,
@@ -164,13 +164,13 @@ export class StripeTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error('Failed to create subscription', {
             error: error.message,
             customerId: dto.customerId,
             priceId: dto.priceId,
           });
-          
+
           throw error;
         }
       },
@@ -195,11 +195,11 @@ export class StripeTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
-          
+
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'payment.intent.status': paymentIntent.status,
             'payment.amount': paymentIntent.amount,
@@ -215,7 +215,7 @@ export class StripeTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           throw error;
         }
       },
@@ -230,7 +230,11 @@ export class StripeTracedService {
    * Create customer with tracing
    */
   @TraceExternalService('stripe', 'createCustomer')
-  async createCustomer(email: string, name?: string, metadata?: Record<string, any>): Promise<Stripe.Customer> {
+  async createCustomer(
+    email: string,
+    name?: string,
+    metadata?: Record<string, any>,
+  ): Promise<Stripe.Customer> {
     return this.tracingService.withSpan(
       'payment.stripe.createCustomer',
       async (span) => {
@@ -241,15 +245,15 @@ export class StripeTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           const customer = await this.stripe.customers.create({
             email,
             name,
             metadata,
           });
-          
+
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'customer.id': customer.id,
             'customer.created': customer.created,
@@ -269,12 +273,12 @@ export class StripeTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error('Failed to create customer', {
             error: error.message,
             email,
           });
-          
+
           throw error;
         }
       },
@@ -300,15 +304,15 @@ export class StripeTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           const event = this.stripe.webhooks.constructEvent(
             payload,
             signature,
             this.configService.get<string>('STRIPE_WEBHOOK_SECRET'),
           );
-          
+
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'webhook.event_id': event.id,
             'webhook.event_type': event.type,
@@ -329,11 +333,11 @@ export class StripeTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error('Failed to process webhook', {
             error: error.message,
           });
-          
+
           throw error;
         }
       },

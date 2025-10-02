@@ -13,21 +13,21 @@ class PerformanceBaseline {
       endpoints: {},
       system: {},
       database: {},
-      summary: {}
+      summary: {},
     };
   }
 
   async run() {
     console.log('🚀 Starting Performance Baseline Collection...');
     console.log(`Target: ${this.baseUrl}`);
-    
+
     try {
       await this.collectSystemBaseline();
       await this.collectEndpointBaselines();
       await this.collectDatabaseBaselines();
       await this.generateSummary();
       await this.saveResults();
-      
+
       console.log('✅ Performance baseline collection completed!');
       this.printSummary();
     } catch (error) {
@@ -38,13 +38,13 @@ class PerformanceBaseline {
 
   async collectSystemBaseline() {
     console.log('📊 Collecting system baseline...');
-    
+
     try {
       const healthResponse = await axios.get(`${this.baseUrl}/health`);
       this.results.system = {
         health: healthResponse.data,
         responseTime: healthResponse.headers['x-response-time'] || 'N/A',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       console.warn('⚠️  Could not collect system baseline:', error.message);
@@ -53,21 +53,24 @@ class PerformanceBaseline {
 
   async collectEndpointBaselines() {
     console.log('🎯 Collecting endpoint baselines...');
-    
+
     const endpoints = [
       { name: 'health', method: 'GET', path: '/health' },
       { name: 'courses_list', method: 'GET', path: '/courses?page=1&limit=20' },
       { name: 'courses_categories', method: 'GET', path: '/courses/categories' },
       { name: 'courses_search', method: 'GET', path: '/courses/search?q=blockchain' },
-      { name: 'auth_register', method: 'POST', path: '/auth/register', 
+      {
+        name: 'auth_register',
+        method: 'POST',
+        path: '/auth/register',
         data: {
           firstName: 'Baseline',
           lastName: 'Test',
           email: `baseline-${Date.now()}@test.com`,
           username: `baseline-${Date.now()}`,
-          password: 'BaselineTest123!'
-        }
-      }
+          password: 'BaselineTest123!',
+        },
+      },
     ];
 
     for (const endpoint of endpoints) {
@@ -77,45 +80,45 @@ class PerformanceBaseline {
 
   async measureEndpoint(endpoint) {
     console.log(`  📈 Measuring ${endpoint.name}...`);
-    
+
     const measurements = [];
     const iterations = 10;
 
     for (let i = 0; i < iterations; i++) {
       try {
         const startTime = process.hrtime.bigint();
-        
+
         let response;
         if (endpoint.method === 'GET') {
           response = await axios.get(`${this.baseUrl}${endpoint.path}`);
         } else if (endpoint.method === 'POST') {
           response = await axios.post(`${this.baseUrl}${endpoint.path}`, endpoint.data);
         }
-        
+
         const endTime = process.hrtime.bigint();
         const duration = Number(endTime - startTime) / 1000000; // Convert to milliseconds
-        
+
         measurements.push({
           duration,
           statusCode: response.status,
-          responseSize: JSON.stringify(response.data).length
+          responseSize: JSON.stringify(response.data).length,
         });
-        
+
         // Small delay between requests
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (error) {
         measurements.push({
           duration: null,
           statusCode: error.response?.status || 0,
-          error: error.message
+          error: error.message,
         });
       }
     }
 
     // Calculate statistics
-    const validMeasurements = measurements.filter(m => m.duration !== null);
-    const durations = validMeasurements.map(m => m.duration);
-    
+    const validMeasurements = measurements.filter((m) => m.duration !== null);
+    const durations = validMeasurements.map((m) => m.duration);
+
     this.results.endpoints[endpoint.name] = {
       method: endpoint.method,
       path: endpoint.path,
@@ -126,43 +129,43 @@ class PerformanceBaseline {
         max: Math.max(...durations),
         avg: durations.reduce((a, b) => a + b, 0) / durations.length,
         p95: this.percentile(durations, 95),
-        p99: this.percentile(durations, 99)
+        p99: this.percentile(durations, 99),
       },
       throughput: validMeasurements.length / (iterations * 0.1), // requests per second
-      errors: measurements.filter(m => m.error).length
+      errors: measurements.filter((m) => m.error).length,
     };
   }
 
   async collectDatabaseBaselines() {
     console.log('🗄️  Collecting database baselines...');
-    
+
     try {
       // Try to get database metrics if available
       const metricsResponse = await axios.get(`${this.baseUrl}/metrics`);
-      
+
       // Extract database-related metrics
       this.results.database = {
         connectionPool: 'Available via metrics endpoint',
         queryPerformance: 'Monitored via application logs',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       console.warn('⚠️  Could not collect database baseline:', error.message);
       this.results.database = {
         status: 'Metrics endpoint not available',
-        note: 'Database performance should be monitored via application logs'
+        note: 'Database performance should be monitored via application logs',
       };
     }
   }
 
   generateSummary() {
     console.log('📋 Generating summary...');
-    
+
     const endpointNames = Object.keys(this.results.endpoints);
-    const avgResponseTimes = endpointNames.map(name => 
-      this.results.endpoints[name].responseTime?.avg || 0
+    const avgResponseTimes = endpointNames.map(
+      (name) => this.results.endpoints[name].responseTime?.avg || 0,
     );
-    
+
     this.results.summary = {
       totalEndpoints: endpointNames.length,
       avgResponseTime: avgResponseTimes.reduce((a, b) => a + b, 0) / avgResponseTimes.length,
@@ -176,9 +179,11 @@ class PerformanceBaseline {
         const fastestAvg = this.results.endpoints[fastest]?.responseTime?.avg || Infinity;
         return currentAvg < fastestAvg ? current : fastest;
       }),
-      overallSuccessRate: endpointNames.reduce((total, name) => 
-        total + (this.results.endpoints[name].successRate || 0), 0
-      ) / endpointNames.length
+      overallSuccessRate:
+        endpointNames.reduce(
+          (total, name) => total + (this.results.endpoints[name].successRate || 0),
+          0,
+        ) / endpointNames.length,
     };
   }
 
@@ -187,10 +192,10 @@ class PerformanceBaseline {
     if (!fs.existsSync(resultsDir)) {
       fs.mkdirSync(resultsDir, { recursive: true });
     }
-    
+
     const filename = `baseline-${new Date().toISOString().split('T')[0]}.json`;
     const filepath = path.join(resultsDir, filename);
-    
+
     fs.writeFileSync(filepath, JSON.stringify(this.results, null, 2));
     console.log(`💾 Results saved to: ${filepath}`);
   }
@@ -203,10 +208,12 @@ class PerformanceBaseline {
     console.log(`Fastest Endpoint: ${this.results.summary.fastestEndpoint}`);
     console.log(`Slowest Endpoint: ${this.results.summary.slowestEndpoint}`);
     console.log('\nEndpoint Details:');
-    
+
     Object.entries(this.results.endpoints).forEach(([name, data]) => {
       if (data.responseTime) {
-        console.log(`  ${name}: ${data.responseTime.avg.toFixed(2)}ms avg (${data.successRate.toFixed(1)}% success)`);
+        console.log(
+          `  ${name}: ${data.responseTime.avg.toFixed(2)}ms avg (${data.successRate.toFixed(1)}% success)`,
+        );
       }
     });
   }

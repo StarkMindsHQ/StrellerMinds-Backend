@@ -1,20 +1,20 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common"
-import type { TranslationService } from "../services/translation.service"
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import type { TranslationService } from '../services/translation.service';
 // import { CreateTranslationDto } from "../dto/create-translation.dto"
 // import { UpdateTranslationDto } from "../dto/update-translation.dto"
 // import { BulkCreateTranslationDto } from "../dto/bulk-create-translation.dto"
 // import { LanguageGuard } from "../guards/language.guard"
-import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from "@nestjs/swagger"
+import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags("Content Translation")
-@Controller("translations")
+@ApiTags('Content Translation')
+@Controller('translations')
 export class TranslationController {
   constructor(private readonly translationService: TranslationService) {}
 
   @ApiOperation({ summary: 'Get all translations for a language' })
   @ApiParam({ name: 'languageCode', description: 'Language code (e.g., en, es, fr)' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns all translations for the specified language',
   })
   @Get(':languageCode')
@@ -26,25 +26,31 @@ export class TranslationController {
     };
   }
 
-  @ApiOperation({ summary: "Get translations by category for a language" })
-  @ApiParam({ name: "languageCode", description: "Language code (e.g., en, es, fr)" })
-  @ApiParam({ name: "category", description: "Translation category (e.g., UI, Puzzle, Hint)" })
+  @ApiOperation({ summary: 'Get translations by category for a language' })
+  @ApiParam({ name: 'languageCode', description: 'Language code (e.g., en, es, fr)' })
+  @ApiParam({ name: 'category', description: 'Translation category (e.g., UI, Puzzle, Hint)' })
   @ApiResponse({
     status: 200,
-    description: "Returns translations for the specified language and category",
+    description: 'Returns translations for the specified language and category',
   })
-  @Get(":languageCode/category/:category")
-  async getTranslationsByCategory(@Param('languageCode') languageCode: string, @Param('category') category: string) {
-    const translations = await this.translationService.getTranslationsByCategory(languageCode, category)
+  @Get(':languageCode/category/:category')
+  async getTranslationsByCategory(
+    @Param('languageCode') languageCode: string,
+    @Param('category') category: string,
+  ) {
+    const translations = await this.translationService.getTranslationsByCategory(
+      languageCode,
+      category,
+    );
     return {
       success: true,
       data: translations,
-    }
+    };
   }
 
   // @ApiOperation({ summary: 'Create a new translation' })
-  // @ApiResponse({ 
-  //   status: 201, 
+  // @ApiResponse({
+  //   status: 201,
   //   description: 'Creates a new translation',
   // })
   // @Post()
@@ -74,8 +80,8 @@ export class TranslationController {
 
   @ApiOperation({ summary: 'Delete a translation' })
   @ApiParam({ name: 'id', description: 'Translation ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Deletes a translation',
   })
   @Delete(':id')
@@ -88,8 +94,8 @@ export class TranslationController {
   }
 
   // @ApiOperation({ summary: 'Bulk create translations' })
-  // @ApiResponse({ 
-  //   status: 201, 
+  // @ApiResponse({
+  //   status: 201,
   //   description: 'Creates multiple translations at once',
   // })
   // @Post('bulk')

@@ -85,7 +85,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const nameErrors = errors.filter(error => error.property === 'name');
+      const nameErrors = errors.filter((error) => error.property === 'name');
       expect(nameErrors).toHaveLength(0);
     });
 
@@ -107,7 +107,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const nameErrors = errors.filter(error => error.property === 'name');
+      const nameErrors = errors.filter((error) => error.property === 'name');
       expect(nameErrors.length).toBeGreaterThan(0);
       expect(nameErrors[0].constraints).toHaveProperty('isNotEmpty');
     });
@@ -132,7 +132,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const emailErrors = errors.filter(error => error.property === 'email');
+      const emailErrors = errors.filter((error) => error.property === 'email');
       expect(emailErrors).toHaveLength(0);
     });
 
@@ -154,7 +154,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const emailErrors = errors.filter(error => error.property === 'email');
+      const emailErrors = errors.filter((error) => error.property === 'email');
       expect(emailErrors.length).toBeGreaterThan(0);
       expect(emailErrors[0].constraints).toHaveProperty('isEmail');
     });
@@ -179,7 +179,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const descriptionErrors = errors.filter(error => error.property === 'description');
+      const descriptionErrors = errors.filter((error) => error.property === 'description');
       expect(descriptionErrors).toHaveLength(0);
     });
 
@@ -201,7 +201,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const descriptionErrors = errors.filter(error => error.property === 'description');
+      const descriptionErrors = errors.filter((error) => error.property === 'description');
       expect(descriptionErrors.length).toBeGreaterThan(0);
       expect(descriptionErrors[0].constraints).toHaveProperty('length');
     });
@@ -226,7 +226,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const scoreErrors = errors.filter(error => error.property === 'score');
+      const scoreErrors = errors.filter((error) => error.property === 'score');
       expect(scoreErrors).toHaveLength(0);
     });
 
@@ -248,7 +248,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const scoreErrors = errors.filter(error => error.property === 'score');
+      const scoreErrors = errors.filter((error) => error.property === 'score');
       expect(scoreErrors.length).toBeGreaterThan(0);
       expect(scoreErrors[0].constraints).toHaveProperty('max');
     });
@@ -273,7 +273,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const idErrors = errors.filter(error => error.property === 'id');
+      const idErrors = errors.filter((error) => error.property === 'id');
       expect(idErrors).toHaveLength(0);
     });
 
@@ -295,7 +295,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const idErrors = errors.filter(error => error.property === 'id');
+      const idErrors = errors.filter((error) => error.property === 'id');
       expect(idErrors.length).toBeGreaterThan(0);
       expect(idErrors[0].constraints).toHaveProperty('isUuid');
     });
@@ -320,7 +320,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const codeErrors = errors.filter(error => error.property === 'code');
+      const codeErrors = errors.filter((error) => error.property === 'code');
       expect(codeErrors).toHaveLength(0);
     });
 
@@ -342,7 +342,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const codeErrors = errors.filter(error => error.property === 'code');
+      const codeErrors = errors.filter((error) => error.property === 'code');
       expect(codeErrors.length).toBeGreaterThan(0);
       expect(codeErrors[0].constraints).toHaveProperty('matches');
     });
@@ -367,7 +367,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const phoneErrors = errors.filter(error => error.property === 'phone');
+      const phoneErrors = errors.filter((error) => error.property === 'phone');
       expect(phoneErrors).toHaveLength(0);
     });
 
@@ -389,7 +389,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const phoneErrors = errors.filter(error => error.property === 'phone');
+      const phoneErrors = errors.filter((error) => error.property === 'phone');
       expect(phoneErrors.length).toBeGreaterThan(0);
       expect(phoneErrors[0].constraints).toHaveProperty('matches');
     });
@@ -414,7 +414,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const websiteErrors = errors.filter(error => error.property === 'website');
+      const websiteErrors = errors.filter((error) => error.property === 'website');
       expect(websiteErrors).toHaveLength(0);
     });
 
@@ -436,7 +436,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const websiteErrors = errors.filter(error => error.property === 'website');
+      const websiteErrors = errors.filter((error) => error.property === 'website');
       expect(websiteErrors.length).toBeGreaterThan(0);
       expect(websiteErrors[0].constraints).toHaveProperty('matches');
     });
@@ -461,7 +461,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const ipErrors = errors.filter(error => error.property === 'ipAddress');
+      const ipErrors = errors.filter((error) => error.property === 'ipAddress');
       expect(ipErrors).toHaveLength(0);
     });
 
@@ -483,7 +483,7 @@ describe('Data Quality Decorators', () => {
       });
 
       const errors = await validate(entity);
-      const ipErrors = errors.filter(error => error.property === 'ipAddress');
+      const ipErrors = errors.filter((error) => error.property === 'ipAddress');
       expect(ipErrors.length).toBeGreaterThan(0);
       expect(ipErrors[0].constraints).toHaveProperty('matches');
     });

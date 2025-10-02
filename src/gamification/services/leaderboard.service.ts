@@ -31,4 +31,4 @@ export class LeaderboardService {
     // Optionally, recalculate ranks here
     return entry;
   }
-} 
+}

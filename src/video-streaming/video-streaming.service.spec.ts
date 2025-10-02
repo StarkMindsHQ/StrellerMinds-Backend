@@ -145,7 +145,9 @@ describe('VideoStreamingService', () => {
 
       jest.spyOn(videoRepository, 'create').mockReturnValue(mockVideo);
       jest.spyOn(videoRepository, 'save').mockResolvedValue(mockVideo);
-      jest.spyOn(cloudFrontService, 'generateVideoKey').mockReturnValue('videos/video-123/original.mp4');
+      jest
+        .spyOn(cloudFrontService, 'generateVideoKey')
+        .mockReturnValue('videos/video-123/original.mp4');
 
       const result = await service.createVideo(createVideoDto, mockUser);
 
@@ -182,7 +184,9 @@ describe('VideoStreamingService', () => {
         ...mockVideo,
         status: VideoStatus.UPLOADING,
       });
-      jest.spyOn(cloudFrontService, 'generateVideoKey').mockReturnValue('videos/video-123/original.mp4');
+      jest
+        .spyOn(cloudFrontService, 'generateVideoKey')
+        .mockReturnValue('videos/video-123/original.mp4');
       jest.spyOn(cloudFrontService, 'uploadVideo').mockResolvedValue(uploadResult);
       jest.spyOn(processingService, 'queueVideoProcessing').mockResolvedValue();
 
@@ -227,9 +231,9 @@ describe('VideoStreamingService', () => {
       jest.spyOn(service, 'findVideoById').mockResolvedValue(mockVideo);
       jest.spyOn(securityService, 'validateVideoAccess').mockResolvedValue(accessResult);
 
-      await expect(
-        service.getVideoStreamingInfo('video-123', 'user-456'),
-      ).rejects.toThrow('Access denied');
+      await expect(service.getVideoStreamingInfo('video-123', 'user-456')).rejects.toThrow(
+        'Access denied',
+      );
     });
   });
 
@@ -244,11 +248,21 @@ describe('VideoStreamingService', () => {
       };
 
       jest.spyOn(service, 'findVideoById').mockResolvedValue(mockVideo);
-      jest.spyOn(analyticsService, 'getEngagementMetrics').mockResolvedValue(mockAnalytics.engagement as any);
-      jest.spyOn(analyticsService, 'getPerformanceMetrics').mockResolvedValue(mockAnalytics.performance as any);
-      jest.spyOn(analyticsService, 'getGeographicMetrics').mockResolvedValue(mockAnalytics.geographic as any);
-      jest.spyOn(analyticsService, 'getDeviceMetrics').mockResolvedValue(mockAnalytics.device as any);
-      jest.spyOn(analyticsService, 'getQualityMetrics').mockResolvedValue(mockAnalytics.quality as any);
+      jest
+        .spyOn(analyticsService, 'getEngagementMetrics')
+        .mockResolvedValue(mockAnalytics.engagement as any);
+      jest
+        .spyOn(analyticsService, 'getPerformanceMetrics')
+        .mockResolvedValue(mockAnalytics.performance as any);
+      jest
+        .spyOn(analyticsService, 'getGeographicMetrics')
+        .mockResolvedValue(mockAnalytics.geographic as any);
+      jest
+        .spyOn(analyticsService, 'getDeviceMetrics')
+        .mockResolvedValue(mockAnalytics.device as any);
+      jest
+        .spyOn(analyticsService, 'getQualityMetrics')
+        .mockResolvedValue(mockAnalytics.quality as any);
 
       const result = await service.getVideoAnalytics('video-123', 'user-123');
 
@@ -263,9 +277,9 @@ describe('VideoStreamingService', () => {
     it('should throw error for non-owner', async () => {
       jest.spyOn(service, 'findVideoById').mockResolvedValue(mockVideo);
 
-      await expect(
-        service.getVideoAnalytics('video-123', 'user-456'),
-      ).rejects.toThrow('You do not have permission to view analytics for this video');
+      await expect(service.getVideoAnalytics('video-123', 'user-456')).rejects.toThrow(
+        'You do not have permission to view analytics for this video',
+      );
     });
   });
 

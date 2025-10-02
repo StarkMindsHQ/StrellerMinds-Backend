@@ -7,6 +7,7 @@ This directory contains environment-specific secrets files. These files should *
 Create a secrets file for your environment:
 
 ### Development
+
 ```bash
 # secrets/development.secrets
 DATABASE_PASSWORD=your_dev_password
@@ -17,6 +18,7 @@ SIGNER_SECRET_KEY=your_signer_key
 ```
 
 ### Staging
+
 ```bash
 # secrets/staging.secrets
 DATABASE_PASSWORD=your_staging_password
@@ -29,6 +31,7 @@ AWS_CLOUDFRONT_PRIVATE_KEY=your_cloudfront_key
 ```
 
 ### Production
+
 ```bash
 # secrets/production.secrets
 DATABASE_PASSWORD=your_production_password
@@ -43,6 +46,7 @@ AWS_CLOUDFRONT_PRIVATE_KEY=your_cloudfront_key
 ## File Location
 
 The secrets manager looks for secrets in the following locations (in order):
+
 1. Custom path from `SECRETS_FILE_PATH` environment variable
 2. `secrets/{environment}.secrets` in project root
 3. `/etc/app/secrets/{environment}.secrets` (production path)

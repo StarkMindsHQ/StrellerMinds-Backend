@@ -66,13 +66,13 @@ All errors are logged with rich context using Winston logger:
 
 Errors are categorized for better tracking and reporting:
 
-| Category | Error Codes | Description |
-|----------|-------------|-------------|
-| AUTHENTICATION | UNAUTHORIZED, INVALID_CREDENTIALS, TOKEN_EXPIRED, FORBIDDEN | Authentication and authorization failures |
-| RESOURCE | NOT_FOUND, ALREADY_EXISTS, CONFLICT | Resource-related errors |
-| VALIDATION | INVALID_INPUT, MISSING_REQUIRED_FIELD, INVALID_FORMAT | Input validation failures |
-| BUSINESS_LOGIC | INSUFFICIENT_FUNDS, PAYMENT_FAILED, COURSE_NOT_AVAILABLE, ENROLLMENT_CLOSED | Business rule violations |
-| SYSTEM | INTERNAL_ERROR, SERVICE_UNAVAILABLE, DATABASE_ERROR, EXTERNAL_SERVICE_ERROR | System-level failures |
+| Category       | Error Codes                                                                 | Description                               |
+| -------------- | --------------------------------------------------------------------------- | ----------------------------------------- |
+| AUTHENTICATION | UNAUTHORIZED, INVALID_CREDENTIALS, TOKEN_EXPIRED, FORBIDDEN                 | Authentication and authorization failures |
+| RESOURCE       | NOT_FOUND, ALREADY_EXISTS, CONFLICT                                         | Resource-related errors                   |
+| VALIDATION     | INVALID_INPUT, MISSING_REQUIRED_FIELD, INVALID_FORMAT                       | Input validation failures                 |
+| BUSINESS_LOGIC | INSUFFICIENT_FUNDS, PAYMENT_FAILED, COURSE_NOT_AVAILABLE, ENROLLMENT_CLOSED | Business rule violations                  |
+| SYSTEM         | INTERNAL_ERROR, SERVICE_UNAVAILABLE, DATABASE_ERROR, EXTERNAL_SERVICE_ERROR | System-level failures                     |
 
 ## 5. Error Monitoring Dashboard
 

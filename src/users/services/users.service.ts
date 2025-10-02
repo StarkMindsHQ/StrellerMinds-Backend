@@ -9,7 +9,11 @@ import { Repository, FindOptionsWhere } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { CreateUsersDto } from '../dtos/create.users.dto';
 import { updateUsersDto } from '../dtos/update.users.dto';
-import { BaseService, PaginationOptions, PaginatedResult } from '../../common/services/base.service';
+import {
+  BaseService,
+  PaginationOptions,
+  PaginatedResult,
+} from '../../common/services/base.service';
 import { IUserService } from '../../common/interfaces/service.interface';
 import { SharedUtilityService } from '../../common/services/shared-utility.service';
 import * as bcrypt from 'bcrypt';
@@ -45,9 +49,13 @@ export class UsersService extends BaseService<User> implements IUserService<User
       }
 
       // Validate password strength
-      const passwordValidation = this.sharedUtilityService.validatePasswordStrength(createUsersDto.password);
+      const passwordValidation = this.sharedUtilityService.validatePasswordStrength(
+        createUsersDto.password,
+      );
       if (!passwordValidation.isValid) {
-        throw new ConflictException(`Password validation failed: ${passwordValidation.errors.join(', ')}`);
+        throw new ConflictException(
+          `Password validation failed: ${passwordValidation.errors.join(', ')}`,
+        );
       }
 
       // Hash password
@@ -59,7 +67,9 @@ export class UsersService extends BaseService<User> implements IUserService<User
         password: hashedPassword,
         firstName: this.sharedUtilityService.sanitizeInput(createUsersDto.firstName),
         lastName: this.sharedUtilityService.sanitizeInput(createUsersDto.lastName),
-        bio: createUsersDto.bio ? this.sharedUtilityService.sanitizeInput(createUsersDto.bio) : undefined,
+        bio: createUsersDto.bio
+          ? this.sharedUtilityService.sanitizeInput(createUsersDto.bio)
+          : undefined,
       };
 
       return await this.createEntity(sanitizedData);
@@ -104,17 +114,20 @@ export class UsersService extends BaseService<User> implements IUserService<User
   /**
    * Update user by ID
    */
-  public async update(
-    id: string,
-    updateUserDto: updateUsersDto,
-  ): Promise<User> {
+  public async update(id: string, updateUserDto: updateUsersDto): Promise<User> {
     try {
       // Sanitize input data
       const sanitizedData = this.sharedUtilityService.removeEmptyValues({
         ...updateUserDto,
-        firstName: updateUserDto.firstName ? this.sharedUtilityService.sanitizeInput(updateUserDto.firstName) : undefined,
-        lastName: updateUserDto.lastName ? this.sharedUtilityService.sanitizeInput(updateUserDto.lastName) : undefined,
-        bio: updateUserDto.bio ? this.sharedUtilityService.sanitizeInput(updateUserDto.bio) : undefined,
+        firstName: updateUserDto.firstName
+          ? this.sharedUtilityService.sanitizeInput(updateUserDto.firstName)
+          : undefined,
+        lastName: updateUserDto.lastName
+          ? this.sharedUtilityService.sanitizeInput(updateUserDto.lastName)
+          : undefined,
+        bio: updateUserDto.bio
+          ? this.sharedUtilityService.sanitizeInput(updateUserDto.bio)
+          : undefined,
       });
 
       return await this.updateEntity(id, sanitizedData);
@@ -226,14 +239,17 @@ export class UsersService extends BaseService<User> implements IUserService<User
   async findByCriteria(criteria: Record<string, any>): Promise<User[]> {
     try {
       // Sanitize criteria
-      const sanitizedCriteria = Object.entries(criteria).reduce((acc, [key, value]) => {
-        if (typeof value === 'string') {
-          acc[key] = this.sharedUtilityService.sanitizeInput(value);
-        } else {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as Record<string, any>);
+      const sanitizedCriteria = Object.entries(criteria).reduce(
+        (acc, [key, value]) => {
+          if (typeof value === 'string') {
+            acc[key] = this.sharedUtilityService.sanitizeInput(value);
+          } else {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
 
       return await this.userRepository.find({
         where: sanitizedCriteria as FindOptionsWhere<User>,

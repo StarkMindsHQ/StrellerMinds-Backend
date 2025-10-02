@@ -12,7 +12,7 @@ describe('ErrorLog', () => {
 
   it('should have correct properties', () => {
     const errorLog = new ErrorLog();
-    
+
     // Test that all properties exist
     expect(errorLog).toHaveProperty('id');
     expect(errorLog).toHaveProperty('correlationId');
@@ -33,7 +33,7 @@ describe('ErrorLog', () => {
 
   it('should have correct default values', () => {
     const errorLog = new ErrorLog();
-    
+
     // Test default values
     expect(errorLog.severity).toBe('medium');
     expect(errorLog.category).toBe('UNKNOWN');
@@ -41,7 +41,7 @@ describe('ErrorLog', () => {
 
   it('should accept assigned values', () => {
     const errorLog = new ErrorLog();
-    
+
     // Assign values
     errorLog.id = 'test-id';
     errorLog.correlationId = 'test-correlation-id';
@@ -57,7 +57,7 @@ describe('ErrorLog', () => {
     errorLog.context = { test: 'context' };
     errorLog.severity = 'critical';
     errorLog.category = 'SYSTEM';
-    
+
     // Test assigned values
     expect(errorLog.id).toBe('test-id');
     expect(errorLog.correlationId).toBe('test-correlation-id');

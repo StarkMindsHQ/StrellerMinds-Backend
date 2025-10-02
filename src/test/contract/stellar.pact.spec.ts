@@ -27,9 +27,7 @@ describe('Stellar Horizon API Pact', () => {
     );
 
     it('returns the expected transaction', async () => {
-      const response = await axios.get(
-        `${provider.mockService.baseUrl}/transactions/12345`,
-      );
+      const response = await axios.get(`${provider.mockService.baseUrl}/transactions/12345`);
       expect(response.status).toBe(200);
       expect(response.data.id).toBe('12345');
     });

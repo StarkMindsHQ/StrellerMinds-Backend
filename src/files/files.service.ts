@@ -23,11 +23,7 @@ export class FilesService {
     }
   }
 
-  async saveChunk(
-    uploadId: string,
-    chunkIndex: number,
-    file: UploadedFileLike,
-  ) {
+  async saveChunk(uploadId: string, chunkIndex: number, file: UploadedFileLike) {
     const chunkDir = path.join(this.tempDir, uploadId);
     if (!fs.existsSync(chunkDir)) {
       fs.mkdirSync(chunkDir, { recursive: true });
@@ -40,11 +36,7 @@ export class FilesService {
    * Assembles file chunks, compresses if video, uploads to Cloudinary, and returns the CDN URL.
    * @returns The Cloudinary CDN URL for the uploaded file
    */
-  async assembleChunks(
-    uploadId: string,
-    fileName: string,
-    totalChunks: number,
-  ): Promise<string> {
+  async assembleChunks(uploadId: string, fileName: string, totalChunks: number): Promise<string> {
     const chunkDir = path.join(this.tempDir, uploadId);
     const finalPath = path.join(process.cwd(), 'uploads', fileName);
     const writeStream = fs.createWriteStream(finalPath);
@@ -56,9 +48,7 @@ export class FilesService {
     writeStream.end();
 
     // Wait for the write stream to finish
-    await new Promise<void>((resolve) =>
-      writeStream.on('finish', () => resolve()),
-    );
+    await new Promise<void>((resolve) => writeStream.on('finish', () => resolve()));
 
     // Cleanup chunks
     const files = await fs.promises.readdir(chunkDir);
@@ -84,8 +74,7 @@ export class FilesService {
     }
 
     // Upload to Cloudinary and return the CDN URL
-    const uploadResult =
-      await this.cloudinaryService.uploadVideoFromPath(finalPath);
+    const uploadResult = await this.cloudinaryService.uploadVideoFromPath(finalPath);
     // Store hash-to-url mapping in Redis (no expiration)
     await this.redisService.set(redisKey, uploadResult.secure_url);
     return uploadResult.secure_url;
@@ -138,9 +127,7 @@ export class FilesService {
     let receivedChunks: number[] = [];
     if (fs.existsSync(chunkDir)) {
       const files = await fs.promises.readdir(chunkDir);
-      receivedChunks = files
-        .map((f) => parseInt(f, 10))
-        .filter((n) => !isNaN(n));
+      receivedChunks = files.map((f) => parseInt(f, 10)).filter((n) => !isNaN(n));
     }
     return {
       uploadId,

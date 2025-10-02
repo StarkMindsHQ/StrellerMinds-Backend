@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserProfile } from './entities/user-profile.entity';
@@ -19,10 +15,7 @@ export class UserProfilesService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(
-    userId: string,
-    createUserProfileDto: CreateUserProfileDto,
-  ): Promise<UserProfile> {
+  async create(userId: string, createUserProfileDto: CreateUserProfileDto): Promise<UserProfile> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -49,15 +42,7 @@ export class UserProfilesService {
   async findAll(): Promise<UserProfile[]> {
     return this.userProfileRepository.find({
       where: { isPublic: true },
-      select: [
-        'id',
-        'firstName',
-        'lastName',
-        'bio',
-        'avatarUrl',
-        'createdAt',
-        'updatedAt',
-      ],
+      select: ['id', 'firstName', 'lastName', 'bio', 'avatarUrl', 'createdAt', 'updatedAt'],
     });
   }
 
@@ -71,25 +56,18 @@ export class UserProfilesService {
     return profile;
   }
 
-  async findByUserId(
-    userId: string,
-    requestingUserId: string,
-  ): Promise<UserProfile> {
+  async findByUserId(userId: string, requestingUserId: string): Promise<UserProfile> {
     const profile = await this.userProfileRepository.findOne({
       where: { userId },
     });
 
     if (!profile) {
-      throw new NotFoundException(
-        `Profile for user with ID ${userId} not found`,
-      );
+      throw new NotFoundException(`Profile for user with ID ${userId} not found`);
     }
 
     // If profile is not public and the requesting user is not the owner
     if (!profile.isPublic && userId !== requestingUserId) {
-      throw new ForbiddenException(
-        'You do not have permission to view this profile',
-      );
+      throw new ForbiddenException('You do not have permission to view this profile');
     }
 
     return profile;
@@ -108,9 +86,7 @@ export class UserProfilesService {
 
     // Check if the user is the owner of the profile
     if (profile.userId !== userId) {
-      throw new ForbiddenException(
-        'You do not have permission to update this profile',
-      );
+      throw new ForbiddenException('You do not have permission to update this profile');
     }
 
     await this.userProfileRepository.update(id, updateUserProfileDto);
@@ -137,9 +113,7 @@ export class UserProfilesService {
 
     // Check if the user is the owner of the profile
     if (profile.userId !== userId) {
-      throw new ForbiddenException(
-        'You do not have permission to delete this profile',
-      );
+      throw new ForbiddenException('You do not have permission to delete this profile');
     }
 
     await this.userProfileRepository.delete(id);
@@ -150,10 +124,8 @@ export class UserProfilesService {
     if (!profile) {
       throw new NotFoundException(`Profile for user ${userId} not found`);
     }
-  
+
     profile.preferredLanguage = lang;
     await this.userProfileRepository.save(profile);
   }
-
-  
 }

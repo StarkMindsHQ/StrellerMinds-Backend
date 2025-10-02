@@ -32,7 +32,7 @@ export class MonitoringMiddleware implements NestMiddleware {
 
     // Override res.end to capture response data
     const originalEnd = res.end;
-    res.end = function(chunk: any, encoding?: any, cb?: () => void): Response {
+    res.end = function (chunk: any, encoding?: any, cb?: () => void): Response {
       const endTime = Date.now();
       const duration = endTime - startTime;
       const statusCode = res.statusCode.toString();
@@ -59,7 +59,7 @@ export class MonitoringMiddleware implements NestMiddleware {
       // Log request completion
       const logLevel = res.statusCode >= 400 ? 'warn' : 'debug';
       const logger = new Logger(MonitoringMiddleware.name);
-      
+
       logger[logLevel](`${method} ${route} - ${statusCode} - ${duration}ms`, {
         method,
         route,
@@ -80,25 +80,27 @@ export class MonitoringMiddleware implements NestMiddleware {
   private extractRoute(req: Request): string {
     // Try to get the route pattern from the request
     const route = req.route?.path || req.url;
-    
+
     // Clean up the route for better grouping in metrics
     if (typeof route === 'string') {
       return this.normalizeRoute(route);
     }
-    
+
     return req.url || 'unknown';
   }
 
   private normalizeRoute(route: string): string {
     // Remove query parameters
     const pathOnly = route.split('?')[0];
-    
+
     // Replace common ID patterns with placeholders for better metric grouping
-    return pathOnly
-      .replace(/\/\d+/g, '/:id') // Replace numeric IDs
-      .replace(/\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '/:uuid') // Replace UUIDs
-      .replace(/\/[a-f0-9]{24}/g, '/:objectId') // Replace MongoDB ObjectIds
-      || '/';
+    return (
+      pathOnly
+        .replace(/\/\d+/g, '/:id') // Replace numeric IDs
+        .replace(/\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '/:uuid') // Replace UUIDs
+        .replace(/\/[a-f0-9]{24}/g, '/:objectId') || // Replace MongoDB ObjectIds
+      '/'
+    );
   }
 }
 
@@ -124,8 +126,11 @@ export class ResponseTimeMiddleware implements NestMiddleware {
       res.set('X-Response-Time', `${duration.toFixed(2)}ms`);
 
       // Log slow requests
-      if (duration > 1000) { // Log requests slower than 1 second
-        this.logger.warn(`Slow request detected: ${req.method} ${req.url} - ${duration.toFixed(2)}ms`);
+      if (duration > 1000) {
+        // Log requests slower than 1 second
+        this.logger.warn(
+          `Slow request detected: ${req.method} ${req.url} - ${duration.toFixed(2)}ms`,
+        );
       }
     });
 
@@ -142,8 +147,8 @@ export class ErrorTrackingMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction): void {
     // Capture and track errors
     const originalSend = res.send;
-    
-    res.send = function(body: any) {
+
+    res.send = function (body: any) {
       if (res.statusCode >= 400) {
         const errorInfo = {
           method: req.method,
@@ -189,8 +194,8 @@ export class SecurityMonitoringMiddleware implements NestMiddleware {
     const query = JSON.stringify(req.query || {});
 
     // Check for suspicious patterns
-    const suspicious = this.suspiciousPatterns.some(pattern => 
-      pattern.test(url) || pattern.test(body) || pattern.test(query)
+    const suspicious = this.suspiciousPatterns.some(
+      (pattern) => pattern.test(url) || pattern.test(body) || pattern.test(query),
     );
 
     if (suspicious) {
@@ -205,7 +210,7 @@ export class SecurityMonitoringMiddleware implements NestMiddleware {
     // Rate limiting indicators
     const forwardedFor = req.get('X-Forwarded-For');
     const realIp = req.get('X-Real-IP');
-    
+
     if (forwardedFor || realIp) {
       this.logger.debug('Request through proxy', {
         ip: req.ip,

@@ -30,15 +30,10 @@ export class EmailSendRequestedEvent extends DomainEvent {
     private readonly payload: EmailSendRequestedPayload,
     metadata: Partial<DomainEventMetadata> = {},
   ) {
-    super(
-      payload.emailId,
-      'Email',
-      1,
-      {
-        ...metadata,
-        correlationId: metadata.correlationId,
-      },
-    );
+    super(payload.emailId, 'Email', 1, {
+      ...metadata,
+      correlationId: metadata.correlationId,
+    });
   }
 
   getPayload(): EmailSendRequestedPayload {

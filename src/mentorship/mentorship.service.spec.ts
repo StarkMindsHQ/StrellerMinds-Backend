@@ -31,8 +31,24 @@ describe('MentorshipService.matchMentorMentee', () => {
   it('returns mentors ordered by score when matching skills in bio/username', async () => {
     userRepo.findOne.mockResolvedValue({ id: 'mentee-1' } as any);
     userRepo.find.mockResolvedValue([
-      { id: 'm1', isInstructor: true, reputation: 1, bio: 'Solidity and Stellar dev', username: 'dev1', firstName: 'A', lastName: 'B' } as any,
-      { id: 'm2', isInstructor: true, reputation: 100, bio: 'Python', username: 'py', firstName: 'C', lastName: 'D' } as any,
+      {
+        id: 'm1',
+        isInstructor: true,
+        reputation: 1,
+        bio: 'Solidity and Stellar dev',
+        username: 'dev1',
+        firstName: 'A',
+        lastName: 'B',
+      } as any,
+      {
+        id: 'm2',
+        isInstructor: true,
+        reputation: 100,
+        bio: 'Python',
+        username: 'py',
+        firstName: 'C',
+        lastName: 'D',
+      } as any,
     ]);
 
     const result = await service.matchMentorMentee('mentee-1', { skills: ['Stellar'] });
@@ -40,5 +56,3 @@ describe('MentorshipService.matchMentorMentee', () => {
     expect(result.length).toBeGreaterThan(0);
   });
 });
-
-

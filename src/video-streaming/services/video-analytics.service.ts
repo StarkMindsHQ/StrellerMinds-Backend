@@ -83,7 +83,9 @@ export class VideoAnalyticsService {
         await this.incrementViewCount(eventData.videoId);
       }
 
-      this.logger.debug(`Analytics event recorded: ${eventData.eventType} for video ${eventData.videoId}`);
+      this.logger.debug(
+        `Analytics event recorded: ${eventData.eventType} for video ${eventData.videoId}`,
+      );
       return savedAnalytics;
     } catch (error) {
       this.logger.error('Failed to record analytics event', error.stack);
@@ -98,7 +100,7 @@ export class VideoAnalyticsService {
   ): Promise<EngagementMetrics> {
     try {
       const whereClause: any = { video: { id: videoId } };
-      
+
       if (startDate && endDate) {
         whereClause.timestamp = Between(startDate, endDate);
       }
@@ -109,7 +111,7 @@ export class VideoAnalyticsService {
       });
 
       const sessions = this.groupEventsBySessions(events);
-      
+
       return {
         totalViews: this.calculateTotalViews(sessions),
         uniqueViewers: this.calculateUniqueViewers(sessions),
@@ -131,7 +133,7 @@ export class VideoAnalyticsService {
     endDate?: Date,
   ): Promise<PerformanceMetrics> {
     try {
-      const whereClause: any = { 
+      const whereClause: any = {
         video: { id: videoId },
         eventType: In([
           AnalyticsEventType.VIEW_START,
@@ -141,7 +143,7 @@ export class VideoAnalyticsService {
           AnalyticsEventType.ERROR,
         ]),
       };
-      
+
       if (startDate && endDate) {
         whereClause.timestamp = Between(startDate, endDate);
       }
@@ -172,11 +174,11 @@ export class VideoAnalyticsService {
     endDate?: Date,
   ): Promise<GeographicMetrics> {
     try {
-      const whereClause: any = { 
+      const whereClause: any = {
         video: { id: videoId },
         eventType: AnalyticsEventType.VIEW_START,
       };
-      
+
       if (startDate && endDate) {
         whereClause.timestamp = Between(startDate, endDate);
       }
@@ -189,14 +191,14 @@ export class VideoAnalyticsService {
       const viewsByCountry: Record<string, number> = {};
       const viewsByRegion: Record<string, number> = {};
 
-      events.forEach(event => {
+      events.forEach((event) => {
         if (event.geolocation?.country) {
-          viewsByCountry[event.geolocation.country] = 
+          viewsByCountry[event.geolocation.country] =
             (viewsByCountry[event.geolocation.country] || 0) + 1;
         }
-        
+
         if (event.geolocation?.region) {
-          viewsByRegion[event.geolocation.region] = 
+          viewsByRegion[event.geolocation.region] =
             (viewsByRegion[event.geolocation.region] || 0) + 1;
         }
       });
@@ -228,11 +230,11 @@ export class VideoAnalyticsService {
     endDate?: Date,
   ): Promise<DeviceMetrics> {
     try {
-      const whereClause: any = { 
+      const whereClause: any = {
         video: { id: videoId },
         eventType: AnalyticsEventType.VIEW_START,
       };
-      
+
       if (startDate && endDate) {
         whereClause.timestamp = Between(startDate, endDate);
       }
@@ -247,24 +249,21 @@ export class VideoAnalyticsService {
       const operatingSystems: Record<string, number> = {};
       const screenResolutions: Record<string, number> = {};
 
-      events.forEach(event => {
+      events.forEach((event) => {
         if (event.deviceInfo?.type) {
-          deviceTypes[event.deviceInfo.type] = 
-            (deviceTypes[event.deviceInfo.type] || 0) + 1;
+          deviceTypes[event.deviceInfo.type] = (deviceTypes[event.deviceInfo.type] || 0) + 1;
         }
-        
+
         if (event.deviceInfo?.browser) {
-          browsers[event.deviceInfo.browser] = 
-            (browsers[event.deviceInfo.browser] || 0) + 1;
+          browsers[event.deviceInfo.browser] = (browsers[event.deviceInfo.browser] || 0) + 1;
         }
-        
+
         if (event.deviceInfo?.os) {
-          operatingSystems[event.deviceInfo.os] = 
-            (operatingSystems[event.deviceInfo.os] || 0) + 1;
+          operatingSystems[event.deviceInfo.os] = (operatingSystems[event.deviceInfo.os] || 0) + 1;
         }
-        
+
         if (event.deviceInfo?.screenResolution) {
-          screenResolutions[event.deviceInfo.screenResolution] = 
+          screenResolutions[event.deviceInfo.screenResolution] =
             (screenResolutions[event.deviceInfo.screenResolution] || 0) + 1;
         }
       });
@@ -288,7 +287,7 @@ export class VideoAnalyticsService {
   ): Promise<QualityMetrics> {
     try {
       const whereClause: any = { video: { id: videoId } };
-      
+
       if (startDate && endDate) {
         whereClause.timestamp = Between(startDate, endDate);
       }
@@ -302,26 +301,24 @@ export class VideoAnalyticsService {
       let qualityChanges = 0;
       let totalSessions = 0;
 
-      events.forEach(event => {
+      events.forEach((event) => {
         if (event.quality) {
-          qualityDistribution[event.quality] = 
-            (qualityDistribution[event.quality] || 0) + 1;
+          qualityDistribution[event.quality] = (qualityDistribution[event.quality] || 0) + 1;
         }
-        
+
         if (event.eventType === AnalyticsEventType.QUALITY_CHANGE) {
           qualityChanges++;
         }
-        
+
         if (event.eventType === AnalyticsEventType.VIEW_START) {
           totalSessions++;
         }
       });
 
       const qualityChangesPerSession = totalSessions > 0 ? qualityChanges / totalSessions : 0;
-      
+
       // Calculate most common quality as average
-      const sortedQualities = Object.entries(qualityDistribution)
-        .sort(([, a], [, b]) => b - a);
+      const sortedQualities = Object.entries(qualityDistribution).sort(([, a], [, b]) => b - a);
       const averageQuality = sortedQualities[0]?.[0] || 'unknown';
 
       return {
@@ -338,14 +335,14 @@ export class VideoAnalyticsService {
 
   private groupEventsBySessions(events: VideoAnalytics[]): Map<string, VideoAnalytics[]> {
     const sessions = new Map<string, VideoAnalytics[]>();
-    
-    events.forEach(event => {
+
+    events.forEach((event) => {
       if (!sessions.has(event.sessionId)) {
         sessions.set(event.sessionId, []);
       }
       sessions.get(event.sessionId)!.push(event);
     });
-    
+
     return sessions;
   }
 
@@ -355,32 +352,32 @@ export class VideoAnalyticsService {
 
   private calculateUniqueViewers(sessions: Map<string, VideoAnalytics[]>): number {
     const uniqueUsers = new Set<string>();
-    
-    sessions.forEach(sessionEvents => {
-      const userEvent = sessionEvents.find(e => e.user);
+
+    sessions.forEach((sessionEvents) => {
+      const userEvent = sessionEvents.find((e) => e.user);
       if (userEvent?.user) {
         uniqueUsers.add(userEvent.user.id);
       }
     });
-    
+
     return uniqueUsers.size;
   }
 
   private calculateAverageWatchTime(sessions: Map<string, VideoAnalytics[]>): number {
     let totalWatchTime = 0;
     let validSessions = 0;
-    
-    sessions.forEach(sessionEvents => {
-      const startEvent = sessionEvents.find(e => e.eventType === AnalyticsEventType.VIEW_START);
-      const endEvent = sessionEvents.find(e => e.eventType === AnalyticsEventType.VIEW_END);
-      
+
+    sessions.forEach((sessionEvents) => {
+      const startEvent = sessionEvents.find((e) => e.eventType === AnalyticsEventType.VIEW_START);
+      const endEvent = sessionEvents.find((e) => e.eventType === AnalyticsEventType.VIEW_END);
+
       if (startEvent && endEvent) {
         const watchTime = endEvent.timestamp.getTime() - startEvent.timestamp.getTime();
         totalWatchTime += watchTime / 1000; // Convert to seconds
         validSessions++;
       }
     });
-    
+
     return validSessions > 0 ? totalWatchTime / validSessions : 0;
   }
 
@@ -391,21 +388,23 @@ export class VideoAnalyticsService {
 
   private calculateCompletionRate(sessions: Map<string, VideoAnalytics[]>): number {
     let completedSessions = 0;
-    
-    sessions.forEach(sessionEvents => {
-      const hasViewEnd = sessionEvents.some(e => e.eventType === AnalyticsEventType.VIEW_END);
-      const maxPosition = Math.max(...sessionEvents.map(e => e.playbackPosition || 0));
-      
+
+    sessions.forEach((sessionEvents) => {
+      const hasViewEnd = sessionEvents.some((e) => e.eventType === AnalyticsEventType.VIEW_END);
+      const maxPosition = Math.max(...sessionEvents.map((e) => e.playbackPosition || 0));
+
       // Consider completed if reached 90% or has view_end event
       if (hasViewEnd || maxPosition > 0.9) {
         completedSessions++;
       }
     });
-    
+
     return sessions.size > 0 ? (completedSessions / sessions.size) * 100 : 0;
   }
 
-  private calculateDropOffPoints(sessions: Map<string, VideoAnalytics[]>): Array<{ timestamp: number; percentage: number }> {
+  private calculateDropOffPoints(
+    sessions: Map<string, VideoAnalytics[]>,
+  ): Array<{ timestamp: number; percentage: number }> {
     // Implementation for drop-off points calculation
     return []; // Placeholder
   }
@@ -417,35 +416,37 @@ export class VideoAnalyticsService {
 
   private calculateAverageLoadTime(events: VideoAnalytics[]): number {
     const loadTimes = events
-      .filter(e => e.performanceMetrics?.loadTime)
-      .map(e => e.performanceMetrics!.loadTime!);
-    
-    return loadTimes.length > 0 ? 
-      loadTimes.reduce((sum, time) => sum + time, 0) / loadTimes.length : 0;
+      .filter((e) => e.performanceMetrics?.loadTime)
+      .map((e) => e.performanceMetrics!.loadTime!);
+
+    return loadTimes.length > 0
+      ? loadTimes.reduce((sum, time) => sum + time, 0) / loadTimes.length
+      : 0;
   }
 
   private calculateBufferEvents(events: VideoAnalytics[]): number {
-    return events.filter(e => e.eventType === AnalyticsEventType.BUFFER_START).length;
+    return events.filter((e) => e.eventType === AnalyticsEventType.BUFFER_START).length;
   }
 
   private calculateQualityChanges(events: VideoAnalytics[]): number {
-    return events.filter(e => e.eventType === AnalyticsEventType.QUALITY_CHANGE).length;
+    return events.filter((e) => e.eventType === AnalyticsEventType.QUALITY_CHANGE).length;
   }
 
   private calculateErrorRate(events: VideoAnalytics[]): number {
     const totalEvents = events.length;
-    const errorEvents = events.filter(e => e.eventType === AnalyticsEventType.ERROR).length;
-    
+    const errorEvents = events.filter((e) => e.eventType === AnalyticsEventType.ERROR).length;
+
     return totalEvents > 0 ? (errorEvents / totalEvents) * 100 : 0;
   }
 
   private calculateAverageBitrate(events: VideoAnalytics[]): number {
     const bitrates = events
-      .filter(e => e.performanceMetrics?.averageBitrate)
-      .map(e => e.performanceMetrics!.averageBitrate!);
-    
-    return bitrates.length > 0 ? 
-      bitrates.reduce((sum, bitrate) => sum + bitrate, 0) / bitrates.length : 0;
+      .filter((e) => e.performanceMetrics?.averageBitrate)
+      .map((e) => e.performanceMetrics!.averageBitrate!);
+
+    return bitrates.length > 0
+      ? bitrates.reduce((sum, bitrate) => sum + bitrate, 0) / bitrates.length
+      : 0;
   }
 
   private calculateRebufferRatio(events: VideoAnalytics[]): number {

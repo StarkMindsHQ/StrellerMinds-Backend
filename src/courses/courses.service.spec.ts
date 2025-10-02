@@ -21,8 +21,8 @@ const jest = {
     return mockFn;
   },
   spyOn: () => ({
-    mockImplementation: () => {}
-  })
+    mockImplementation: () => {},
+  }),
 };
 
 import { CourseService } from './courses.service';
@@ -46,7 +46,7 @@ describe('CourseService', () => {
       leftJoin: jest.fn().mockReturnThis(),
       select: jest.fn().mockReturnThis(),
       groupBy: jest.fn().mockReturnThis(),
-      getRawOne: jest.fn().mockResolvedValue(null)
+      getRawOne: jest.fn().mockResolvedValue(null),
     };
 
     mockCourseRepository = {
@@ -58,25 +58,21 @@ describe('CourseService', () => {
       update: jest.fn().mockResolvedValue({}),
       delete: jest.fn().mockResolvedValue({}),
       softDelete: jest.fn().mockResolvedValue({}),
-      count: jest.fn().mockResolvedValue(0)
+      count: jest.fn().mockResolvedValue(0),
     };
 
     // Create mock services
     mockSharedUtilityService = {
       sanitizeInput: jest.fn().mockImplementation((input: string) => input),
-      removeEmptyValues: jest.fn().mockImplementation((input: any) => input)
+      removeEmptyValues: jest.fn().mockImplementation((input: any) => input),
     };
 
     mockEventEmitter = {
-      emit: jest.fn()
+      emit: jest.fn(),
     };
 
     // Create service instance
-    service = new CourseService(
-      mockCourseRepository,
-      mockSharedUtilityService,
-      mockEventEmitter
-    );
+    service = new CourseService(mockCourseRepository, mockSharedUtilityService, mockEventEmitter);
   });
 
   it('should be defined', () => {
@@ -87,9 +83,9 @@ describe('CourseService', () => {
     const instructorId = 'test-instructor-id';
     const options = { page: 1, limit: 10 };
     const relations = ['modules', 'tags'];
-    
+
     await service.findByInstructor(instructorId, options, relations);
-    
+
     // Verify that createQueryBuilder was called
     expect(mockCourseRepository.createQueryBuilder).toHaveBeenCalled();
   });
@@ -98,16 +94,16 @@ describe('CourseService', () => {
     const categoryId = 'test-category-id';
     const options = { page: 1, limit: 10 };
     const relations = ['modules', 'tags'];
-    
+
     await service.findByCategory(categoryId, options, relations);
-    
+
     // Verify that createQueryBuilder was called
     expect(mockCourseRepository.createQueryBuilder).toHaveBeenCalled();
   });
 
   it('should get course statistics with optimized query', async () => {
     const courseId = 'test-course-id';
-    
+
     // Mock the query builder chain for statistics
     const mockStatsQueryBuilder = {
       leftJoin: jest.fn().mockReturnThis(),
@@ -119,14 +115,14 @@ describe('CourseService', () => {
         lessoncount: '10',
         reviewcount: '3',
         enrollmentcount: '25',
-        averagerating: '4.5'
-      })
+        averagerating: '4.5',
+      }),
     };
-    
+
     mockCourseRepository.createQueryBuilder.mockReturnValue(mockStatsQueryBuilder);
-    
+
     const stats = await service.getCourseStatistics(courseId);
-    
+
     expect(stats).toHaveProperty('moduleId');
     expect(stats).toHaveProperty('moduleCount');
     expect(stats).toHaveProperty('lessonCount');
@@ -145,14 +141,14 @@ describe('CourseService', () => {
       orderBy: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       getRawAndEntities: jest.fn().mockResolvedValue({
-        entities: [{ id: '1', title: 'Test Course' }]
-      })
+        entities: [{ id: '1', title: 'Test Course' }],
+      }),
     };
-    
+
     mockCourseRepository.createQueryBuilder.mockReturnValue(mockPopularQueryBuilder);
-    
+
     const popularCourses = await service.getPopularCourses(5);
-    
+
     expect(popularCourses).toHaveLength(1);
     expect(mockCourseRepository.createQueryBuilder).toHaveBeenCalled();
   });

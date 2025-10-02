@@ -17,15 +17,12 @@ export class VersionTrackingInterceptor implements NestInterceptor {
     const handler = context.getHandler();
     const controller = context.getClass();
 
-    const version = this.reflector.getAllAndOverride<string>(API_VERSION_KEY, [
-      handler,
-      controller,
-    ]) || request.headers['api-version'] || 'v1';
+    const version =
+      this.reflector.getAllAndOverride<string>(API_VERSION_KEY, [handler, controller]) ||
+      request.headers['api-version'] ||
+      'v1';
 
-    const deprecationInfo = this.reflector.getAllAndOverride(DEPRECATED_KEY, [
-      handler,
-      controller,
-    ]);
+    const deprecationInfo = this.reflector.getAllAndOverride(DEPRECATED_KEY, [handler, controller]);
 
     request.apiVersion = version;
     request.deprecationInfo = deprecationInfo;

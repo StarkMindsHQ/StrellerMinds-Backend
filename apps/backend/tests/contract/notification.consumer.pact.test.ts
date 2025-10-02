@@ -22,12 +22,12 @@ describe('Notification Service Consumer Pact', () => {
     return provider.setup().then(() => {
       // Create service instances with mocked dependencies
       pushNotificationService = new PushNotificationService({} as any); // configService
-      
+
       // Mock the Firebase admin SDK for testing
       (pushNotificationService as any).firebaseAdmin = {
         messaging: () => ({
-          send: jest.fn()
-        })
+          send: jest.fn(),
+        }),
       };
 
       // Mock other services
@@ -39,7 +39,7 @@ describe('Notification Service Consumer Pact', () => {
         pushNotificationService,
         {} as any, // preferenceService
         {} as any, // analyticsService
-        {} as any  // eventEmitter
+        {} as any, // eventEmitter
       );
 
       smsService = new SmsService({} as any); // configService
@@ -59,14 +59,14 @@ describe('Notification Service Consumer Pact', () => {
         data: {
           courseId: 'course_123',
           type: 'course_available',
-          actionUrl: '/courses/course_123'
-        }
+          actionUrl: '/courses/course_123',
+        },
       };
 
       const expectedResponse = {
         success: true,
         messageId: 'projects/strellerminds/messages/1234567890',
-        multicastId: 1234567890
+        multicastId: 1234567890,
       };
 
       return provider
@@ -78,43 +78,45 @@ describe('Notification Service Consumer Pact', () => {
             path: '/v1/projects/strellerminds/messages:send',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': Matchers.like('Bearer ya29.c...')
+              Authorization: Matchers.like('Bearer ya29.c...'),
             },
             body: {
               message: {
                 token: Matchers.like(deviceToken),
                 notification: {
                   title: Matchers.like(notificationData.title),
-                  body: Matchers.like(notificationData.body)
+                  body: Matchers.like(notificationData.body),
                 },
-                data: Matchers.like(notificationData.data)
-              }
-            }
+                data: Matchers.like(notificationData.data),
+              },
+            },
           },
           willRespondWith: {
             status: 200,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               name: Matchers.like(expectedResponse.messageId),
-              success: Matchers.boolean(expectedResponse.success)
-            }
-          }
+              success: Matchers.boolean(expectedResponse.success),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the Firebase messaging send method
-            (pushNotificationService as any).firebaseAdmin.messaging().send.mockResolvedValue(expectedResponse.messageId);
-            
+            (pushNotificationService as any).firebaseAdmin
+              .messaging()
+              .send.mockResolvedValue(expectedResponse.messageId);
+
             // Call the actual service method
             const result = await pushNotificationService.sendPushNotification(
               deviceToken,
               notificationData.title,
               notificationData.body,
-              notificationData.data
+              notificationData.data,
             );
-            
+
             // Assert the result
             expect(result).toBe(true);
           });
@@ -125,7 +127,7 @@ describe('Notification Service Consumer Pact', () => {
       const invalidToken = 'invalid_device_token';
       const notificationData = {
         title: 'Test Notification',
-        body: 'This should fail'
+        body: 'This should fail',
       };
 
       const errorResponse = {
@@ -139,12 +141,12 @@ describe('Notification Service Consumer Pact', () => {
               fieldViolations: [
                 {
                   field: 'message.token',
-                  description: 'Invalid registration token'
-                }
-              ]
-            }
-          ]
-        }
+                  description: 'Invalid registration token',
+                },
+              ],
+            },
+          ],
+        },
       };
 
       return provider
@@ -156,22 +158,22 @@ describe('Notification Service Consumer Pact', () => {
             path: '/v1/projects/strellerminds/messages:send',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': Matchers.like('Bearer ya29.c...')
+              Authorization: Matchers.like('Bearer ya29.c...'),
             },
             body: {
               message: {
                 token: Matchers.like(invalidToken),
                 notification: {
                   title: Matchers.like(notificationData.title),
-                  body: Matchers.like(notificationData.body)
-                }
-              }
-            }
+                  body: Matchers.like(notificationData.body),
+                },
+              },
+            },
           },
           willRespondWith: {
             status: 400,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               error: {
@@ -182,25 +184,27 @@ describe('Notification Service Consumer Pact', () => {
                   '@type': Matchers.like('type.googleapis.com/google.rpc.BadRequest'),
                   fieldViolations: Matchers.eachLike({
                     field: Matchers.like('message.token'),
-                    description: Matchers.like('Invalid registration token')
-                  })
-                })
-              }
-            }
-          }
+                    description: Matchers.like('Invalid registration token'),
+                  }),
+                }),
+              },
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the Firebase messaging send method to throw an error
-            (pushNotificationService as any).firebaseAdmin.messaging().send.mockRejectedValue(new Error('Invalid registration token'));
-            
+            (pushNotificationService as any).firebaseAdmin
+              .messaging()
+              .send.mockRejectedValue(new Error('Invalid registration token'));
+
             // Call the service method and expect it to return false
             const result = await pushNotificationService.sendPushNotification(
               invalidToken,
               notificationData.title,
-              notificationData.body
+              notificationData.body,
             );
-            
+
             // Assert the result
             expect(result).toBe(false);
           });
@@ -211,16 +215,16 @@ describe('Notification Service Consumer Pact', () => {
       const deviceTokens = [
         'fcm_device_token_123456789',
         'fcm_device_token_987654321',
-        'fcm_device_token_555666777'
+        'fcm_device_token_555666777',
       ];
-      
+
       const notificationData = {
         title: 'Course Update',
         body: 'Your enrolled course has been updated with new content',
         data: {
           courseId: 'course_456',
-          type: 'course_update'
-        }
+          type: 'course_update',
+        },
       };
 
       const expectedResponse = {
@@ -229,17 +233,17 @@ describe('Notification Service Consumer Pact', () => {
         responses: [
           {
             success: true,
-            messageId: 'projects/strellerminds/messages/1234567890'
+            messageId: 'projects/strellerminds/messages/1234567890',
           },
           {
             success: true,
-            messageId: 'projects/strellerminds/messages/0987654321'
+            messageId: 'projects/strellerminds/messages/0987654321',
           },
           {
             success: true,
-            messageId: 'projects/strellerminds/messages/1112223333'
-          }
-        ]
+            messageId: 'projects/strellerminds/messages/1112223333',
+          },
+        ],
       };
 
       return provider
@@ -251,57 +255,59 @@ describe('Notification Service Consumer Pact', () => {
             path: '/v1/projects/strellerminds/messages:send',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': Matchers.like('Bearer ya29.c...')
+              Authorization: Matchers.like('Bearer ya29.c...'),
             },
             body: {
               message: {
                 tokens: Matchers.eachLike(Matchers.like('fcm_device_token_123456789')),
                 notification: {
                   title: Matchers.like(notificationData.title),
-                  body: Matchers.like(notificationData.body)
+                  body: Matchers.like(notificationData.body),
                 },
-                data: Matchers.like(notificationData.data)
-              }
-            }
+                data: Matchers.like(notificationData.data),
+              },
+            },
           },
           willRespondWith: {
             status: 200,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               successCount: Matchers.integer(expectedResponse.successCount),
               failureCount: Matchers.integer(expectedResponse.failureCount),
               responses: Matchers.eachLike({
                 success: Matchers.boolean(true),
-                messageId: Matchers.like('projects/strellerminds/messages/1234567890')
-              })
-            }
-          }
+                messageId: Matchers.like('projects/strellerminds/messages/1234567890'),
+              }),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the Firebase messaging sendMulticast method
-            (pushNotificationService as any).firebaseAdmin.messaging().sendMulticast = jest.fn().mockResolvedValue({
-              successCount: expectedResponse.successCount,
-              failureCount: expectedResponse.failureCount,
-              responses: expectedResponse.responses
-            });
-            
+            (pushNotificationService as any).firebaseAdmin.messaging().sendMulticast = jest
+              .fn()
+              .mockResolvedValue({
+                successCount: expectedResponse.successCount,
+                failureCount: expectedResponse.failureCount,
+                responses: expectedResponse.responses,
+              });
+
             // Call the service method for each token (simulating batch sending)
             const results = await Promise.all(
-              deviceTokens.map(token => 
+              deviceTokens.map((token) =>
                 pushNotificationService.sendPushNotification(
                   token,
                   notificationData.title,
                   notificationData.body,
-                  notificationData.data
-                )
-              )
+                  notificationData.data,
+                ),
+              ),
             );
-            
+
             // Assert all results are successful
-            expect(results.every(result => result === true)).toBe(true);
+            expect(results.every((result) => result === true)).toBe(true);
           });
         });
     });
@@ -310,15 +316,15 @@ describe('Notification Service Consumer Pact', () => {
       const deviceToken = 'fcm_device_token_123456789';
       const notificationData = {
         title: 'Service Test',
-        body: 'Testing service availability'
+        body: 'Testing service availability',
       };
 
       const errorResponse = {
         error: {
           code: 503,
           message: 'Service unavailable',
-          status: 'UNAVAILABLE'
-        }
+          status: 'UNAVAILABLE',
+        },
       };
 
       return provider
@@ -330,44 +336,46 @@ describe('Notification Service Consumer Pact', () => {
             path: '/v1/projects/strellerminds/messages:send',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': Matchers.like('Bearer ya29.c...')
+              Authorization: Matchers.like('Bearer ya29.c...'),
             },
             body: {
               message: {
                 token: Matchers.like(deviceToken),
                 notification: {
                   title: Matchers.like(notificationData.title),
-                  body: Matchers.like(notificationData.body)
-                }
-              }
-            }
+                  body: Matchers.like(notificationData.body),
+                },
+              },
+            },
           },
           willRespondWith: {
             status: 503,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               error: {
                 code: Matchers.integer(errorResponse.error.code),
                 message: Matchers.like(errorResponse.error.message),
-                status: Matchers.like(errorResponse.error.status)
-              }
-            }
-          }
+                status: Matchers.like(errorResponse.error.status),
+              },
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the Firebase messaging send method to throw a service unavailable error
-            (pushNotificationService as any).firebaseAdmin.messaging().send.mockRejectedValue(new Error('Service unavailable'));
-            
+            (pushNotificationService as any).firebaseAdmin
+              .messaging()
+              .send.mockRejectedValue(new Error('Service unavailable'));
+
             // Call the service method and expect it to return false
             const result = await pushNotificationService.sendPushNotification(
               deviceToken,
               notificationData.title,
-              notificationData.body
+              notificationData.body,
             );
-            
+
             // Assert the result
             expect(result).toBe(false);
           });
@@ -378,7 +386,8 @@ describe('Notification Service Consumer Pact', () => {
   describe('SMS Service', () => {
     it('should send SMS successfully', () => {
       const phoneNumber = '+1234567890';
-      const message = 'Your course enrollment is confirmed. Access your course at: https://strellerminds.com/courses';
+      const message =
+        'Your course enrollment is confirmed. Access your course at: https://strellerminds.com/courses';
 
       const expectedResponse = {
         sid: 'SM1234567890abcdef',
@@ -387,7 +396,7 @@ describe('Notification Service Consumer Pact', () => {
         body: message,
         dateCreated: '2023-12-01T10:00:00Z',
         price: '0.0075',
-        priceUnit: 'USD'
+        priceUnit: 'USD',
       };
 
       return provider
@@ -399,14 +408,16 @@ describe('Notification Service Consumer Pact', () => {
             path: '/2010-04-01/Accounts/AC1234567890abcdef/Messages.json',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
-              'Authorization': Matchers.like('Basic QUMxMjM0NTY3ODkwYWJjZGVm...')
+              Authorization: Matchers.like('Basic QUMxMjM0NTY3ODkwYWJjZGVm...'),
             },
-            body: Matchers.like(`To=${encodeURIComponent(phoneNumber)}&Body=${encodeURIComponent(message)}`)
+            body: Matchers.like(
+              `To=${encodeURIComponent(phoneNumber)}&Body=${encodeURIComponent(message)}`,
+            ),
           },
           willRespondWith: {
             status: 201,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               sid: Matchers.like(expectedResponse.sid),
@@ -415,22 +426,22 @@ describe('Notification Service Consumer Pact', () => {
               body: Matchers.like(expectedResponse.body),
               date_created: Matchers.iso8601DateTime(expectedResponse.dateCreated),
               price: Matchers.like(expectedResponse.price),
-              price_unit: Matchers.like(expectedResponse.priceUnit)
-            }
-          }
+              price_unit: Matchers.like(expectedResponse.priceUnit),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the SMS service
             (smsService as any).twilioClient = {
               messages: {
-                create: jest.fn().mockResolvedValue(expectedResponse)
-              }
+                create: jest.fn().mockResolvedValue(expectedResponse),
+              },
             };
-            
+
             // Call the actual service method
             const result = await smsService.sendSms(phoneNumber, message);
-            
+
             // Assert the result
             expect(result).toBe(true);
           });
@@ -443,9 +454,9 @@ describe('Notification Service Consumer Pact', () => {
 
       const errorResponse = {
         code: 21211,
-        message: 'The \'To\' number is not a valid phone number.',
+        message: "The 'To' number is not a valid phone number.",
         more_info: 'https://www.twilio.com/docs/errors/21211',
-        status: 400
+        status: 400,
       };
 
       return provider
@@ -457,35 +468,37 @@ describe('Notification Service Consumer Pact', () => {
             path: '/2010-04-01/Accounts/AC1234567890abcdef/Messages.json',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
-              'Authorization': Matchers.like('Basic QUMxMjM0NTY3ODkwYWJjZGVm...')
+              Authorization: Matchers.like('Basic QUMxMjM0NTY3ODkwYWJjZGVm...'),
             },
-            body: Matchers.like(`To=${encodeURIComponent(invalidPhoneNumber)}&Body=${encodeURIComponent(message)}`)
+            body: Matchers.like(
+              `To=${encodeURIComponent(invalidPhoneNumber)}&Body=${encodeURIComponent(message)}`,
+            ),
           },
           willRespondWith: {
             status: 400,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               code: Matchers.integer(errorResponse.code),
               message: Matchers.like(errorResponse.message),
               more_info: Matchers.like(errorResponse.more_info),
-              status: Matchers.integer(errorResponse.status)
-            }
-          }
+              status: Matchers.integer(errorResponse.status),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the SMS service to throw an error
             (smsService as any).twilioClient = {
               messages: {
-                create: jest.fn().mockRejectedValue(new Error('Invalid phone number'))
-              }
+                create: jest.fn().mockRejectedValue(new Error('Invalid phone number')),
+              },
             };
-            
+
             // Call the service method and expect it to return false
             const result = await smsService.sendSms(invalidPhoneNumber, message);
-            
+
             // Assert the result
             expect(result).toBe(false);
           });

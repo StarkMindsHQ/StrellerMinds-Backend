@@ -1,22 +1,26 @@
-import { 
-  IsEmail, 
-  IsString, 
-  MinLength, 
-  MaxLength, 
-  IsOptional, 
+import {
+  IsEmail,
+  IsString,
+  MinLength,
+  MaxLength,
+  IsOptional,
   IsEnum,
   Matches,
   IsNotEmpty,
-  IsAlphanumeric
+  IsAlphanumeric,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsStrongPassword, IsNotSqlInjection, IsNotXSS } from '../../common/decorators/validation.decorators';
+import {
+  IsStrongPassword,
+  IsNotSqlInjection,
+  IsNotXSS,
+} from '../../common/decorators/validation.decorators';
 
 enum UserRole {
   STUDENT = 'student',
   INSTRUCTOR = 'instructor',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
 }
 
 export class EnhancedRegisterDto {
@@ -42,7 +46,9 @@ export class EnhancedRegisterDto {
   @IsNotXSS({ message: 'First name contains potentially dangerous content' })
   @MinLength(2, { message: 'First name must be at least 2 characters long' })
   @MaxLength(50, { message: 'First name must not exceed 50 characters' })
-  @Matches(/^[a-zA-Z\s'-]+$/, { message: 'First name can only contain letters, spaces, hyphens, and apostrophes' })
+  @Matches(/^[a-zA-Z\s'-]+$/, {
+    message: 'First name can only contain letters, spaces, hyphens, and apostrophes',
+  })
   @Transform(({ value }) => value?.trim())
   firstName: string;
 
@@ -53,7 +59,9 @@ export class EnhancedRegisterDto {
   @IsNotXSS({ message: 'Last name contains potentially dangerous content' })
   @MinLength(2, { message: 'Last name must be at least 2 characters long' })
   @MaxLength(50, { message: 'Last name must not exceed 50 characters' })
-  @Matches(/^[a-zA-Z\s'-]+$/, { message: 'Last name can only contain letters, spaces, hyphens, and apostrophes' })
+  @Matches(/^[a-zA-Z\s'-]+$/, {
+    message: 'Last name can only contain letters, spaces, hyphens, and apostrophes',
+  })
   @Transform(({ value }) => value?.trim())
   lastName: string;
 

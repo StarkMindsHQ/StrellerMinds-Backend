@@ -149,10 +149,7 @@ describe('User Registration Integration Tests', () => {
       };
 
       // First registration
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(userData)
-        .expect(201);
+      await request(app.getHttpServer()).post('/auth/register').send(userData).expect(201);
 
       // Attempt duplicate registration
       const duplicateResponse = await request(app.getHttpServer())
@@ -168,13 +165,7 @@ describe('User Registration Integration Tests', () => {
     });
 
     it('should validate password strength requirements', async () => {
-      const weakPasswords = [
-        '123',
-        'password',
-        '12345678',
-        'Password',
-        'Password1',
-      ];
+      const weakPasswords = ['123', 'password', '12345678', 'Password', 'Password1'];
 
       for (const password of weakPasswords) {
         const response = await request(app.getHttpServer())
@@ -225,17 +216,17 @@ describe('User Registration Integration Tests', () => {
       };
 
       // Attempt concurrent registrations
-      const promises = Array(5).fill(null).map(() =>
-        request(app.getHttpServer())
-          .post('/auth/register')
-          .send(userData)
-      );
+      const promises = Array(5)
+        .fill(null)
+        .map(() => request(app.getHttpServer()).post('/auth/register').send(userData));
 
       const responses = await Promise.allSettled(promises);
 
       // Only one should succeed
-      const successful = responses.filter(r => r.status === 'fulfilled' && r.value.status === 201);
-      const failed = responses.filter(r => r.status === 'fulfilled' && r.value.status === 400);
+      const successful = responses.filter(
+        (r) => r.status === 'fulfilled' && r.value.status === 201,
+      );
+      const failed = responses.filter((r) => r.status === 'fulfilled' && r.value.status === 400);
 
       expect(successful).toHaveLength(1);
       expect(failed).toHaveLength(4);
@@ -352,24 +343,24 @@ describe('User Registration Integration Tests', () => {
 
   describe('Registration Edge Cases', () => {
     it('should handle registration during high load', async () => {
-      const userPromises = Array(10).fill(null).map((_, index) => {
-        const userData = {
-          email: `loadtest${index}@example.com`,
-          password: 'SecurePass123!',
-          firstName: 'Load',
-          lastName: 'Test',
-          role: 'student',
-        };
+      const userPromises = Array(10)
+        .fill(null)
+        .map((_, index) => {
+          const userData = {
+            email: `loadtest${index}@example.com`,
+            password: 'SecurePass123!',
+            firstName: 'Load',
+            lastName: 'Test',
+            role: 'student',
+          };
 
-        return request(app.getHttpServer())
-          .post('/auth/register')
-          .send(userData);
-      });
+          return request(app.getHttpServer()).post('/auth/register').send(userData);
+        });
 
       const responses = await Promise.all(userPromises);
 
       // All should succeed
-      responses.forEach(response => {
+      responses.forEach((response) => {
         expect(response.status).toBe(201);
         expect(response.body.user).toBeDefined();
       });
@@ -377,7 +368,7 @@ describe('User Registration Integration Tests', () => {
 
     it('should handle very long email addresses', async () => {
       const longEmail = 'a'.repeat(250) + '@example.com';
-      
+
       const response = await request(app.getHttpServer())
         .post('/auth/register')
         .send({
@@ -422,15 +413,13 @@ describe('User Registration Integration Tests', () => {
       };
 
       // Make multiple rapid requests
-      const promises = Array(20).fill(null).map(() =>
-        request(app.getHttpServer())
-          .post('/auth/register')
-          .send(userData)
-      );
+      const promises = Array(20)
+        .fill(null)
+        .map(() => request(app.getHttpServer()).post('/auth/register').send(userData));
 
       const responses = await Promise.allSettled(promises);
-      const rateLimited = responses.filter(r => 
-        r.status === 'fulfilled' && r.value.status === 429
+      const rateLimited = responses.filter(
+        (r) => r.status === 'fulfilled' && r.value.status === 429,
       );
 
       expect(rateLimited.length).toBeGreaterThan(0);
@@ -463,10 +452,7 @@ describe('User Registration Integration Tests', () => {
         role: 'student',
       };
 
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(userData)
-        .expect(201);
+      await request(app.getHttpServer()).post('/auth/register').send(userData).expect(201);
 
       const savedUser = await userRepository.findOne({
         where: { email: 'passwordtest@example.com' },

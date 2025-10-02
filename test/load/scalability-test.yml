@@ -4,43 +4,43 @@ config:
     # Phase 1: Baseline (10 users)
     - duration: 120
       arrivalRate: 10
-      name: "Baseline Load"
-    
+      name: 'Baseline Load'
+
     # Phase 2: Light Load (50 users)
     - duration: 180
       arrivalRate: 10
       rampTo: 50
-      name: "Light Load Ramp"
-    
+      name: 'Light Load Ramp'
+
     # Phase 3: Medium Load (100 users)
     - duration: 240
       arrivalRate: 50
       rampTo: 100
-      name: "Medium Load Ramp"
-    
+      name: 'Medium Load Ramp'
+
     # Phase 4: Heavy Load (200 users)
     - duration: 300
       arrivalRate: 100
       rampTo: 200
-      name: "Heavy Load Ramp"
-    
+      name: 'Heavy Load Ramp'
+
     # Phase 5: Peak Load (400 users)
     - duration: 180
       arrivalRate: 200
       rampTo: 400
-      name: "Peak Load Test"
-    
+      name: 'Peak Load Test'
+
     # Phase 6: Stress Test (600 users)
     - duration: 120
       arrivalRate: 400
       rampTo: 600
-      name: "Stress Test"
-    
+      name: 'Stress Test'
+
     # Phase 7: Cool Down
     - duration: 120
       arrivalRate: 600
       rampTo: 10
-      name: "Cool Down"
+      name: 'Cool Down'
 
   # Performance thresholds for scalability testing
   ensure:
@@ -55,7 +55,7 @@ config:
       - type: statsd
         host: localhost
         port: 8125
-        prefix: "scalability"
+        prefix: 'scalability'
     expect: {}
 
   http:
@@ -65,130 +65,130 @@ config:
 
   variables:
     userPool:
-      - email: "scale1@test.com"
-        password: "ScaleTest123!"
-      - email: "scale2@test.com"
-        password: "ScaleTest123!"
-      - email: "scale3@test.com"
-        password: "ScaleTest123!"
-      - email: "scale4@test.com"
-        password: "ScaleTest123!"
-      - email: "scale5@test.com"
-        password: "ScaleTest123!"
+      - email: 'scale1@test.com'
+        password: 'ScaleTest123!'
+      - email: 'scale2@test.com'
+        password: 'ScaleTest123!'
+      - email: 'scale3@test.com'
+        password: 'ScaleTest123!'
+      - email: 'scale4@test.com'
+        password: 'ScaleTest123!'
+      - email: 'scale5@test.com'
+        password: 'ScaleTest123!'
 
 scenarios:
   # Read-heavy scenario (typical user browsing)
-  - name: "Read Heavy Browsing"
+  - name: 'Read Heavy Browsing'
     weight: 60
     flow:
       # Health check
       - get:
-          url: "/health"
+          url: '/health'
           expect:
             - statusCode: 200
-      
+
       - think: 1
-      
+
       # Browse courses
       - get:
-          url: "/courses"
+          url: '/courses'
           qs:
-            page: "{{ $randomInt(1, 10) }}"
+            page: '{{ $randomInt(1, 10) }}'
             limit: 20
           expect:
             - statusCode: 200
-      
+
       - think: 2
-      
+
       # Search courses
       - get:
-          url: "/courses/search"
+          url: '/courses/search'
           qs:
-            q: "{{ $randomString() }}"
+            q: '{{ $randomString() }}'
             page: 1
             limit: 10
           expect:
             - statusCode: 200
-      
+
       - think: 3
-      
+
       # Get course details
       - get:
-          url: "/courses"
+          url: '/courses'
           qs:
             limit: 1
           capture:
-            - json: "$.data[0].id"
-              as: "courseId"
+            - json: '$.data[0].id'
+              as: 'courseId'
           expect:
             - statusCode: 200
-      
+
       - get:
-          url: "/courses/{{ courseId }}"
+          url: '/courses/{{ courseId }}'
           expect:
             - statusCode: 200
 
   # Authentication scenario
-  - name: "Authentication Load"
+  - name: 'Authentication Load'
     weight: 25
     flow:
       # Login
       - post:
-          url: "/auth/login"
+          url: '/auth/login'
           json:
-            email: "{{ userPool.email }}"
-            password: "{{ userPool.password }}"
+            email: '{{ userPool.email }}'
+            password: '{{ userPool.password }}'
           capture:
-            - json: "$.access_token"
-              as: "token"
+            - json: '$.access_token'
+              as: 'token'
           expect:
             - statusCode: 200
-      
+
       - think: 1
-      
+
       # Get profile
       - get:
-          url: "/auth/profile"
+          url: '/auth/profile'
           headers:
-            Authorization: "Bearer {{ token }}"
+            Authorization: 'Bearer {{ token }}'
           expect:
             - statusCode: 200
-      
+
       - think: 2
-      
+
       # Access protected resource
       - get:
-          url: "/courses"
+          url: '/courses'
           headers:
-            Authorization: "Bearer {{ token }}"
+            Authorization: 'Bearer {{ token }}'
           expect:
             - statusCode: 200
 
   # Write operations scenario
-  - name: "Write Operations"
+  - name: 'Write Operations'
     weight: 15
     flow:
       # Register new user
       - post:
-          url: "/auth/register"
+          url: '/auth/register'
           json:
-            firstName: "Scale"
-            lastName: "Test"
-            email: "scaletest{{ $randomString() }}@example.com"
-            username: "scaleuser{{ $randomString() }}"
-            password: "ScaleTest123!"
+            firstName: 'Scale'
+            lastName: 'Test'
+            email: 'scaletest{{ $randomString() }}@example.com'
+            username: 'scaleuser{{ $randomString() }}'
+            password: 'ScaleTest123!'
           capture:
-            - json: "$.access_token"
-              as: "newToken"
+            - json: '$.access_token'
+              as: 'newToken'
           expect:
             - statusCode: 201
-      
+
       - think: 2
-      
+
       # Update profile (if endpoint exists)
       - get:
-          url: "/auth/profile"
+          url: '/auth/profile'
           headers:
-            Authorization: "Bearer {{ newToken }}"
+            Authorization: 'Bearer {{ newToken }}'
           expect:
             - statusCode: 200

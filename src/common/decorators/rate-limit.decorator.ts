@@ -27,10 +27,10 @@ export interface RateLimitDecoratorConfig {
 
 /**
  * Custom rate limit decorator that uses centralized configuration
- * 
+ *
  * @param config - Rate limit configuration
  * @returns Decorator function
- * 
+ *
  * @example
  * ```typescript
  * @RateLimit({ category: 'auth', endpoint: 'login' })
@@ -46,8 +46,8 @@ export function RateLimit(config: RateLimitDecoratorConfig) {
     // Apply the actual throttle decorator with calculated values
     Throttle(
       config.limit || getEndpointRateLimit(config.category, config.endpoint)?.limit || 100,
-      config.ttl || getEndpointRateLimit(config.category, config.endpoint)?.ttl || 60
-    )
+      config.ttl || getEndpointRateLimit(config.category, config.endpoint)?.ttl || 60,
+    ),
   );
 }
 
@@ -288,11 +288,11 @@ export function SkipRateLimit() {
 
 /**
  * Custom rate limit with specific values
- * 
+ *
  * @param limit - Number of requests allowed
  * @param ttl - Time window in seconds
  * @param keyPrefix - Optional key prefix
- * 
+ *
  * @example
  * ```typescript
  * @CustomRateLimit(5, 60, 'custom_endpoint')

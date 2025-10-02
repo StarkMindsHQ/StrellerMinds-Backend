@@ -20,8 +20,8 @@ const jest = {
     return mockFn;
   },
   spyOn: () => ({
-    mockImplementation: () => {}
-  })
+    mockImplementation: () => {},
+  }),
 };
 
 import { DatabaseOptimizationModule } from '../database-optimization.module';
@@ -44,7 +44,7 @@ describe('DatabaseOptimizationIntegration', () => {
     // Create service instances
     databaseMonitoringService = new DatabaseMonitoringService(mockDataSource);
     queryCacheService = new QueryCacheService(mockDataSource);
-    
+
     // Create mock services for dashboard
     const mockQueryAnalyzerService: any = {
       logger: { debug: jest.fn(), log: jest.fn(), warn: jest.fn(), error: jest.fn() },
@@ -64,12 +64,12 @@ describe('DatabaseOptimizationIntegration', () => {
       getQueryComplexity: jest.fn().mockResolvedValue(0),
       recommendOptimizations: jest.fn().mockResolvedValue([]),
     };
-    
+
     databaseDashboardService = new DatabaseDashboardService(
       mockDataSource,
       databaseMonitoringService,
       queryCacheService,
-      mockQueryAnalyzerService
+      mockQueryAnalyzerService,
     );
   });
 
@@ -97,12 +97,14 @@ describe('DatabaseOptimizationIntegration', () => {
 
   it('should provide connection pool metrics through dashboard service', async () => {
     // Mock PostgreSQL query response
-    mockDataSource.query.mockResolvedValue([{
-      total_connections: '5',
-      idle_connections: '3',
-      active_connections: '2'
-    }]);
-    
+    mockDataSource.query.mockResolvedValue([
+      {
+        total_connections: '5',
+        idle_connections: '3',
+        active_connections: '2',
+      },
+    ]);
+
     const poolMetrics = await databaseDashboardService.getConnectionPoolMetrics();
     expect(poolMetrics).toHaveProperty('totalConnections');
     expect(poolMetrics).toHaveProperty('activeConnections');
@@ -113,19 +115,19 @@ describe('DatabaseOptimizationIntegration', () => {
     const query = 'SELECT * FROM courses WHERE id = $1';
     const parameters = [1];
     const result = [{ id: 1, title: 'Test Course' }];
-    
+
     // Mock data source query
     mockDataSource.query.mockResolvedValue(result);
-    
+
     // Execute query with cache
     const cachedResult = await queryCacheService.executeWithCache(query, parameters);
-    
+
     expect(cachedResult).toEqual(result);
-    
+
     // Get cache stats
     const stats = queryCacheService.getStats();
     expect(stats.misses).toBe(1);
-    
+
     // Execute again to test cache hit
     await queryCacheService.executeWithCache(query, parameters);
     const updatedStats = queryCacheService.getStats();

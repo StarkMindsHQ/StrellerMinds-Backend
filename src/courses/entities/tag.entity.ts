@@ -1,25 +1,28 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { Course } from "./course.entity"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Course } from './course.entity';
 
-@Entity("tags")
+@Entity('tags')
 export class Tag {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 50, unique: true })
-  name: string
+  name: string;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 
   // Many-to-Many relationship
-  @ManyToMany(
-    () => Course,
-    (course) => course.tags,
-  )
-  courses: Course[]
+  @ManyToMany(() => Course, (course) => course.tags)
+  courses: Course[];
 }
-

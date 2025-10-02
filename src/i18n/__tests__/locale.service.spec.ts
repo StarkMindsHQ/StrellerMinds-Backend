@@ -1,16 +1,16 @@
-import { Test, type TestingModule } from "@nestjs/testing"
-import { getRepositoryToken } from "@nestjs/typeorm"
-import type { Repository } from "typeorm"
-import { jest } from "@jest/globals"
+import { Test, type TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import type { Repository } from 'typeorm';
+import { jest } from '@jest/globals';
 
-import { LocaleService } from "../services/locale.service"
-import { UserLocale, LocaleSource } from "../entities/user-locale.entity"
-import { LocaleMetadata, LocaleStatus } from "../entities/locale-metadata.entity"
+import { LocaleService } from '../services/locale.service';
+import { UserLocale, LocaleSource } from '../entities/user-locale.entity';
+import { LocaleMetadata, LocaleStatus } from '../entities/locale-metadata.entity';
 
-describe("LocaleService", () => {
-  let service: LocaleService
-  let userLocaleRepository: jest.Mocked<Repository<UserLocale>>
-  let localeMetadataRepository: jest.Mocked<Repository<LocaleMetadata>>
+describe('LocaleService', () => {
+  let service: LocaleService;
+  let userLocaleRepository: jest.Mocked<Repository<UserLocale>>;
+  let localeMetadataRepository: jest.Mocked<Repository<LocaleMetadata>>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -36,101 +36,101 @@ describe("LocaleService", () => {
           },
         },
       ],
-    }).compile()
+    }).compile();
 
-    service = module.get<LocaleService>(LocaleService)
-    userLocaleRepository = module.get(getRepositoryToken(UserLocale))
-    localeMetadataRepository = module.get(getRepositoryToken(LocaleMetadata))
-  })
+    service = module.get<LocaleService>(LocaleService);
+    userLocaleRepository = module.get(getRepositoryToken(UserLocale));
+    localeMetadataRepository = module.get(getRepositoryToken(LocaleMetadata));
+  });
 
-  it("should be defined", () => {
-    expect(service).toBeDefined()
-  })
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
-  describe("getUserLocale", () => {
-    it("should return user locale if exists", async () => {
+  describe('getUserLocale', () => {
+    it('should return user locale if exists', async () => {
       const mockUserLocale = {
-        id: "1",
-        userId: "user1",
-        locale: "fr",
+        id: '1',
+        userId: 'user1',
+        locale: 'fr',
         isActive: true,
-      } as UserLocale
+      } as UserLocale;
 
-      userLocaleRepository.findOne.mockResolvedValue(mockUserLocale)
+      userLocaleRepository.findOne.mockResolvedValue(mockUserLocale);
 
-      const result = await service.getUserLocale("user1")
+      const result = await service.getUserLocale('user1');
 
-      expect(result).toBe("fr")
-      expect(userLocaleRepository.update).toHaveBeenCalledWith("1", {
+      expect(result).toBe('fr');
+      expect(userLocaleRepository.update).toHaveBeenCalledWith('1', {
         lastUsedAt: expect.any(Date),
-      })
-    })
+      });
+    });
 
-    it("should return default locale if user locale not found", async () => {
-      userLocaleRepository.findOne.mockResolvedValue(null)
+    it('should return default locale if user locale not found', async () => {
+      userLocaleRepository.findOne.mockResolvedValue(null);
 
-      const result = await service.getUserLocale("user1")
+      const result = await service.getUserLocale('user1');
 
-      expect(result).toBe("en")
-    })
-  })
+      expect(result).toBe('en');
+    });
+  });
 
-  describe("setUserLocale", () => {
-    it("should create new user locale", async () => {
+  describe('setUserLocale', () => {
+    it('should create new user locale', async () => {
       const mockLocaleMetadata = {
-        code: "fr",
+        code: 'fr',
         status: LocaleStatus.ACTIVE,
-        fallbackLocales: ["en"],
-      } as LocaleMetadata
+        fallbackLocales: ['en'],
+      } as LocaleMetadata;
 
-      userLocaleRepository.findOne.mockResolvedValue(null)
-      localeMetadataRepository.findOne.mockResolvedValue(mockLocaleMetadata)
-      userLocaleRepository.create.mockReturnValue({} as any)
+      userLocaleRepository.findOne.mockResolvedValue(null);
+      localeMetadataRepository.findOne.mockResolvedValue(mockLocaleMetadata);
+      userLocaleRepository.create.mockReturnValue({} as any);
       userLocaleRepository.save.mockResolvedValue({
-        id: "1",
-        userId: "user1",
-        locale: "fr",
-      } as any)
+        id: '1',
+        userId: 'user1',
+        locale: 'fr',
+      } as any);
 
-      const result = await service.setUserLocale("user1", "fr")
+      const result = await service.setUserLocale('user1', 'fr');
 
-      expect(result.locale).toBe("fr")
+      expect(result.locale).toBe('fr');
       expect(userLocaleRepository.create).toHaveBeenCalledWith({
-        userId: "user1",
-        locale: "fr",
+        userId: 'user1',
+        locale: 'fr',
         source: LocaleSource.USER_PREFERENCE,
-        fallbackLocales: ["en"],
+        fallbackLocales: ['en'],
         lastUsedAt: expect.any(Date),
-      })
-    })
+      });
+    });
 
-    it("should throw error for unsupported locale", async () => {
-      localeMetadataRepository.findOne.mockResolvedValue(null)
+    it('should throw error for unsupported locale', async () => {
+      localeMetadataRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.setUserLocale("user1", "invalid")).rejects.toThrow(
-        "Locale invalid is not supported or active",
-      )
-    })
-  })
+      await expect(service.setUserLocale('user1', 'invalid')).rejects.toThrow(
+        'Locale invalid is not supported or active',
+      );
+    });
+  });
 
-  describe("detectLocaleFromGeoLocation", () => {
-    it("should return locale for known country", async () => {
+  describe('detectLocaleFromGeoLocation', () => {
+    it('should return locale for known country', async () => {
       const mockLocaleMetadata = {
-        code: "fr-FR",
+        code: 'fr-FR',
         status: LocaleStatus.ACTIVE,
-      } as LocaleMetadata
+      } as LocaleMetadata;
 
-      localeMetadataRepository.findOne.mockResolvedValue(mockLocaleMetadata)
+      localeMetadataRepository.findOne.mockResolvedValue(mockLocaleMetadata);
 
-      const result = await service.detectLocaleFromGeoLocation("FR")
+      const result = await service.detectLocaleFromGeoLocation('FR');
 
-      expect(result).toBe("fr-FR")
-    })
+      expect(result).toBe('fr-FR');
+    });
 
-    it("should return default locale for unknown country", async () => {
-      const result = await service.detectLocaleFromGeoLocation("XX")
+    it('should return default locale for unknown country', async () => {
+      const result = await service.detectLocaleFromGeoLocation('XX');
 
-      expect(result).toBe("en")
-    })
-  })
-})
+      expect(result).toBe('en');
+    });
+  });
+});

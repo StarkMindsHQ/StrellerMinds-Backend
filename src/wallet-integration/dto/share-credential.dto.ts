@@ -16,4 +16,3 @@ export class ShareCredentialDto {
   @IsString()
   expirationDate?: string;
 }
-

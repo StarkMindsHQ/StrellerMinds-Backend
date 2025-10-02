@@ -20,6 +20,7 @@ The Docker Compose setup provides a complete local development environment with 
 ## Quick Start
 
 1. **Clone and setup**:
+
    ```bash
    git clone <repository-url>
    cd strellerminds-backend
@@ -27,11 +28,13 @@ The Docker Compose setup provides a complete local development environment with 
    ```
 
 2. **Start services**:
+
    ```bash
    docker-compose up -d
    ```
 
 3. **Install dependencies**:
+
    ```bash
    npm install
    ```
@@ -52,6 +55,7 @@ The Docker Compose setup provides a complete local development environment with 
 - **Volume**: postgres_data (persistent)
 
 **Connection string**:
+
 ```
 postgresql://postgres:postgres@localhost:5432/strellerminds_dev
 ```
@@ -64,6 +68,7 @@ postgresql://postgres:postgres@localhost:5432/strellerminds_dev
 - **Volume**: redis_data (persistent)
 
 **Connection string**:
+
 ```
 redis://:redis_password@localhost:6379/0
 ```
@@ -75,6 +80,7 @@ redis://:redis_password@localhost:6379/0
 - **Web UI URL**: http://localhost:8025
 
 **SMTP Configuration**:
+
 ```
 Host: localhost
 Port: 1025
@@ -92,6 +98,7 @@ TLS: false
 - **Bucket**: strellerminds-dev-storage
 
 **S3 Configuration**:
+
 ```
 Endpoint: http://localhost:4566
 Region: us-east-1
@@ -206,12 +213,14 @@ aws --endpoint-url=http://localhost:4566 s3 cp s3://strellerminds-dev-storage/te
 ### Services Not Starting
 
 1. **Check Docker is running**:
+
    ```bash
    docker --version
    docker-compose --version
    ```
 
 2. **Check port conflicts**:
+
    ```bash
    lsof -i :5432  # PostgreSQL
    lsof -i :6379  # Redis
@@ -228,6 +237,7 @@ aws --endpoint-url=http://localhost:4566 s3 cp s3://strellerminds-dev-storage/te
 ### Database Connection Issues
 
 1. **Check PostgreSQL is ready**:
+
    ```bash
    docker-compose exec postgres pg_isready -U postgres
    ```
@@ -240,6 +250,7 @@ aws --endpoint-url=http://localhost:4566 s3 cp s3://strellerminds-dev-storage/te
 ### Redis Connection Issues
 
 1. **Test Redis connection**:
+
    ```bash
    docker-compose exec redis redis-cli -a redis_password ping
    ```
@@ -252,6 +263,7 @@ aws --endpoint-url=http://localhost:4566 s3 cp s3://strellerminds-dev-storage/te
 ### Email Not Working
 
 1. **Check Mailhog is running**:
+
    ```bash
    curl http://localhost:8025/api/v1/messages
    ```
@@ -264,6 +276,7 @@ aws --endpoint-url=http://localhost:4566 s3 cp s3://strellerminds-dev-storage/te
 ### S3 Operations Failing
 
 1. **Check LocalStack health**:
+
    ```bash
    curl http://localhost:4566/_localstack/health
    ```
@@ -278,11 +291,13 @@ aws --endpoint-url=http://localhost:4566 s3 cp s3://strellerminds-dev-storage/te
 ### Daily Development
 
 1. **Start services**:
+
    ```bash
    docker-compose up -d
    ```
 
 2. **Start application**:
+
    ```bash
    npm run start:dev
    ```
@@ -295,11 +310,13 @@ aws --endpoint-url=http://localhost:4566 s3 cp s3://strellerminds-dev-storage/te
 ### Database Changes
 
 1. **Create migration**:
+
    ```bash
    npm run db:generate -- --name=your-migration-name
    ```
 
 2. **Run migration**:
+
    ```bash
    npm run db:migrate
    ```

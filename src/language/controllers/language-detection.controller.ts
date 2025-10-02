@@ -1,17 +1,17 @@
-import { Controller, Get, Req, Param } from "@nestjs/common"
-import type { LanguageDetectionService } from "../services/language-detection.service"
-import type { Request } from "express"
-import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiHeader } from "@nestjs/swagger"
+import { Controller, Get, Req, Param } from '@nestjs/common';
+import type { LanguageDetectionService } from '../services/language-detection.service';
+import type { Request } from 'express';
+import { ApiTags, ApiOperation, ApiParam, ApiResponse, ApiHeader } from '@nestjs/swagger';
 
-@ApiTags("Language Detection")
-@Controller("language/detect")
+@ApiTags('Language Detection')
+@Controller('language/detect')
 export class LanguageDetectionController {
   constructor(private readonly languageDetectionService: LanguageDetectionService) {}
 
   @ApiOperation({ summary: 'Detect language from request headers' })
   @ApiHeader({ name: 'Accept-Language', required: false })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns the detected language based on Accept-Language header',
   })
   @Get()
@@ -22,7 +22,8 @@ export class LanguageDetectionController {
     let detectedLanguage;
 
     if (acceptLanguage) {
-      detectedLanguage = await this.languageDetectionService.detectLanguageFromHeaders(acceptLanguage);
+      detectedLanguage =
+        await this.languageDetectionService.detectLanguageFromHeaders(acceptLanguage);
     } else if (ipAddress) {
       detectedLanguage = await this.languageDetectionService.detectLanguageFromIP(ipAddress);
     } else {
@@ -39,31 +40,31 @@ export class LanguageDetectionController {
     };
   }
 
-  @ApiOperation({ summary: "Detect and save language preference for a user" })
-  @ApiParam({ name: "userId", description: "User ID" })
-  @ApiHeader({ name: "Accept-Language", required: false })
+  @ApiOperation({ summary: 'Detect and save language preference for a user' })
+  @ApiParam({ name: 'userId', description: 'User ID' })
+  @ApiHeader({ name: 'Accept-Language', required: false })
   @ApiResponse({
     status: 200,
-    description: "Detects and saves the language preference for the user",
+    description: 'Detects and saves the language preference for the user',
   })
-  @Get("user/:userId")
+  @Get('user/:userId')
   async detectAndSaveUserLanguage(@Param('userId') userId: string, @Req() request: Request) {
-    const acceptLanguage = request.headers["accept-language"] as string
-    const ipAddress = request.ip
+    const acceptLanguage = request.headers['accept-language'] as string;
+    const ipAddress = request.ip;
 
     const detectedLanguage = await this.languageDetectionService.detectAndSaveUserLanguage(
       userId,
       acceptLanguage,
       ipAddress,
-    )
+    );
 
     return {
       success: true,
       data: {
         language: detectedLanguage,
-        detectionMethod: acceptLanguage ? "headers" : ipAddress ? "ip" : "default",
+        detectionMethod: acceptLanguage ? 'headers' : ipAddress ? 'ip' : 'default',
         userId,
       },
-    }
+    };
   }
 }

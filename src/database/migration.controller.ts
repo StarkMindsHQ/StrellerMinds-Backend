@@ -60,15 +60,12 @@ export class MigrationController {
   @ApiResponse({ status: 400, description: 'Invalid migration or validation failed' })
   @ApiResponse({ status: 500, description: 'Migration execution failed' })
   async executeMigration(@Body() executeDto: ExecuteMigrationDto) {
-    const result = await this.enhancedMigrationService.executeMigration(
-      executeDto.migrationName,
-      {
-        validateBefore: executeDto.validateBefore ?? true,
-        createBackup: executeDto.createBackup ?? true,
-        monitorProgress: executeDto.monitorProgress ?? true,
-        rollbackOnFailure: executeDto.rollbackOnFailure ?? true,
-      }
-    );
+    const result = await this.enhancedMigrationService.executeMigration(executeDto.migrationName, {
+      validateBefore: executeDto.validateBefore ?? true,
+      createBackup: executeDto.createBackup ?? true,
+      monitorProgress: executeDto.monitorProgress ?? true,
+      rollbackOnFailure: executeDto.rollbackOnFailure ?? true,
+    });
 
     return {
       success: true,
@@ -86,14 +83,13 @@ export class MigrationController {
   async validateMigration(@Body() validateDto: ValidateMigrationDto) {
     const result = await this.dataValidationService.validateBeforeMigration(
       validateDto.migrationName,
-      validateDto.context
+      validateDto.context,
     );
 
     return {
       success: result.summary.failed === 0,
-      message: result.summary.failed === 0 
-        ? 'Migration validation passed' 
-        : 'Migration validation failed',
+      message:
+        result.summary.failed === 0 ? 'Migration validation passed' : 'Migration validation failed',
       data: result,
     };
   }
@@ -107,7 +103,7 @@ export class MigrationController {
   async rollbackMigration(@Body() rollbackDto: RollbackMigrationDto) {
     await this.enhancedMigrationService.rollbackMigration(
       rollbackDto.migrationName,
-      rollbackDto.backupPath
+      rollbackDto.backupPath,
     );
 
     return {
@@ -179,9 +175,7 @@ export class MigrationController {
   @ApiQuery({ name: 'includeAcknowledged', required: false, type: Boolean })
   @ApiOperation({ summary: 'Get migration alerts' })
   @ApiResponse({ status: 200, description: 'Alerts retrieved' })
-  async getMigrationAlerts(
-    @Query('includeAcknowledged') includeAcknowledged: boolean = false
-  ) {
+  async getMigrationAlerts(@Query('includeAcknowledged') includeAcknowledged: boolean = false) {
     const alerts = this.migrationMonitoringService.getAlerts(includeAcknowledged);
 
     return {
@@ -198,12 +192,9 @@ export class MigrationController {
   @ApiResponse({ status: 404, description: 'Alert not found' })
   async acknowledgeAlert(
     @Param('alertId') alertId: string,
-    @Body() body: { acknowledgedBy: string }
+    @Body() body: { acknowledgedBy: string },
   ) {
-    const success = this.migrationMonitoringService.acknowledgeAlert(
-      alertId,
-      body.acknowledgedBy
-    );
+    const success = this.migrationMonitoringService.acknowledgeAlert(alertId, body.acknowledgedBy);
 
     if (success) {
       return {
@@ -237,19 +228,13 @@ export class MigrationController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Run targeted validation on specific tables or constraints' })
   @ApiResponse({ status: 200, description: 'Targeted validation completed' })
-  async runTargetedValidation(
-    @Body() body: { targets: string[]; ruleTypes?: string[] }
-  ) {
-    const result = await this.dataValidationService.validateSpecific(
-      body.targets,
-      body.ruleTypes
-    );
+  async runTargetedValidation(@Body() body: { targets: string[]; ruleTypes?: string[] }) {
+    const result = await this.dataValidationService.validateSpecific(body.targets, body.ruleTypes);
 
     return {
       success: result.summary.failed === 0,
-      message: result.summary.failed === 0 
-        ? 'Targeted validation passed' 
-        : 'Targeted validation failed',
+      message:
+        result.summary.failed === 0 ? 'Targeted validation passed' : 'Targeted validation failed',
       data: result,
     };
   }
@@ -260,10 +245,7 @@ export class MigrationController {
   @ApiQuery({ name: 'endDate', required: true, description: 'Report end date (ISO string)' })
   @ApiOperation({ summary: 'Generate migration report for a specific period' })
   @ApiResponse({ status: 200, description: 'Report generated successfully' })
-  async generateReport(
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string
-  ) {
+  async generateReport(@Query('startDate') startDate: string, @Query('endDate') endDate: string) {
     const start = new Date(startDate);
     const end = new Date(endDate);
 

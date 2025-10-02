@@ -53,15 +53,24 @@ export class TracingConfigService {
       exporters: {
         jaeger: {
           enabled: this.configService.get<boolean>('TRACING_JAEGER_ENABLED', false),
-          endpoint: this.configService.get<string>('TRACING_JAEGER_ENDPOINT', 'http://localhost:14268/api/traces'),
+          endpoint: this.configService.get<string>(
+            'TRACING_JAEGER_ENDPOINT',
+            'http://localhost:14268/api/traces',
+          ),
         },
         zipkin: {
           enabled: this.configService.get<boolean>('TRACING_ZIPKIN_ENABLED', false),
-          endpoint: this.configService.get<string>('TRACING_ZIPKIN_ENDPOINT', 'http://localhost:9411/api/v2/spans'),
+          endpoint: this.configService.get<string>(
+            'TRACING_ZIPKIN_ENDPOINT',
+            'http://localhost:9411/api/v2/spans',
+          ),
         },
         otlp: {
           enabled: this.configService.get<boolean>('TRACING_OTLP_ENABLED', false),
-          endpoint: this.configService.get<string>('TRACING_OTLP_ENDPOINT', 'http://localhost:4318/v1/traces'),
+          endpoint: this.configService.get<string>(
+            'TRACING_OTLP_ENDPOINT',
+            'http://localhost:4318/v1/traces',
+          ),
         },
       },
       sampling: {
@@ -69,7 +78,10 @@ export class TracingConfigService {
         ratio: this.configService.get<number>('TRACING_SAMPLING_RATIO', 0.1),
       },
       attributes: {
-        'service.name': this.configService.get<string>('TRACING_SERVICE_NAME', 'strellerminds-backend'),
+        'service.name': this.configService.get<string>(
+          'TRACING_SERVICE_NAME',
+          'strellerminds-backend',
+        ),
         'service.version': this.configService.get<string>('TRACING_SERVICE_VERSION', '1.0.0'),
         'deployment.environment': this.configService.get<string>('NODE_ENV', 'development'),
         'service.instance.id': this.configService.get<string>('HOSTNAME', 'localhost'),

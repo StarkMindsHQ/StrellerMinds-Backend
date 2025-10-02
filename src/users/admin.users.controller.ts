@@ -1,5 +1,24 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, ParseUUIDPipe, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  ParseUUIDPipe,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+} from '@nestjs/swagger';
 import { UsersService } from './services/users.service';
 import { CreateUsersDto } from './dtos/create.users.dto';
 import { updateUsersDto } from './dtos/update.users.dto';
@@ -82,7 +101,11 @@ export class AdminUsersController {
   @ApiBody({ type: updateUsersDto })
   @ApiResponse({ status: 200, description: 'User updated.' })
   @Patch(':id')
-  async update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: updateUsersDto, @Body('adminId') adminId: string) {
+  async update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: updateUsersDto,
+    @Body('adminId') adminId: string,
+  ) {
     const user = await this.usersService.update(id, dto);
     await this.auditLogService.createLog({
       action: 'UPDATE_USER',
@@ -125,13 +148,17 @@ export class AdminUsersController {
    */
   @ApiOperation({ summary: 'Update user role' })
   @ApiParam({ name: 'id', type: 'string', description: 'User ID' })
-  @ApiBody({ schema: { properties: { role: { type: 'string', enum: UserRole }, adminId: { type: 'string' } } } })
+  @ApiBody({
+    schema: {
+      properties: { role: { type: 'string', enum: UserRole }, adminId: { type: 'string' } },
+    },
+  })
   @ApiResponse({ status: 200, description: 'User role updated.' })
   @Patch(':id/role')
   async updateRole(
     @Param('id', ParseUUIDPipe) id: string,
     @Body('role') role: UserRole,
-    @Body('adminId') adminId: string
+    @Body('adminId') adminId: string,
   ) {
     const user = await this.usersService.update(id, { role });
     await this.auditLogService.createLog({
@@ -153,13 +180,17 @@ export class AdminUsersController {
    */
   @ApiOperation({ summary: 'Update user account status' })
   @ApiParam({ name: 'id', type: 'string', description: 'User ID' })
-  @ApiBody({ schema: { properties: { status: { type: 'string', enum: AccountStatus }, adminId: { type: 'string' } } } })
+  @ApiBody({
+    schema: {
+      properties: { status: { type: 'string', enum: AccountStatus }, adminId: { type: 'string' } },
+    },
+  })
   @ApiResponse({ status: 200, description: 'User status updated.' })
   @Patch(':id/status')
   async updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Body('status') status: AccountStatus,
-    @Body('adminId') adminId: string
+    @Body('adminId') adminId: string,
   ) {
     const user = await this.usersService.update(id, { status });
     await this.auditLogService.createLog({

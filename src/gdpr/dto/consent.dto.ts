@@ -29,7 +29,11 @@ export class UpdateConsentDto {
   legalBasis?: string;
 
   /** Expiry date for consent (optional) */
-  @ApiPropertyOptional({ description: 'Expiry date for consent', type: String, format: 'date-time' })
+  @ApiPropertyOptional({
+    description: 'Expiry date for consent',
+    type: String,
+    format: 'date-time',
+  })
   @IsOptional()
   @IsDateString()
   expiresAt?: string;

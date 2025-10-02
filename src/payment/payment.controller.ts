@@ -107,7 +107,8 @@ export class PaymentController {
     type: PaymentEntity,
   })
   async createCoursePurchase(
-    @Body() data: {
+    @Body()
+    data: {
       courseId: string;
       amount: number;
       currency: string;
@@ -255,7 +256,9 @@ export class PaymentController {
     description: 'Subscription retrieved successfully',
     type: SubscriptionEntity,
   })
-  async getSubscription(@Param('subscriptionId') subscriptionId: string): Promise<SubscriptionEntity> {
+  async getSubscription(
+    @Param('subscriptionId') subscriptionId: string,
+  ): Promise<SubscriptionEntity> {
     return this.subscriptionService.getSubscriptionById(subscriptionId);
   }
 
@@ -304,7 +307,9 @@ export class PaymentController {
     description: 'Subscription reactivated successfully',
     type: SubscriptionEntity,
   })
-  async reactivateSubscription(@Param('subscriptionId') subscriptionId: string): Promise<SubscriptionEntity> {
+  async reactivateSubscription(
+    @Param('subscriptionId') subscriptionId: string,
+  ): Promise<SubscriptionEntity> {
     return this.subscriptionService.reactivateSubscription(subscriptionId);
   }
 
@@ -400,4 +405,4 @@ export class PaymentController {
   async getCustomerAnalytics(): Promise<any> {
     return this.paymentAnalyticsService.getCustomerAnalytics();
   }
-} 
+}

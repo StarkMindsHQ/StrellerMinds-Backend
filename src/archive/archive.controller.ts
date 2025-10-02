@@ -35,6 +35,4 @@ export class ArchiveController {
   //   await this.archivingService.archiveOldPayments();
   //   return { message: ' Payments archived.' };
   // }
-
- 
 }

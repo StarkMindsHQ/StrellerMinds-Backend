@@ -66,12 +66,7 @@ import { SharedModule } from '../shared/shared.module';
         facebook: FacebookOAuthAdapter,
         apple: AppleOAuthAdapter,
       ): IAuthStrategy[] => [jwtLocalStrategy, google, facebook, apple],
-      inject: [
-        JwtLocalStrategy,
-        GoogleOAuthAdapter,
-        FacebookOAuthAdapter,
-        AppleOAuthAdapter,
-      ],
+      inject: [JwtLocalStrategy, GoogleOAuthAdapter, FacebookOAuthAdapter, AppleOAuthAdapter],
     },
     {
       provide: APP_GUARD,

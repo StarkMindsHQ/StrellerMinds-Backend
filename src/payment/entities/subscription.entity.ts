@@ -133,4 +133,4 @@ export class SubscriptionEntity {
 
   @OneToMany(() => PaymentEntity, (payment) => payment.subscription)
   payments: PaymentEntity[];
-} 
+}

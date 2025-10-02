@@ -5,26 +5,26 @@ metadata:
   name: analytics-platform
 
 resources:
-- namespace.yaml
-- configmap.yaml
-- secrets.yaml
-- rbac.yaml
-- deployment.yaml
-- worker-deployment.yaml
-- redis-deployment.yaml
-- service.yaml
-- ingress.yaml
-- hpa.yaml
-- network-policy.yaml
-- pdb.yaml
-- jobs/migration-job.yaml
-- cronjobs/cleanup-job.yaml
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - rbac.yaml
+  - deployment.yaml
+  - worker-deployment.yaml
+  - redis-deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - hpa.yaml
+  - network-policy.yaml
+  - pdb.yaml
+  - jobs/migration-job.yaml
+  - cronjobs/cleanup-job.yaml
 
 images:
-- name: analytics-platform/api
-  newTag: latest
-- name: analytics-platform/worker
-  newTag: latest
+  - name: analytics-platform/api
+    newTag: latest
+  - name: analytics-platform/worker
+    newTag: latest
 
 commonLabels:
   app.kubernetes.io/name: analytics-platform
@@ -36,7 +36,7 @@ commonLabels:
 namespace: analytics-platform
 
 replicas:
-- name: analytics-platform-api
-  count: 3
-- name: analytics-platform-worker
-  count: 2
+  - name: analytics-platform-api
+    count: 3
+  - name: analytics-platform-worker
+    count: 2

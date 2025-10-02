@@ -81,7 +81,11 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ApiProperty({ enum: AccountStatus, description: 'Account status', example: AccountStatus.ACTIVE })
+  @ApiProperty({
+    enum: AccountStatus,
+    description: 'Account status',
+    example: AccountStatus.ACTIVE,
+  })
   @Column({ type: 'enum', enum: AccountStatus, default: AccountStatus.ACTIVE })
   @Index()
   status: AccountStatus;
@@ -135,7 +139,10 @@ export class User {
   @Column({ unique: true, nullable: false })
   username: string;
 
-  @ApiPropertyOptional({ description: 'Stripe customer ID linked to this user', example: 'cus_123456789' })
+  @ApiPropertyOptional({
+    description: 'Stripe customer ID linked to this user',
+    example: 'cus_123456789',
+  })
   @Column({ nullable: true })
   stripeCustomerId?: string;
 

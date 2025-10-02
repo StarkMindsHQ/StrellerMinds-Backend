@@ -1,4 +1,14 @@
-import { Controller, Get, Query, Param, Req, UsePipes, ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Param,
+  Req,
+  UsePipes,
+  ValidationPipe,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { AchievementService } from '../services/achievement.service';
 import { RewardService } from '../services/reward.service';
 import { LeaderboardService } from '../services/leaderboard.service';
@@ -50,4 +60,4 @@ export class GamificationController {
       throw new HttpException('Failed to fetch events', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-} 
+}

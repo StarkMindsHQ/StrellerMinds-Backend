@@ -1,11 +1,11 @@
 export interface DatabaseOptimizationConfig {
-  enableQueryLogging: boolean
-  slowQueryThreshold: number // milliseconds
-  maxQueryHistorySize: number
-  enableAutomaticIndexSuggestions: boolean
-  performanceAnalysisInterval: number // minutes
-  excludePatterns: string[]
-  includeExplainAnalyze: boolean
+  enableQueryLogging: boolean;
+  slowQueryThreshold: number; // milliseconds
+  maxQueryHistorySize: number;
+  enableAutomaticIndexSuggestions: boolean;
+  performanceAnalysisInterval: number; // minutes
+  excludePatterns: string[];
+  includeExplainAnalyze: boolean;
 }
 
 export const DEFAULT_OPTIMIZATION_CONFIG: DatabaseOptimizationConfig = {
@@ -14,6 +14,6 @@ export const DEFAULT_OPTIMIZATION_CONFIG: DatabaseOptimizationConfig = {
   maxQueryHistorySize: 1000,
   enableAutomaticIndexSuggestions: true,
   performanceAnalysisInterval: 60,
-  excludePatterns: ["SHOW", "SET", "BEGIN", "COMMIT", "ROLLBACK"],
+  excludePatterns: ['SHOW', 'SET', 'BEGIN', 'COMMIT', 'ROLLBACK'],
   includeExplainAnalyze: false,
-}
+};

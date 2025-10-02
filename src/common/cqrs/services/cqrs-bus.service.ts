@@ -56,7 +56,7 @@ export class CqrsBusService {
 
   async executeCommand<T extends Command, R = any>(command: T): Promise<CommandResult<R>> {
     const startTime = Date.now();
-    
+
     try {
       this.logger.debug(`Executing command: ${command.commandType}`, {
         commandId: command.commandId,
@@ -116,7 +116,7 @@ export class CqrsBusService {
 
   async executeQuery<T extends Query, R = any>(query: T): Promise<QueryResult<R>> {
     const startTime = Date.now();
-    
+
     try {
       this.logger.debug(`Executing query: ${query.queryType}`, {
         queryId: query.queryId,

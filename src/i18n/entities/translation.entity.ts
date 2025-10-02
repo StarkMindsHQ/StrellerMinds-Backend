@@ -1,98 +1,106 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, Unique } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+  Unique,
+} from 'typeorm';
 
 export enum TranslationStatus {
-  DRAFT = "draft",
-  PENDING_REVIEW = "pending_review",
-  APPROVED = "approved",
-  PUBLISHED = "published",
-  DEPRECATED = "deprecated",
+  DRAFT = 'draft',
+  PENDING_REVIEW = 'pending_review',
+  APPROVED = 'approved',
+  PUBLISHED = 'published',
+  DEPRECATED = 'deprecated',
 }
 
 export enum TranslationSource {
-  MANUAL = "manual",
-  TMS = "tms",
-  AUTO_TRANSLATE = "auto_translate",
-  IMPORT = "import",
+  MANUAL = 'manual',
+  TMS = 'tms',
+  AUTO_TRANSLATE = 'auto_translate',
+  IMPORT = 'import',
 }
 
-@Entity("translations")
-@Unique(["key", "locale", "namespace"])
-@Index(["locale", "namespace"])
-@Index(["key", "locale"])
-@Index(["status", "locale"])
+@Entity('translations')
+@Unique(['key', 'locale', 'namespace'])
+@Index(['locale', 'namespace'])
+@Index(['key', 'locale'])
+@Index(['status', 'locale'])
 export class Translation {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   @Index()
-  key: string
+  key: string;
 
   @Column()
   @Index()
-  locale: string
+  locale: string;
 
   @Column()
   @Index()
-  namespace: string
+  namespace: string;
 
-  @Column("text")
-  value: string
+  @Column('text')
+  value: string;
 
-  @Column("text", { nullable: true })
-  description?: string
+  @Column('text', { nullable: true })
+  description?: string;
 
-  @Column("text", { nullable: true })
-  context?: string
+  @Column('text', { nullable: true })
+  context?: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: TranslationStatus,
     default: TranslationStatus.DRAFT,
   })
-  status: TranslationStatus
+  status: TranslationStatus;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: TranslationSource,
     default: TranslationSource.MANUAL,
   })
-  source: TranslationSource
+  source: TranslationSource;
 
-  @Column("jsonb", { nullable: true })
+  @Column('jsonb', { nullable: true })
   metadata?: {
-    pluralForms?: Record<string, string>
-    variables?: string[]
-    maxLength?: number
-    tags?: string[]
-    translatorNotes?: string
-    reviewNotes?: string
-  }
+    pluralForms?: Record<string, string>;
+    variables?: string[];
+    maxLength?: number;
+    tags?: string[];
+    translatorNotes?: string;
+    reviewNotes?: string;
+  };
 
   @Column({ nullable: true })
-  translatedBy?: string
+  translatedBy?: string;
 
   @Column({ nullable: true })
-  reviewedBy?: string
+  reviewedBy?: string;
 
-  @Column({ type: "timestamp", nullable: true })
-  translatedAt?: Date
+  @Column({ type: 'timestamp', nullable: true })
+  translatedAt?: Date;
 
-  @Column({ type: "timestamp", nullable: true })
-  reviewedAt?: Date
+  @Column({ type: 'timestamp', nullable: true })
+  reviewedAt?: Date;
 
-  @Column({ type: "timestamp", nullable: true })
-  publishedAt?: Date
+  @Column({ type: 'timestamp', nullable: true })
+  publishedAt?: Date;
 
   @Column({ default: 1 })
-  version: number
+  version: number;
 
   @Column({ nullable: true })
-  parentId?: string
+  parentId?: string;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

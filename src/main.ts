@@ -9,10 +9,7 @@ import { GlobalExceptionsFilter } from './common/filters/global-exception.filter
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import compress from '@fastify/compress';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import fastifyHelmet from '@fastify/helmet';
 import fastifyCsrf from '@fastify/csrf-protection';
 import { FastifyRequest } from 'fastify';
@@ -23,12 +20,9 @@ import multipart from '@fastify/multipart';
 import { setupTracing } from './monitoring/tracing.bootstrap';
 
 async function bootstrap() {
-    await setupTracing();
+  await setupTracing();
 
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
   // Register compression
   await app.register(compress, {
@@ -44,9 +38,9 @@ async function bootstrap() {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],       
-        styleSrc: ["'self'", "'unsafe-inline'"], 
-        imgSrc: ["'self'", "data:", "https:"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
         connectSrc: ["'self'"],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
@@ -66,10 +60,10 @@ async function bootstrap() {
   });
   // Rate limiting
   await app.register(rateLimit, {
-    max: 100,          
+    max: 100,
     timeWindow: '1 minute',
     keyGenerator: (req: FastifyRequest) => {
-      const user = (req as any).user; 
+      const user = (req as any).user;
       return user?.id ?? req.ip;
     },
     errorResponseBuilder: () => ({
@@ -78,9 +72,6 @@ async function bootstrap() {
       message: 'Rate limit exceeded. Please try again later.',
     }),
   });
-
-
-
 
   // Register CSRF protection globally
   await app.register(fastifyCsrf);
@@ -108,20 +99,22 @@ async function bootstrap() {
   const sentryService = app.get('SentryService');
   const alertingService = app.get('AlertingService');
   const errorDashboardService = app.get('ErrorDashboardService');
-  app.useGlobalFilters(new GlobalExceptionsFilter(
-    i18n,
-    loggerService,
-    sentryService,
-    alertingService,
-    errorDashboardService
-  ));
+  app.useGlobalFilters(
+    new GlobalExceptionsFilter(
+      i18n,
+      loggerService,
+      sentryService,
+      alertingService,
+      errorDashboardService,
+    ),
+  );
   app.useGlobalGuards(new RolesGuard(new Reflector()));
 
   // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Mentor Grading API')
     .setDescription(
-      'APIs for mentors to grade student assignments and provide feedback. Admin API for course management.'
+      'APIs for mentors to grade student assignments and provide feedback. Admin API for course management.',
     )
     .setVersion('1.0')
     .addBearerAuth()

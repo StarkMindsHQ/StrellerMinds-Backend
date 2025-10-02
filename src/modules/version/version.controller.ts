@@ -14,9 +14,9 @@ export class VersionController {
   ) {}
 
   @Get('info')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get API version information',
-    description: 'Returns current API version, supported versions, and deprecation status'
+    description: 'Returns current API version, supported versions, and deprecation status',
   })
   @ApiResponse({
     status: 200,
@@ -34,7 +34,10 @@ export class VersionController {
               version: { type: 'string', example: 'v1' },
               deprecatedIn: { type: 'string', example: '2024-01-01' },
               removedIn: { type: 'string', example: '2024-12-31' },
-              migrationGuide: { type: 'string', example: 'https://docs.strellerminds.com/api/migration/v1-to-v2' },
+              migrationGuide: {
+                type: 'string',
+                example: 'https://docs.strellerminds.com/api/migration/v1-to-v2',
+              },
               alternative: { type: 'string', example: 'v2' },
               reason: { type: 'string', example: 'Enhanced features and improved performance' },
             },
@@ -65,9 +68,9 @@ export class VersionController {
   }
 
   @Get('analytics')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get version usage analytics',
-    description: 'Returns detailed analytics about API version usage and deprecated endpoint usage'
+    description: 'Returns detailed analytics about API version usage and deprecated endpoint usage',
   })
   @ApiQuery({
     name: 'days',
@@ -121,9 +124,9 @@ export class VersionController {
   }
 
   @Get('migration')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get migration recommendations',
-    description: 'Returns migration guides and recommendations for deprecated versions'
+    description: 'Returns migration guides and recommendations for deprecated versions',
   })
   @ApiResponse({
     status: 200,
@@ -149,7 +152,10 @@ export class VersionController {
             properties: {
               from: { type: 'string', example: 'v1' },
               to: { type: 'string', example: 'v2' },
-              guide: { type: 'string', example: 'https://docs.strellerminds.com/api/migration/v1-to-v2' },
+              guide: {
+                type: 'string',
+                example: 'https://docs.strellerminds.com/api/migration/v1-to-v2',
+              },
               deadline: { type: 'string', example: '2024-12-31' },
               usageCount: { type: 'number', example: 150 },
             },
@@ -163,9 +169,9 @@ export class VersionController {
   }
 
   @Get('compatibility/:oldVersion/:newVersion')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Check backward compatibility',
-    description: 'Validates backward compatibility between two API versions'
+    description: 'Validates backward compatibility between two API versions',
   })
   @ApiParam({ name: 'oldVersion', description: 'Old API version', example: 'v1' })
   @ApiParam({ name: 'newVersion', description: 'New API version', example: 'v2' })
@@ -197,9 +203,9 @@ export class VersionController {
   }
 
   @Get('documentation/:version')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get versioned API documentation',
-    description: 'Returns API documentation for a specific version'
+    description: 'Returns API documentation for a specific version',
   })
   @ApiParam({ name: 'version', description: 'API version', example: 'v2' })
   @ApiResponse({
@@ -249,9 +255,9 @@ export class VersionController {
   }
 
   @Get('status')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get API version status',
-    description: 'Returns current status of all API versions'
+    description: 'Returns current status of all API versions',
   })
   @ApiResponse({
     status: 200,
@@ -284,25 +290,32 @@ export class VersionController {
   async getVersionStatus() {
     const versionInfo = this.apiVersioningService.getVersionInfo();
     const deprecatedVersions = versionInfo.deprecated.map((d: any) => d.version);
-    
+
     // Calculate next deprecation
     const nextDeprecation = versionInfo.deprecated
       .filter((d: any) => new Date(d.removedIn) > new Date())
-      .sort((a: any, b: any) => new Date(a.removedIn).getTime() - new Date(b.removedIn).getTime())[0];
+      .sort(
+        (a: any, b: any) => new Date(a.removedIn).getTime() - new Date(b.removedIn).getTime(),
+      )[0];
 
-    const daysRemaining = nextDeprecation 
-      ? Math.ceil((new Date(nextDeprecation.removedIn).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    const daysRemaining = nextDeprecation
+      ? Math.ceil(
+          (new Date(nextDeprecation.removedIn).getTime() - new Date().getTime()) /
+            (1000 * 60 * 60 * 24),
+        )
       : null;
 
     return {
       currentVersion: versionInfo.current,
       supportedVersions: versionInfo.supported,
       deprecatedVersions,
-      nextDeprecation: nextDeprecation ? {
-        version: nextDeprecation.version,
-        removedIn: nextDeprecation.removedIn,
-        daysRemaining,
-      } : null,
+      nextDeprecation: nextDeprecation
+        ? {
+            version: nextDeprecation.version,
+            removedIn: nextDeprecation.removedIn,
+            daysRemaining,
+          }
+        : null,
     };
   }
 }

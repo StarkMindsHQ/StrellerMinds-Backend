@@ -2,7 +2,7 @@
 
 /**
  * Contract Testing Pipeline Test Script
- * 
+ *
  * This script tests the complete contract testing pipeline to ensure
  * all components are working correctly.
  */
@@ -19,7 +19,7 @@ class ContractPipelineTester {
       contractTests: false,
       providerVerification: false,
       pactGeneration: false,
-      cleanup: false
+      cleanup: false,
     };
   }
 
@@ -29,10 +29,10 @@ class ContractPipelineTester {
   runCommand(command, description) {
     console.log(`\n🔄 ${description}...`);
     try {
-      execSync(command, { 
-        stdio: 'pipe', 
+      execSync(command, {
+        stdio: 'pipe',
         cwd: this.projectRoot,
-        timeout: 60000 // 60 second timeout
+        timeout: 60000, // 60 second timeout
       });
       console.log(`✅ ${description} - SUCCESS`);
       return true;
@@ -49,8 +49,8 @@ class ContractPipelineTester {
   checkFiles(files, description) {
     console.log(`\n🔍 ${description}...`);
     let allExist = true;
-    
-    files.forEach(file => {
+
+    files.forEach((file) => {
       const filePath = path.resolve(this.projectRoot, file);
       if (fs.existsSync(filePath)) {
         console.log(`✅ ${file} - EXISTS`);
@@ -59,7 +59,7 @@ class ContractPipelineTester {
         allExist = false;
       }
     });
-    
+
     return allExist;
   }
 
@@ -72,10 +72,7 @@ class ContractPipelineTester {
 
     // 1. Test setup
     console.log('\n📋 Step 1: Testing Setup');
-    this.testResults.setup = this.runCommand(
-      'npm run pact:setup',
-      'Pact setup initialization'
-    );
+    this.testResults.setup = this.runCommand('npm run pact:setup', 'Pact setup initialization');
 
     // 2. Check contract test files exist
     console.log('\n📋 Step 2: Checking Contract Test Files');
@@ -85,9 +82,9 @@ class ContractPipelineTester {
       'apps/backend/tests/contract/storage.consumer.pact.test.ts',
       'apps/backend/tests/contract/payment.consumer.pact.test.ts',
       'apps/backend/tests/contract/notification.consumer.pact.test.ts',
-      'apps/backend/tests/contract/provider-verification.test.ts'
+      'apps/backend/tests/contract/provider-verification.test.ts',
     ];
-    
+
     const filesExist = this.checkFiles(contractFiles, 'Contract test files');
 
     // 3. Check configuration files
@@ -99,23 +96,23 @@ class ContractPipelineTester {
       'scripts/pact-ci-integration.sh',
       'apps/backend/tests/contract/setup.ts',
       'apps/backend/tests/contract/global-setup.ts',
-      'apps/backend/tests/contract/global-teardown.ts'
+      'apps/backend/tests/contract/global-teardown.ts',
     ];
-    
+
     const configExists = this.checkFiles(configFiles, 'Configuration files');
 
     // 4. Test Jest configuration
     console.log('\n📋 Step 4: Testing Jest Configuration');
     const jestConfigWorks = this.runCommand(
       'npx jest --showConfig --config jest.contract.config.js',
-      'Jest contract configuration validation'
+      'Jest contract configuration validation',
     );
 
     // 5. Test contract tests (dry run)
     console.log('\n📋 Step 5: Testing Contract Tests (Dry Run)');
     const contractTestsWork = this.runCommand(
       'npm run test:contract -- --passWithNoTests',
-      'Contract tests execution'
+      'Contract tests execution',
     );
     this.testResults.contractTests = contractTestsWork;
 
@@ -123,10 +120,10 @@ class ContractPipelineTester {
     console.log('\n📋 Step 6: Checking Pact File Generation');
     const pactsDir = path.join(this.projectRoot, 'pacts');
     const logsDir = path.join(this.projectRoot, 'logs');
-    
+
     let pactsGenerated = false;
     if (fs.existsSync(pactsDir)) {
-      const pactFiles = fs.readdirSync(pactsDir).filter(f => f.endsWith('.json'));
+      const pactFiles = fs.readdirSync(pactsDir).filter((f) => f.endsWith('.json'));
       if (pactFiles.length > 0) {
         console.log(`✅ ${pactFiles.length} Pact files generated`);
         pactsGenerated = true;
@@ -142,16 +139,13 @@ class ContractPipelineTester {
     console.log('\n📋 Step 7: Testing Provider Verification Setup');
     const providerVerificationWorks = this.runCommand(
       'npm run test:contract:provider -- --passWithNoTests',
-      'Provider verification setup'
+      'Provider verification setup',
     );
     this.testResults.providerVerification = providerVerificationWorks;
 
     // 8. Test cleanup
     console.log('\n📋 Step 8: Testing Cleanup');
-    this.testResults.cleanup = this.runCommand(
-      'npm run pact:cleanup',
-      'Pact cleanup'
-    );
+    this.testResults.cleanup = this.runCommand('npm run pact:cleanup', 'Pact cleanup');
 
     // Generate report
     this.generateReport(filesExist && configExists && jestConfigWorks);
@@ -178,7 +172,9 @@ class ContractPipelineTester {
     console.log('\n📋 Test Results:');
     console.log(`   - Setup: ${this.testResults.setup ? '✅' : '❌'}`);
     console.log(`   - Contract Tests: ${this.testResults.contractTests ? '✅' : '❌'}`);
-    console.log(`   - Provider Verification: ${this.testResults.providerVerification ? '✅' : '❌'}`);
+    console.log(
+      `   - Provider Verification: ${this.testResults.providerVerification ? '✅' : '❌'}`,
+    );
     console.log(`   - Pact Generation: ${this.testResults.pactGeneration ? '✅' : '❌'}`);
     console.log(`   - Cleanup: ${this.testResults.cleanup ? '✅' : '❌'}`);
 
@@ -211,7 +207,7 @@ class ContractPipelineTester {
       overallStatus: `${passedTests}/${totalTests}`,
       allSetup,
       testResults: this.testResults,
-      recommendations: this.getRecommendations()
+      recommendations: this.getRecommendations(),
     };
 
     const reportPath = path.join(this.projectRoot, 'contract-pipeline-test-report.json');

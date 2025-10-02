@@ -31,11 +31,13 @@ logs/                                # Pact execution logs
 **File**: `apps/backend/tests/contract/stellar.consumer.pact.test.ts`
 
 **Coverage**:
+
 - Account details fetching
 - Transaction monitoring
 - Error handling scenarios
 
 **Key Interactions**:
+
 - `GET /accounts/{accountId}` - Fetch account details
 - `GET /transactions/{txHash}` - Monitor transaction status
 - Error responses for invalid accounts/transactions
@@ -45,11 +47,13 @@ logs/                                # Pact execution logs
 **File**: `apps/backend/tests/contract/email.consumer.pact.test.ts`
 
 **Coverage**:
+
 - Single email sending
 - Bulk email sending
 - Email delivery failures
 
 **Key Interactions**:
+
 - `POST /send` - Send email with `to`, `from`, `subject`, `html`
 - Response includes `messageId`, `accepted`, `rejected` arrays
 - Error handling for invalid recipients
@@ -59,12 +63,14 @@ logs/                                # Pact execution logs
 **File**: `apps/backend/tests/contract/storage.consumer.pact.test.ts`
 
 **Coverage**:
+
 - File uploads (images, videos)
 - File deletion
 - AWS S3 integration
 - Cloudinary transformations
 
 **Key Interactions**:
+
 - `PUT /uploads/{filename}` - Upload files
 - `DELETE /delete/{publicId}` - Delete files
 - Response includes `fileUrl`, `publicId`, `secureUrl`
@@ -256,11 +262,13 @@ npm run pact:full
 **File**: `apps/backend/tests/contract/stellar.consumer.pact.test.ts`
 
 **Coverage**:
+
 - Account details fetching
 - Transaction monitoring
 - Error handling scenarios
 
 **Key Interactions**:
+
 - `GET /accounts/{accountId}` - Fetch account details
 - `GET /transactions/{txHash}` - Monitor transaction status
 - Error responses for invalid accounts/transactions
@@ -270,11 +278,13 @@ npm run pact:full
 **File**: `apps/backend/tests/contract/email.consumer.pact.test.ts`
 
 **Coverage**:
+
 - Single email sending
 - Bulk email sending
 - Email delivery failures
 
 **Key Interactions**:
+
 - `POST /send` - Send email with `to`, `from`, `subject`, `html`
 - Response includes `messageId`, `accepted`, `rejected` arrays
 - Error handling for invalid recipients
@@ -284,12 +294,14 @@ npm run pact:full
 **File**: `apps/backend/tests/contract/storage.consumer.pact.test.ts`
 
 **Coverage**:
+
 - File uploads (images, videos)
 - File deletion
 - AWS S3 integration
 - Cloudinary transformations
 
 **Key Interactions**:
+
 - `PUT /uploads/{filename}` - Upload files
 - `DELETE /delete/{publicId}` - Delete files
 - Response includes `fileUrl`, `publicId`, `secureUrl`
@@ -299,12 +311,14 @@ npm run pact:full
 **File**: `apps/backend/tests/contract/payment.consumer.pact.test.ts`
 
 **Coverage**:
+
 - Customer creation
 - Payment intent creation and confirmation
 - Webhook signature verification
 - Error handling for invalid payments
 
 **Key Interactions**:
+
 - `POST /v1/customers` - Create Stripe customer
 - `POST /v1/payment_intents` - Create payment intent
 - `POST /v1/payment_intents/{id}/confirm` - Confirm payment
@@ -315,12 +329,14 @@ npm run pact:full
 **File**: `apps/backend/tests/contract/notification.consumer.pact.test.ts`
 
 **Coverage**:
+
 - Firebase Cloud Messaging (FCM) push notifications
 - SMS notifications via Twilio
 - Batch notification sending
 - Error handling for invalid tokens/numbers
 
 **Key Interactions**:
+
 - `POST /v1/projects/{project}/messages:send` - Send FCM notification
 - `POST /2010-04-01/Accounts/{account}/Messages.json` - Send SMS
 - Error responses for invalid tokens and service unavailability
@@ -334,12 +350,14 @@ npm run pact:full
 ## Configuration Files
 
 ### Jest Configuration
+
 - `jest.contract.config.js` - Dedicated Jest configuration for contract tests
 - `apps/backend/tests/contract/setup.ts` - Test setup and teardown
 - `apps/backend/tests/contract/global-setup.ts` - Global test setup
 - `apps/backend/tests/contract/global-teardown.ts` - Global test cleanup
 
 ### Pact Configuration
+
 - `.pactrc` - Pact CLI configuration file
 - Environment variables for Pact Broker integration
 

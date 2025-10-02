@@ -14,13 +14,8 @@ export class EmailPreviewController {
   }
 
   @Post('validate')
-  async validateTemplate(
-    @Body() body: { templateName: string; context: Record<string, any> },
-  ) {
-    return this.emailTestService.validateTemplate(
-      body.templateName,
-      body.context,
-    );
+  async validateTemplate(@Body() body: { templateName: string; context: Record<string, any> }) {
+    return this.emailTestService.validateTemplate(body.templateName, body.context);
   }
 
   @Post('test')
@@ -32,10 +27,6 @@ export class EmailPreviewController {
       context: Record<string, any>;
     },
   ) {
-    return this.emailTestService.testTemplate(
-      body.templateName,
-      body.email,
-      body.context,
-    );
+    return this.emailTestService.testTemplate(body.templateName, body.email, body.context);
   }
 }

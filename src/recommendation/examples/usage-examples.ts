@@ -1,6 +1,6 @@
 /**
  * Content Recommendation Engine Usage Examples
- * 
+ *
  * This file demonstrates various ways to use the recommendation engine
  * in different scenarios and use cases.
  */
@@ -38,8 +38,8 @@ export class RecommendationUsageExamples {
       });
 
       console.log(`Generated ${recommendations.length} recommendations for user ${userId}`);
-      
-      return recommendations.map(rec => ({
+
+      return recommendations.map((rec) => ({
         courseId: rec.courseId,
         title: rec.course?.title,
         reason: rec.explanation,
@@ -56,12 +56,15 @@ export class RecommendationUsageExamples {
    * Example 2: Contextual Recommendations
    * Generate recommendations based on user context (device, location, time)
    */
-  async contextualRecommendations(userId: string, context: {
-    deviceType: string;
-    sessionId: string;
-    currentPage: string;
-    timeOfDay: string;
-  }) {
+  async contextualRecommendations(
+    userId: string,
+    context: {
+      deviceType: string;
+      sessionId: string;
+      currentPage: string;
+      timeOfDay: string;
+    },
+  ) {
     try {
       const recommendations = await this.recommendationService.generateRecommendations({
         userId,
@@ -76,17 +79,17 @@ export class RecommendationUsageExamples {
       });
 
       // Filter recommendations based on context
-      const filteredRecs = recommendations.filter(rec => {
+      const filteredRecs = recommendations.filter((rec) => {
         // Example: Show shorter courses on mobile
         if (context.deviceType === 'mobile' && rec.course?.duration > 60) {
           return false;
         }
-        
+
         // Example: Show beginner courses in the evening
         if (context.timeOfDay === 'evening' && rec.course?.difficulty === 'advanced') {
           return false;
         }
-        
+
         return true;
       });
 
@@ -127,7 +130,7 @@ export class RecommendationUsageExamples {
       const learningPath = await this.learningPathService.generateLearningPath(
         userId,
         learningGoal,
-        options
+        options,
       );
 
       return {
@@ -136,7 +139,7 @@ export class RecommendationUsageExamples {
         estimatedDuration: learningPath.estimatedDuration,
         totalSteps: learningPath.totalSteps,
         skills: learningPath.targetSkills,
-        steps: learningPath.steps?.map(step => ({
+        steps: learningPath.steps?.map((step) => ({
           id: step.id,
           title: step.title,
           type: step.stepType,
@@ -157,10 +160,10 @@ export class RecommendationUsageExamples {
   async cachedRecommendations(userId: string) {
     try {
       const cacheKey = { userId, context: 'homepage' };
-      
+
       // Try to get from cache first
       let recommendations = await this.cacheService.getCachedRecommendations(userId, cacheKey);
-      
+
       if (!recommendations) {
         // Generate fresh recommendations
         recommendations = await this.recommendationService.generateRecommendations({
@@ -171,7 +174,7 @@ export class RecommendationUsageExamples {
 
         // Cache for future requests
         await this.cacheService.cacheRecommendations(userId, cacheKey, recommendations);
-        
+
         this.logger.log(`Generated and cached recommendations for user ${userId}`);
       } else {
         this.logger.log(`Served cached recommendations for user ${userId}`);
@@ -198,7 +201,7 @@ export class RecommendationUsageExamples {
       });
 
       this.logger.log(`Queued batch processing for ${userIds.length} users`);
-      
+
       return {
         success: true,
         message: `Batch processing initiated for ${userIds.length} users`,
@@ -214,24 +217,27 @@ export class RecommendationUsageExamples {
    * Example 6: Real-time Recommendation Updates
    * Update recommendations based on user interactions
    */
-  async handleUserInteraction(userId: string, interactionData: {
-    recommendationId: string;
-    interactionType: 'view' | 'click' | 'dismiss' | 'enroll';
-    courseId: string;
-    metadata?: any;
-  }) {
+  async handleUserInteraction(
+    userId: string,
+    interactionData: {
+      recommendationId: string;
+      interactionType: 'view' | 'click' | 'dismiss' | 'enroll';
+      courseId: string;
+      metadata?: any;
+    },
+  ) {
     try {
       // Record the interaction
       await this.recommendationService.recordInteraction(
         interactionData.recommendationId,
         interactionData.interactionType,
-        interactionData.metadata
+        interactionData.metadata,
       );
 
       // If user enrolled, invalidate cache to refresh recommendations
       if (interactionData.interactionType === 'enroll') {
         await this.cacheService.invalidateRecommendationCache(userId);
-        
+
         // Generate fresh recommendations in background
         setTimeout(async () => {
           await this.recommendationService.generateRecommendations({
@@ -266,7 +272,10 @@ export class RecommendationUsageExamples {
           userId,
           limit: 10,
           minConfidence: 0.3,
-          includeReasons: [RecommendationReason.SIMILAR_USERS, RecommendationReason.COLLABORATIVE_FILTERING],
+          includeReasons: [
+            RecommendationReason.SIMILAR_USERS,
+            RecommendationReason.COLLABORATIVE_FILTERING,
+          ],
         });
       } else {
         // Algorithm B: Focus on content similarity
@@ -281,7 +290,7 @@ export class RecommendationUsageExamples {
       // Track A/B test metrics
       await this.analyticsService.trackRecommendationGeneration({
         userId,
-        recommendationIds: recommendations.map(r => r.id),
+        recommendationIds: recommendations.map((r) => r.id),
         algorithmVersion: `ab_test_${testGroup.toLowerCase()}`,
         generationTimeMs: Date.now(),
         context: { abTestGroup: testGroup },
@@ -289,7 +298,7 @@ export class RecommendationUsageExamples {
 
       return {
         testGroup,
-        recommendations: recommendations.map(rec => ({
+        recommendations: recommendations.map((rec) => ({
           id: rec.id,
           courseId: rec.courseId,
           confidence: rec.confidenceScore,
@@ -338,11 +347,15 @@ export class RecommendationUsageExamples {
    * Example 9: Personalized Course Discovery
    * Enhanced course discovery with recommendations
    */
-  async enhancedCourseDiscovery(userId: string, searchQuery?: string, filters?: {
-    difficulty?: string;
-    duration?: number;
-    topics?: string[];
-  }) {
+  async enhancedCourseDiscovery(
+    userId: string,
+    searchQuery?: string,
+    filters?: {
+      difficulty?: string;
+      duration?: number;
+      topics?: string[];
+    },
+  ) {
     try {
       // Get base recommendations
       const recommendations = await this.recommendationService.generateRecommendations({
@@ -355,28 +368,29 @@ export class RecommendationUsageExamples {
       let filteredCourses = recommendations;
 
       if (searchQuery) {
-        filteredCourses = filteredCourses.filter(rec => 
-          rec.course?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          rec.course?.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        filteredCourses = filteredCourses.filter(
+          (rec) =>
+            rec.course?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            rec.course?.description?.toLowerCase().includes(searchQuery.toLowerCase()),
         );
       }
 
       if (filters) {
         if (filters.difficulty) {
-          filteredCourses = filteredCourses.filter(rec => 
-            rec.course?.difficulty === filters.difficulty
+          filteredCourses = filteredCourses.filter(
+            (rec) => rec.course?.difficulty === filters.difficulty,
           );
         }
 
         if (filters.duration) {
-          filteredCourses = filteredCourses.filter(rec => 
-            (rec.course?.duration || 0) <= filters.duration!
+          filteredCourses = filteredCourses.filter(
+            (rec) => (rec.course?.duration || 0) <= filters.duration!,
           );
         }
 
         if (filters.topics?.length) {
-          filteredCourses = filteredCourses.filter(rec => 
-            rec.course?.tags?.some(tag => filters.topics!.includes(tag))
+          filteredCourses = filteredCourses.filter((rec) =>
+            rec.course?.tags?.some((tag) => filters.topics!.includes(tag)),
           );
         }
       }
@@ -389,7 +403,7 @@ export class RecommendationUsageExamples {
       });
 
       return {
-        courses: filteredCourses.slice(0, 12).map(rec => ({
+        courses: filteredCourses.slice(0, 12).map((rec) => ({
           id: rec.courseId,
           title: rec.course?.title,
           description: rec.course?.description,
@@ -424,7 +438,7 @@ export class RecommendationUsageExamples {
         sortOrder: 'DESC',
       });
 
-      const path = learningPath.paths.find(p => p.id === pathId);
+      const path = learningPath.paths.find((p) => p.id === pathId);
       if (!path) {
         throw new Error(`Learning path ${pathId} not found`);
       }
@@ -436,9 +450,9 @@ export class RecommendationUsageExamples {
 
       // Get recommended next steps
       const nextSteps = path.steps
-        ?.filter(step => !step.completed)
+        ?.filter((step) => !step.completed)
         .slice(0, 3)
-        .map(step => ({
+        .map((step) => ({
           id: step.id,
           title: step.title,
           type: step.stepType,
@@ -456,7 +470,7 @@ export class RecommendationUsageExamples {
           status: path.status,
         },
         nextSteps,
-        estimatedTimeToComplete: path.estimatedDuration - (path.completedSteps * 60), // rough estimate
+        estimatedTimeToComplete: path.estimatedDuration - path.completedSteps * 60, // rough estimate
       };
     } catch (error) {
       this.logger.error('Error tracking learning path progress:', error);

@@ -46,7 +46,7 @@ describe('LoggerService', () => {
   it('should log debug message', () => {
     const logSpy = jest.spyOn(service['logger'], 'log');
     service.debug('Test debug message', { correlationId: 'test-123' });
-    
+
     expect(logSpy).toHaveBeenCalledWith(
       'debug',
       'Test debug message',
@@ -55,19 +55,19 @@ describe('LoggerService', () => {
         context: 'Application',
         environment: 'test',
         service: 'test-app',
-      })
+      }),
     );
   });
 
   it('should log error with context', () => {
     const logSpy = jest.spyOn(service['logger'], 'log');
     const error = new Error('Test error');
-    
+
     service.logError(error, {
       correlationId: 'test-123',
       userId: 'user-456',
     });
-    
+
     expect(logSpy).toHaveBeenCalledWith(
       'error',
       'Test error',
@@ -77,7 +77,7 @@ describe('LoggerService', () => {
         type: 'error',
         errorType: 'Error',
         stack: expect.any(String),
-      })
+      }),
     );
   });
 
@@ -89,7 +89,7 @@ describe('LoggerService', () => {
   it('should sanitize database queries', () => {
     const query = "SELECT * FROM users WHERE password='secret123' AND token='abc123'";
     const sanitized = service['sanitizeQuery'](query);
-    
+
     expect(sanitized).toContain("password='***'");
     expect(sanitized).toContain("token='***'");
     expect(sanitized).not.toContain('secret123');
@@ -98,20 +98,20 @@ describe('LoggerService', () => {
 
   it('should log performance with appropriate level', () => {
     const logSpy = jest.spyOn(service['logger'], 'log');
-    
+
     // Fast request
     service.logPerformance('Fast request', {
       correlationId: 'test-123',
       duration: 100,
     });
-    
+
     expect(logSpy).toHaveBeenCalledWith(
       'info',
       'Fast request',
       expect.objectContaining({
         duration: 100,
         type: 'performance',
-      })
+      }),
     );
 
     // Slow request
@@ -119,25 +119,25 @@ describe('LoggerService', () => {
       correlationId: 'test-456',
       duration: 6000,
     });
-    
+
     expect(logSpy).toHaveBeenCalledWith(
       'warn',
       'Slow request',
       expect.objectContaining({
         duration: 6000,
         type: 'performance',
-      })
+      }),
     );
   });
 
   it('should log business events', () => {
     const logSpy = jest.spyOn(service['logger'], 'log');
-    
+
     service.logBusinessEvent('User registered', {
       correlationId: 'test-123',
       userId: 'user-456',
     });
-    
+
     expect(logSpy).toHaveBeenCalledWith(
       'info',
       'User registered',
@@ -145,18 +145,18 @@ describe('LoggerService', () => {
         type: 'business_event',
         correlationId: 'test-123',
         userId: 'user-456',
-      })
+      }),
     );
   });
 
   it('should log security events with high severity', () => {
     const logSpy = jest.spyOn(service['logger'], 'log');
-    
+
     service.logSecurityEvent('Failed login attempt', {
       correlationId: 'test-123',
       ip: '192.168.1.1',
     });
-    
+
     expect(logSpy).toHaveBeenCalledWith(
       'warn',
       'Failed login attempt',
@@ -165,7 +165,7 @@ describe('LoggerService', () => {
         severity: 'high',
         correlationId: 'test-123',
         ip: '192.168.1.1',
-      })
+      }),
     );
   });
 });

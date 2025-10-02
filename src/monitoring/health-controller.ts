@@ -34,10 +34,11 @@ export class HealthController {
       () => this.db.pingCheck('database'),
       () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
       () => this.memory.checkRSS('memory_rss', 150 * 1024 * 1024),
-      () => this.disk.checkStorage('storage', {
-        path: '/',
-        thresholdPercent: 0.9,
-      }),
+      () =>
+        this.disk.checkStorage('storage', {
+          path: '/',
+          thresholdPercent: 0.9,
+        }),
       () => this.databaseHealth.isHealthy('postgres'),
       () => this.customHealth.isHealthy('application'),
     ]);
@@ -68,10 +69,11 @@ export class HealthController {
   @HealthCheck()
   checkDisk() {
     return this.health.check([
-      () => this.disk.checkStorage('disk_health', {
-        path: '/',
-        thresholdPercent: 0.8,
-      }),
+      () =>
+        this.disk.checkStorage('disk_health', {
+          path: '/',
+          thresholdPercent: 0.8,
+        }),
     ]);
   }
 
@@ -89,8 +91,6 @@ export class HealthController {
   @ApiOperation({ summary: 'Check if application is alive' })
   @HealthCheck()
   checkLiveness() {
-    return this.health.check([
-      () => this.customHealth.isHealthy('liveness'),
-    ]);
+    return this.health.check([() => this.customHealth.isHealthy('liveness')]);
   }
 }

@@ -33,11 +33,13 @@ The StrellerMinds Content Recommendation Engine is a comprehensive, AI-powered s
 ### Recommendations
 
 #### Get Personalized Recommendations
+
 ```http
 GET /recommendations
 ```
 
 **Query Parameters:**
+
 - `type` (optional) - Filter by recommendation type
 - `limit` (optional, default: 10) - Number of recommendations
 - `offset` (optional, default: 0) - Pagination offset
@@ -46,6 +48,7 @@ GET /recommendations
 - `sortOrder` (optional, default: 'DESC') - Sort direction
 
 **Response:**
+
 ```json
 {
   "recommendations": [
@@ -65,7 +68,7 @@ GET /recommendations
       "recommendationType": "CONTENT_BASED",
       "reason": "SKILL_BASED",
       "confidenceScore": 0.85,
-      "relevanceScore": 0.80,
+      "relevanceScore": 0.8,
       "priority": 4,
       "explanation": "Recommended based on your React skills",
       "status": "ACTIVE",
@@ -82,11 +85,13 @@ GET /recommendations
 ```
 
 #### Generate New Recommendations
+
 ```http
 POST /recommendations/generate
 ```
 
 **Request Body:**
+
 ```json
 {
   "limit": 10,
@@ -100,11 +105,13 @@ POST /recommendations/generate
 ```
 
 #### Record Interaction
+
 ```http
 POST /recommendations/{id}/interact
 ```
 
 **Request Body:**
+
 ```json
 {
   "interactionType": "click",
@@ -116,11 +123,13 @@ POST /recommendations/{id}/interact
 ```
 
 #### Provide Feedback
+
 ```http
 POST /recommendations/{id}/feedback
 ```
 
 **Request Body:**
+
 ```json
 {
   "score": 4,
@@ -132,16 +141,19 @@ POST /recommendations/{id}/feedback
 ### Learning Paths
 
 #### Get Learning Paths
+
 ```http
 GET /learning-paths
 ```
 
 #### Generate Learning Path
+
 ```http
 POST /learning-paths/generate
 ```
 
 **Request Body:**
+
 ```json
 {
   "goal": {
@@ -165,6 +177,7 @@ POST /learning-paths/generate
 ```
 
 #### Update Progress
+
 ```http
 POST /learning-paths/{pathId}/steps/{stepId}/complete
 ```
@@ -178,9 +191,7 @@ import { RecommendationEngineService } from './recommendation/services/recommend
 
 @Injectable()
 export class CourseService {
-  constructor(
-    private recommendationService: RecommendationEngineService
-  ) {}
+  constructor(private recommendationService: RecommendationEngineService) {}
 
   async getCourseRecommendations(userId: string) {
     const recommendations = await this.recommendationService.generateRecommendations({
@@ -189,7 +200,7 @@ export class CourseService {
       minConfidence: 0.3,
     });
 
-    return recommendations.map(rec => ({
+    return recommendations.map((rec) => ({
       courseId: rec.courseId,
       reason: rec.explanation,
       confidence: rec.confidenceScore,
@@ -205,9 +216,7 @@ import { LearningPathService } from './recommendation/services/learning-path.ser
 
 @Injectable()
 export class LearningService {
-  constructor(
-    private learningPathService: LearningPathService
-  ) {}
+  constructor(private learningPathService: LearningPathService) {}
 
   async createPersonalizedPath(userId: string, skills: string[]) {
     const goal = {
@@ -221,10 +230,7 @@ export class LearningService {
       },
     };
 
-    const learningPath = await this.learningPathService.generateLearningPath(
-      userId,
-      goal
-    );
+    const learningPath = await this.learningPathService.generateLearningPath(userId, goal);
 
     return learningPath;
   }
@@ -240,15 +246,15 @@ import { RecommendationCacheService } from './recommendation/services/recommenda
 export class OptimizedRecommendationService {
   constructor(
     private cacheService: RecommendationCacheService,
-    private recommendationService: RecommendationEngineService
+    private recommendationService: RecommendationEngineService,
   ) {}
 
   async getRecommendationsWithCache(userId: string) {
     // Try cache first
-    const cached = await this.cacheService.getCachedRecommendations(
+    const cached = await this.cacheService.getCachedRecommendations(userId, {
       userId,
-      { userId, context: 'homepage' }
-    );
+      context: 'homepage',
+    });
 
     if (cached) {
       return cached;
@@ -264,7 +270,7 @@ export class OptimizedRecommendationService {
     await this.cacheService.cacheRecommendations(
       userId,
       { userId, context: 'homepage' },
-      recommendations
+      recommendations,
     );
 
     return recommendations;
@@ -279,13 +285,11 @@ import { RecommendationAnalyticsService } from './recommendation/services/recomm
 
 @Injectable()
 export class AnalyticsService {
-  constructor(
-    private analyticsService: RecommendationAnalyticsService
-  ) {}
+  constructor(private analyticsService: RecommendationAnalyticsService) {}
 
   async getUserInsights(userId: string) {
     const analytics = await this.analyticsService.getUserAnalytics(userId, 30);
-    
+
     return {
       totalRecommendations: analytics.totalRecommendationsReceived,
       engagementRate: analytics.totalInteractions / analytics.totalRecommendationsReceived,
@@ -351,14 +355,11 @@ export class AppModule {}
 
 ```typescript
 // Queue batch recommendation generation
-await performanceService.batchGenerateRecommendations(
-  userIds,
-  {
-    limit: 10,
-    minConfidence: 0.1,
-    refreshCache: false,
-  }
-);
+await performanceService.batchGenerateRecommendations(userIds, {
+  limit: 10,
+  minConfidence: 0.1,
+  refreshCache: false,
+});
 
 // Precompute similarity scores
 await performanceService.precomputeSimilarityScores(popularCourseIds);
@@ -377,7 +378,7 @@ const recommendations = await performanceService.executeWithCircuitBreaker(
     failureThreshold: 5,
     timeout: 10000,
     resetTimeout: 60000,
-  }
+  },
 );
 ```
 
@@ -488,22 +489,22 @@ spec:
         app: recommendation-service
     spec:
       containers:
-      - name: recommendation-service
-        image: recommendation-service:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: CACHE_TTL
-          value: "300"
-        - name: ML_MODEL_VERSION
-          value: "v2.1"
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
+        - name: recommendation-service
+          image: recommendation-service:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: CACHE_TTL
+              value: '300'
+            - name: ML_MODEL_VERSION
+              value: 'v2.1'
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '250m'
+            limits:
+              memory: '1Gi'
+              cpu: '500m'
 ```
 
 ## Troubleshooting
@@ -552,6 +553,7 @@ const recommendations = await service.generateRecommendations({
 ## Support
 
 For technical support and questions:
+
 - Check the troubleshooting section above
 - Review the test files for usage examples
 - Consult the API documentation for endpoint details
@@ -560,6 +562,7 @@ For technical support and questions:
 ## Contributing
 
 When contributing to the recommendation engine:
+
 1. Write comprehensive tests for new features
 2. Update documentation for API changes
 3. Follow the established code style and patterns

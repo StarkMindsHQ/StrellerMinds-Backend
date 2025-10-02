@@ -120,7 +120,7 @@ export class VideoProcessingService {
 
       // Extract video metadata
       const metadata = await this.extractVideoMetadata(inputPath);
-      
+
       // Update video with metadata
       await this.updateVideoMetadata(videoId, metadata);
 
@@ -176,8 +176,8 @@ export class VideoProcessingService {
           return;
         }
 
-        const videoStream = metadata.streams.find(s => s.codec_type === 'video');
-        const audioStream = metadata.streams.find(s => s.codec_type === 'audio');
+        const videoStream = metadata.streams.find((s) => s.codec_type === 'video');
+        const audioStream = metadata.streams.find((s) => s.codec_type === 'audio');
 
         if (!videoStream) {
           reject(new Error('No video stream found'));
@@ -202,7 +202,7 @@ export class VideoProcessingService {
 
   private parseFrameRate(frameRateString: string): number {
     if (!frameRateString) return 0;
-    
+
     const parts = frameRateString.split('/');
     if (parts.length === 2) {
       return parseFloat(parts[0]) / parseFloat(parts[1]);
@@ -237,7 +237,7 @@ export class VideoProcessingService {
               const filePath = path.join(thumbnailDir, file);
               const buffer = fs.readFileSync(filePath);
               const key = this.cloudFrontService.generateThumbnailKey(videoId, index);
-              
+
               return this.cloudFrontService.uploadVideo(buffer, key, 'image/jpeg');
             });
 
@@ -247,7 +247,7 @@ export class VideoProcessingService {
             if (thumbnailFiles.length > 0) {
               const firstThumbnailKey = this.cloudFrontService.generateThumbnailKey(videoId, 0);
               const thumbnailUrl = `https://${this.cloudFrontService['config'].distributionDomain}/${firstThumbnailKey}`;
-              
+
               await this.videoRepository.update(videoId, {
                 thumbnailUrl,
               });
@@ -262,11 +262,7 @@ export class VideoProcessingService {
     });
   }
 
-  async generatePreviewGif(
-    videoId: string,
-    inputPath: string,
-    outputDir: string,
-  ): Promise<void> {
+  async generatePreviewGif(videoId: string, inputPath: string, outputDir: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const previewPath = path.join(outputDir, 'preview.gif');
 
@@ -306,7 +302,7 @@ export class VideoProcessingService {
     qualityLevels: QualityLevel[],
   ): Promise<void> {
     const qualitySettings = this.getQualitySettings();
-    
+
     for (const quality of qualityLevels) {
       const settings = qualitySettings[quality];
       if (!settings) continue;
@@ -333,11 +329,7 @@ export class VideoProcessingService {
         .size(settings.resolution)
         .fps(settings.fps)
         .format('mp4')
-        .outputOptions([
-          '-preset fast',
-          '-crf 23',
-          '-movflags +faststart',
-        ]);
+        .outputOptions(['-preset fast', '-crf 23', '-movflags +faststart']);
 
       // Add watermark if enabled
       // if (watermark?.enabled && watermark.url) {
@@ -438,7 +430,7 @@ export class VideoProcessingService {
   ): Promise<void> {
     // Generate HLS manifest
     await this.generateHLSManifest(videoId, inputPath, outputDir, settings.qualityLevels);
-    
+
     // Generate DASH manifest
     await this.generateDASHManifest(videoId, inputPath, outputDir, settings.qualityLevels);
   }

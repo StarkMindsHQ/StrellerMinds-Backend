@@ -39,7 +39,7 @@ export class TracedDatabaseService {
       `db.${operation}`,
       async (span) => {
         const startTime = Date.now();
-        
+
         span.setAttributes({
           'db.system': 'postgresql',
           'db.operation': operation,
@@ -65,7 +65,7 @@ export class TracedDatabaseService {
         try {
           const result = await this.dataSource.query(sql, parameters);
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'db.rows_affected': result.length,
             'db.operation.duration_ms': duration,
@@ -105,7 +105,7 @@ export class TracedDatabaseService {
           return result;
         } catch (error) {
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'db.operation.duration_ms': duration,
             'db.operation.success': false,
@@ -144,7 +144,7 @@ export class TracedDatabaseService {
       `db.${operation}`,
       async (span) => {
         const startTime = Date.now();
-        
+
         span.setAttributes({
           'db.system': 'postgresql',
           'db.operation': operation,
@@ -152,20 +152,21 @@ export class TracedDatabaseService {
         });
 
         const queryRunner = this.dataSource.createQueryRunner();
-        
+
         try {
           await queryRunner.connect();
           await queryRunner.startTransaction();
 
           const result = await runInTransaction(queryRunner.manager);
-          
+
           await queryRunner.commitTransaction();
-          
+
           const duration = Date.now() - startTime;
           span.setAttributes({
             'db.transaction.duration_ms': duration,
             'db.transaction.success': true,
-            'performance.duration_category': duration > 1000 ? 'slow' : duration > 500 ? 'moderate' : 'fast',
+            'performance.duration_category':
+              duration > 1000 ? 'slow' : duration > 500 ? 'moderate' : 'fast',
           });
 
           this.logger.debug(`Database transaction completed: ${operation}`, {
@@ -176,7 +177,7 @@ export class TracedDatabaseService {
           return result;
         } catch (error) {
           await queryRunner.rollbackTransaction();
-          
+
           const duration = Date.now() - startTime;
           span.setAttributes({
             'db.transaction.duration_ms': duration,
@@ -208,37 +209,42 @@ export class TracedDatabaseService {
    */
   createTracedRepository<T>(entity: any, operation?: string) {
     const repository = this.dataSource.getRepository(entity);
-    
+
     return {
-      find: (options?: any) => this.query(
-        repository.createQueryBuilder().getSql(),
-        [],
-        { table: entity.name, operation: operation || 'find', includeQuery: true }
-      ),
-      
-      findOne: (options?: any) => this.query(
-        repository.createQueryBuilder().getSql(),
-        [],
-        { table: entity.name, operation: operation || 'findOne', includeQuery: true }
-      ),
-      
-      save: (entity: T) => this.query(
-        `INSERT INTO ${entity.constructor.name}`,
-        [entity],
-        { table: entity.constructor.name, operation: 'save', includeParams: true }
-      ),
-      
-      update: (criteria: any, partialEntity: any) => this.query(
-        `UPDATE ${entity.name}`,
-        [criteria, partialEntity],
-        { table: entity.name, operation: 'update', includeParams: true }
-      ),
-      
-      delete: (criteria: any) => this.query(
-        `DELETE FROM ${entity.name}`,
-        [criteria],
-        { table: entity.name, operation: 'delete', includeParams: true }
-      ),
+      find: (options?: any) =>
+        this.query(repository.createQueryBuilder().getSql(), [], {
+          table: entity.name,
+          operation: operation || 'find',
+          includeQuery: true,
+        }),
+
+      findOne: (options?: any) =>
+        this.query(repository.createQueryBuilder().getSql(), [], {
+          table: entity.name,
+          operation: operation || 'findOne',
+          includeQuery: true,
+        }),
+
+      save: (entity: T) =>
+        this.query(`INSERT INTO ${entity.constructor.name}`, [entity], {
+          table: entity.constructor.name,
+          operation: 'save',
+          includeParams: true,
+        }),
+
+      update: (criteria: any, partialEntity: any) =>
+        this.query(`UPDATE ${entity.name}`, [criteria, partialEntity], {
+          table: entity.name,
+          operation: 'update',
+          includeParams: true,
+        }),
+
+      delete: (criteria: any) =>
+        this.query(`DELETE FROM ${entity.name}`, [criteria], {
+          table: entity.name,
+          operation: 'delete',
+          includeParams: true,
+        }),
     };
   }
 }

@@ -19,4 +19,4 @@ export class NotificationSettings {
 
   @Column('jsonb', { nullable: true })
   rules: Record<string, any>;
-} 
+}

@@ -11,9 +11,7 @@ describe('CoursesAdvancesController', () => {
       providers: [CoursesAdvancesService],
     }).compile();
 
-    controller = module.get<CoursesAdvancesController>(
-      CoursesAdvancesController,
-    );
+    controller = module.get<CoursesAdvancesController>(CoursesAdvancesController);
   });
 
   it('should be defined', () => {

@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -8,7 +13,10 @@ import { ConnectWalletDto } from '../dto/connect-wallet.dto';
 import { ShareCredentialDto } from '../dto/share-credential.dto';
 import { CredentialFilterDto } from '../dto/credential-filter.dto';
 import { EthereumWalletProvider } from '../providers/ethereum-wallet.provider';
-import { WalletConnectionResult, CredentialShareResult } from '../interfaces/wallet-service.interface';
+import {
+  WalletConnectionResult,
+  CredentialShareResult,
+} from '../interfaces/wallet-service.interface';
 import * as crypto from 'crypto';
 
 /**
@@ -39,7 +47,7 @@ export class WalletService {
     const isValidSignature = await this.ethereumProvider.verifySignature(
       address,
       message,
-      signature
+      signature,
     );
 
     if (!isValidSignature) {
@@ -48,7 +56,7 @@ export class WalletService {
 
     // Check if wallet already exists
     let wallet = await this.walletRepository.findOne({
-      where: { address: address.toLowerCase() }
+      where: { address: address.toLowerCase() },
     });
 
     let isNewWallet = false;
@@ -95,7 +103,7 @@ export class WalletService {
    */
   async disconnectWallet(walletId: string): Promise<void> {
     const wallet = await this.walletRepository.findOne({
-      where: { id: walletId }
+      where: { id: walletId },
     });
 
     if (!wallet) {
@@ -114,7 +122,7 @@ export class WalletService {
    */
   async getWalletCredentials(
     walletId: string,
-    filters: CredentialFilterDto
+    filters: CredentialFilterDto,
   ): Promise<Credential[]> {
     const queryBuilder = this.credentialRepository
       .createQueryBuilder('credential')
@@ -129,21 +137,21 @@ export class WalletService {
     }
 
     if (filters.issuer) {
-      queryBuilder.andWhere('credential.issuer ILIKE :issuer', { 
-        issuer: `%${filters.issuer}%` 
+      queryBuilder.andWhere('credential.issuer ILIKE :issuer', {
+        issuer: `%${filters.issuer}%`,
       });
     }
 
     if (filters.isShared !== undefined) {
-      queryBuilder.andWhere('credential.isShared = :isShared', { 
-        isShared: filters.isShared 
+      queryBuilder.andWhere('credential.isShared = :isShared', {
+        isShared: filters.isShared,
       });
     }
 
     if (filters.search) {
       queryBuilder.andWhere(
         '(credential.subject ILIKE :search OR credential.issuer ILIKE :search)',
-        { search: `%${filters.search}%` }
+        { search: `%${filters.search}%` },
       );
     }
 
@@ -162,7 +170,7 @@ export class WalletService {
   async getCredentialById(credentialId: string, walletId: string): Promise<Credential> {
     const credential = await this.credentialRepository.findOne({
       where: { id: credentialId, walletId },
-      relations: ['wallet']
+      relations: ['wallet'],
     });
 
     if (!credential) {
@@ -180,16 +188,16 @@ export class WalletService {
    */
   async shareCredentials(
     walletId: string,
-    shareDto: ShareCredentialDto
+    shareDto: ShareCredentialDto,
   ): Promise<CredentialShareResult> {
     const { credentialIds, recipientAddress, message, expirationDate } = shareDto;
 
     // Validate credentials belong to wallet
     const credentials = await this.credentialRepository.find({
-      where: { 
+      where: {
         id: credentialIds as any, // TypeORM In operator
-        walletId 
-      }
+        walletId,
+      },
     });
 
     if (credentials.length !== credentialIds.length) {
@@ -203,15 +211,15 @@ export class WalletService {
       try {
         // Generate sharing hash
         const shareHash = this.generateShareHash(credential.id, recipientAddress);
-        
+
         // Update credential
         credential.isShared = true;
         credential.sharedWith = recipientAddress;
-        
+
         // In a real implementation, you would create a blockchain transaction here
         // For now, we'll simulate with a mock transaction hash
         credential.transactionHash = `0x${crypto.randomBytes(32).toString('hex')}`;
-        
+
         await this.credentialRepository.save(credential);
         sharedCredentials.push(credential.id);
       } catch (error) {
@@ -234,7 +242,7 @@ export class WalletService {
    */
   async revokeCredentialShare(credentialId: string, walletId: string): Promise<void> {
     const credential = await this.getCredentialById(credentialId, walletId);
-    
+
     if (!credential.isShared) {
       throw new BadRequestException('Credential is not currently shared');
     }
@@ -252,7 +260,7 @@ export class WalletService {
   async getWalletStats(walletId: string): Promise<any> {
     const wallet = await this.walletRepository.findOne({
       where: { id: walletId },
-      relations: ['credentials']
+      relations: ['credentials'],
     });
 
     if (!wallet) {
@@ -261,11 +269,7 @@ export class WalletService {
 
     const stats = await this.credentialRepository
       .createQueryBuilder('credential')
-      .select([
-        'credential.type',
-        'credential.status',
-        'COUNT(*) as count'
-      ])
+      .select(['credential.type', 'credential.status', 'COUNT(*) as count'])
       .where('credential.walletId = :walletId', { walletId })
       .groupBy('credential.type, credential.status')
       .getRawMany();
@@ -280,7 +284,7 @@ export class WalletService {
       totalCredentials: wallet.credentials.length,
       credentialsByType: this.groupStats(stats, 'type'),
       credentialsByStatus: this.groupStats(stats, 'status'),
-      sharedCredentials: wallet.credentials.filter(c => c.isShared).length,
+      sharedCredentials: wallet.credentials.filter((c) => c.isShared).length,
     };
   }
 

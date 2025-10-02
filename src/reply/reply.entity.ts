@@ -1,11 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  CreateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
 import { Thread } from 'src/thread/thread.entity';
 import { User } from '../users/entities/user.entity';
 

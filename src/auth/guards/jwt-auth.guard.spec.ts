@@ -85,15 +85,11 @@ describe('JwtAuthGuard', () => {
 
     it('should throw UnauthorizedException for expired token', () => {
       const error = { name: 'TokenExpiredError' };
-      expect(() => guard.handleRequest(null, null, error)).toThrow(
-        'Token has expired',
-      );
+      expect(() => guard.handleRequest(null, null, error)).toThrow('Token has expired');
     });
 
     it('should throw UnauthorizedException for invalid token', () => {
-      expect(() => guard.handleRequest(new Error(), null, null)).toThrow(
-        'Invalid token',
-      );
+      expect(() => guard.handleRequest(new Error(), null, null)).toThrow('Invalid token');
     });
   });
 });

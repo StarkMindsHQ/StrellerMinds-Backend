@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  UserConsent,
-  ConsentType,
-  ConsentStatus,
-} from './entities/user-consent.entity';
+import { UserConsent, ConsentType, ConsentStatus } from './entities/user-consent.entity';
 import { UpdateConsentDto, ConsentPreferencesDto } from './dto/consent.dto';
 
 @Injectable()
@@ -22,10 +18,7 @@ export class ConsentService {
     });
   }
 
-  async updateConsent(
-    userId: string,
-    consentDto: UpdateConsentDto,
-  ): Promise<UserConsent> {
+  async updateConsent(userId: string, consentDto: UpdateConsentDto): Promise<UserConsent> {
     const existingConsent = await this.consentRepository.findOne({
       where: { userId, consentType: consentDto.consentType },
     });
@@ -71,10 +64,7 @@ export class ConsentService {
     );
   }
 
-  async hasValidConsent(
-    userId: string,
-    consentType: ConsentType,
-  ): Promise<boolean> {
+  async hasValidConsent(userId: string, consentType: ConsentType): Promise<boolean> {
     const consent = await this.consentRepository.findOne({
       where: { userId, consentType, status: ConsentStatus.GRANTED },
     });

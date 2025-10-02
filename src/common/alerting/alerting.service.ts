@@ -28,10 +28,13 @@ export interface AlertConfig {
     responseTime: number;
     criticalErrors: string[];
     // Error category based thresholds
-    categoryThresholds: Record<string, {
-      rate: number;
-      severity: 'low' | 'medium' | 'high' | 'critical';
-    }>;
+    categoryThresholds: Record<
+      string,
+      {
+        rate: number;
+        severity: 'low' | 'medium' | 'high' | 'critical';
+      }
+    >;
   };
   rateLimiting: {
     enabled: boolean;
@@ -76,7 +79,7 @@ export class AlertingService {
     }
 
     const alertKey = `critical_error_${context.errorCode || 'unknown'}`;
-    
+
     if (!this.shouldSendAlert(alertKey)) {
       this.loggerService.debug('Alert rate limited', { alertKey, context: context.correlationId });
       return;
@@ -102,9 +105,9 @@ export class AlertingService {
    * @param context Additional context for the alert
    */
   async sendCategorizedErrorAlert(
-    errorCategory: string, 
-    errorRate: number, 
-    context: Partial<AlertContext>
+    errorCategory: string,
+    errorRate: number,
+    context: Partial<AlertContext>,
   ): Promise<void> {
     if (!this.config.enabled) {
       return;
@@ -117,7 +120,7 @@ export class AlertingService {
     }
 
     const alertKey = `categorized_error_${errorCategory}`;
-    
+
     if (!this.shouldSendAlert(alertKey)) {
       return;
     }
@@ -146,7 +149,7 @@ export class AlertingService {
     }
 
     const alertKey = 'high_error_rate';
-    
+
     if (!this.shouldSendAlert(alertKey)) {
       return;
     }
@@ -174,7 +177,7 @@ export class AlertingService {
     }
 
     const alertKey = 'slow_response';
-    
+
     if (!this.shouldSendAlert(alertKey)) {
       return;
     }
@@ -196,7 +199,12 @@ export class AlertingService {
     this.recordAlert(alertKey);
   }
 
-  async sendCustomAlert(title: string, description: string, severity: 'low' | 'medium' | 'high', context?: Partial<AlertContext>): Promise<void> {
+  async sendCustomAlert(
+    title: string,
+    description: string,
+    severity: 'low' | 'medium' | 'high',
+    context?: Partial<AlertContext>,
+  ): Promise<void> {
     if (!this.config.enabled) {
       return;
     }
@@ -285,7 +293,7 @@ export class AlertingService {
     };
 
     await firstValueFrom(
-      this.httpService.post(this.config.channels.slack.webhookUrl, slackPayload)
+      this.httpService.post(this.config.channels.slack.webhookUrl, slackPayload),
     );
   }
 
@@ -296,7 +304,7 @@ export class AlertingService {
     };
 
     await firstValueFrom(
-      this.httpService.post(this.config.channels.webhook.url, alertData, { headers })
+      this.httpService.post(this.config.channels.webhook.url, alertData, { headers }),
     );
   }
 
@@ -322,7 +330,7 @@ export class AlertingService {
     }
 
     const hoursSinceLastAlert = (now.getTime() - alertInfo.lastAlert.getTime()) / (1000 * 60 * 60);
-    
+
     if (hoursSinceLastAlert >= 1) {
       // Reset count after an hour
       this.alertCounts.set(alertKey, { count: 0, lastAlert: now });
@@ -340,7 +348,7 @@ export class AlertingService {
   private recordAlert(alertKey: string): void {
     const now = new Date();
     const alertInfo = this.alertCounts.get(alertKey) || { count: 0, lastAlert: now };
-    
+
     this.alertCounts.set(alertKey, {
       count: alertInfo.count + 1,
       lastAlert: now,
@@ -349,19 +357,19 @@ export class AlertingService {
 
   private formatErrorDescription(error: Error, context: AlertContext): string {
     let description = `Error: ${error.message}\n`;
-    
+
     if (context.method && context.url) {
       description += `Request: ${context.method} ${context.url}\n`;
     }
-    
+
     if (context.userId) {
       description += `User: ${context.userId}\n`;
     }
-    
+
     if (context.correlationId) {
       description += `Correlation ID: ${context.correlationId}\n`;
     }
-    
+
     return description;
   }
 
@@ -384,7 +392,10 @@ export class AlertingService {
       channels: {
         email: {
           enabled: this.configService.get<boolean>('EMAIL_ALERTS_ENABLED', false),
-          recipients: this.configService.get<string>('EMAIL_ALERT_RECIPIENTS', '').split(',').filter(Boolean),
+          recipients: this.configService
+            .get<string>('EMAIL_ALERT_RECIPIENTS', '')
+            .split(',')
+            .filter(Boolean),
         },
         slack: {
           enabled: this.configService.get<boolean>('SLACK_ALERTS_ENABLED', false),
@@ -400,10 +411,12 @@ export class AlertingService {
       thresholds: {
         errorRate: this.configService.get<number>('ERROR_RATE_THRESHOLD', 0.05),
         responseTime: this.configService.get<number>('RESPONSE_TIME_THRESHOLD', 5000),
-        criticalErrors: this.configService.get<string>('CRITICAL_ERROR_CODES', 'INTERNAL_ERROR,DATABASE_ERROR').split(','),
+        criticalErrors: this.configService
+          .get<string>('CRITICAL_ERROR_CODES', 'INTERNAL_ERROR,DATABASE_ERROR')
+          .split(','),
         // Default category thresholds
         categoryThresholds: this.parseCategoryThresholds(
-          this.configService.get<string>('CATEGORY_ERROR_THRESHOLDS', '{}')
+          this.configService.get<string>('CATEGORY_ERROR_THRESHOLDS', '{}'),
         ),
       },
       rateLimiting: {
@@ -427,18 +440,20 @@ export class AlertingService {
    * @param thresholdsString JSON string of category thresholds
    * @returns Parsed category thresholds object
    */
-  private parseCategoryThresholds(thresholdsString: string): Record<string, { rate: number; severity: 'low' | 'medium' | 'high' | 'critical' }> {
+  private parseCategoryThresholds(
+    thresholdsString: string,
+  ): Record<string, { rate: number; severity: 'low' | 'medium' | 'high' | 'critical' }> {
     try {
       return JSON.parse(thresholdsString);
     } catch {
       // Return default thresholds
       return {
-        'AUTHENTICATION': { rate: 0.1, severity: 'high' },
-        'VALIDATION': { rate: 0.05, severity: 'medium' },
-        'RESOURCE': { rate: 0.02, severity: 'medium' },
-        'BUSINESS_LOGIC': { rate: 0.01, severity: 'low' },
-        'SYSTEM': { rate: 0.005, severity: 'critical' },
-        'UNKNOWN': { rate: 0.01, severity: 'medium' },
+        AUTHENTICATION: { rate: 0.1, severity: 'high' },
+        VALIDATION: { rate: 0.05, severity: 'medium' },
+        RESOURCE: { rate: 0.02, severity: 'medium' },
+        BUSINESS_LOGIC: { rate: 0.01, severity: 'low' },
+        SYSTEM: { rate: 0.005, severity: 'critical' },
+        UNKNOWN: { rate: 0.01, severity: 'medium' },
       };
     }
   }

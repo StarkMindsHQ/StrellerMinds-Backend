@@ -38,7 +38,10 @@ export class Thread {
   title: string;
 
   /** Content of the thread */
-  @ApiProperty({ description: 'Content of the thread', example: 'Can someone explain how to document APIs with Swagger in NestJS?' })
+  @ApiProperty({
+    description: 'Content of the thread',
+    example: 'Can someone explain how to document APIs with Swagger in NestJS?',
+  })
   @Column('text')
   content: string;
 
@@ -48,7 +51,12 @@ export class Thread {
   isOpen: boolean;
 
   /** Date/time when the thread was created */
-  @ApiProperty({ description: 'Date/time when the thread was created', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the thread was created',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   @CreateDateColumn()
   createdAt: Date;
 

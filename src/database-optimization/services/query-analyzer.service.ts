@@ -31,22 +31,13 @@ export class QueryAnalyzerService {
       const executionTime = Date.now() - startTime;
 
       // Generate suggestions based on execution plan
-      const suggestions = this.generateOptimizationSuggestions(
-        executionPlan,
-        query,
-      );
+      const suggestions = this.generateOptimizationSuggestions(executionPlan, query);
 
       // Generate index recommendations
-      const indexRecommendations = this.generateIndexRecommendations(
-        executionPlan,
-        query,
-      );
+      const indexRecommendations = this.generateIndexRecommendations(executionPlan, query);
 
       // Calculate performance score
-      const performanceScore = this.calculatePerformanceScore(
-        executionPlan,
-        executionTime,
-      );
+      const performanceScore = this.calculatePerformanceScore(executionPlan, executionTime);
 
       // Update query history
       this.updateQueryHistory(query, executionTime);
@@ -60,10 +51,7 @@ export class QueryAnalyzerService {
         indexRecommendations,
       };
     } catch (error) {
-      this.logger.error(
-        `Failed to analyze query: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Failed to analyze query: ${error.message}`, error.stack);
       throw error;
     }
   }
@@ -95,8 +83,7 @@ export class QueryAnalyzerService {
         type: 'INDEX',
         priority: 'HIGH',
         description: 'Sequential scan detected on large table',
-        impact:
-          'Adding appropriate indexes can significantly improve query performance',
+        impact: 'Adding appropriate indexes can significantly improve query performance',
         implementation: 'CREATE INDEX ON table_name (column_name)',
       });
     }
@@ -130,8 +117,7 @@ export class QueryAnalyzerService {
         type: 'QUERY_REWRITE',
         priority: 'LOW',
         description: 'SELECT * usage detected',
-        impact:
-          'Selecting only needed columns can improve performance and reduce network traffic',
+        impact: 'Selecting only needed columns can improve performance and reduce network traffic',
         implementation: 'Replace SELECT * with specific column names',
       });
     }
@@ -163,18 +149,12 @@ export class QueryAnalyzerService {
     return recommendations;
   }
 
-  private calculatePerformanceScore(
-    plan: QueryExecutionPlan,
-    executionTime: number,
-  ): number {
+  private calculatePerformanceScore(plan: QueryExecutionPlan, executionTime: number): number {
     let score = 100;
 
     // Deduct points for high execution time
     if (executionTime > this.config.slowQueryThreshold) {
-      score -= Math.min(
-        50,
-        (executionTime / this.config.slowQueryThreshold) * 10,
-      );
+      score -= Math.min(50, (executionTime / this.config.slowQueryThreshold) * 10);
     }
 
     // Deduct points for high cost operations
@@ -197,17 +177,10 @@ export class QueryAnalyzerService {
     if (existing) {
       existing.totalExecutions++;
       existing.avgExecutionTime =
-        (existing.avgExecutionTime * (existing.totalExecutions - 1) +
-          executionTime) /
+        (existing.avgExecutionTime * (existing.totalExecutions - 1) + executionTime) /
         existing.totalExecutions;
-      existing.slowestExecution = Math.max(
-        existing.slowestExecution,
-        executionTime,
-      );
-      existing.fastestExecution = Math.min(
-        existing.fastestExecution,
-        executionTime,
-      );
+      existing.slowestExecution = Math.max(existing.slowestExecution, executionTime);
+      existing.fastestExecution = Math.min(existing.fastestExecution, executionTime);
       existing.lastExecuted = new Date();
     } else {
       this.queryHistory.set(queryId, {
@@ -232,19 +205,14 @@ export class QueryAnalyzerService {
     if (plan.nodeType === 'Seq Scan') {
       return true;
     }
-    return (
-      plan.children?.some((child) => this.hasSequentialScan(child)) || false
-    );
+    return plan.children?.some((child) => this.hasSequentialScan(child)) || false;
   }
 
   private hasExpensiveNestedLoop(plan: QueryExecutionPlan): boolean {
     if (plan.nodeType === 'Nested Loop' && plan.totalCost > 1000) {
       return true;
     }
-    return (
-      plan.children?.some((child) => this.hasExpensiveNestedLoop(child)) ||
-      false
-    );
+    return plan.children?.some((child) => this.hasExpensiveNestedLoop(child)) || false;
   }
 
   private isMissingWhereClause(query: string): boolean {
@@ -296,9 +264,7 @@ export class QueryAnalyzerService {
 
   getSlowQueries(threshold?: number): QueryPerformanceMetrics[] {
     const slowThreshold = threshold || this.config.slowQueryThreshold;
-    return this.getQueryHistory().filter(
-      (metrics) => metrics.avgExecutionTime > slowThreshold,
-    );
+    return this.getQueryHistory().filter((metrics) => metrics.avgExecutionTime > slowThreshold);
   }
 
   clearQueryHistory(): void {

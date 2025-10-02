@@ -63,7 +63,7 @@ export class EventReplayService {
 
       // Build query from options
       const query = this.buildQuery(options);
-      
+
       // Get events to replay
       const events = await this.eventStore.queryEvents(query);
       result.totalEvents = events.length;
@@ -84,8 +84,10 @@ export class EventReplayService {
 
       for (let i = 0; i < events.length; i += batchSize) {
         const batch = events.slice(i, i + batchSize);
-        
-        this.logger.debug(`Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(events.length / batchSize)}`);
+
+        this.logger.debug(
+          `Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(events.length / batchSize)}`,
+        );
 
         for (const eventRecord of batch) {
           try {
@@ -109,7 +111,6 @@ export class EventReplayService {
             if (options.onProgress) {
               options.onProgress(result.processedEvents + result.skippedEvents, result.totalEvents);
             }
-
           } catch (error) {
             result.failedEvents++;
             const errorInfo = {
@@ -147,12 +148,11 @@ export class EventReplayService {
       });
 
       return result;
-
     } catch (error) {
       result.success = false;
       result.endTime = new Date();
       result.duration = result.endTime.getTime() - startTime.getTime();
-      
+
       this.logger.error('Event replay failed', error.stack);
       throw error;
     }
@@ -312,6 +312,6 @@ export class EventReplayService {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

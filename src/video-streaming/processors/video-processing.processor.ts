@@ -12,7 +12,7 @@ export class VideoProcessingProcessor {
   @Process('process-video')
   async handleVideoProcessing(job: Job<ProcessingJob>): Promise<void> {
     this.logger.log(`Starting video processing job ${job.id} for video ${job.data.videoId}`);
-    
+
     try {
       await this.processingService.processVideo(job.data);
       this.logger.log(`Video processing completed for job ${job.id}`);
@@ -34,9 +34,6 @@ export class VideoProcessingProcessor {
 
   @OnQueueFailed()
   onFailed(job: Job<ProcessingJob>, err: Error) {
-    this.logger.error(
-      `Processing job ${job.id} failed for video ${job.data.videoId}`,
-      err.stack,
-    );
+    this.logger.error(`Processing job ${job.id} failed for video ${job.data.videoId}`, err.stack);
   }
 }

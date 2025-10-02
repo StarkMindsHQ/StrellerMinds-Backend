@@ -1,35 +1,39 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { PuzzleTranslation } from "./puzzle-translation.entity"
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { PuzzleTranslation } from './puzzle-translation.entity';
 
-@Entity("puzzles")
+@Entity('puzzles')
 export class Puzzle {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 255 })
-  identifier: string
+  identifier: string;
 
   @Column({ length: 100 })
-  type: string
+  type: string;
 
   @Column({ default: true })
-  isActive: boolean
+  isActive: boolean;
 
-  @Column({ type: "jsonb", nullable: true })
-  defaultContent: Record<string, any>
+  @Column({ type: 'jsonb', nullable: true })
+  defaultContent: Record<string, any>;
 
-  @Column({ type: "jsonb", nullable: true })
-  metadata: Record<string, any>
+  @Column({ type: 'jsonb', nullable: true })
+  metadata: Record<string, any>;
 
-  @OneToMany(
-    () => PuzzleTranslation,
-    (translation) => translation.puzzle,
-  )
-  translations: PuzzleTranslation[]
+  @OneToMany(() => PuzzleTranslation, (translation) => translation.puzzle)
+  translations: PuzzleTranslation[];
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

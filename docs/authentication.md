@@ -1,11 +1,13 @@
 # Authentication Flow Documentation
 
 ## Overview
+
 The StrellerMinds platform uses JWT (JSON Web Tokens) for authentication. This document outlines the authentication flow, token structure, and security measures implemented.
 
 ## Authentication Flow
 
 ### 1. Login Process
+
 1. User submits credentials (email and password)
 2. System validates credentials against database
 3. If valid, generates:
@@ -16,6 +18,7 @@ The StrellerMinds platform uses JWT (JSON Web Tokens) for authentication. This d
 ### 2. Token Structure
 
 #### Access Token
+
 ```json
 {
   "sub": "user_id",
@@ -27,11 +30,13 @@ The StrellerMinds platform uses JWT (JSON Web Tokens) for authentication. This d
 ```
 
 #### Refresh Token
+
 - Same structure as access token
 - Longer expiration time (7 days)
 - Stored hashed in database
 
 ### 3. Protected Routes
+
 - Routes are protected by default
 - Use `@Public()` decorator to make routes public
 - Token validation includes:
@@ -40,12 +45,14 @@ The StrellerMinds platform uses JWT (JSON Web Tokens) for authentication. This d
   - User existence verification
 
 ### 4. Token Refresh
+
 1. Client sends refresh token
 2. Server validates refresh token
 3. If valid, issues new access and refresh tokens
 4. Invalid refresh tokens result in logout
 
 ### 5. Error Handling
+
 - Invalid credentials: 401 Unauthorized
 - Expired token: 401 Unauthorized with "Token has expired"
 - Invalid token: 401 Unauthorized with "Invalid token"
@@ -54,17 +61,20 @@ The StrellerMinds platform uses JWT (JSON Web Tokens) for authentication. This d
 ## Security Measures
 
 ### 1. Token Security
+
 - Access tokens expire in 1 hour
 - Refresh tokens expire in 7 days
 - Refresh tokens are hashed before storage
 - Tokens include minimal necessary claims
 
 ### 2. Password Security
+
 - Passwords are hashed using bcrypt
 - Minimum password length: 8 characters
 - Email verification required
 
 ### 3. Route Protection
+
 - Global JWT guard implementation
 - Role-based access control
 - Public route decorator for unprotected endpoints
@@ -72,6 +82,7 @@ The StrellerMinds platform uses JWT (JSON Web Tokens) for authentication. This d
 ## API Endpoints
 
 ### Authentication
+
 - `POST /auth/login` - User login
 - `POST /auth/refresh` - Refresh tokens
 - `POST /auth/logout` - User logout
@@ -79,6 +90,7 @@ The StrellerMinds platform uses JWT (JSON Web Tokens) for authentication. This d
 ### Example Usage
 
 #### Login Request
+
 ```http
 POST /auth/login
 Content-Type: application/json
@@ -90,6 +102,7 @@ Content-Type: application/json
 ```
 
 #### Login Response
+
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIs...",
@@ -111,4 +124,4 @@ Content-Type: application/json
 4. Handle token expiration gracefully
 5. Use appropriate error messages
 6. Implement rate limiting for login attempts
-7. Monitor failed login attempts 
+7. Monitor failed login attempts

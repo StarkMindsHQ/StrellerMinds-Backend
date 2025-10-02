@@ -39,9 +39,9 @@ export class RecommendationProcessor {
   @Process('batch-recommendations')
   async processBatchRecommendations(job: Job<BatchRecommendationJob>) {
     const { userIds, options } = job.data;
-    
+
     this.logger.log(`Processing batch recommendations for ${userIds.length} users`);
-    
+
     let processed = 0;
     let failed = 0;
 
@@ -64,12 +64,11 @@ export class RecommendationProcessor {
         await this.cacheService.cacheRecommendations(
           userId,
           { userId, context: 'batch' },
-          recommendations
+          recommendations,
         );
 
         processed++;
         this.logger.debug(`Generated recommendations for user ${userId}`);
-
       } catch (error) {
         failed++;
         this.logger.error(`Failed to generate recommendations for user ${userId}:`, error);
@@ -77,7 +76,7 @@ export class RecommendationProcessor {
     }
 
     this.logger.log(`Batch processing completed: ${processed} successful, ${failed} failed`);
-    
+
     return {
       processed,
       failed,
@@ -89,9 +88,9 @@ export class RecommendationProcessor {
   async precomputeSimilarity(job: Job<PrecomputationJob>) {
     const { params } = job.data;
     const { courseIds } = params;
-    
+
     this.logger.log(`Precomputing similarity for ${courseIds.length} courses`);
-    
+
     let computed = 0;
     const total = (courseIds.length * (courseIds.length - 1)) / 2; // Combinations
 
@@ -105,25 +104,27 @@ export class RecommendationProcessor {
 
           // Check if similarity already cached
           const cached = await this.cacheService.getCachedSimilarityScores(courseId1, courseId2);
-          
+
           if (cached === null) {
             // Compute similarity (this would use your similarity algorithm)
             const similarity = await this.computeCourseSimilarity(courseId1, courseId2);
-            
+
             // Cache the result
             await this.cacheService.cacheSimilarityScores(courseId1, courseId2, similarity);
           }
 
           computed++;
-
         } catch (error) {
-          this.logger.error(`Failed to compute similarity for courses ${courseIds[i]} and ${courseIds[j]}:`, error);
+          this.logger.error(
+            `Failed to compute similarity for courses ${courseIds[i]} and ${courseIds[j]}:`,
+            error,
+          );
         }
       }
     }
 
     this.logger.log(`Similarity precomputation completed: ${computed} pairs processed`);
-    
+
     return { computed, total };
   }
 
@@ -131,9 +132,9 @@ export class RecommendationProcessor {
   async precomputeUserFeatures(job: Job<PrecomputationJob>) {
     const { params } = job.data;
     const { userIds } = params;
-    
+
     this.logger.log(`Precomputing features for ${userIds.length} users`);
-    
+
     let processed = 0;
 
     for (const userId of userIds) {
@@ -142,7 +143,7 @@ export class RecommendationProcessor {
 
         // Check if features already cached
         const cached = await this.cacheService.getCachedMLFeatures(userId);
-        
+
         if (!cached) {
           // Extract and cache user features
           const features = await this.extractUserFeatures(userId);
@@ -150,23 +151,22 @@ export class RecommendationProcessor {
         }
 
         processed++;
-
       } catch (error) {
         this.logger.error(`Failed to precompute features for user ${userId}:`, error);
       }
     }
 
     this.logger.log(`Feature precomputation completed: ${processed} users processed`);
-    
+
     return { processed, total: userIds.length };
   }
 
   @Process('background-refresh')
   async backgroundRefresh(job: Job<BackgroundRefreshJob>) {
     const { userId, options } = job.data;
-    
+
     this.logger.debug(`Background refresh for user ${userId}`);
-    
+
     try {
       // Generate fresh recommendations
       const recommendations = await this.recommendationService.generateRecommendations({
@@ -178,13 +178,12 @@ export class RecommendationProcessor {
       await this.cacheService.cacheRecommendations(
         userId,
         { userId, context: 'background_refresh' },
-        recommendations
+        recommendations,
       );
 
       this.logger.debug(`Background refresh completed for user ${userId}`);
-      
-      return { success: true, count: recommendations.length };
 
+      return { success: true, count: recommendations.length };
     } catch (error) {
       this.logger.error(`Background refresh failed for user ${userId}:`, error);
       throw error;
@@ -194,20 +193,19 @@ export class RecommendationProcessor {
   @Process('cleanup-expired-cache')
   async cleanupExpiredCache(job: Job) {
     this.logger.log('Starting expired cache cleanup');
-    
+
     try {
       // This would implement cache cleanup logic
       // The actual implementation depends on your cache store
-      
+
       let cleaned = 0;
-      
+
       // Example cleanup logic (implementation would vary by cache type)
       // cleaned = await this.performCacheCleanup();
-      
-      this.logger.log(`Cache cleanup completed: ${cleaned} entries removed`);
-      
-      return { cleaned };
 
+      this.logger.log(`Cache cleanup completed: ${cleaned} entries removed`);
+
+      return { cleaned };
     } catch (error) {
       this.logger.error('Cache cleanup failed:', error);
       throw error;
@@ -217,27 +215,26 @@ export class RecommendationProcessor {
   @Process('model-training')
   async processModelTraining(job: Job) {
     this.logger.log('Starting ML model training');
-    
+
     try {
       // This would trigger ML model retraining
       // Implementation depends on your ML pipeline
-      
+
       await job.progress(25);
       // Collect training data
-      
+
       await job.progress(50);
       // Train model
-      
+
       await job.progress(75);
       // Validate model
-      
+
       await job.progress(100);
       // Deploy model
-      
-      this.logger.log('ML model training completed');
-      
-      return { success: true };
 
+      this.logger.log('ML model training completed');
+
+      return { success: true };
     } catch (error) {
       this.logger.error('Model training failed:', error);
       throw error;
@@ -247,20 +244,19 @@ export class RecommendationProcessor {
   @Process('analytics-aggregation')
   async processAnalyticsAggregation(job: Job) {
     this.logger.log('Starting analytics aggregation');
-    
+
     try {
       // This would aggregate analytics data for reporting
       // Implementation depends on your analytics requirements
-      
+
       let processed = 0;
-      
+
       // Example aggregation logic
       // processed = await this.aggregateAnalyticsData();
-      
-      this.logger.log(`Analytics aggregation completed: ${processed} records processed`);
-      
-      return { processed };
 
+      this.logger.log(`Analytics aggregation completed: ${processed} records processed`);
+
+      return { processed };
     } catch (error) {
       this.logger.error('Analytics aggregation failed:', error);
       throw error;

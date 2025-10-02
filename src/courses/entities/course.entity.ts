@@ -35,7 +35,10 @@ export class Course {
   @Column({ length: 255 })
   title: string;
 
-  @ApiProperty({ description: 'Course description', example: 'Learn the basics of blockchain technology.' })
+  @ApiProperty({
+    description: 'Course description',
+    example: 'Learn the basics of blockchain technology.',
+  })
   @Column({ type: 'text' })
   description: string;
 
@@ -64,7 +67,10 @@ export class Course {
   @Column({ type: 'boolean', default: false })
   isPremium: boolean;
 
-  @ApiPropertyOptional({ description: 'Minimum subscription plan required to access', enum: SubscriptionPlan })
+  @ApiPropertyOptional({
+    description: 'Minimum subscription plan required to access',
+    enum: SubscriptionPlan,
+  })
   @Column({ type: 'enum', enum: SubscriptionPlan, nullable: true })
   requiredPlan?: SubscriptionPlan | null;
 

@@ -3,10 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile, VerifyFunction } from 'passport-facebook';
 
 @Injectable()
-export class FacebookOAuthPassportStrategy extends PassportStrategy(
-  Strategy,
-  'facebook',
-) {
+export class FacebookOAuthPassportStrategy extends PassportStrategy(Strategy, 'facebook') {
   constructor() {
     super({
       clientID: process.env.FACEBOOK_CLIENT_ID,

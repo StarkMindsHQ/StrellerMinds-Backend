@@ -40,25 +40,34 @@ export class DatabaseMonitoringService {
   private setupQueryMonitoring() {
     // Override the query method to add monitoring
     const originalQuery = this.dataSource.query;
-    
-    this.dataSource.query = async (query: string, parameters?: any[], usedQueryRunner?: QueryRunner) => {
+
+    this.dataSource.query = async (
+      query: string,
+      parameters?: any[],
+      usedQueryRunner?: QueryRunner,
+    ) => {
       const startTime = Date.now();
-      
+
       try {
-        const result = await originalQuery.call(this.dataSource, query, parameters, usedQueryRunner);
+        const result = await originalQuery.call(
+          this.dataSource,
+          query,
+          parameters,
+          usedQueryRunner,
+        );
         const executionTime = Date.now() - startTime;
-        
+
         // Log slow queries
         if (executionTime > this.slowQueryThreshold) {
           this.logSlowQuery(query, parameters, executionTime);
         }
-        
+
         // Log all queries in development
         // Skip environment check for now to avoid TypeScript errors
         this.logger.debug(
           `Query executed (${executionTime}ms):\nQuery: ${query}\nParameters: ${JSON.stringify(parameters)}`,
         );
-        
+
         return result;
       } catch (error: any) {
         const executionTime = Date.now() - startTime;
@@ -79,7 +88,7 @@ export class DatabaseMonitoringService {
     };
 
     this.slowQueries.push(slowQuery);
-    
+
     // Keep only recent slow queries (last 1000)
     if (this.slowQueries.length > 1000) {
       this.slowQueries = this.slowQueries.slice(-1000);
@@ -93,7 +102,7 @@ export class DatabaseMonitoringService {
   public async getSlowQueries(limit: number = 50, hours: number = 24): Promise<SlowQueryLog[]> {
     const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
     return this.slowQueries
-      .filter(query => query.timestamp >= cutoffTime)
+      .filter((query) => query.timestamp >= cutoffTime)
       .sort((a, b) => b.executionTime - a.executionTime)
       .slice(0, limit);
   }
@@ -108,7 +117,7 @@ export class DatabaseMonitoringService {
           count(*) FILTER (WHERE state = 'active') as active_connections
         FROM pg_stat_activity
       `);
-      
+
       if (result && result[0]) {
         this.connectionPoolMetrics = {
           totalConnections: parseInt(result[0].total_connections) || 0,
@@ -120,17 +129,18 @@ export class DatabaseMonitoringService {
     } catch (error) {
       this.logger.error('Failed to get connection pool metrics:', error);
     }
-    
+
     return this.connectionPoolMetrics;
   }
 
   public getQueryMetrics() {
     // Calculate query metrics
     const totalQueries = this.slowQueries.length;
-    const slowQueries = this.slowQueries.filter(q => q.executionTime > this.slowQueryThreshold);
-    const averageExecutionTime = totalQueries > 0 
-      ? this.slowQueries.reduce((sum, q) => sum + q.executionTime, 0) / totalQueries 
-      : 0;
+    const slowQueries = this.slowQueries.filter((q) => q.executionTime > this.slowQueryThreshold);
+    const averageExecutionTime =
+      totalQueries > 0
+        ? this.slowQueries.reduce((sum, q) => sum + q.executionTime, 0) / totalQueries
+        : 0;
 
     return {
       timestamp: new Date(),

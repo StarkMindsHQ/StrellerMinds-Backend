@@ -94,10 +94,10 @@ export class VideoQuality {
   s3Key: string;
 
   @ApiProperty({ description: 'Processing status' })
-  @Column({ 
+  @Column({
     type: 'enum',
     enum: ['pending', 'processing', 'completed', 'failed'],
-    default: 'pending'
+    default: 'pending',
   })
   status: 'pending' | 'processing' | 'completed' | 'failed';
 
@@ -160,12 +160,12 @@ export class VideoQuality {
     const units = ['B', 'KB', 'MB', 'GB'];
     let size = Number(this.fileSize);
     let unitIndex = 0;
-    
+
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
       unitIndex++;
     }
-    
+
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   }
 

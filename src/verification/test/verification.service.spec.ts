@@ -12,12 +12,7 @@ describe('VerificationService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        VerificationService,
-        EthSignatureStrategy,
-        JwtStrategy,
-        IpfsProofStrategy,
-      ],
+      providers: [VerificationService, EthSignatureStrategy, JwtStrategy, IpfsProofStrategy],
     }).compile();
 
     service = module.get<VerificationService>(VerificationService);
@@ -52,6 +47,8 @@ describe('VerificationService', () => {
   });
 
   it('should throw error for unsupported method', async () => {
-    await expect(service.verify({ credentialHash: 'x', method: 'unknown' })).rejects.toThrow('Unsupported verification method');
+    await expect(service.verify({ credentialHash: 'x', method: 'unknown' })).rejects.toThrow(
+      'Unsupported verification method',
+    );
   });
 });

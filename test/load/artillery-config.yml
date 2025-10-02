@@ -4,33 +4,33 @@ config:
     # Warm-up phase
     - duration: 60
       arrivalRate: 5
-      name: "Warm-up"
+      name: 'Warm-up'
     # Ramp-up phase
     - duration: 120
       arrivalRate: 5
       rampTo: 50
-      name: "Ramp-up"
+      name: 'Ramp-up'
     # Sustained load phase
     - duration: 300
       arrivalRate: 50
-      name: "Sustained load"
+      name: 'Sustained load'
     # Peak load phase
     - duration: 120
       arrivalRate: 50
       rampTo: 100
-      name: "Peak load"
+      name: 'Peak load'
     # Cool-down phase
     - duration: 60
       arrivalRate: 100
       rampTo: 5
-      name: "Cool-down"
-  
+      name: 'Cool-down'
+
   # Performance thresholds
   ensure:
     maxErrorRate: 1
     maxResponseTime: 2000
     minThoughput: 100
-  
+
   # Plugins for enhanced reporting
   plugins:
     metrics-by-endpoint:
@@ -39,97 +39,97 @@ config:
       - type: statsd
         host: localhost
         port: 8125
-        prefix: "artillery"
+        prefix: 'artillery'
     expect: {}
-  
+
   # HTTP configuration
   http:
     timeout: 10
     pool: 50
     maxSockets: 50
-  
+
   # Variables for dynamic testing
   variables:
     testUser:
-      - "testuser1@example.com"
-      - "testuser2@example.com"
-      - "testuser3@example.com"
-    testPassword: "TestPassword123!"
+      - 'testuser1@example.com'
+      - 'testuser2@example.com'
+      - 'testuser3@example.com'
+    testPassword: 'TestPassword123!'
 
 scenarios:
   # Health check scenario
-  - name: "Health Check"
+  - name: 'Health Check'
     weight: 10
     flow:
       - get:
-          url: "/health"
+          url: '/health'
           expect:
             - statusCode: 200
-            - hasProperty: "status"
+            - hasProperty: 'status'
 
   # Authentication flow
-  - name: "Authentication Flow"
+  - name: 'Authentication Flow'
     weight: 30
     flow:
       - post:
-          url: "/auth/login"
+          url: '/auth/login'
           json:
-            email: "{{ testUser }}"
-            password: "{{ testPassword }}"
+            email: '{{ testUser }}'
+            password: '{{ testPassword }}'
           capture:
-            - json: "$.access_token"
-              as: "authToken"
+            - json: '$.access_token'
+              as: 'authToken'
           expect:
             - statusCode: 200
-            - hasProperty: "access_token"
-      
+            - hasProperty: 'access_token'
+
       - get:
-          url: "/auth/profile"
+          url: '/auth/profile'
           headers:
-            Authorization: "Bearer {{ authToken }}"
+            Authorization: 'Bearer {{ authToken }}'
           expect:
             - statusCode: 200
 
   # Course browsing scenario
-  - name: "Course Browsing"
+  - name: 'Course Browsing'
     weight: 40
     flow:
       # Get all courses
       - get:
-          url: "/courses"
+          url: '/courses'
           qs:
             page: 1
             limit: 20
           expect:
             - statusCode: 200
-      
+
       # Get course categories
       - get:
-          url: "/courses/categories"
+          url: '/courses/categories'
           expect:
             - statusCode: 200
-      
+
       # Search courses
       - get:
-          url: "/courses/search"
+          url: '/courses/search'
           qs:
-            q: "blockchain"
+            q: 'blockchain'
             page: 1
             limit: 10
           expect:
             - statusCode: 200
 
   # User registration scenario
-  - name: "User Registration"
+  - name: 'User Registration'
     weight: 20
     flow:
       - post:
-          url: "/auth/register"
+          url: '/auth/register'
           json:
-            firstName: "Load"
-            lastName: "Test"
-            email: "loadtest{{ $randomString() }}@example.com"
-            username: "loadtest{{ $randomString() }}"
-            password: "TestPassword123!"
+            firstName: 'Load'
+            lastName: 'Test'
+            email: 'loadtest{{ $randomString() }}@example.com'
+            username: 'loadtest{{ $randomString() }}'
+            password: 'TestPassword123!'
           expect:
             - statusCode: 201

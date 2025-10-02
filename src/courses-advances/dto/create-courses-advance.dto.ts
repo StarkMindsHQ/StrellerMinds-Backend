@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsNumber,
-  Min,
-  IsEnum,
-  IsOptional,
-  IsArray,
-} from 'class-validator';
+import { IsString, IsNumber, Min, IsEnum, IsOptional, IsArray } from 'class-validator';
 
 export class CreateCoursesAdvanceDto {
   @IsString()

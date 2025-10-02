@@ -20,8 +20,8 @@ const jest = {
     return mockFn;
   },
   spyOn: () => ({
-    mockImplementation: () => {}
-  })
+    mockImplementation: () => {},
+  }),
 };
 
 import { DatabaseMonitoringService } from './database-monitoring.service';
@@ -58,14 +58,16 @@ describe('DatabaseMonitoringService', () => {
 
   it('should get connection pool metrics', async () => {
     // Mock PostgreSQL query response
-    mockDataSource.query.mockResolvedValue([{
-      total_connections: '5',
-      idle_connections: '3',
-      active_connections: '2'
-    }]);
+    mockDataSource.query.mockResolvedValue([
+      {
+        total_connections: '5',
+        idle_connections: '3',
+        active_connections: '2',
+      },
+    ]);
 
     const metrics = await service.getConnectionPoolMetrics();
-    
+
     expect(metrics.totalConnections).toBe(5);
     expect(metrics.idleConnections).toBe(3);
     expect(metrics.activeConnections).toBe(2);
@@ -76,7 +78,7 @@ describe('DatabaseMonitoringService', () => {
     mockDataSource.query.mockRejectedValue(new Error('Database error'));
 
     const metrics = await service.getConnectionPoolMetrics();
-    
+
     // Should return default metrics when error occurs
     expect(metrics.totalConnections).toBe(0);
     expect(metrics.idleConnections).toBe(0);
@@ -85,7 +87,7 @@ describe('DatabaseMonitoringService', () => {
 
   it('should get query metrics', () => {
     const metrics = service.getQueryMetrics();
-    
+
     expect(metrics).toHaveProperty('timestamp');
     expect(metrics).toHaveProperty('metrics');
     expect(metrics.metrics).toHaveProperty('totalQueries');
@@ -96,15 +98,17 @@ describe('DatabaseMonitoringService', () => {
 
   it('should clear slow query logs', () => {
     // Add a slow query first
-    (service as any)['slowQueries'] = [{
-      query: 'SELECT * FROM users',
-      parameters: [],
-      executionTime: 150,
-      timestamp: new Date()
-    }];
-    
+    (service as any)['slowQueries'] = [
+      {
+        query: 'SELECT * FROM users',
+        parameters: [],
+        executionTime: 150,
+        timestamp: new Date(),
+      },
+    ];
+
     service.clearSlowQueryLogs();
-    
+
     const slowQueries = (service as any)['slowQueries'];
     expect(slowQueries.length).toBe(0);
   });

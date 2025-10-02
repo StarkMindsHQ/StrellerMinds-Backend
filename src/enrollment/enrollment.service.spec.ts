@@ -67,7 +67,7 @@ describe('EnrollmentService', () => {
 
       await service.unenroll(enrollment.id);
 
-      const found = service.findAll().find(e => e.id === enrollment.id);
+      const found = service.findAll().find((e) => e.id === enrollment.id);
       expect(found.status).toBe('UNENROLLED');
     });
 

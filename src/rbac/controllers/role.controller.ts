@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { RoleService } from '../services/role.service';
 import { AuditLogService } from '../services/audit-log.service';
 import { Permissions } from '../decorators/permissions.decorator';
@@ -44,11 +34,7 @@ export class RoleController {
   })
   @ApiResponse({ status: 201, description: 'Role created.' })
   async create(@Body() body: any, @Req() req: any) {
-    const role = await this.roleService.createRole(
-      body.name,
-      body.description,
-      body.parentRoleId,
-    );
+    const role = await this.roleService.createRole(body.name, body.description, body.parentRoleId);
     await this.auditLogService.log(req.user.id, 'create', 'role', { role });
     return role;
   }

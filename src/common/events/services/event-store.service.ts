@@ -2,12 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, QueryRunner, DataSource } from 'typeorm';
 import { DomainEvent } from '../base/domain-event.base';
-import { 
-  IEventStore, 
-  EventStoreRecord, 
-  EventStream, 
-  EventStoreQuery, 
-  EventStoreOptions 
+import {
+  IEventStore,
+  EventStoreRecord,
+  EventStream,
+  EventStoreQuery,
+  EventStoreOptions,
 } from '../interfaces/event-store.interface';
 import { EventStoreRecordEntity } from '../entities/event-store-record.entity';
 import { AggregateSnapshotEntity } from '../entities/aggregate-snapshot.entity';
@@ -46,16 +46,16 @@ export class EventStoreService implements IEventStore {
           aggregateId,
           aggregateType,
         );
-        
+
         if (currentVersion !== options.expectedVersion) {
           throw new Error(
-            `Concurrency conflict: Expected version ${options.expectedVersion}, but current version is ${currentVersion}`
+            `Concurrency conflict: Expected version ${options.expectedVersion}, but current version is ${currentVersion}`,
           );
         }
       }
 
       // Create event records
-      const eventRecords = events.map(event => {
+      const eventRecords = events.map((event) => {
         const record = new EventStoreRecordEntity();
         record.eventId = event.eventId;
         record.eventType = event.eventType;
@@ -74,10 +74,15 @@ export class EventStoreService implements IEventStore {
 
       await queryRunner.commitTransaction();
 
-      this.logger.debug(`Appended ${events.length} events for aggregate ${aggregateType}:${aggregateId}`);
+      this.logger.debug(
+        `Appended ${events.length} events for aggregate ${aggregateType}:${aggregateId}`,
+      );
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(`Failed to append events for aggregate ${aggregateType}:${aggregateId}`, error.stack);
+      this.logger.error(
+        `Failed to append events for aggregate ${aggregateType}:${aggregateId}`,
+        error.stack,
+      );
       throw error;
     } finally {
       await queryRunner.release();
@@ -105,7 +110,7 @@ export class EventStoreService implements IEventStore {
 
   async getEventStream(aggregateId: string, aggregateType: string): Promise<EventStream> {
     const events = await this.getEvents(aggregateId, aggregateType);
-    const version = events.length > 0 ? Math.max(...events.map(e => e.eventVersion)) : 0;
+    const version = events.length > 0 ? Math.max(...events.map((e) => e.eventVersion)) : 0;
 
     return {
       aggregateId,
@@ -123,15 +128,21 @@ export class EventStoreService implements IEventStore {
     }
 
     if (query.aggregateType) {
-      queryBuilder.andWhere('event.aggregateType = :aggregateType', { aggregateType: query.aggregateType });
+      queryBuilder.andWhere('event.aggregateType = :aggregateType', {
+        aggregateType: query.aggregateType,
+      });
     }
 
     if (query.eventTypes && query.eventTypes.length > 0) {
-      queryBuilder.andWhere('event.eventType IN (:...eventTypes)', { eventTypes: query.eventTypes });
+      queryBuilder.andWhere('event.eventType IN (:...eventTypes)', {
+        eventTypes: query.eventTypes,
+      });
     }
 
     if (query.fromVersion !== undefined) {
-      queryBuilder.andWhere('event.eventVersion >= :fromVersion', { fromVersion: query.fromVersion });
+      queryBuilder.andWhere('event.eventVersion >= :fromVersion', {
+        fromVersion: query.fromVersion,
+      });
     }
 
     if (query.toVersion !== undefined) {
@@ -139,7 +150,9 @@ export class EventStoreService implements IEventStore {
     }
 
     if (query.fromTimestamp) {
-      queryBuilder.andWhere('event.timestamp >= :fromTimestamp', { fromTimestamp: query.fromTimestamp });
+      queryBuilder.andWhere('event.timestamp >= :fromTimestamp', {
+        fromTimestamp: query.fromTimestamp,
+      });
     }
 
     if (query.toTimestamp) {
@@ -222,7 +235,9 @@ export class EventStoreService implements IEventStore {
       await this.snapshotRepository.save(newSnapshot);
     }
 
-    this.logger.debug(`Created snapshot for aggregate ${aggregateType}:${aggregateId} at version ${version}`);
+    this.logger.debug(
+      `Created snapshot for aggregate ${aggregateType}:${aggregateId} at version ${version}`,
+    );
   }
 
   async getSnapshot(

@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditLog } from '../entities/audit.log.entity';
 
-
 /**
  * AuditLogService provides logic for creating and retrieving audit logs.
  */
@@ -55,10 +54,7 @@ export class AuditLogService {
    * @param entityType Type of entity
    * @param entityId Entity ID
    */
-  async getLogsForEntity(
-    entityType: string,
-    entityId: string,
-  ): Promise<AuditLog[]> {
+  async getLogsForEntity(entityType: string, entityId: string): Promise<AuditLog[]> {
     return this.auditLogRepository.find({
       where: {
         entityType,

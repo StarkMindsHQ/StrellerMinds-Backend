@@ -11,7 +11,9 @@ export class MockEmailService {
   }
 
   async sendImmediate(options: EmailOptions): Promise<boolean> {
-    this.logger.log(`[MOCK] Would immediately send email to: ${options.to}, subject: ${options.subject}`);
+    this.logger.log(
+      `[MOCK] Would immediately send email to: ${options.to}, subject: ${options.subject}`,
+    );
     return true;
   }
-} 
+}

@@ -12,4 +12,4 @@ export class ProgressDto {
   @Min(0)
   @Max(100)
   progress?: number;
-} 
+}

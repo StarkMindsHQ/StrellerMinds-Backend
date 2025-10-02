@@ -30,16 +30,16 @@ export class StellarTracedService {
         try {
           // Simulate the trustline creation process
           const startTime = Date.now();
-          
+
           // Step 1: Load account
           await this.loadAccount(sourceSecret, span);
-          
+
           // Step 2: Build transaction
           const transaction = await this.buildTrustlineTransaction(assetCode, issuer, span);
-          
+
           // Step 3: Submit transaction
           const response = await this.submitTransaction(transaction, span);
-          
+
           const duration = Date.now() - startTime;
           span.setAttributes({
             'blockchain.transaction.hash': response.hash,
@@ -55,7 +55,7 @@ export class StellarTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error('Error creating trustline', error);
           throw error;
         }
@@ -101,7 +101,7 @@ export class StellarTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           throw error;
         }
       },
@@ -173,7 +173,7 @@ export class StellarTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error(`Soroban RPC failed: ${method}`, error);
           throw error;
         }
@@ -195,8 +195,8 @@ export class StellarTracedService {
         });
 
         // Simulate account loading
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         span.setAttributes({
           'blockchain.account.loaded': true,
         });
@@ -222,8 +222,8 @@ export class StellarTracedService {
         });
 
         // Simulate transaction building
-        await new Promise(resolve => setTimeout(resolve, 50));
-        
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
         span.setAttributes({
           'blockchain.transaction.built': true,
         });
@@ -246,10 +246,10 @@ export class StellarTracedService {
         });
 
         // Simulate transaction submission
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
         const hash = 'tx_hash_' + Date.now();
-        
+
         span.setAttributes({
           'blockchain.transaction.hash': hash,
           'blockchain.transaction.submitted': true,

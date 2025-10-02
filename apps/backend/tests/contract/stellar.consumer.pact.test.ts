@@ -23,11 +23,11 @@ describe('Stellar API Consumer Pact', () => {
         loadAccount: jest.fn(),
         transactions: jest.fn().mockReturnValue({
           transaction: jest.fn().mockReturnValue({
-            call: jest.fn()
-          })
+            call: jest.fn(),
+          }),
         }),
         submitTransaction: jest.fn(),
-        fetchBaseFee: jest.fn()
+        fetchBaseFee: jest.fn(),
       };
     });
   });
@@ -46,14 +46,14 @@ describe('Stellar API Consumer Pact', () => {
         balances: [
           {
             balance: '1000.5000000',
-            asset_type: 'native'
+            asset_type: 'native',
           },
           {
             balance: '500.0000000',
             asset_type: 'credit_alphanum4',
             asset_code: 'USDC',
-            asset_issuer: 'GXYZ9876543210ABC'
-          }
+            asset_issuer: 'GXYZ9876543210ABC',
+          },
         ],
         subentry_count: 2,
         last_modified_ledger: 12345,
@@ -61,13 +61,13 @@ describe('Stellar API Consumer Pact', () => {
         flags: {
           auth_required: false,
           auth_revocable: false,
-          auth_immutable: false
+          auth_immutable: false,
         },
         thresholds: {
           low_threshold: 1,
           med_threshold: 2,
-          high_threshold: 3
-        }
+          high_threshold: 3,
+        },
       };
 
       return provider
@@ -78,46 +78,53 @@ describe('Stellar API Consumer Pact', () => {
             method: 'GET',
             path: `/accounts/${accountId}`,
             headers: {
-              'Accept': 'application/json'
-            }
+              Accept: 'application/json',
+            },
           },
           willRespondWith: {
             status: 200,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               id: Matchers.like(accountId),
               account_id: Matchers.like(accountId),
               sequence: Matchers.like('123456789'),
-              balances: Matchers.eachLike({
-                balance: Matchers.decimal(1000.50),
-                asset_type: Matchers.like('native')
-              }, { min: 1 }),
+              balances: Matchers.eachLike(
+                {
+                  balance: Matchers.decimal(1000.5),
+                  asset_type: Matchers.like('native'),
+                },
+                { min: 1 },
+              ),
               subentry_count: Matchers.integer(2),
               last_modified_ledger: Matchers.integer(12345),
               last_modified_time: Matchers.iso8601DateTime('2023-12-01T10:00:00Z'),
               flags: {
                 auth_required: Matchers.boolean(false),
                 auth_revocable: Matchers.boolean(false),
-                auth_immutable: Matchers.boolean(false)
+                auth_immutable: Matchers.boolean(false),
               },
               thresholds: {
                 low_threshold: Matchers.integer(1),
                 med_threshold: Matchers.integer(2),
-                high_threshold: Matchers.integer(3)
-              }
-            }
-          }
+                high_threshold: Matchers.integer(3),
+              },
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the server.loadAccount method to return our expected response
             (stellarService as any).server.loadAccount.mockResolvedValue(expectedAccount);
-            
+
             // Call the actual service method
-            const result = await stellarService.createTrustline('test-secret', 'USDC', 'GXYZ9876543210ABC');
-            
+            const result = await stellarService.createTrustline(
+              'test-secret',
+              'USDC',
+              'GXYZ9876543210ABC',
+            );
+
             // Assert the result
             expect(result).toBeDefined();
             expect(result.hash).toBeDefined();
@@ -136,30 +143,34 @@ describe('Stellar API Consumer Pact', () => {
             method: 'GET',
             path: `/accounts/${accountId}`,
             headers: {
-              'Accept': 'application/json'
-            }
+              Accept: 'application/json',
+            },
           },
           willRespondWith: {
             status: 404,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               type: Matchers.like('https://stellar.org/horizon-errors/not_found'),
               title: Matchers.like('Resource Missing'),
               status: Matchers.integer(404),
-              detail: Matchers.like('The resource at the url requested was not found. This is usually occurs for one of two reasons:  The url requested is not valid, or no data in our database could be found with the parameters provided.')
-            }
-          }
+              detail: Matchers.like(
+                'The resource at the url requested was not found. This is usually occurs for one of two reasons:  The url requested is not valid, or no data in our database could be found with the parameters provided.',
+              ),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the server.loadAccount method to throw an error
-            (stellarService as any).server.loadAccount.mockRejectedValue(new Error('Account not found'));
-            
+            (stellarService as any).server.loadAccount.mockRejectedValue(
+              new Error('Account not found'),
+            );
+
             // Call the service method and expect it to throw
             await expect(
-              stellarService.createTrustline('test-secret', 'USDC', 'GXYZ9876543210ABC')
+              stellarService.createTrustline('test-secret', 'USDC', 'GXYZ9876543210ABC'),
             ).rejects.toThrow('Blockchain error: Account not found');
           });
         });
@@ -176,7 +187,7 @@ describe('Stellar API Consumer Pact', () => {
         operation_count: 1,
         result_meta_xdr: 'AAAAAQAAAAIAAAADAAAAAAAAAAEAAAABAAAAAA==',
         result_xdr: 'AAAAAAAAAGQAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAA=',
-        signatures: ['signature1', 'signature2']
+        signatures: ['signature1', 'signature2'],
       };
 
       return provider
@@ -187,13 +198,13 @@ describe('Stellar API Consumer Pact', () => {
             method: 'GET',
             path: `/transactions/${transactionHash}`,
             headers: {
-              'Accept': 'application/json'
-            }
+              Accept: 'application/json',
+            },
           },
           willRespondWith: {
             status: 200,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               id: Matchers.like(transactionHash),
@@ -204,18 +215,21 @@ describe('Stellar API Consumer Pact', () => {
               operation_count: Matchers.integer(1),
               result_meta_xdr: Matchers.like('AAAAAQAAAAIAAAADAAAAAAAAAAEAAAABAAAAAA=='),
               result_xdr: Matchers.like('AAAAAAAAAGQAAAAAAAAAAQAAAAAAAAABAAAAAAAAAAA='),
-              signatures: Matchers.eachLike(Matchers.like('signature1'))
-            }
-          }
+              signatures: Matchers.eachLike(Matchers.like('signature1')),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the transaction monitoring method
-            (stellarService as any).server.transactions().transaction().call.mockResolvedValue(expectedTransaction);
-            
+            (stellarService as any).server
+              .transactions()
+              .transaction()
+              .call.mockResolvedValue(expectedTransaction);
+
             // Call the actual service method
             const result = await stellarService.monitorTransaction(transactionHash);
-            
+
             // Assert the result
             expect(result).toBeDefined();
             expect(result.id).toBe(transactionHash);
@@ -226,10 +240,3 @@ describe('Stellar API Consumer Pact', () => {
     });
   });
 });
-
-
-
-
-
-
-

@@ -14,13 +14,15 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @ApiOperation({ summary: 'Export analytics data as CSV or JSON' })
-  @ApiQuery({ name: 'format', enum: ['csv', 'json'], required: false, description: 'Export format' })
+  @ApiQuery({
+    name: 'format',
+    enum: ['csv', 'json'],
+    required: false,
+    description: 'Export format',
+  })
   @ApiResponse({ status: 200, description: 'Analytics data exported.' })
   @Get('export')
-  async exportAnalyticsData(
-    @Query() query: ExportAnalyticsDto,
-    @Res() res: Response,
-  ) {
+  async exportAnalyticsData(@Query() query: ExportAnalyticsDto, @Res() res: Response) {
     const data = await this.analyticsService.getAllAnalytics();
 
     if (query.format === 'csv') {

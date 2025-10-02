@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Delete,
-  Body,
-  BadRequestException,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Delete, Body, BadRequestException, Req } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
@@ -24,8 +17,15 @@ export class ProfileController {
    * Upload a profile image for the user.
    */
   @Post('upload')
-  @ApiOperation({ summary: 'Upload profile image', description: 'Uploads a profile image (JPEG, PNG, JPG, max 5MB) for the user.' })
-  @ApiResponse({ status: 201, description: 'Image uploaded successfully', schema: { properties: { url: { type: 'string' }, publicId: { type: 'string' } } } })
+  @ApiOperation({
+    summary: 'Upload profile image',
+    description: 'Uploads a profile image (JPEG, PNG, JPG, max 5MB) for the user.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Image uploaded successfully',
+    schema: { properties: { url: { type: 'string' }, publicId: { type: 'string' } } },
+  })
   async uploadProfileImage(@Req() req: FastifyRequest) {
     const part = await (req as any).file();
     if (!part) {
@@ -57,8 +57,13 @@ export class ProfileController {
    * Delete a profile image by its public ID.
    */
   @Delete('delete')
-  @ApiOperation({ summary: 'Delete profile image', description: 'Deletes a profile image by its public ID.' })
-  @ApiBody({ schema: { properties: { publicId: { type: 'string', description: 'Cloudinary public ID' } } } })
+  @ApiOperation({
+    summary: 'Delete profile image',
+    description: 'Deletes a profile image by its public ID.',
+  })
+  @ApiBody({
+    schema: { properties: { publicId: { type: 'string', description: 'Cloudinary public ID' } } },
+  })
   @ApiResponse({ status: 200, description: 'Image deleted successfully' })
   async deleteProfileImage(@Body('publicId') publicId: string) {
     if (!publicId) {

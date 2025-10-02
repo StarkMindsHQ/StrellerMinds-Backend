@@ -14,30 +14,29 @@ class ScalabilityTestRunner {
       phases: [],
       summary: {},
       bottlenecks: [],
-      recommendations: []
+      recommendations: [],
     };
   }
 
   async run() {
     console.log('🚀 Starting Scalability Test Suite...');
     console.log(`Target: ${this.baseUrl}`);
-    
+
     try {
       // Pre-test health check
       await this.preTestHealthCheck();
-      
+
       // Run scalability test phases
       await this.runScalabilityPhases();
-      
+
       // Analyze results and identify bottlenecks
       await this.analyzeBottlenecks();
-      
+
       // Generate comprehensive report
       await this.generateReport();
-      
+
       console.log('✅ Scalability testing completed!');
       this.printSummary();
-      
     } catch (error) {
       console.error('❌ Scalability test failed:', error.message);
       process.exit(1);
@@ -46,7 +45,7 @@ class ScalabilityTestRunner {
 
   async preTestHealthCheck() {
     console.log('🔍 Performing pre-test health check...');
-    
+
     try {
       const response = await axios.get(`${this.baseUrl}/health`, { timeout: 5000 });
       console.log('✅ System is healthy, proceeding with scalability tests');
@@ -57,22 +56,22 @@ class ScalabilityTestRunner {
 
   async runScalabilityPhases() {
     console.log('📈 Running scalability test phases...');
-    
+
     const phases = [
       { name: 'Baseline', users: 10, duration: 60 },
       { name: 'Light Load', users: 50, duration: 120 },
       { name: 'Medium Load', users: 100, duration: 180 },
       { name: 'Heavy Load', users: 200, duration: 240 },
       { name: 'Peak Load', users: 400, duration: 180 },
-      { name: 'Stress Test', users: 600, duration: 120 }
+      { name: 'Stress Test', users: 600, duration: 120 },
     ];
 
     for (const phase of phases) {
       console.log(`\n🎯 Running ${phase.name} (${phase.users} users, ${phase.duration}s)`);
-      
+
       const phaseResult = await this.runPhase(phase);
       this.results.phases.push(phaseResult);
-      
+
       // Brief pause between phases
       await this.sleep(10000);
     }
@@ -80,15 +79,17 @@ class ScalabilityTestRunner {
 
   async runPhase(phase) {
     const startTime = Date.now();
-    
+
     return new Promise((resolve, reject) => {
       // Use autocannon for precise load testing
       const autocannon = spawn('npx', [
         'autocannon',
-        '-c', phase.users.toString(),
-        '-d', phase.duration.toString(),
+        '-c',
+        phase.users.toString(),
+        '-d',
+        phase.duration.toString(),
         '--json',
-        this.baseUrl + '/health'
+        this.baseUrl + '/health',
       ]);
 
       let output = '';
@@ -104,7 +105,7 @@ class ScalabilityTestRunner {
 
       autocannon.on('close', (code) => {
         const endTime = Date.now();
-        
+
         if (code !== 0) {
           console.error(`❌ ${phase.name} failed with code ${code}`);
           console.error('Error output:', errorOutput);
@@ -114,7 +115,7 @@ class ScalabilityTestRunner {
 
         try {
           const result = JSON.parse(output);
-          
+
           const phaseResult = {
             name: phase.name,
             config: phase,
@@ -127,14 +128,16 @@ class ScalabilityTestRunner {
               throughput: result.throughput,
               errors: result.errors,
               timeouts: result.timeouts,
-              non2xx: result.non2xx
+              non2xx: result.non2xx,
             },
             performance: this.analyzePhasePerformance(result, phase),
-            bottleneckIndicators: this.identifyPhaseBottlenecks(result, phase)
+            bottleneckIndicators: this.identifyPhaseBottlenecks(result, phase),
           };
 
-          console.log(`   ✅ Completed: ${result.requests.average}/s avg, ${result.latency.average.toFixed(2)}ms latency`);
-          
+          console.log(
+            `   ✅ Completed: ${result.requests.average}/s avg, ${result.latency.average.toFixed(2)}ms latency`,
+          );
+
           resolve(phaseResult);
         } catch (parseError) {
           console.error(`❌ Failed to parse results for ${phase.name}:`, parseError.message);
@@ -154,8 +157,8 @@ class ScalabilityTestRunner {
         p99Latency: result.latency.p99,
         throughput: result.throughput.average,
         errorRate: (result.errors / result.requests.total) * 100,
-        successRate: ((result.requests.total - result.errors) / result.requests.total) * 100
-      }
+        successRate: ((result.requests.total - result.errors) / result.requests.total) * 100,
+      },
     };
 
     // Analyze performance degradation
@@ -195,7 +198,7 @@ class ScalabilityTestRunner {
         severity: 'HIGH',
         indicator: 'High P99 latency variance',
         value: result.latency.p99,
-        threshold: result.latency.average * 3
+        threshold: result.latency.average * 3,
       });
     }
 
@@ -206,7 +209,7 @@ class ScalabilityTestRunner {
         severity: 'MEDIUM',
         indicator: 'Errors with high latency',
         errorCount: result.errors,
-        avgLatency: result.latency.average
+        avgLatency: result.latency.average,
       });
     }
 
@@ -216,7 +219,7 @@ class ScalabilityTestRunner {
         type: 'CONNECTION_BOTTLENECK',
         severity: 'HIGH',
         indicator: 'Request timeouts detected',
-        timeouts: result.timeouts
+        timeouts: result.timeouts,
       });
     }
 
@@ -227,7 +230,7 @@ class ScalabilityTestRunner {
         severity: 'MEDIUM',
         indicator: 'High latency with low throughput',
         avgLatency: result.latency.average,
-        throughput: result.throughput.average
+        throughput: result.throughput.average,
       });
     }
 
@@ -236,9 +239,9 @@ class ScalabilityTestRunner {
 
   async analyzeBottlenecks() {
     console.log('🔍 Analyzing bottlenecks across all phases...');
-    
-    const allBottlenecks = this.results.phases.flatMap(phase => 
-      phase.bottleneckIndicators.map(b => ({ ...b, phase: phase.name }))
+
+    const allBottlenecks = this.results.phases.flatMap((phase) =>
+      phase.bottleneckIndicators.map((b) => ({ ...b, phase: phase.name })),
     );
 
     // Group bottlenecks by type
@@ -255,8 +258,8 @@ class ScalabilityTestRunner {
           type,
           frequency: bottlenecks.length,
           severity: this.calculateOverallSeverity(bottlenecks),
-          phases: bottlenecks.map(b => b.phase),
-          recommendation: this.getBottleneckRecommendation(type)
+          phases: bottlenecks.map((b) => b.phase),
+          recommendation: this.getBottleneckRecommendation(type),
         });
       }
     });
@@ -275,28 +278,32 @@ class ScalabilityTestRunner {
     phases.forEach((phase, index) => {
       if (index === 0) return; // Skip baseline
 
-      const latencyIncrease = ((phase.results.latency.average - baselineLatency) / baselineLatency) * 100;
-      const throughputDecrease = ((baselineThroughput - phase.results.throughput.average) / baselineThroughput) * 100;
+      const latencyIncrease =
+        ((phase.results.latency.average - baselineLatency) / baselineLatency) * 100;
+      const throughputDecrease =
+        ((baselineThroughput - phase.results.throughput.average) / baselineThroughput) * 100;
 
-      if (latencyIncrease > 100) { // 100% increase in latency
+      if (latencyIncrease > 100) {
+        // 100% increase in latency
         this.results.bottlenecks.push({
           type: 'PERFORMANCE_DEGRADATION',
           phase: phase.name,
           severity: 'HIGH',
           metric: 'latency',
           increase: latencyIncrease,
-          recommendation: 'Investigate performance bottlenecks causing latency spikes'
+          recommendation: 'Investigate performance bottlenecks causing latency spikes',
         });
       }
 
-      if (throughputDecrease > 50) { // 50% decrease in throughput
+      if (throughputDecrease > 50) {
+        // 50% decrease in throughput
         this.results.bottlenecks.push({
           type: 'THROUGHPUT_DEGRADATION',
           phase: phase.name,
           severity: 'HIGH',
           metric: 'throughput',
           decrease: throughputDecrease,
-          recommendation: 'Scale resources or optimize application performance'
+          recommendation: 'Scale resources or optimize application performance',
         });
       }
     });
@@ -304,8 +311,9 @@ class ScalabilityTestRunner {
 
   calculateOverallSeverity(bottlenecks) {
     const severityLevels = { LOW: 1, MEDIUM: 2, HIGH: 3 };
-    const avgSeverity = bottlenecks.reduce((sum, b) => sum + severityLevels[b.severity], 0) / bottlenecks.length;
-    
+    const avgSeverity =
+      bottlenecks.reduce((sum, b) => sum + severityLevels[b.severity], 0) / bottlenecks.length;
+
     if (avgSeverity >= 2.5) return 'HIGH';
     if (avgSeverity >= 1.5) return 'MEDIUM';
     return 'LOW';
@@ -316,15 +324,15 @@ class ScalabilityTestRunner {
       CPU_BOTTLENECK: 'Scale CPU resources or optimize CPU-intensive operations',
       MEMORY_BOTTLENECK: 'Increase memory allocation or optimize memory usage',
       CONNECTION_BOTTLENECK: 'Increase connection pool size or optimize connection handling',
-      DATABASE_BOTTLENECK: 'Optimize database queries, add indexes, or scale database resources'
+      DATABASE_BOTTLENECK: 'Optimize database queries, add indexes, or scale database resources',
     };
-    
+
     return recommendations[type] || 'Investigate and optimize the identified bottleneck';
   }
 
   async generateReport() {
     console.log('📋 Generating scalability test report...');
-    
+
     this.results.summary = this.generateSummary();
     this.results.recommendations = this.generateRecommendations();
 
@@ -333,25 +341,26 @@ class ScalabilityTestRunner {
     if (!fs.existsSync(reportsDir)) {
       fs.mkdirSync(reportsDir, { recursive: true });
     }
-    
+
     const filename = `scalability-${new Date().toISOString().split('T')[0]}-${Date.now()}.json`;
     const filepath = path.join(reportsDir, filename);
-    
+
     fs.writeFileSync(filepath, JSON.stringify(this.results, null, 2));
     console.log(`💾 Detailed report saved to: ${filepath}`);
   }
 
   generateSummary() {
     const phases = this.results.phases;
-    const maxUsers = Math.max(...phases.map(p => p.config.users));
-    const maxThroughput = Math.max(...phases.map(p => p.results.throughput.average));
-    const minLatency = Math.min(...phases.map(p => p.results.latency.average));
-    const maxLatency = Math.max(...phases.map(p => p.results.latency.average));
-    
-    const overallErrorRate = phases.reduce((sum, p) => {
-      const errorRate = (p.results.errors / p.results.requests.total) * 100;
-      return sum + errorRate;
-    }, 0) / phases.length;
+    const maxUsers = Math.max(...phases.map((p) => p.config.users));
+    const maxThroughput = Math.max(...phases.map((p) => p.results.throughput.average));
+    const minLatency = Math.min(...phases.map((p) => p.results.latency.average));
+    const maxLatency = Math.max(...phases.map((p) => p.results.latency.average));
+
+    const overallErrorRate =
+      phases.reduce((sum, p) => {
+        const errorRate = (p.results.errors / p.results.requests.total) * 100;
+        return sum + errorRate;
+      }, 0) / phases.length;
 
     return {
       maxConcurrentUsers: maxUsers,
@@ -360,16 +369,19 @@ class ScalabilityTestRunner {
       overallErrorRate: overallErrorRate,
       totalBottlenecks: this.results.bottlenecks.length,
       scalabilityGrade: this.calculateScalabilityGrade(),
-      breakingPoint: this.findBreakingPoint()
+      breakingPoint: this.findBreakingPoint(),
     };
   }
 
   calculateScalabilityGrade() {
-    const criticalBottlenecks = this.results.bottlenecks.filter(b => b.severity === 'HIGH').length;
-    const avgPerformanceGrade = this.results.phases.reduce((sum, p) => {
-      const gradeValues = { A: 4, B: 3, C: 2, D: 1, F: 0 };
-      return sum + gradeValues[p.performance.grade];
-    }, 0) / this.results.phases.length;
+    const criticalBottlenecks = this.results.bottlenecks.filter(
+      (b) => b.severity === 'HIGH',
+    ).length;
+    const avgPerformanceGrade =
+      this.results.phases.reduce((sum, p) => {
+        const gradeValues = { A: 4, B: 3, C: 2, D: 1, F: 0 };
+        return sum + gradeValues[p.performance.grade];
+      }, 0) / this.results.phases.length;
 
     if (criticalBottlenecks > 2 || avgPerformanceGrade < 1) return 'F';
     if (criticalBottlenecks > 1 || avgPerformanceGrade < 2) return 'D';
@@ -385,7 +397,7 @@ class ScalabilityTestRunner {
         return {
           phase: phase.name,
           users: phase.config.users,
-          reason: phase.performance.issues.join(', ')
+          reason: phase.performance.issues.join(', '),
         };
       }
     }
@@ -394,15 +406,15 @@ class ScalabilityTestRunner {
 
   generateRecommendations() {
     const recommendations = [];
-    
+
     // Based on bottlenecks
-    this.results.bottlenecks.forEach(bottleneck => {
+    this.results.bottlenecks.forEach((bottleneck) => {
       if (bottleneck.severity === 'HIGH') {
         recommendations.push({
           priority: 'HIGH',
           category: 'BOTTLENECK',
           issue: bottleneck.type,
-          recommendation: bottleneck.recommendation
+          recommendation: bottleneck.recommendation,
         });
       }
     });
@@ -413,7 +425,7 @@ class ScalabilityTestRunner {
         priority: 'CRITICAL',
         category: 'SCALABILITY',
         issue: 'Poor scalability performance',
-        recommendation: 'Immediate performance optimization and infrastructure scaling required'
+        recommendation: 'Immediate performance optimization and infrastructure scaling required',
       });
     }
 
@@ -423,7 +435,7 @@ class ScalabilityTestRunner {
         priority: 'HIGH',
         category: 'CAPACITY',
         issue: `System breaks at ${this.results.summary.breakingPoint.users} concurrent users`,
-        recommendation: 'Optimize performance or scale infrastructure before reaching this load'
+        recommendation: 'Optimize performance or scale infrastructure before reaching this load',
       });
     }
 
@@ -435,24 +447,28 @@ class ScalabilityTestRunner {
     console.log('============================');
     console.log(`Max Concurrent Users Tested: ${this.results.summary.maxConcurrentUsers}`);
     console.log(`Max Throughput Achieved: ${this.results.summary.maxThroughput.toFixed(2)} req/s`);
-    console.log(`Latency Range: ${this.results.summary.latencyRange.min.toFixed(2)}ms - ${this.results.summary.latencyRange.max.toFixed(2)}ms`);
+    console.log(
+      `Latency Range: ${this.results.summary.latencyRange.min.toFixed(2)}ms - ${this.results.summary.latencyRange.max.toFixed(2)}ms`,
+    );
     console.log(`Overall Error Rate: ${this.results.summary.overallErrorRate.toFixed(2)}%`);
     console.log(`Scalability Grade: ${this.results.summary.scalabilityGrade}`);
-    
+
     if (this.results.summary.breakingPoint) {
-      console.log(`Breaking Point: ${this.results.summary.breakingPoint.users} users (${this.results.summary.breakingPoint.reason})`);
+      console.log(
+        `Breaking Point: ${this.results.summary.breakingPoint.users} users (${this.results.summary.breakingPoint.reason})`,
+      );
     } else {
       console.log('Breaking Point: Not reached within test parameters');
     }
-    
+
     console.log(`\nBottlenecks Identified: ${this.results.bottlenecks.length}`);
-    this.results.bottlenecks.forEach(bottleneck => {
+    this.results.bottlenecks.forEach((bottleneck) => {
       console.log(`  - ${bottleneck.type} (${bottleneck.severity}): ${bottleneck.recommendation}`);
     });
   }
 
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

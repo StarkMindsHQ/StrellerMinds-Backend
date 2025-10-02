@@ -38,7 +38,9 @@ describe('AssignmentService', () => {
   describe('findOne', () => {
     it('should return a specific assignment by ID', async () => {
       const assignmentId = 1;
-      expect(await service.findOne(assignmentId)).toBe(`This action returns a #${assignmentId} assignment`);
+      expect(await service.findOne(assignmentId)).toBe(
+        `This action returns a #${assignmentId} assignment`,
+      );
     });
   });
 
@@ -50,14 +52,18 @@ describe('AssignmentService', () => {
         instructions: 'Complete the updated task',
         dueDate: '2025-12-05',
       };
-      expect(await service.update(assignmentId, updateAssignmentDto)).toBe(`This action updates a #${assignmentId} assignment`);
+      expect(await service.update(assignmentId, updateAssignmentDto)).toBe(
+        `This action updates a #${assignmentId} assignment`,
+      );
     });
   });
 
   describe('remove', () => {
     it('should return a success message when an assignment is removed', async () => {
       const assignmentId = 1;
-      expect(await service.remove(assignmentId)).toBe(`This action removes a #${assignmentId} assignment`);
+      expect(await service.remove(assignmentId)).toBe(
+        `This action removes a #${assignmentId} assignment`,
+      );
     });
   });
 });

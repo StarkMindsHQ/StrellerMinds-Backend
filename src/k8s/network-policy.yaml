@@ -8,44 +8,44 @@ spec:
     matchLabels:
       app: analytics-platform-api
   policyTypes:
-  - Ingress
-  - Egress
+    - Ingress
+    - Egress
   ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: ingress-nginx
-    - podSelector:
-        matchLabels:
-          app: analytics-platform-api
-    ports:
-    - protocol: TCP
-      port: 3000
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: monitoring
-    ports:
-    - protocol: TCP
-      port: 9090
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app: analytics-platform-api
+      ports:
+        - protocol: TCP
+          port: 3000
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
   egress:
-  - to:
-    - podSelector:
-        matchLabels:
-          app: redis
-    ports:
-    - protocol: TCP
-      port: 6379
-  - to: []
-    ports:
-    - protocol: TCP
-      port: 5432
-    - protocol: TCP
-      port: 443
-    - protocol: TCP
-      port: 80
-    - protocol: UDP
-      port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+        - protocol: UDP
+          port: 53
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -57,15 +57,15 @@ spec:
     matchLabels:
       app: redis
   policyTypes:
-  - Ingress
+    - Ingress
   ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          app: analytics-platform-api
-    - podSelector:
-        matchLabels:
-          app: analytics-platform-worker
-    ports:
-    - protocol: TCP
-      port: 6379
+    - from:
+        - podSelector:
+            matchLabels:
+              app: analytics-platform-api
+        - podSelector:
+            matchLabels:
+              app: analytics-platform-worker
+      ports:
+        - protocol: TCP
+          port: 6379

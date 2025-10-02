@@ -9,9 +9,7 @@ export function useMockStellar(success = true) {
   if (!success) {
     mockStellarSdk.Server.mockImplementation(() => ({
       loadAccount: jest.fn(() => Promise.reject(new Error('Failed to load'))),
-      submitTransaction: jest.fn(() =>
-        Promise.reject(new Error('Transaction failed')),
-      ),
+      submitTransaction: jest.fn(() => Promise.reject(new Error('Transaction failed'))),
     }));
   }
 }

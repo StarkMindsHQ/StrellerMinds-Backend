@@ -112,7 +112,7 @@ declare global {
       toMatchApiResponse(): R;
     }
   }
-  
+
   var testUtils: {
     createTestingModule: (metadata: any) => Promise<TestingModule>;
     createMockRepository: () => any;
@@ -171,7 +171,7 @@ global.testUtils = {
 
   createMockService: (methods: string[]) => {
     const mockService = {};
-    methods.forEach(method => {
+    methods.forEach((method) => {
       mockService[method] = jest.fn();
     });
     return mockService;

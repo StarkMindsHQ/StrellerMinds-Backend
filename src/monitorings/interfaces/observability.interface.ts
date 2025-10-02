@@ -1,3 +1,5 @@
+export { LogLevel } from './monitoring-config.interface';
+
 export interface ObservabilityMetrics {
   systemMetrics: SystemMetrics;
   applicationMetrics: ApplicationMetrics;

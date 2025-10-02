@@ -10,7 +10,7 @@ import { Reply } from 'src/reply/reply.entity';
 /**
  * Moderation module for managing forum moderation actions and logs.
  */
-@Module({ 
+@Module({
   imports: [TypeOrmModule.forFeature([ModerationLog, Thread, Reply])],
   controllers: [ModerationController],
   providers: [ModerationService],

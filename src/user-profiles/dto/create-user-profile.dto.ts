@@ -1,46 +1,53 @@
-import { IsString, IsOptional, IsBoolean, IsDateString, IsUrl, IsPhoneNumber } from "class-validator"
-import { ApiProperty } from "@nestjs/swagger"
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsDateString,
+  IsUrl,
+  IsPhoneNumber,
+} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserProfileDto {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  firstName?: string
+  firstName?: string;
 
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  lastName?: string
+  lastName?: string;
 
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  bio?: string
+  bio?: string;
 
   @ApiProperty({ required: false })
   @IsUrl()
   @IsOptional()
-  avatarUrl?: string
+  avatarUrl?: string;
 
   @ApiProperty({ required: false })
   @IsPhoneNumber()
   @IsOptional()
-  phoneNumber?: string
+  phoneNumber?: string;
 
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  address?: string
+  address?: string;
 
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  city?: string
+  city?: string;
 
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  country?: string
+  country?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -50,15 +57,15 @@ export class CreateUserProfileDto {
   @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
-  postalCode?: string
+  postalCode?: string;
 
   @ApiProperty({ required: false })
   @IsDateString()
   @IsOptional()
-  dateOfBirth?: string
+  dateOfBirth?: string;
 
   @ApiProperty({ required: false, default: false })
   @IsBoolean()
   @IsOptional()
-  isPublic?: boolean
+  isPublic?: boolean;
 }

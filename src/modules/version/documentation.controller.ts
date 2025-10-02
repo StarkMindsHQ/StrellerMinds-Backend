@@ -8,9 +8,9 @@ export class DocumentationController {
   constructor(private apiDocumentationService: ApiDocumentationService) {}
 
   @Get('versions')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get all available documentation versions',
-    description: 'Returns list of all available API documentation versions'
+    description: 'Returns list of all available API documentation versions',
   })
   @ApiResponse({
     status: 200,
@@ -42,9 +42,9 @@ export class DocumentationController {
   }
 
   @Get(':version')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get documentation for specific version',
-    description: 'Returns complete API documentation for the specified version'
+    description: 'Returns complete API documentation for the specified version',
   })
   @ApiParam({ name: 'version', description: 'API version', example: 'v2' })
   @ApiResponse({
@@ -81,9 +81,9 @@ export class DocumentationController {
   }
 
   @Get(':version/openapi')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get OpenAPI specification for version',
-    description: 'Returns OpenAPI 3.0 specification for the specified version'
+    description: 'Returns OpenAPI 3.0 specification for the specified version',
   })
   @ApiParam({ name: 'version', description: 'API version', example: 'v2' })
   @ApiResponse({
@@ -95,9 +95,9 @@ export class DocumentationController {
   }
 
   @Get(':version/changelog')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get changelog for version',
-    description: 'Returns changelog entries for the specified version'
+    description: 'Returns changelog entries for the specified version',
   })
   @ApiParam({ name: 'version', description: 'API version', example: 'v2' })
   @ApiResponse({
@@ -122,9 +122,9 @@ export class DocumentationController {
   }
 
   @Get('migration/:fromVersion/:toVersion')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get migration guide between versions',
-    description: 'Returns migration guide for upgrading from one version to another'
+    description: 'Returns migration guide for upgrading from one version to another',
   })
   @ApiParam({ name: 'fromVersion', description: 'Source version', example: 'v1' })
   @ApiParam({ name: 'toVersion', description: 'Target version', example: 'v2' })
@@ -178,9 +178,9 @@ export class DocumentationController {
   }
 
   @Get('report')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Generate documentation report',
-    description: 'Returns comprehensive report of all documentation versions'
+    description: 'Returns comprehensive report of all documentation versions',
   })
   @ApiResponse({
     status: 200,
@@ -226,9 +226,9 @@ export class DocumentationController {
   }
 
   @Get('compare/:version1/:version2')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Compare two API versions',
-    description: 'Returns detailed comparison between two API versions'
+    description: 'Returns detailed comparison between two API versions',
   })
   @ApiParam({ name: 'version1', description: 'First version to compare', example: 'v1' })
   @ApiParam({ name: 'version2', description: 'Second version to compare', example: 'v2' })
@@ -264,10 +264,7 @@ export class DocumentationController {
       },
     },
   })
-  async compareVersions(
-    @Param('version1') version1: string,
-    @Param('version2') version2: string,
-  ) {
+  async compareVersions(@Param('version1') version1: string, @Param('version2') version2: string) {
     const doc1 = this.apiDocumentationService.getDocumentation(version1);
     const doc2 = this.apiDocumentationService.getDocumentation(version2);
 
@@ -275,22 +272,24 @@ export class DocumentationController {
       throw new Error(`Documentation not found for one or both versions`);
     }
 
-    const endpoints1 = new Set(doc1.endpoints.map(e => `${e.method} ${e.path}`));
-    const endpoints2 = new Set(doc2.endpoints.map(e => `${e.method} ${e.path}`));
+    const endpoints1 = new Set(doc1.endpoints.map((e) => `${e.method} ${e.path}`));
+    const endpoints2 = new Set(doc2.endpoints.map((e) => `${e.method} ${e.path}`));
 
-    const addedEndpoints = Array.from(endpoints2).filter(e => !endpoints1.has(e));
-    const removedEndpoints = Array.from(endpoints1).filter(e => !endpoints2.has(e));
-    const commonEndpoints = Array.from(endpoints1).filter(e => endpoints2.has(e));
+    const addedEndpoints = Array.from(endpoints2).filter((e) => !endpoints1.has(e));
+    const removedEndpoints = Array.from(endpoints1).filter((e) => !endpoints2.has(e));
+    const commonEndpoints = Array.from(endpoints1).filter((e) => endpoints2.has(e));
 
     // Find changed endpoints (simplified comparison)
-    const changedEndpoints = commonEndpoints.filter(endpoint => {
+    const changedEndpoints = commonEndpoints.filter((endpoint) => {
       const [method, path] = endpoint.split(' ');
-      const ep1 = doc1.endpoints.find(e => e.method === method && e.path === path);
-      const ep2 = doc2.endpoints.find(e => e.method === method && e.path === path);
-      
-      return ep1 && ep2 && (
-        ep1.deprecated !== ep2.deprecated ||
-        JSON.stringify(ep1.parameters) !== JSON.stringify(ep2.parameters)
+      const ep1 = doc1.endpoints.find((e) => e.method === method && e.path === path);
+      const ep2 = doc2.endpoints.find((e) => e.method === method && e.path === path);
+
+      return (
+        ep1 &&
+        ep2 &&
+        (ep1.deprecated !== ep2.deprecated ||
+          JSON.stringify(ep1.parameters) !== JSON.stringify(ep2.parameters))
       );
     });
 
@@ -305,4 +304,4 @@ export class DocumentationController {
       },
     };
   }
-} 
+}

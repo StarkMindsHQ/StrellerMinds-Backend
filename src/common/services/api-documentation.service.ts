@@ -182,7 +182,7 @@ export class ApiDocumentationService {
     if (!doc) return null;
 
     const migrationGuide = doc.migrationGuides.find(
-      guide => guide.fromVersion === fromVersion && guide.toVersion === toVersion
+      (guide) => guide.fromVersion === fromVersion && guide.toVersion === toVersion,
     );
 
     return migrationGuide || null;
@@ -201,13 +201,13 @@ export class ApiDocumentationService {
    */
   generateDocumentationReport(): any {
     const versions = this.getAllVersions();
-    const reports = versions.map(version => {
+    const reports = versions.map((version) => {
       const doc = this.getDocumentation(version);
       return {
         version,
         title: doc?.title,
         endpoints: doc?.endpoints.length || 0,
-        deprecatedEndpoints: doc?.endpoints.filter(e => e.deprecated).length || 0,
+        deprecatedEndpoints: doc?.endpoints.filter((e) => e.deprecated).length || 0,
         schemas: doc?.schemas.length || 0,
         examples: doc?.examples.length || 0,
         migrationGuides: doc?.migrationGuides.length || 0,
@@ -218,7 +218,7 @@ export class ApiDocumentationService {
       summary: {
         totalVersions: versions.length,
         currentVersion: this.configService.get('api.defaultVersion'),
-        deprecatedVersions: versions.filter(v => this.isVersionDeprecated(v)),
+        deprecatedVersions: versions.filter((v) => this.isVersionDeprecated(v)),
       },
       versions: reports,
       recommendations: this.generateDocumentationRecommendations(),
@@ -249,7 +249,7 @@ export class ApiDocumentationService {
         description: endpoint.description,
         deprecated: endpoint.deprecated,
         tags: endpoint.tags,
-        parameters: endpoint.parameters.map(p => ({
+        parameters: endpoint.parameters.map((p) => ({
           name: p.name,
           in: p.in,
           required: p.required,
@@ -257,18 +257,20 @@ export class ApiDocumentationService {
           description: p.description,
           example: p.example,
         })),
-        requestBody: endpoint.requestBody ? {
-          required: endpoint.requestBody.required,
-          content: endpoint.requestBody.content,
-        } : undefined,
+        requestBody: endpoint.requestBody
+          ? {
+              required: endpoint.requestBody.required,
+              content: endpoint.requestBody.content,
+            }
+          : undefined,
         responses: Object.fromEntries(
-          endpoint.responses.map(r => [
+          endpoint.responses.map((r) => [
             r.code,
             {
               description: r.description,
               content: r.content,
             },
-          ])
+          ]),
         ),
       };
     }
@@ -299,14 +301,14 @@ export class ApiDocumentationService {
    */
   private generateTags(endpoints: ApiEndpoint[]): any[] {
     const tagSet = new Set<string>();
-    
+
     for (const endpoint of endpoints) {
       for (const tag of endpoint.tags) {
         tagSet.add(tag);
       }
     }
 
-    return Array.from(tagSet).map(tag => ({ name: tag }));
+    return Array.from(tagSet).map((tag) => ({ name: tag }));
   }
 
   /**
@@ -321,7 +323,7 @@ export class ApiDocumentationService {
       const fromVersion = versions[i];
       const toVersion = versions[i + 1];
       const migrationGuide = this.getMigrationGuide(fromVersion, toVersion);
-      
+
       if (!migrationGuide) {
         recommendations.push(`Missing migration guide from ${fromVersion} to ${toVersion}`);
       }
@@ -331,10 +333,15 @@ export class ApiDocumentationService {
     for (const version of versions) {
       const doc = this.getDocumentation(version);
       if (doc) {
-        const deprecatedEndpoints = doc.endpoints.filter(e => e.deprecated);
+        const deprecatedEndpoints = doc.endpoints.filter((e) => e.deprecated);
         for (const endpoint of deprecatedEndpoints) {
-          if (!endpoint.description.includes('alternative') && !endpoint.description.includes('replacement')) {
-            recommendations.push(`Deprecated endpoint ${endpoint.method} ${endpoint.path} in ${version} needs alternative endpoint`);
+          if (
+            !endpoint.description.includes('alternative') &&
+            !endpoint.description.includes('replacement')
+          ) {
+            recommendations.push(
+              `Deprecated endpoint ${endpoint.method} ${endpoint.path} in ${version} needs alternative endpoint`,
+            );
           }
         }
       }
@@ -358,7 +365,8 @@ export class ApiDocumentationService {
           path: '/auth/login',
           method: 'POST',
           summary: 'User authentication (deprecated)',
-          description: 'Authenticate user with username and password. This endpoint is deprecated, use v2 for enhanced security.',
+          description:
+            'Authenticate user with username and password. This endpoint is deprecated, use v2 for enhanced security.',
           deprecated: true,
           deprecatedIn: '2024-01-01',
           removedIn: '2024-12-31',
@@ -406,7 +414,8 @@ export class ApiDocumentationService {
           path: '/courses',
           method: 'GET',
           summary: 'List courses (deprecated)',
-          description: 'Get list of courses with basic filtering. This endpoint is deprecated, use v2 for enhanced filtering.',
+          description:
+            'Get list of courses with basic filtering. This endpoint is deprecated, use v2 for enhanced filtering.',
           deprecated: true,
           deprecatedIn: '2024-01-01',
           removedIn: '2024-12-31',
@@ -599,7 +608,8 @@ GET /courses?categories=blockchain`,
           path: '/auth/login',
           method: 'POST',
           summary: 'Enhanced user authentication',
-          description: 'Authenticate user with email and password. Enhanced security with rate limiting and improved error handling.',
+          description:
+            'Authenticate user with email and password. Enhanced security with rate limiting and improved error handling.',
           deprecated: false,
           parameters: [],
           requestBody: {
@@ -646,7 +656,8 @@ GET /courses?categories=blockchain`,
           path: '/courses',
           method: 'GET',
           summary: 'Enhanced course listing',
-          description: 'Get list of courses with advanced filtering, pagination, and sorting options.',
+          description:
+            'Get list of courses with advanced filtering, pagination, and sorting options.',
           deprecated: false,
           parameters: [
             {
@@ -782,4 +793,4 @@ GET /courses?categories=blockchain`,
       migrationGuides: [],
     });
   }
-} 
+}

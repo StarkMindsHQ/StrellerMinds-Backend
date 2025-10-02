@@ -1,30 +1,30 @@
-import { IsEnum, IsOptional, IsString, IsDateString, IsUUID } from "class-validator"
-import { ReportFormat, ReportType } from "../interfaces/analytics.interface"
+import { IsEnum, IsOptional, IsString, IsDateString, IsUUID } from 'class-validator';
+import { ReportFormat, ReportType } from '../interfaces/analytics.interface';
 
 export class GenerateReportDto {
   @IsEnum(ReportType)
-  reportType: ReportType
+  reportType: ReportType;
 
   @IsEnum(ReportFormat)
-  format: ReportFormat
+  format: ReportFormat;
 
   @IsOptional()
   @IsDateString()
-  startDate?: string
+  startDate?: string;
 
   @IsOptional()
   @IsDateString()
-  endDate?: string
+  endDate?: string;
 
   @IsOptional()
   @IsUUID()
-  courseId?: string
+  courseId?: string;
 
   @IsOptional()
   @IsUUID()
-  instructorId?: string
+  instructorId?: string;
 
   @IsOptional()
   @IsString()
-  title?: string
+  title?: string;
 }

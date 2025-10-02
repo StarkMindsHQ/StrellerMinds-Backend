@@ -1,63 +1,70 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
 export enum WebhookStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  FAILED = "failed",
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  FAILED = 'failed',
 }
 
 export enum WebhookEvent {
-  USER_CREATED = "user.created",
-  USER_UPDATED = "user.updated",
-  USER_DELETED = "user.deleted",
-  ORDER_CREATED = "order.created",
-  ORDER_UPDATED = "order.updated",
-  ORDER_COMPLETED = "order.completed",
-  PAYMENT_PROCESSED = "payment.processed",
-  CUSTOM_EVENT = "custom.event",
+  USER_CREATED = 'user.created',
+  USER_UPDATED = 'user.updated',
+  USER_DELETED = 'user.deleted',
+  ORDER_CREATED = 'order.created',
+  ORDER_UPDATED = 'order.updated',
+  ORDER_COMPLETED = 'order.completed',
+  PAYMENT_PROCESSED = 'payment.processed',
+  CUSTOM_EVENT = 'custom.event',
 }
 
-@Entity("webhooks")
-@Index(["status"])
-@Index(["events"])
+@Entity('webhooks')
+@Index(['status'])
+@Index(['events'])
 export class Webhook {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 255 })
-  name: string
+  name: string;
 
-  @Column({ type: "text" })
-  url: string
+  @Column({ type: 'text' })
+  url: string;
 
-  @Column({ type: "simple-array" })
-  events: WebhookEvent[]
+  @Column({ type: 'simple-array' })
+  events: WebhookEvent[];
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: WebhookStatus,
     default: WebhookStatus.ACTIVE,
   })
-  status: WebhookStatus
+  status: WebhookStatus;
 
-  @Column({ type: "text", nullable: true })
-  secret: string
+  @Column({ type: 'text', nullable: true })
+  secret: string;
 
-  @Column({ type: "json", nullable: true })
-  headers: Record<string, string>
+  @Column({ type: 'json', nullable: true })
+  headers: Record<string, string>;
 
-  @Column({ type: "int", default: 3 })
-  maxRetries: number
+  @Column({ type: 'int', default: 3 })
+  maxRetries: number;
 
-  @Column({ type: "int", default: 30 })
-  timeoutSeconds: number
+  @Column({ type: 'int', default: 30 })
+  timeoutSeconds: number;
 
-  @Column({ type: "text", nullable: true })
-  description: string
+  @Column({ type: 'text', nullable: true })
+  description: string;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

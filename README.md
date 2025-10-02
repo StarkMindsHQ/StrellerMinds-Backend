@@ -95,7 +95,6 @@ _Contribution Guidelines:_
 • Write tests for new features and ensure all existing tests pass.
 • Submit a detailed pull request describing your changes.
 
-
 • NB: `package-lock.json` is the recommended file for tracking package versions and ensuring consistent installations across environments.
 
 **Contact**
@@ -269,6 +268,7 @@ This data retention policy is reviewed annually and updated as necessary to comp
 The backend provides interactive OpenAPI (Swagger) documentation and supports SDK generation for client integration.
 
 ### Swagger UI
+
 - Access the interactive API docs at: `/api` (e.g., http://localhost:3000/api)
 - All endpoints, request/response models, and modules are grouped and described for clarity.
 
@@ -297,28 +297,35 @@ Replace `typescript-axios` and output path as needed for your target language.
 ### Automated SDK Release
 
 When you push a version tag in the format `vX.Y.Z`, an automated workflow will:
+
 - Build the backend and generate the OpenAPI spec (`openapi.json`) aligned to your `package.json` version.
 - Generate a TypeScript Axios SDK with fully typed models and API clients.
 - Publish artifacts to GitHub Releases, and optionally publish the SDK to npm if `NPM_TOKEN` is configured in repository secrets.
 
 Artifacts published in the GitHub Release:
+
 - `openapi.json` (the exact OpenAPI spec used for generation)
 - `typescript-sdk-<version>.zip` (generated SDK package)
 
 To consume the SDK from npm:
+
 - Install: `npm install @starkmindshq/strellerminds-sdk@<version>`
 - Import and use in your TypeScript/JavaScript project:
 
 ```ts
 import { Configuration, DefaultApi } from '@starkmindshq/strellerminds-sdk';
 
-const config = new Configuration({ basePath: 'https://api.strellerminds.io', accessToken: 'YOUR_TOKEN' });
+const config = new Configuration({
+  basePath: 'https://api.strellerminds.io',
+  accessToken: 'YOUR_TOKEN',
+});
 const api = new DefaultApi(config);
 // Example call
 // const result = await api.usersControllerFindAll();
 ```
 
 Release traceability:
+
 - Each Release includes a direct link to the matching `openapi.json` used for SDK generation.
 - The SDK package version matches the backend `package.json` version used for the tag.
 
@@ -360,6 +367,7 @@ Please follow the contribution guidelines outlined in the **Getting Started** se
 The backend provides interactive OpenAPI (Swagger) documentation and supports SDK generation for client integration.
 
 ### Swagger UI
+
 - Access the interactive API docs at: `/api` (e.g., http://localhost:3000/api)
 - All endpoints, request/response models, and modules are grouped and described for clarity.
 
@@ -385,14 +393,16 @@ Replace `typescript-axios` and output path as needed for your target language.
 
 Please follow the contribution guidelines outlined in the **Getting Started** section. Additionally, ensure your code changes do not break the API contract and are reflected in the OpenAPI documentation.
 
-
 # Contract Testing with Pact
 
 We use Pact for consumer-driven contract tests against external integrations:
+
 - Stellar Horizon API
 - SMTP Provider
 - S3 (LocalStack)
 
 ## Running locally
+
 ```bash
 yarn test:contract
+```

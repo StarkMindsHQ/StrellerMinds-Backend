@@ -24,16 +24,11 @@ export class UserRegisteredEvent extends DomainEvent {
     private readonly payload: UserRegisteredPayload,
     metadata: Partial<DomainEventMetadata> = {},
   ) {
-    super(
-      payload.userId,
-      'User',
-      1,
-      {
-        ...metadata,
-        userId: payload.userId,
-        correlationId: metadata.correlationId,
-      },
-    );
+    super(payload.userId, 'User', 1, {
+      ...metadata,
+      userId: payload.userId,
+      correlationId: metadata.correlationId,
+    });
   }
 
   getPayload(): UserRegisteredPayload {

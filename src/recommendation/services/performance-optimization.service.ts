@@ -67,7 +67,7 @@ export class PerformanceOptimizationService {
               type: 'exponential',
               delay: 2000,
             },
-          }
+          },
         );
       }
 
@@ -92,7 +92,7 @@ export class PerformanceOptimizationService {
         {
           priority: -1, // Lower priority
           attempts: 2,
-        }
+        },
       );
 
       this.logger.log(`Queued similarity precomputation for ${courseIds.length} courses`);
@@ -120,7 +120,7 @@ export class PerformanceOptimizationService {
           {
             priority: -1,
             attempts: 2,
-          }
+          },
         );
       }
 
@@ -156,12 +156,12 @@ export class PerformanceOptimizationService {
 
         if (cached && cached.length > 0) {
           this.logger.debug(`Serving cached recommendations for user ${userId}`);
-          
+
           // Optionally refresh cache in background
           if (backgroundRefresh) {
             this.queueBackgroundRefresh(userId, options);
           }
-          
+
           return cached;
         }
       }
@@ -178,7 +178,7 @@ export class PerformanceOptimizationService {
         await this.cacheService.cacheRecommendations(
           userId,
           { userId, context: 'optimized' },
-          recommendations
+          recommendations,
         );
       }
 
@@ -257,10 +257,10 @@ export class PerformanceOptimizationService {
     try {
       // Clear old cache entries
       await this.cleanupExpiredCache();
-      
+
       // Optimize object references
       this.optimizeObjectReferences();
-      
+
       // Trigger garbage collection hint (Node.js specific)
       if (global.gc) {
         global.gc();
@@ -317,7 +317,7 @@ export class PerformanceOptimizationService {
   }> {
     try {
       const metrics = await this.collectPerformanceMetrics();
-      
+
       let scaleUp = false;
       let scaleDown = false;
       let reason = 'Normal operation';
@@ -335,7 +335,8 @@ export class PerformanceOptimizationService {
       }
 
       // Memory pressure
-      if (metrics.memoryUsage > 1024) { // > 1GB
+      if (metrics.memoryUsage > 1024) {
+        // > 1GB
         scaleUp = true;
         reason = 'High memory usage detected';
       }
@@ -408,7 +409,7 @@ export class PerformanceOptimizationService {
       {
         priority: -10, // Very low priority
         delay: 60000, // 1 minute delay
-      }
+      },
     );
   }
 
@@ -456,11 +457,14 @@ export class PerformanceOptimizationService {
   /**
    * Circuit breaker pattern implementation
    */
-  private circuitBreakers = new Map<string, {
-    failures: number;
-    lastFailure: number;
-    state: 'closed' | 'open' | 'half-open';
-  }>();
+  private circuitBreakers = new Map<
+    string,
+    {
+      failures: number;
+      lastFailure: number;
+      state: 'closed' | 'open' | 'half-open';
+    }
+  >();
 
   async executeWithCircuitBreaker<T>(
     key: string,
@@ -471,11 +475,7 @@ export class PerformanceOptimizationService {
       resetTimeout?: number;
     } = {},
   ): Promise<T> {
-    const {
-      failureThreshold = 5,
-      timeout = 10000,
-      resetTimeout = 60000,
-    } = options;
+    const { failureThreshold = 5, timeout = 10000, resetTimeout = 60000 } = options;
 
     let breaker = this.circuitBreakers.get(key);
     if (!breaker) {
@@ -501,7 +501,7 @@ export class PerformanceOptimizationService {
       const result = await Promise.race([
         operation(),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Operation timeout')), timeout)
+          setTimeout(() => reject(new Error('Operation timeout')), timeout),
         ),
       ]);
 

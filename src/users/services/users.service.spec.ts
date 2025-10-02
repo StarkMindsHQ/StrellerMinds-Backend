@@ -3,11 +3,7 @@ import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
-import {
-  ConflictException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UserRole } from '../enums/userRole.enum';
 import { AccountStatus } from '../enums/accountStatus.enum';
 import { SharedUtilityService } from '../../common/services/shared-utility.service';
@@ -175,7 +171,9 @@ describe('UsersService', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      jest.spyOn(service as any, 'findEntitiesWithPagination').mockRejectedValue(new Error('DB error'));
+      jest
+        .spyOn(service as any, 'findEntitiesWithPagination')
+        .mockRejectedValue(new Error('DB error'));
 
       await expect(service.findAll()).rejects.toThrow(InternalServerErrorException);
     });
@@ -201,7 +199,9 @@ describe('UsersService', () => {
     });
 
     it('should handle NotFoundException', async () => {
-      jest.spyOn(service as any, 'findEntityById').mockRejectedValue(new NotFoundException('User not found'));
+      jest
+        .spyOn(service as any, 'findEntityById')
+        .mockRejectedValue(new NotFoundException('User not found'));
 
       await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
     });
@@ -226,7 +226,9 @@ describe('UsersService', () => {
     it('should handle NotFoundException', async () => {
       const updateDto = { firstName: 'Updated' };
 
-      jest.spyOn(service as any, 'updateEntity').mockRejectedValue(new NotFoundException('User not found'));
+      jest
+        .spyOn(service as any, 'updateEntity')
+        .mockRejectedValue(new NotFoundException('User not found'));
 
       await expect(service.update('1', updateDto)).rejects.toThrow(NotFoundException);
     });
@@ -242,7 +244,9 @@ describe('UsersService', () => {
     });
 
     it('should handle NotFoundException', async () => {
-      jest.spyOn(service as any, 'deleteEntity').mockRejectedValue(new NotFoundException('User not found'));
+      jest
+        .spyOn(service as any, 'deleteEntity')
+        .mockRejectedValue(new NotFoundException('User not found'));
 
       await expect(service.delete('1')).rejects.toThrow(NotFoundException);
     });

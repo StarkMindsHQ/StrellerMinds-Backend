@@ -1,14 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  DeletionRequest,
-  DeletionStatus,
-} from './entities/deletion-request.entity';
-import {
-  DataProcessingLog,
-  ProcessingActivity,
-} from './entities/data-processing-log.entity';
+import { DeletionRequest, DeletionStatus } from './entities/deletion-request.entity';
+import { DataProcessingLog, ProcessingActivity } from './entities/data-processing-log.entity';
 import { CreateDeletionRequestDto } from './dto/deletion-request.dto';
 import { ConsentService } from './consent.service';
 
@@ -40,9 +34,7 @@ export class DataDeletionService {
     const deletionRequest = this.deletionRepository.create({
       userId,
       ...requestDto,
-      scheduledAt: requestDto.scheduledAt
-        ? new Date(requestDto.scheduledAt)
-        : null,
+      scheduledAt: requestDto.scheduledAt ? new Date(requestDto.scheduledAt) : null,
     });
 
     const saved = await this.deletionRepository.save(deletionRequest);
@@ -100,10 +92,7 @@ export class DataDeletionService {
     }
   }
 
-  private async deleteUserData(
-    userId: string,
-    dataTypes?: string[],
-  ): Promise<void> {
+  private async deleteUserData(userId: string, dataTypes?: string[]): Promise<void> {
     // Delete user consents
     if (!dataTypes || dataTypes.includes('consents')) {
       await this.consentService.withdrawAllConsents(userId);

@@ -103,10 +103,12 @@ export class SentryConfigService {
         component: context?.component || 'unknown',
         correlationId: context?.correlationId,
       },
-      user: context?.user ? {
-        id: context.user.id,
-        email: context.user.email,
-      } : undefined,
+      user: context?.user
+        ? {
+            id: context.user.id,
+            email: context.user.email,
+          }
+        : undefined,
       extra: {
         ...context,
         timestamp: new Date().toISOString(),
@@ -124,10 +126,12 @@ export class SentryConfigService {
         component: context?.component || 'unknown',
         correlationId: context?.correlationId,
       },
-      user: context?.user ? {
-        id: context.user.id,
-        email: context.user.email,
-      } : undefined,
+      user: context?.user
+        ? {
+            id: context.user.id,
+            email: context.user.email,
+          }
+        : undefined,
       extra: {
         ...context,
         timestamp: new Date().toISOString(),
@@ -175,7 +179,7 @@ export class SentryConfigService {
     const sensitiveParams = ['password', 'token', 'secret', 'key', 'auth'];
     let sanitized = queryString;
 
-    sensitiveParams.forEach(param => {
+    sensitiveParams.forEach((param) => {
       const regex = new RegExp(`${param}=[^&]*`, 'gi');
       sanitized = sanitized.replace(regex, `${param}=***`);
     });

@@ -1,4 +1,10 @@
-import { Injectable, CanActivate, ExecutionContext, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { API_VERSION_KEY, DEPRECATED_KEY } from '../decorators/api-version.decorator';
@@ -57,7 +63,8 @@ export class VersionGuard implements CanActivate {
   }
 
   private handleDeprecatedVersion(request: any, version: string): void {
-    const deprecatedConfig = this.configService.get('api.deprecatedVersions', [])
+    const deprecatedConfig = this.configService
+      .get('api.deprecatedVersions', [])
       .find((v: any) => v.version === version);
 
     if (deprecatedConfig) {
@@ -81,7 +88,10 @@ export class VersionGuard implements CanActivate {
       request.res?.setHeader('Deprecation', 'true');
       request.res?.setHeader('Sunset', deprecatedConfig.removedIn);
       request.res?.setHeader('Link', `<${deprecatedConfig.migrationGuide}>; rel="deprecation"`);
-      request.res?.setHeader('Warning', `299 - "API version ${version} is deprecated. Will be removed in ${deprecatedConfig.removedIn}"`);
+      request.res?.setHeader(
+        'Warning',
+        `299 - "API version ${version} is deprecated. Will be removed in ${deprecatedConfig.removedIn}"`,
+      );
     }
   }
 }

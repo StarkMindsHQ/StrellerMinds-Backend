@@ -52,11 +52,7 @@ export class QueryCacheService {
    * @param options Cache options
    * @returns Query results
    */
-  async executeWithCache(
-    query: string,
-    parameters?: any[],
-    options?: CacheOptions,
-  ): Promise<any> {
+  async executeWithCache(query: string, parameters?: any[], options?: CacheOptions): Promise<any> {
     // Generate cache key
     const cacheKey = this.generateCacheKey(query, parameters);
 
@@ -177,7 +173,9 @@ export class QueryCacheService {
     const stats = this.getStats();
     this.logger.debug(
       `Query Cache Stats - Hits: ${stats.hits}, Misses: ${stats.misses}, Hit Rate: ${
-        stats.hits + stats.misses > 0 ? ((stats.hits / (stats.hits + stats.misses)) * 100).toFixed(2) : 0
+        stats.hits + stats.misses > 0
+          ? ((stats.hits / (stats.hits + stats.misses)) * 100).toFixed(2)
+          : 0
       }%, Size: ${stats.size}`,
     );
   }

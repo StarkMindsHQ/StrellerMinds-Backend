@@ -7,8 +7,16 @@ import { NotFoundException } from '@nestjs/common';
 const mockPreferences = {
   id: 'pref-1',
   user: { id: 'user-1' },
-  learningCustomization: { preferredTopics: ['Math'], learningPace: 'fast', learningGoals: 'Master Algebra' },
-  notificationSettings: { emailEnabled: true, frequency: 'immediate', rules: { courseUpdate: true } },
+  learningCustomization: {
+    preferredTopics: ['Math'],
+    learningPace: 'fast',
+    learningGoals: 'Master Algebra',
+  },
+  notificationSettings: {
+    emailEnabled: true,
+    frequency: 'immediate',
+    rules: { courseUpdate: true },
+  },
   personalizationData: { theme: 'dark', language: 'en', accessibility: ['high-contrast'] },
   analytics: { lastUpdated: new Date(), usageStats: { create: 1 } },
 };
@@ -27,9 +35,7 @@ describe('UserPreferencesController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserPreferencesController],
-      providers: [
-        { provide: UserPreferencesService, useValue: mockService },
-      ],
+      providers: [{ provide: UserPreferencesService, useValue: mockService }],
     }).compile();
 
     controller = module.get<UserPreferencesController>(UserPreferencesController);
@@ -68,7 +74,10 @@ describe('UserPreferencesController', () => {
       const dto: CreateUserPreferencesDto = {
         learningCustomization: { preferredTopics: ['Science'] },
       };
-      mockService.update.mockResolvedValue({ ...mockPreferences, learningCustomization: dto.learningCustomization });
+      mockService.update.mockResolvedValue({
+        ...mockPreferences,
+        learningCustomization: dto.learningCustomization,
+      });
       const result = await controller.update('user-1', dto);
       expect(service.update).toHaveBeenCalledWith('user-1', dto);
       expect(result.learningCustomization.preferredTopics).toContain('Science');
@@ -84,4 +93,4 @@ describe('UserPreferencesController', () => {
       expect(result).toEqual(learningPath);
     });
   });
-}); 
+});

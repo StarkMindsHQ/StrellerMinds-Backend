@@ -45,13 +45,8 @@ export class GdprController {
   @ApiParam({ name: 'userId', description: 'User ID' })
   @ApiBody({ type: UpdateConsentDto })
   @ApiResponse({ status: 200, description: 'User consent updated' })
-  async updateConsent(
-    @Param('userId') userId: string,
-    @Body() updateConsentDto: UpdateConsentDto,
-  ) {
-    return this.gdprService
-      .getConsentService()
-      .updateConsent(userId, updateConsentDto);
+  async updateConsent(@Param('userId') userId: string, @Body() updateConsentDto: UpdateConsentDto) {
+    return this.gdprService.getConsentService().updateConsent(userId, updateConsentDto);
   }
 
   /**
@@ -66,9 +61,7 @@ export class GdprController {
     @Param('userId') userId: string,
     @Body() preferences: ConsentPreferencesDto,
   ) {
-    return this.gdprService
-      .getConsentService()
-      .updateConsentPreferences(userId, preferences);
+    return this.gdprService.getConsentService().updateConsentPreferences(userId, preferences);
   }
 
   /**
@@ -112,6 +105,8 @@ export class GdprController {
     @Param('userId') userId: string,
     @Body() createDeletionRequestDto: CreateDeletionRequestDto,
   ) {
-    return this.gdprService.getDataDeletionService().createDeletionRequest(userId, createDeletionRequestDto);
+    return this.gdprService
+      .getDataDeletionService()
+      .createDeletionRequest(userId, createDeletionRequestDto);
   }
 }

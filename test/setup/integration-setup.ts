@@ -12,13 +12,9 @@ export default async function globalSetup() {
   try {
     // Ensure test environment variables are set
     process.env.NODE_ENV = 'test';
-    
+
     // Create test directories if they don't exist
-    const testDirs = [
-      'uploads/certificates',
-      'logs/tests',
-      'temp/integration'
-    ];
+    const testDirs = ['uploads/certificates', 'logs/tests', 'temp/integration'];
 
     for (const dir of testDirs) {
       const fullPath = path.join(process.cwd(), dir);
@@ -43,7 +39,6 @@ export default async function globalSetup() {
     setupTestLogging();
 
     console.log('✅ Integration test environment setup complete');
-
   } catch (error) {
     console.error('❌ Failed to setup integration test environment:', error);
     throw error;
@@ -52,7 +47,7 @@ export default async function globalSetup() {
 
 async function setupTestDatabase() {
   const { Client } = require('pg');
-  
+
   const client = new Client({
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
@@ -64,13 +59,10 @@ async function setupTestDatabase() {
 
   try {
     await client.connect();
-    
+
     // Check if test database exists
     const dbName = process.env.DB_DATABASE || 'strellerminds_test';
-    const result = await client.query(
-      'SELECT 1 FROM pg_database WHERE datname = $1',
-      [dbName]
-    );
+    const result = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [dbName]);
 
     if (result.rows.length === 0) {
       console.log(`📊 Creating test database: ${dbName}`);
@@ -79,7 +71,6 @@ async function setupTestDatabase() {
 
     await client.end();
     console.log('✅ Test database setup complete');
-    
   } catch (error) {
     await client.end();
     throw error;
@@ -93,12 +84,12 @@ function setupTestUtils() {
     cleanupDatabase: async () => {
       console.log('🧹 Database cleanup (mock)');
     },
-    
+
     // Seeding utility (will be overridden by DatabaseTestModule)
     seedDatabase: async (seedData: any) => {
       console.log('🌱 Database seeding (mock)', Object.keys(seedData));
     },
-    
+
     // Transaction utility (will be overridden by DatabaseTestModule)
     runInTransaction: async (callback: Function) => {
       console.log('🔄 Running in transaction (mock)');
@@ -106,9 +97,9 @@ function setupTestUtils() {
     },
 
     // Test data generators
-    generateTestEmail: (prefix = 'test') => 
+    generateTestEmail: (prefix = 'test') =>
       `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@example.com`,
-    
+
     generateTestData: (type: string, overrides = {}) => {
       const baseData = {
         user: {
@@ -139,8 +130,8 @@ function setupTestUtils() {
     },
 
     // Async utilities
-    delay: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
-    
+    delay: (ms: number) => new Promise((resolve) => setTimeout(resolve, ms)),
+
     waitFor: async (condition: () => boolean | Promise<boolean>, timeout = 5000) => {
       const start = Date.now();
       while (Date.now() - start < timeout) {
@@ -164,8 +155,11 @@ function setupTestLogging() {
   }
 
   // Setup test-specific logging
-  const testLogFile = path.join(logDir, `integration-${new Date().toISOString().split('T')[0]}.log`);
-  
+  const testLogFile = path.join(
+    logDir,
+    `integration-${new Date().toISOString().split('T')[0]}.log`,
+  );
+
   // Override console methods to include file logging
   const originalConsoleLog = console.log;
   const originalConsoleError = console.error;
@@ -206,7 +200,10 @@ declare global {
         generateTestEmail: (prefix?: string) => string;
         generateTestData: (type: string, overrides?: any) => any;
         delay: (ms: number) => Promise<void>;
-        waitFor: (condition: () => boolean | Promise<boolean>, timeout?: number) => Promise<boolean>;
+        waitFor: (
+          condition: () => boolean | Promise<boolean>,
+          timeout?: number,
+        ) => Promise<boolean>;
       };
     }
   }

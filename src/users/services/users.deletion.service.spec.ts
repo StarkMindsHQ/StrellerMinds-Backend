@@ -70,9 +70,7 @@ describe('UserDeletionService', () => {
         {
           provide: AccountDeletionConfirmationService,
           useValue: {
-            startDeletionConfirmationWorkflow: jest
-              .fn()
-              .mockResolvedValue(undefined),
+            startDeletionConfirmationWorkflow: jest.fn().mockResolvedValue(undefined),
             validateDeletionConfirmation: jest.fn().mockResolvedValue(true),
           },
         },
@@ -96,12 +94,8 @@ describe('UserDeletionService', () => {
 
     service = module.get<UserDeletionService>(UserDeletionService);
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
-    walletInfoRepository = module.get<Repository<WalletInfo>>(
-      getRepositoryToken(WalletInfo),
-    );
-    userProgressRepository = module.get<Repository<UserProgress>>(
-      getRepositoryToken(UserProgress),
-    );
+    walletInfoRepository = module.get<Repository<WalletInfo>>(getRepositoryToken(WalletInfo));
+    userProgressRepository = module.get<Repository<UserProgress>>(getRepositoryToken(UserProgress));
     auditLogService = module.get<AuditLogService>(AuditLogService);
     confirmationService = module.get<AccountDeletionConfirmationService>(
       AccountDeletionConfirmationService,
@@ -141,21 +135,19 @@ describe('UserDeletionService', () => {
     it('should throw NotFoundException if user not found', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
 
-      await expect(
-        service.deactivateAccount('non-existent-id', 'requester-id'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.deactivateAccount('non-existent-id', 'requester-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should rollback transaction on error', async () => {
       const mockUser = { id: 'user-id', email: 'test@example.com' };
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as any);
-      jest
-        .spyOn(mockQueryRunner.manager, 'save')
-        .mockRejectedValue(new Error('Database error'));
+      jest.spyOn(mockQueryRunner.manager, 'save').mockRejectedValue(new Error('Database error'));
 
-      await expect(
-        service.deactivateAccount('user-id', 'requester-id'),
-      ).rejects.toThrow('Database error');
+      await expect(service.deactivateAccount('user-id', 'requester-id')).rejects.toThrow(
+        'Database error',
+      );
 
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.release).toHaveBeenCalled();
@@ -178,9 +170,7 @@ describe('UserDeletionService', () => {
         status: AccountStatus.PENDING_DELETION,
         deletionRequestedAt: expect.any(Date),
       });
-      expect(
-        confirmationService.startDeletionConfirmationWorkflow,
-      ).toHaveBeenCalledWith('user-id');
+      expect(confirmationService.startDeletionConfirmationWorkflow).toHaveBeenCalledWith('user-id');
       expect(auditLogService.createLog).toHaveBeenCalled();
     });
 
@@ -201,40 +191,32 @@ describe('UserDeletionService', () => {
         .mockResolvedValueOnce(mockUser as any)
         .mockResolvedValueOnce(mockRequester as any);
 
-      await expect(
-        service.requestAccountDeletion('user-id', 'requester-id'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.requestAccountDeletion('user-id', 'requester-id')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('confirmAccountDeletion', () => {
     it('should confirm and perform deletion with valid token', async () => {
-      jest
-        .spyOn(confirmationService, 'validateDeletionConfirmation')
-        .mockResolvedValue(true);
-      jest
-        .spyOn(service as any, 'performAccountDeletion')
-        .mockResolvedValue(undefined);
+      jest.spyOn(confirmationService, 'validateDeletionConfirmation').mockResolvedValue(true);
+      jest.spyOn(service as any, 'performAccountDeletion').mockResolvedValue(undefined);
 
       await service.confirmAccountDeletion('user-id', 'valid-token');
 
-      expect(
-        confirmationService.validateDeletionConfirmation,
-      ).toHaveBeenCalledWith('user-id', 'valid-token');
-      expect((service as any).performAccountDeletion).toHaveBeenCalledWith(
+      expect(confirmationService.validateDeletionConfirmation).toHaveBeenCalledWith(
         'user-id',
-        'user-id',
+        'valid-token',
       );
+      expect((service as any).performAccountDeletion).toHaveBeenCalledWith('user-id', 'user-id');
     });
 
     it('should throw error with invalid token', async () => {
-      jest
-        .spyOn(confirmationService, 'validateDeletionConfirmation')
-        .mockResolvedValue(false);
+      jest.spyOn(confirmationService, 'validateDeletionConfirmation').mockResolvedValue(false);
 
-      await expect(
-        service.confirmAccountDeletion('user-id', 'invalid-token'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.confirmAccountDeletion('user-id', 'invalid-token')).rejects.toThrow(
+        BadRequestException,
+      );
 
       expect((service as any).performAccountDeletion).not.toHaveBeenCalled();
     });
@@ -246,12 +228,8 @@ describe('UserDeletionService', () => {
       const mockWallet = { id: 'wallet-id', walletAddress: '0x123' };
 
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as any);
-      jest
-        .spyOn(walletInfoRepository, 'findOne')
-        .mockResolvedValue(mockWallet as any);
-      jest
-        .spyOn(service as any, 'scheduleDataPurge')
-        .mockImplementation(() => {});
+      jest.spyOn(walletInfoRepository, 'findOne').mockResolvedValue(mockWallet as any);
+      jest.spyOn(service as any, 'scheduleDataPurge').mockImplementation(() => {});
 
       await service.performAccountDeletion('user-id', 'requester-id');
 
@@ -273,15 +251,12 @@ describe('UserDeletionService', () => {
         }),
       );
 
-      expect(mockQueryRunner.manager.softDelete).toHaveBeenCalledWith(
-        UserProgress,
-        { user: { id: 'user-id' } },
-      );
+      expect(mockQueryRunner.manager.softDelete).toHaveBeenCalledWith(UserProgress, {
+        user: { id: 'user-id' },
+      });
       expect(mockQueryRunner.manager.save).toHaveBeenCalled();
       expect(auditLogService.createLog).toHaveBeenCalled();
-      expect((service as any).scheduleDataPurge).toHaveBeenCalledWith(
-        'user-id',
-      );
+      expect((service as any).scheduleDataPurge).toHaveBeenCalledWith('user-id');
     });
   });
 });

@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { MentorshipSession } from './mentorship-session.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -24,7 +32,11 @@ export class Mentorship {
   mentee: User;
 
   /** Status of the mentorship */
-  @ApiProperty({ description: 'Status', enum: ['active', 'completed', 'cancelled'], default: 'active' })
+  @ApiProperty({
+    description: 'Status',
+    enum: ['active', 'completed', 'cancelled'],
+    default: 'active',
+  })
   @Column({ default: 'active' })
   status: 'active' | 'completed' | 'cancelled';
 

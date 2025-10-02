@@ -1,4 +1,4 @@
-import { Injectable, LoggerService as NestLoggerService } from '@nestjs/common';
+import { Injectable, LoggerService as NestLoggerService, Inject } from '@nestjs/common';
 import { LogEntry, LogLevel } from '../interfaces/observability.interface';
 import { MonitoringConfig } from '../interfaces/monitoring-config.interface';
 
@@ -7,7 +7,7 @@ export class CustomLoggerService implements NestLoggerService {
   private logs: LogEntry[] = [];
   private readonly maxLogs = 10000;
 
-  constructor(private readonly config: MonitoringConfig) {}
+  constructor(@Inject('MonitoringConfig') private readonly config: MonitoringConfig) {}
 
   log(message: any, context?: string, traceId?: string): void {
     this.writeLog(LogLevel.INFO, message, context, undefined, traceId);
@@ -38,7 +38,7 @@ export class CustomLoggerService implements NestLoggerService {
     message: any,
     context?: string,
     metadata?: Record<string, any>,
-    traceId?: string
+    traceId?: string,
   ): void {
     const logEntry: LogEntry = {
       timestamp: new Date(),
@@ -46,7 +46,7 @@ export class CustomLoggerService implements NestLoggerService {
       message: typeof message === 'string' ? message : JSON.stringify(message),
       context,
       metadata,
-      traceId
+      traceId,
     };
 
     this.logs.push(logEntry);
@@ -97,22 +97,22 @@ export class CustomLoggerService implements NestLoggerService {
     let filteredLogs = [...this.logs];
 
     if (since) {
-      filteredLogs = filteredLogs.filter(log => log.timestamp >= since);
+      filteredLogs = filteredLogs.filter((log) => log.timestamp >= since);
     }
 
     if (level) {
-      filteredLogs = filteredLogs.filter(log => log.level === level);
+      filteredLogs = filteredLogs.filter((log) => log.level === level);
     }
 
     if (context) {
-      filteredLogs = filteredLogs.filter(log => log.context === context);
+      filteredLogs = filteredLogs.filter((log) => log.context === context);
     }
 
     return filteredLogs;
   }
 
   getLogsByTraceId(traceId: string): LogEntry[] {
-    return this.logs.filter(log => log.traceId === traceId);
+    return this.logs.filter((log) => log.traceId === traceId);
   }
 
   getErrorLogs(since?: Date): LogEntry[] {
@@ -123,19 +123,20 @@ export class CustomLoggerService implements NestLoggerService {
     this.logs = [];
   }
 
-  getLogStats(): { total: number; byLevel: Record<LogLevel, number> } {
+  getLogStats(): { total: number; byLevel: Record<string, number> } {
     const stats = {
       total: this.logs.length,
-      byLevel: {
-        [LogLevel.ERROR]: 0,
-        [LogLevel.WARN]: 0,
-        [LogLevel.INFO]: 0,
-        [LogLevel.DEBUG]: 0,
-        [LogLevel.VERBOSE]: 0
-      }
+      byLevel: {} as Record<string, number>,
     };
 
-    this.logs.forEach(log => {
+    // Initialize counts
+    stats.byLevel[LogLevel.ERROR] = 0;
+    stats.byLevel[LogLevel.WARN] = 0;
+    stats.byLevel[LogLevel.INFO] = 0;
+    stats.byLevel[LogLevel.DEBUG] = 0;
+    stats.byLevel[LogLevel.VERBOSE] = 0;
+
+    this.logs.forEach((log) => {
       stats.byLevel[log.level]++;
     });
 

@@ -153,7 +153,7 @@ export class UserInteraction {
     };
 
     let weight = weights[this.interactionType] || 1;
-    
+
     // Apply value multiplier for ratings
     if (this.interactionType === InteractionType.RATE && this.value) {
       weight *= this.value;

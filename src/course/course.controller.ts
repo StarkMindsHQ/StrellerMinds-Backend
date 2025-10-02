@@ -21,7 +21,3 @@ export class CourseController {
     return this.courseService.getAllCourses();
   }
 }
-
-
-
-

@@ -23,12 +23,12 @@ describe('Email Service Consumer Pact', () => {
         undefined, // emailTemplateRepository
         undefined, // emailLogRepository
         undefined, // emailPreferenceRepository
-        undefined  // jwtService
+        undefined, // jwtService
       );
-      
+
       // Override the transporter to use our mock server
       (emailService as any).transporter = {
-        sendMail: jest.fn()
+        sendMail: jest.fn(),
       };
     });
   });
@@ -43,7 +43,7 @@ describe('Email Service Consumer Pact', () => {
         to: 'user@example.com',
         from: 'noreply@strellerminds.com',
         subject: 'Welcome to StrellerMinds',
-        html: '<h1>Welcome!</h1><p>Thank you for joining StrellerMinds.</p>'
+        html: '<h1>Welcome!</h1><p>Thank you for joining StrellerMinds.</p>',
       };
 
       const expectedResponse = {
@@ -51,7 +51,7 @@ describe('Email Service Consumer Pact', () => {
         accepted: ['user@example.com'],
         rejected: [],
         pending: [],
-        response: '250 2.0.0 OK: queued as 20231201100000.12345'
+        response: '250 2.0.0 OK: queued as 20231201100000.12345',
       };
 
       return provider
@@ -63,42 +63,42 @@ describe('Email Service Consumer Pact', () => {
             path: '/send',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json'
+              Accept: 'application/json',
             },
             body: {
               to: Matchers.like(emailRequest.to),
               from: Matchers.like(emailRequest.from),
               subject: Matchers.like(emailRequest.subject),
-              html: Matchers.like(emailRequest.html)
-            }
+              html: Matchers.like(emailRequest.html),
+            },
           },
           willRespondWith: {
             status: 202,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               messageId: Matchers.like(expectedResponse.messageId),
               accepted: Matchers.eachLike(Matchers.like(emailRequest.to)),
               rejected: Matchers.eachLike(Matchers.like('')),
               pending: Matchers.eachLike(Matchers.like('')),
-              response: Matchers.like(expectedResponse.response)
-            }
-          }
+              response: Matchers.like(expectedResponse.response),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the transporter.sendMail method to return our expected response
             (emailService as any).transporter.sendMail.mockResolvedValue(expectedResponse);
-            
+
             // Call the actual service method
             const result = await emailService.sendImmediate({
               to: emailRequest.to,
               subject: emailRequest.subject,
               templateName: 'welcome',
-              context: { userName: 'John Doe' }
+              context: { userName: 'John Doe' },
             });
-            
+
             // Assert the result
             expect(result).toBe(true);
           });
@@ -110,14 +110,14 @@ describe('Email Service Consumer Pact', () => {
         to: 'invalid@example.com',
         from: 'noreply@strellerminds.com',
         subject: 'Test Email',
-        html: '<p>Test content</p>'
+        html: '<p>Test content</p>',
       };
 
       const errorResponse = {
         code: 'EENVELOPE',
         response: '550 5.1.1 User unknown',
         responseCode: 550,
-        command: 'RCPT TO'
+        command: 'RCPT TO',
       };
 
       return provider
@@ -129,41 +129,43 @@ describe('Email Service Consumer Pact', () => {
             path: '/send',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json'
+              Accept: 'application/json',
             },
             body: {
               to: Matchers.like(emailRequest.to),
               from: Matchers.like(emailRequest.from),
               subject: Matchers.like(emailRequest.subject),
-              html: Matchers.like(emailRequest.html)
-            }
+              html: Matchers.like(emailRequest.html),
+            },
           },
           willRespondWith: {
             status: 400,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               code: Matchers.like(errorResponse.code),
               response: Matchers.like(errorResponse.response),
               responseCode: Matchers.integer(errorResponse.responseCode),
-              command: Matchers.like(errorResponse.command)
-            }
-          }
+              command: Matchers.like(errorResponse.command),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the transporter.sendMail method to throw an error
-            (emailService as any).transporter.sendMail.mockRejectedValue(new Error('Invalid recipient'));
-            
+            (emailService as any).transporter.sendMail.mockRejectedValue(
+              new Error('Invalid recipient'),
+            );
+
             // Call the service method and expect it to return false
             const result = await emailService.sendImmediate({
               to: emailRequest.to,
               subject: emailRequest.subject,
               templateName: 'test',
-              context: {}
+              context: {},
             });
-            
+
             // Assert the result
             expect(result).toBe(false);
           });
@@ -175,7 +177,7 @@ describe('Email Service Consumer Pact', () => {
         to: ['user1@example.com', 'user2@example.com', 'user3@example.com'],
         from: 'noreply@strellerminds.com',
         subject: 'Course Update Notification',
-        html: '<h2>Course Update</h2><p>Your course has been updated.</p>'
+        html: '<h2>Course Update</h2><p>Your course has been updated.</p>',
       };
 
       const expectedResponse = {
@@ -183,7 +185,7 @@ describe('Email Service Consumer Pact', () => {
         accepted: bulkEmailRequest.to,
         rejected: [],
         pending: [],
-        response: '250 2.0.0 OK: queued as 20231201100001.67890'
+        response: '250 2.0.0 OK: queued as 20231201100001.67890',
       };
 
       return provider
@@ -195,42 +197,42 @@ describe('Email Service Consumer Pact', () => {
             path: '/send',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json'
+              Accept: 'application/json',
             },
             body: {
               to: Matchers.eachLike(Matchers.like('user@example.com')),
               from: Matchers.like(bulkEmailRequest.from),
               subject: Matchers.like(bulkEmailRequest.subject),
-              html: Matchers.like(bulkEmailRequest.html)
-            }
+              html: Matchers.like(bulkEmailRequest.html),
+            },
           },
           willRespondWith: {
             status: 202,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               messageId: Matchers.like(expectedResponse.messageId),
               accepted: Matchers.eachLike(Matchers.like('user@example.com')),
               rejected: Matchers.eachLike(Matchers.like('')),
               pending: Matchers.eachLike(Matchers.like('')),
-              response: Matchers.like(expectedResponse.response)
-            }
-          }
+              response: Matchers.like(expectedResponse.response),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the transporter.sendMail method to return our expected response
             (emailService as any).transporter.sendMail.mockResolvedValue(expectedResponse);
-            
+
             // Call the actual service method
             const result = await emailService.sendImmediate({
               to: bulkEmailRequest.to,
               subject: bulkEmailRequest.subject,
               templateName: 'course-update',
-              context: { courseName: 'Blockchain Fundamentals' }
+              context: { courseName: 'Blockchain Fundamentals' },
             });
-            
+
             // Assert the result
             expect(result).toBe(true);
           });
@@ -238,10 +240,3 @@ describe('Email Service Consumer Pact', () => {
     });
   });
 });
-
-
-
-
-
-
-

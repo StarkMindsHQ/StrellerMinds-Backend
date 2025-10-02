@@ -1,27 +1,27 @@
-import { Injectable, Logger } from "@nestjs/common"
-import type { Repository } from "typeorm"
+import { Injectable, Logger } from '@nestjs/common';
+import type { Repository } from 'typeorm';
 
-import { type UserLocale, LocaleSource } from "../entities/user-locale.entity"
-import { type LocaleMetadata, LocaleStatus } from "../entities/locale-metadata.entity"
+import { type UserLocale, LocaleSource } from '../entities/user-locale.entity';
+import { type LocaleMetadata, LocaleStatus } from '../entities/locale-metadata.entity';
 
 export interface CreateUserLocaleDto {
-  userId: string
-  locale: string
-  source?: LocaleSource
-  fallbackLocales?: string[]
-  preferences?: any
+  userId: string;
+  locale: string;
+  source?: LocaleSource;
+  fallbackLocales?: string[];
+  preferences?: any;
 }
 
 export interface UpdateUserLocaleDto {
-  locale?: string
-  fallbackLocales?: string[]
-  preferences?: any
+  locale?: string;
+  fallbackLocales?: string[];
+  preferences?: any;
 }
 
 @Injectable()
 export class LocaleService {
-  private readonly logger = new Logger(LocaleService.name)
-  private readonly defaultLocale = "en"
+  private readonly logger = new Logger(LocaleService.name);
+  private readonly defaultLocale = 'en';
 
   constructor(
     private readonly userLocaleRepository: Repository<UserLocale>,
@@ -31,16 +31,16 @@ export class LocaleService {
   async getUserLocale(userId: string): Promise<string> {
     const userLocale = await this.userLocaleRepository.findOne({
       where: { userId, isActive: true },
-    })
+    });
 
     if (userLocale) {
       await this.userLocaleRepository.update(userLocale.id, {
         lastUsedAt: new Date(),
-      })
-      return userLocale.locale
+      });
+      return userLocale.locale;
     }
 
-    return this.defaultLocale
+    return this.defaultLocale;
   }
 
   async setUserLocale(
@@ -49,21 +49,21 @@ export class LocaleService {
     source: LocaleSource = LocaleSource.USER_PREFERENCE,
   ): Promise<UserLocale> {
     // Validate locale
-    const localeMetadata = await this.getLocaleMetadata(locale)
+    const localeMetadata = await this.getLocaleMetadata(locale);
     if (!localeMetadata || localeMetadata.status !== LocaleStatus.ACTIVE) {
-      throw new Error(`Locale ${locale} is not supported or active`)
+      throw new Error(`Locale ${locale} is not supported or active`);
     }
 
     const existingUserLocale = await this.userLocaleRepository.findOne({
       where: { userId },
-    })
+    });
 
     if (existingUserLocale) {
-      existingUserLocale.locale = locale
-      existingUserLocale.source = source
-      existingUserLocale.lastUsedAt = new Date()
-      existingUserLocale.fallbackLocales = localeMetadata.fallbackLocales
-      return this.userLocaleRepository.save(existingUserLocale)
+      existingUserLocale.locale = locale;
+      existingUserLocale.source = source;
+      existingUserLocale.lastUsedAt = new Date();
+      existingUserLocale.fallbackLocales = localeMetadata.fallbackLocales;
+      return this.userLocaleRepository.save(existingUserLocale);
     } else {
       const userLocale = this.userLocaleRepository.create({
         userId,
@@ -71,137 +71,137 @@ export class LocaleService {
         source,
         fallbackLocales: localeMetadata.fallbackLocales,
         lastUsedAt: new Date(),
-      })
-      return this.userLocaleRepository.save(userLocale)
+      });
+      return this.userLocaleRepository.save(userLocale);
     }
   }
 
   async getUserLocaleWithFallbacks(userId: string): Promise<string[]> {
     const userLocale = await this.userLocaleRepository.findOne({
       where: { userId, isActive: true },
-    })
+    });
 
     if (userLocale) {
-      const locales = [userLocale.locale]
+      const locales = [userLocale.locale];
       if (userLocale.fallbackLocales) {
-        locales.push(...userLocale.fallbackLocales)
+        locales.push(...userLocale.fallbackLocales);
       }
       if (!locales.includes(this.defaultLocale)) {
-        locales.push(this.defaultLocale)
+        locales.push(this.defaultLocale);
       }
-      return locales
+      return locales;
     }
 
-    return [this.defaultLocale]
+    return [this.defaultLocale];
   }
 
   async getSupportedLocales(): Promise<LocaleMetadata[]> {
     return this.localeMetadataRepository.find({
       where: { status: LocaleStatus.ACTIVE },
-      order: { priority: "DESC", name: "ASC" },
-    })
+      order: { priority: 'DESC', name: 'ASC' },
+    });
   }
 
   async getLocaleMetadata(code: string): Promise<LocaleMetadata | null> {
     return this.localeMetadataRepository.findOne({
       where: { code },
-    })
+    });
   }
 
   async createLocaleMetadata(data: Partial<LocaleMetadata>): Promise<LocaleMetadata> {
-    const locale = this.localeMetadataRepository.create(data)
-    return this.localeMetadataRepository.save(locale)
+    const locale = this.localeMetadataRepository.create(data);
+    return this.localeMetadataRepository.save(locale);
   }
 
   async updateLocaleMetadata(code: string, data: Partial<LocaleMetadata>): Promise<LocaleMetadata> {
-    await this.localeMetadataRepository.update({ code }, data)
-    const updated = await this.getLocaleMetadata(code)
+    await this.localeMetadataRepository.update({ code }, data);
+    const updated = await this.getLocaleMetadata(code);
     if (!updated) {
-      throw new Error(`Locale ${code} not found`)
+      throw new Error(`Locale ${code} not found`);
     }
-    return updated
+    return updated;
   }
 
   async getLocaleStats(): Promise<{
-    totalLocales: number
-    activeLocales: number
-    localesByStatus: Record<LocaleStatus, number>
-    averageCompletion: number
+    totalLocales: number;
+    activeLocales: number;
+    localesByStatus: Record<LocaleStatus, number>;
+    averageCompletion: number;
   }> {
-    const locales = await this.localeMetadataRepository.find()
+    const locales = await this.localeMetadataRepository.find();
 
     const stats = {
       totalLocales: locales.length,
       activeLocales: 0,
       localesByStatus: {} as Record<LocaleStatus, number>,
       averageCompletion: 0,
-    }
+    };
 
     // Initialize status counts
     Object.values(LocaleStatus).forEach((status) => {
-      stats.localesByStatus[status] = 0
-    })
+      stats.localesByStatus[status] = 0;
+    });
 
-    let totalCompletion = 0
+    let totalCompletion = 0;
     for (const locale of locales) {
-      stats.localesByStatus[locale.status]++
+      stats.localesByStatus[locale.status]++;
       if (locale.status === LocaleStatus.ACTIVE) {
-        stats.activeLocales++
+        stats.activeLocales++;
       }
-      totalCompletion += locale.completionPercentage
+      totalCompletion += locale.completionPercentage;
     }
 
-    stats.averageCompletion = locales.length > 0 ? Math.round(totalCompletion / locales.length) : 0
+    stats.averageCompletion = locales.length > 0 ? Math.round(totalCompletion / locales.length) : 0;
 
-    return stats
+    return stats;
   }
 
   async detectLocaleFromGeoLocation(countryCode: string): Promise<string> {
     // Simple country to locale mapping
     const countryLocaleMap: Record<string, string> = {
-      US: "en-US",
-      GB: "en-GB",
-      CA: "en-CA",
-      FR: "fr-FR",
-      DE: "de-DE",
-      ES: "es-ES",
-      IT: "it-IT",
-      JP: "ja-JP",
-      KR: "ko-KR",
-      CN: "zh-CN",
-      BR: "pt-BR",
-      MX: "es-MX",
-      RU: "ru-RU",
-      IN: "en-IN",
-    }
+      US: 'en-US',
+      GB: 'en-GB',
+      CA: 'en-CA',
+      FR: 'fr-FR',
+      DE: 'de-DE',
+      ES: 'es-ES',
+      IT: 'it-IT',
+      JP: 'ja-JP',
+      KR: 'ko-KR',
+      CN: 'zh-CN',
+      BR: 'pt-BR',
+      MX: 'es-MX',
+      RU: 'ru-RU',
+      IN: 'en-IN',
+    };
 
-    const locale = countryLocaleMap[countryCode.toUpperCase()]
+    const locale = countryLocaleMap[countryCode.toUpperCase()];
     if (locale) {
-      const localeMetadata = await this.getLocaleMetadata(locale)
+      const localeMetadata = await this.getLocaleMetadata(locale);
       if (localeMetadata && localeMetadata.status === LocaleStatus.ACTIVE) {
-        return locale
+        return locale;
       }
     }
 
-    return this.defaultLocale
+    return this.defaultLocale;
   }
 
   async getUserPreferences(userId: string): Promise<any> {
     const userLocale = await this.userLocaleRepository.findOne({
       where: { userId, isActive: true },
-    })
+    });
 
-    return userLocale?.preferences || {}
+    return userLocale?.preferences || {};
   }
 
   async updateUserPreferences(userId: string, preferences: any): Promise<void> {
     const userLocale = await this.userLocaleRepository.findOne({
       where: { userId, isActive: true },
-    })
+    });
 
     if (userLocale) {
-      userLocale.preferences = { ...userLocale.preferences, ...preferences }
-      await this.userLocaleRepository.save(userLocale)
+      userLocale.preferences = { ...userLocale.preferences, ...preferences };
+      await this.userLocaleRepository.save(userLocale);
     }
   }
 }

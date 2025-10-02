@@ -41,10 +41,7 @@ import { EmailTrackingUtil } from './utils/tracking.util';
     {
       provide: EmailService,
       useFactory: (config: ConfigService) => {
-        if (
-          config.get('NODE_ENV') === 'development' ||
-          config.get('EMAIL_ENABLED') === 'false'
-        ) {
+        if (config.get('NODE_ENV') === 'development' || config.get('EMAIL_ENABLED') === 'false') {
           return new MockEmailService();
         }
         // The real EmailService will be instantiated by Nest with DI for other deps

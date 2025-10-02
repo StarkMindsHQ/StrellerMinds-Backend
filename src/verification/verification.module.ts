@@ -10,11 +10,6 @@ import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [HttpModule],
   controllers: [VerificationController],
-  providers: [
-    VerificationService,
-    EthSignatureStrategy,
-    JwtStrategy,
-    IpfsProofStrategy,
-  ],
+  providers: [VerificationService, EthSignatureStrategy, JwtStrategy, IpfsProofStrategy],
 })
 export class VerificationModule {}

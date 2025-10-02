@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -14,28 +8,26 @@ import { PerformanceMonitoringService } from './performance-monitoring.service';
 export class PerformanceInterceptor implements NestInterceptor {
   private readonly logger = new Logger(PerformanceInterceptor.name);
 
-  constructor(
-    private readonly performanceMonitoringService: PerformanceMonitoringService,
-  ) {}
+  constructor(private readonly performanceMonitoringService: PerformanceMonitoringService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
-    
+
     const startTime = process.hrtime.bigint();
     const method = request.method;
     const url = request.url;
     const endpoint = this.extractEndpoint(url);
-    
+
     // Add request start time to request object for other middleware
     request.performanceStartTime = startTime;
-    
+
     return next.handle().pipe(
       tap(() => {
         const endTime = process.hrtime.bigint();
         const duration = Number(endTime - startTime) / 1000000; // Convert to milliseconds
         const statusCode = response.statusCode;
-        
+
         // Record performance metrics
         this.performanceMonitoringService.recordEndpointPerformance(
           endpoint,
@@ -43,11 +35,11 @@ export class PerformanceInterceptor implements NestInterceptor {
           duration,
           statusCode,
         );
-        
+
         // Add performance headers
         response.setHeader('X-Response-Time', `${duration.toFixed(2)}ms`);
         response.setHeader('X-Performance-Grade', this.getPerformanceGrade(duration));
-        
+
         // Log slow requests
         if (duration > 1000) {
           this.logger.warn(
@@ -62,7 +54,7 @@ export class PerformanceInterceptor implements NestInterceptor {
             },
           );
         }
-        
+
         // Log performance metrics in debug mode
         this.logger.debug(
           `Performance: ${method} ${endpoint} - ${duration.toFixed(2)}ms - ${statusCode}`,
@@ -72,7 +64,7 @@ export class PerformanceInterceptor implements NestInterceptor {
         const endTime = process.hrtime.bigint();
         const duration = Number(endTime - startTime) / 1000000;
         const statusCode = error.status || 500;
-        
+
         // Record error performance metrics
         this.performanceMonitoringService.recordEndpointPerformance(
           endpoint,
@@ -80,7 +72,7 @@ export class PerformanceInterceptor implements NestInterceptor {
           duration,
           statusCode,
         );
-        
+
         // Log error with performance context
         this.logger.error(
           `Error in ${method} ${endpoint} - ${duration.toFixed(2)}ms - ${statusCode}`,
@@ -95,7 +87,7 @@ export class PerformanceInterceptor implements NestInterceptor {
             ip: request.ip,
           },
         );
-        
+
         return throwError(() => error);
       }),
     );
@@ -104,7 +96,7 @@ export class PerformanceInterceptor implements NestInterceptor {
   private extractEndpoint(url: string): string {
     // Remove query parameters and normalize the endpoint
     const baseUrl = url.split('?')[0];
-    
+
     // Replace dynamic segments with placeholders for better grouping
     return baseUrl
       .replace(/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '/:id') // UUIDs
@@ -134,10 +126,7 @@ export const ExcludeFromPerformanceMonitoring = () => {
 /**
  * Decorator to set custom performance thresholds for specific endpoints
  */
-export const PerformanceThreshold = (thresholds: {
-  warning?: number;
-  critical?: number;
-}) => {
+export const PerformanceThreshold = (thresholds: { warning?: number; critical?: number }) => {
   return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
     Reflect.defineMetadata('performanceThresholds', thresholds, descriptor.value);
   };

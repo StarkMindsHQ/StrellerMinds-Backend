@@ -24,7 +24,10 @@ export class ModerationController {
    */
   @Post('log')
   @UseGuards(AuthGuard('jwt')) // Specify strategy
-  @ApiOperation({ summary: 'Log moderation action', description: 'Logs a moderation action performed by a moderator.' })
+  @ApiOperation({
+    summary: 'Log moderation action',
+    description: 'Logs a moderation action performed by a moderator.',
+  })
   @ApiBody({ type: ModerationActionDto })
   @ApiResponse({ status: 201, description: 'Moderation action logged.' })
   async logModerationAction(

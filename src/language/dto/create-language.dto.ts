@@ -1,52 +1,62 @@
-import { IsNotEmpty, IsString, IsOptional, IsBoolean, IsNumber, IsObject, MaxLength } from "class-validator"
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+  IsObject,
+  MaxLength,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateLanguageDto {
-  @ApiProperty({ description: "Language code (e.g., en, es, fr)" })
+  @ApiProperty({ description: 'Language code (e.g., en, es, fr)' })
   @IsNotEmpty()
   @IsString()
   @MaxLength(10)
-  code: string
+  code: string;
 
-  @ApiProperty({ description: "Language name in English (e.g., English, Spanish, French)" })
+  @ApiProperty({ description: 'Language name in English (e.g., English, Spanish, French)' })
   @IsNotEmpty()
   @IsString()
   @MaxLength(100)
-  name: string
+  name: string;
 
-  @ApiPropertyOptional({ description: "Language name in its native form (e.g., English, Español, Français)" })
+  @ApiPropertyOptional({
+    description: 'Language name in its native form (e.g., English, Español, Français)',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(100)
-  nativeName?: string
+  nativeName?: string;
 
-  @ApiPropertyOptional({ description: "Whether this is the default language" })
+  @ApiPropertyOptional({ description: 'Whether this is the default language' })
   @IsOptional()
   @IsBoolean()
-  isDefault?: boolean
+  isDefault?: boolean;
 
-  @ApiPropertyOptional({ description: "Whether this language is active" })
+  @ApiPropertyOptional({ description: 'Whether this language is active' })
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean
+  isActive?: boolean;
 
-  @ApiPropertyOptional({ description: "URL or identifier for the language flag icon" })
+  @ApiPropertyOptional({ description: 'URL or identifier for the language flag icon' })
   @IsOptional()
   @IsString()
-  flagIcon?: string
+  flagIcon?: string;
 
-  @ApiPropertyOptional({ description: "Description of the language" })
+  @ApiPropertyOptional({ description: 'Description of the language' })
   @IsOptional()
   @IsString()
-  description?: string
+  description?: string;
 
-  @ApiPropertyOptional({ description: "Sort order for display" })
+  @ApiPropertyOptional({ description: 'Sort order for display' })
   @IsOptional()
   @IsNumber()
-  sortOrder?: number
+  sortOrder?: number;
 
-  @ApiPropertyOptional({ description: "Additional metadata" })
+  @ApiPropertyOptional({ description: 'Additional metadata' })
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>;
 }

@@ -34,15 +34,24 @@ export class GetUserEnrollmentsQuery extends Query {
       throw new Error('Limit must be between 1 and 100');
     }
 
-    if (this.parameters.status && !['active', 'completed', 'cancelled', 'expired'].includes(this.parameters.status)) {
+    if (
+      this.parameters.status &&
+      !['active', 'completed', 'cancelled', 'expired'].includes(this.parameters.status)
+    ) {
       throw new Error('Invalid status filter');
     }
 
-    if (this.parameters.enrollmentType && !['free', 'paid', 'subscription'].includes(this.parameters.enrollmentType)) {
+    if (
+      this.parameters.enrollmentType &&
+      !['free', 'paid', 'subscription'].includes(this.parameters.enrollmentType)
+    ) {
       throw new Error('Invalid enrollment type filter');
     }
 
-    if (this.parameters.sortBy && !['enrolledAt', 'lastAccessed', 'progress', 'courseName'].includes(this.parameters.sortBy)) {
+    if (
+      this.parameters.sortBy &&
+      !['enrolledAt', 'lastAccessed', 'progress', 'courseName'].includes(this.parameters.sortBy)
+    ) {
       throw new Error('Invalid sort field');
     }
 

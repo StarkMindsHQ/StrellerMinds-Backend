@@ -6,9 +6,6 @@
 // // import { randomBytes } from 'crypto';
 // // import { EmailService } from 'src/email/email.service';
 
-
-
-
 // // /**
 // //  * Service to handle account deletion confirmation workflow
 // //  */
@@ -308,11 +305,11 @@
 //     `;
 
 //     try {
-     
+
 //       // await this.emailService.sendEmail({
 //       //   to: user.email,
 //       //   subject: 'Confirm Your Account Deletion',
-//       //   templateName: 'account-deletion-confirmation', 
+//       //   templateName: 'account-deletion-confirmation',
 //       //   context: {
 //       //     name: user.firstName,
 //       //     confirmationUrl,
@@ -347,8 +344,6 @@
 //   }
 // }
 
-
-
 import { Injectable } from '@nestjs/common';
 import { EmailService } from 'src/email/email.service';
 
@@ -381,9 +376,8 @@ export class AccountDeletionConfirmationService {
     });
   }
 
-   async validateAndDeleteAccount(token: string): Promise<boolean> {
+  async validateAndDeleteAccount(token: string): Promise<boolean> {
     // Your validation and deletion logic here
     return true; // or false
   }
 }
-

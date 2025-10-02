@@ -91,17 +91,13 @@ describe('AuthService', () => {
     usersService = module.get<UsersService>(UsersService);
     jwtService = module.get<JwtService>(JwtService);
     configService = module.get<ConfigService>(ConfigService);
-    passwordValidationService = module.get<PasswordValidationService>(
-      PasswordValidationService,
-    );
+    passwordValidationService = module.get<PasswordValidationService>(PasswordValidationService);
     emailService = module.get<EmailService>(EmailService);
 
     (bcrypt.compare as jest.Mock).mockImplementation((plainText, hash) =>
       Promise.resolve(plainText === 'correctPassword'),
     );
-    (bcrypt.hash as jest.Mock).mockImplementation((text) =>
-      Promise.resolve(`hashed-${text}`),
-    );
+    (bcrypt.hash as jest.Mock).mockImplementation((text) => Promise.resolve(`hashed-${text}`));
   });
 });
 
@@ -116,10 +112,7 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        { provide: 'AUTH_STRATEGIES', useValue: [mockGoogle] },
-      ],
+      providers: [AuthService, { provide: 'AUTH_STRATEGIES', useValue: [mockGoogle] }],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -131,8 +124,6 @@ describe('AuthService', () => {
   });
 
   it('should fail for missing strategy', async () => {
-    await expect(service.login('facebook', {})).rejects.toThrow(
-      /Strategy for facebook not found/,
-    );
+    await expect(service.login('facebook', {})).rejects.toThrow(/Strategy for facebook not found/);
   });
 });

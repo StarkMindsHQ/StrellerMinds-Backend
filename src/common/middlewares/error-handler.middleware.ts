@@ -10,9 +10,7 @@ export class ErrorHandlerMiddleware implements NestMiddleware {
 
     res.on('finish', () => {
       const duration = Date.now() - start;
-      console.log(
-        ` ${req.method} ${req.originalUrl} - Status: ${res.statusCode} - ${duration}ms`
-      );
+      console.log(` ${req.method} ${req.originalUrl} - Status: ${res.statusCode} - ${duration}ms`);
     });
 
     res.on('error', (err) => {

@@ -1,7 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, MoreThan, LessThan } from 'typeorm';
-import { Recommendation, RecommendationType, RecommendationReason, RecommendationStatus } from '../entities/recommendation.entity';
+import {
+  Recommendation,
+  RecommendationType,
+  RecommendationReason,
+  RecommendationStatus,
+} from '../entities/recommendation.entity';
 import { UserInteraction, InteractionType } from '../entities/user-interaction.entity';
 import { LearningPath } from '../entities/learning-path.entity';
 import { User } from '../../users/entities/user.entity';
@@ -67,31 +72,32 @@ export class RecommendationEngineService {
       }
 
       const context = await this.buildRecommendationContext(request);
-      
+
       // Generate recommendations using multiple algorithms
       const recommendations = await this.generateMultiAlgorithmRecommendations(context, request);
-      
+
       // Rank and filter recommendations
       const rankedRecommendations = await this.rankRecommendations(recommendations, context);
-      
+
       // Apply business rules and filters
       const filteredRecommendations = await this.applyBusinessRules(rankedRecommendations, request);
-      
+
       // Save recommendations to database
       const savedRecommendations = await this.saveRecommendations(filteredRecommendations);
-      
+
       // Track analytics
       await this.analyticsService.trackRecommendationGeneration({
         userId: request.userId,
-        recommendationIds: savedRecommendations.map(r => r.id),
+        recommendationIds: savedRecommendations.map((r) => r.id),
         algorithmVersion: 'v2.1',
         generationTimeMs: Date.now() - startTime,
         context: request.context,
       });
 
-      this.logger.log(`Generated ${savedRecommendations.length} recommendations for user ${request.userId} in ${Date.now() - startTime}ms`);
+      this.logger.log(
+        `Generated ${savedRecommendations.length} recommendations for user ${request.userId} in ${Date.now() - startTime}ms`,
+      );
       return savedRecommendations;
-
     } catch (error) {
       this.logger.error(`Error generating recommendations for user ${request.userId}:`, error);
       throw error;
@@ -101,7 +107,10 @@ export class RecommendationEngineService {
   /**
    * Get existing recommendations for a user
    */
-  async getRecommendations(userId: string, query: GetRecommendationsQueryDto): Promise<{
+  async getRecommendations(
+    userId: string,
+    query: GetRecommendationsQueryDto,
+  ): Promise<{
     recommendations: Recommendation[];
     total: number;
   }> {
@@ -119,15 +128,22 @@ export class RecommendationEngineService {
       queryBuilder.andWhere('recommendation.status = :status', { status: query.status });
     } else {
       // Default to active recommendations
-      queryBuilder.andWhere('recommendation.status = :status', { status: RecommendationStatus.ACTIVE });
+      queryBuilder.andWhere('recommendation.status = :status', {
+        status: RecommendationStatus.ACTIVE,
+      });
     }
 
     if (query.minConfidence) {
-      queryBuilder.andWhere('recommendation.confidenceScore >= :minConfidence', { minConfidence: query.minConfidence });
+      queryBuilder.andWhere('recommendation.confidenceScore >= :minConfidence', {
+        minConfidence: query.minConfidence,
+      });
     }
 
     if (!query.includeExpired) {
-      queryBuilder.andWhere('(recommendation.expiresAt IS NULL OR recommendation.expiresAt > :now)', { now: new Date() });
+      queryBuilder.andWhere(
+        '(recommendation.expiresAt IS NULL OR recommendation.expiresAt > :now)',
+        { now: new Date() },
+      );
     }
 
     // Apply sorting
@@ -148,8 +164,14 @@ export class RecommendationEngineService {
   /**
    * Record user interaction with a recommendation
    */
-  async recordInteraction(recommendationId: string, interactionType: 'view' | 'click' | 'dismiss', metadata?: any): Promise<void> {
-    const recommendation = await this.recommendationRepository.findOne({ where: { id: recommendationId } });
+  async recordInteraction(
+    recommendationId: string,
+    interactionType: 'view' | 'click' | 'dismiss',
+    metadata?: any,
+  ): Promise<void> {
+    const recommendation = await this.recommendationRepository.findOne({
+      where: { id: recommendationId },
+    });
     if (!recommendation) {
       throw new Error(`Recommendation ${recommendationId} not found`);
     }
@@ -192,8 +214,15 @@ export class RecommendationEngineService {
   /**
    * Provide feedback on recommendation quality
    */
-  async provideFeedback(recommendationId: string, score: number, feedbackType: 'explicit' | 'implicit' = 'explicit', comment?: string): Promise<void> {
-    const recommendation = await this.recommendationRepository.findOne({ where: { id: recommendationId } });
+  async provideFeedback(
+    recommendationId: string,
+    score: number,
+    feedbackType: 'explicit' | 'implicit' = 'explicit',
+    comment?: string,
+  ): Promise<void> {
+    const recommendation = await this.recommendationRepository.findOne({
+      where: { id: recommendationId },
+    });
     if (!recommendation) {
       throw new Error(`Recommendation ${recommendationId} not found`);
     }
@@ -227,7 +256,9 @@ export class RecommendationEngineService {
   /**
    * Build recommendation context from user data
    */
-  private async buildRecommendationContext(request: RecommendationRequest): Promise<RecommendationContext> {
+  private async buildRecommendationContext(
+    request: RecommendationRequest,
+  ): Promise<RecommendationContext> {
     const { userId } = request;
 
     // Get recent user interactions
@@ -239,7 +270,7 @@ export class RecommendationEngineService {
     });
 
     // Get user profile
-    const user = await this.userRepository.findOne({ 
+    const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['enrollments', 'enrollments.course'],
     });
@@ -333,17 +364,17 @@ export class RecommendationEngineService {
 
     // Exclude specific courses
     if (request.excludeCourseIds?.length) {
-      filtered = filtered.filter(rec => !request.excludeCourseIds!.includes(rec.courseId!));
+      filtered = filtered.filter((rec) => !request.excludeCourseIds!.includes(rec.courseId!));
     }
 
     // Filter by recommendation reasons
     if (request.includeReasons?.length) {
-      filtered = filtered.filter(rec => request.includeReasons!.includes(rec.reason!));
+      filtered = filtered.filter((rec) => request.includeReasons!.includes(rec.reason!));
     }
 
     // Apply confidence threshold
     if (request.minConfidence) {
-      filtered = filtered.filter(rec => (rec.confidenceScore || 0) >= request.minConfidence!);
+      filtered = filtered.filter((rec) => (rec.confidenceScore || 0) >= request.minConfidence!);
     }
 
     // Limit results
@@ -360,8 +391,10 @@ export class RecommendationEngineService {
   /**
    * Save recommendations to database
    */
-  private async saveRecommendations(recommendations: Partial<Recommendation>[]): Promise<Recommendation[]> {
-    const entities = recommendations.map(rec => {
+  private async saveRecommendations(
+    recommendations: Partial<Recommendation>[],
+  ): Promise<Recommendation[]> {
+    const entities = recommendations.map((rec) => {
       const recommendation = new Recommendation();
       Object.assign(recommendation, rec);
       recommendation.status = RecommendationStatus.ACTIVE;
@@ -383,13 +416,15 @@ export class RecommendationEngineService {
     const trendingCourses = await this.courseRepository
       .createQueryBuilder('course')
       .leftJoin('course.interactions', 'interaction')
-      .where('interaction.createdAt > :date', { date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) })
+      .where('interaction.createdAt > :date', {
+        date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      })
       .groupBy('course.id')
       .orderBy('COUNT(interaction.id)', 'DESC')
       .take(options.limit)
       .getMany();
 
-    return trendingCourses.map(course => ({
+    return trendingCourses.map((course) => ({
       userId: context.userId,
       courseId: course.id,
       recommendationType: RecommendationType.COURSE,
@@ -428,7 +463,7 @@ export class RecommendationEngineService {
       .take(options.limit)
       .getMany();
 
-    return gapFillingCourses.map(course => ({
+    return gapFillingCourses.map((course) => ({
       userId: context.userId,
       courseId: course.id,
       recommendationType: RecommendationType.SKILL_BASED,
@@ -447,9 +482,11 @@ export class RecommendationEngineService {
   /**
    * Remove duplicate recommendations
    */
-  private removeDuplicateRecommendations(recommendations: Partial<Recommendation>[]): Partial<Recommendation>[] {
+  private removeDuplicateRecommendations(
+    recommendations: Partial<Recommendation>[],
+  ): Partial<Recommendation>[] {
     const seen = new Set<string>();
-    return recommendations.filter(rec => {
+    return recommendations.filter((rec) => {
       const key = `${rec.courseId}-${rec.recommendationType}`;
       if (seen.has(key)) {
         return false;
@@ -482,13 +519,16 @@ export class RecommendationEngineService {
     let adjustedScore = baseScore * weight;
 
     // Boost recent interactions
-    if (context.recentInteractions?.some(i => i.courseId === recommendation.courseId)) {
+    if (context.recentInteractions?.some((i) => i.courseId === recommendation.courseId)) {
       adjustedScore *= 1.2;
     }
 
     // Boost based on user preferences
-    if (recommendation.metadata?.tags?.some((tag: string) => 
-      context.userProfile?.preferences?.favoriteTopics?.includes(tag))) {
+    if (
+      recommendation.metadata?.tags?.some((tag: string) =>
+        context.userProfile?.preferences?.favoriteTopics?.includes(tag),
+      )
+    ) {
       adjustedScore *= 1.15;
     }
 
@@ -498,7 +538,10 @@ export class RecommendationEngineService {
   /**
    * Calculate recommendation priority
    */
-  private calculatePriority(recommendation: Partial<Recommendation>, context: RecommendationContext): number {
+  private calculatePriority(
+    recommendation: Partial<Recommendation>,
+    context: RecommendationContext,
+  ): number {
     let priority = 1;
 
     // High priority for skill gaps
@@ -522,7 +565,9 @@ export class RecommendationEngineService {
   /**
    * Ensure diversity in recommendation types and topics
    */
-  private ensureRecommendationDiversity(recommendations: Partial<Recommendation>[]): Partial<Recommendation>[] {
+  private ensureRecommendationDiversity(
+    recommendations: Partial<Recommendation>[],
+  ): Partial<Recommendation>[] {
     const diversified: Partial<Recommendation>[] = [];
     const typeCount = new Map<RecommendationType, number>();
     const topicCount = new Map<string, number>();
@@ -536,7 +581,9 @@ export class RecommendationEngineService {
       if (currentTypeCount >= 3) continue;
 
       // Limit recommendations per topic
-      const hasOverrepresentedTopic = topics.some((topic: string) => (topicCount.get(topic) || 0) >= 2);
+      const hasOverrepresentedTopic = topics.some(
+        (topic: string) => (topicCount.get(topic) || 0) >= 2,
+      );
       if (hasOverrepresentedTopic) continue;
 
       diversified.push(rec);

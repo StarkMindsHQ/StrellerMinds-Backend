@@ -7,30 +7,35 @@ The StrellerMinds-Backend includes a comprehensive performance monitoring and lo
 ## Features
 
 ### 🔍 Real-time Performance Monitoring
+
 - **Automatic Metrics Collection**: Captures response times, throughput, error rates, and resource usage
 - **Performance Interceptor**: Automatically monitors all API endpoints
 - **System Health Monitoring**: Tracks memory usage, CPU utilization, and database performance
 - **Alert System**: Configurable thresholds with automatic alerting
 
 ### 🔥 Load Testing Framework
+
 - **Artillery.js Integration**: Comprehensive load testing with realistic user scenarios
 - **Multiple Test Types**: Authentication flows, course browsing, search operations
 - **Configurable Load Patterns**: Warm-up, ramp-up, sustained load, and peak testing
 - **Performance Thresholds**: Automatic pass/fail criteria based on response times and error rates
 
 ### 📊 Scalability Testing
+
 - **Progressive Load Testing**: Tests system behavior under increasing concurrent users
 - **Bottleneck Identification**: Automatically identifies CPU, memory, database, and connection bottlenecks
 - **Breaking Point Analysis**: Determines maximum sustainable load
 - **Performance Degradation Tracking**: Monitors how performance changes with load
 
 ### 📋 Performance Baselines
+
 - **Baseline Creation**: Establish performance standards for comparison
 - **Trend Analysis**: Track performance changes over time
 - **Automatic Validation**: Compare current performance against established baselines
 - **Regression Detection**: Alert when performance degrades beyond acceptable thresholds
 
 ### 📈 Comprehensive Reporting
+
 - **Multi-format Reports**: HTML, JSON, and Markdown reports
 - **Performance Dashboards**: Visual representation of metrics and trends
 - **Recommendation Engine**: Automated suggestions for performance improvements
@@ -108,19 +113,19 @@ The system uses configurable thresholds for performance monitoring:
 ```typescript
 const thresholds = {
   responseTime: {
-    warning: 1000,   // 1 second
-    critical: 2000,  // 2 seconds
+    warning: 1000, // 1 second
+    critical: 2000, // 2 seconds
   },
   memoryUsage: {
-    warning: 70,     // 70%
-    critical: 85,    // 85%
+    warning: 70, // 70%
+    critical: 85, // 85%
   },
   errorRate: {
-    warning: 1,      // 1%
-    critical: 5,     // 5%
+    warning: 1, // 1%
+    critical: 5, // 5%
   },
   throughput: {
-    minimum: 100,    // requests per second
+    minimum: 100, // requests per second
   },
 };
 ```
@@ -162,9 +167,7 @@ POST /performance/baseline/create
     "throughput": 125.5
   },
   "performanceGrade": "B",
-  "recommendations": [
-    "Consider implementing caching to reduce response times"
-  ]
+  "recommendations": ["Consider implementing caching to reduce response times"]
 }
 ```
 
@@ -177,6 +180,7 @@ Tests user authentication flows including login, token refresh, and profile acce
 **Configuration**: `test/load/auth-load-test.yml`
 
 **Scenarios**:
+
 - User login (60% weight)
 - Token refresh (20% weight)
 - User registration (20% weight)
@@ -188,6 +192,7 @@ Tests course-related API endpoints under load.
 **Configuration**: `test/load/courses-load-test.yml`
 
 **Scenarios**:
+
 - Course browsing (50% weight)
 - Course search (30% weight)
 - Course details (20% weight)
@@ -199,6 +204,7 @@ Progressive load testing to identify system limits.
 **Configuration**: `test/load/scalability-test.yml`
 
 **Phases**:
+
 1. Baseline (10 users, 120s)
 2. Light Load (50 users, 180s)
 3. Medium Load (100 users, 240s)
@@ -393,4 +399,4 @@ For questions or issues with the performance monitoring system:
 
 ---
 
-*This documentation is part of the StrellerMinds-Backend performance monitoring system.*
+_This documentation is part of the StrellerMinds-Backend performance monitoring system._

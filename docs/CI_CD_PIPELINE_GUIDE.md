@@ -32,11 +32,13 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 ### 1. Enhanced CI/CD Pipeline (`.github/workflows/enhanced-ci-cd.yml`)
 
 **Triggers:**
+
 - Push to `main`, `develop`, `staging` branches
 - Pull requests to `main`, `develop`
 - Manual workflow dispatch with environment selection
 
 **Jobs:**
+
 - `build-and-test`: Comprehensive testing and Docker image building
 - `security-scan`: Vulnerability scanning with Trivy and Snyk
 - `performance-test`: Load testing and performance baselines
@@ -49,6 +51,7 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 ### 2. Comprehensive Testing Pipeline (`.github/workflows/comprehensive-testing.yml`)
 
 **Test Types:**
+
 - Code quality and linting
 - Unit tests (multiple Node.js versions)
 - Integration tests with PostgreSQL and Redis
@@ -63,6 +66,7 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 ### Blue-Green Deployment (`scripts/blue-green-deploy.sh`)
 
 **Features:**
+
 - Zero-downtime deployments
 - Automatic color switching (blue/green)
 - Health checks before traffic switch
@@ -70,6 +74,7 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 - Kubernetes integration
 
 **Usage:**
+
 ```bash
 ./scripts/blue-green-deploy.sh <environment> <image_tag>
 ```
@@ -77,16 +82,19 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 ### Rollback Mechanisms
 
 #### Standard Rollback (`scripts/rollback.sh`)
+
 - Controlled rollback to previous version
 - Health validation
 - State persistence for audit
 
 #### Emergency Rollback (`scripts/emergency-rollback.sh`)
+
 - Fast rollback for critical issues
 - Maintenance mode fallback
 - Emergency notifications
 
 **Usage:**
+
 ```bash
 # Standard rollback
 ./scripts/rollback.sh <environment> [version]
@@ -98,6 +106,7 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 ## Monitoring and Testing
 
 ### Smoke Tests (`scripts/smoke-tests.sh`)
+
 - Health endpoint validation
 - API endpoint testing
 - Security headers verification
@@ -105,12 +114,14 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 - SSL certificate validation
 
 ### Deployment Monitoring (`scripts/monitor-deployment.sh`)
+
 - Real-time health monitoring
 - Error rate tracking
 - Resource usage monitoring
 - Automated alerting
 
 ### Pipeline Monitoring (`scripts/pipeline-monitoring.sh`)
+
 - Metrics collection
 - Grafana dashboard setup
 - Alerting rules configuration
@@ -119,6 +130,7 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 ## Security
 
 ### Security Scanning (`scripts/security-scan.sh`)
+
 - npm audit for dependency vulnerabilities
 - Snyk security scanning
 - Container image scanning with Trivy
@@ -126,6 +138,7 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 - License compliance checking
 
 ### Security Features
+
 - Container security contexts
 - Non-root user execution
 - Read-only root filesystems
@@ -135,12 +148,14 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 ## Database Management
 
 ### Backup (`scripts/backup-database.sh`)
+
 - Pre-deployment backups
 - Compressed storage
 - Cloud storage integration (S3)
 - Retention policies
 
 ### Restore (`scripts/restore-database.sh`)
+
 - Emergency database restoration
 - Pre-restore safety backups
 - Verification checks
@@ -149,6 +164,7 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 ## Kubernetes Configuration
 
 ### Manifests Structure
+
 ```
 k8s/
 ├── namespace.yaml          # Environment namespaces
@@ -161,16 +177,19 @@ k8s/
 ```
 
 ### Environment Separation
+
 - **Staging**: `strellerminds-staging` namespace
 - **Production**: `strellerminds-production` namespace
 
 ### Resource Configuration
+
 - **Staging**: 3 replicas, 256Mi-512Mi memory, 250m-500m CPU
 - **Production**: 5 replicas, 512Mi-1Gi memory, 500m-1000m CPU
 
 ## Package.json Scripts
 
 ### CI/CD Scripts
+
 ```json
 {
   "ci:build": "npm ci && npm run lint && npm run test:coverage:unit && npm run build",
@@ -183,6 +202,7 @@ k8s/
 ```
 
 ### Deployment Scripts
+
 ```json
 {
   "deploy:staging": "./scripts/blue-green-deploy.sh staging",
@@ -194,6 +214,7 @@ k8s/
 ```
 
 ### Monitoring Scripts
+
 ```json
 {
   "smoke:test:staging": "./scripts/smoke-tests.sh staging",
@@ -206,6 +227,7 @@ k8s/
 ## Environment Variables
 
 ### Required Secrets
+
 - `GITHUB_TOKEN`: GitHub API access
 - `SNYK_TOKEN`: Snyk security scanning
 - `SLACK_WEBHOOK_URL`: Slack notifications
@@ -216,6 +238,7 @@ k8s/
 - `STAGING_DB_*`: Staging database credentials
 
 ### Optional Configuration
+
 - `GRAFANA_API_KEY`: Grafana dashboard management
 - `METRICS_API_KEY`: Metrics collection
 - `AWS_S3_BACKUP_BUCKET`: Database backup storage
@@ -224,6 +247,7 @@ k8s/
 ## Usage Examples
 
 ### Manual Deployment
+
 ```bash
 # Deploy to staging
 npm run deploy:staging
@@ -239,6 +263,7 @@ npm run rollback:emergency production
 ```
 
 ### Testing Pipeline
+
 ```bash
 # Run all CI tests
 npm run ci:test:full
@@ -254,6 +279,7 @@ npm run ci:performance
 ```
 
 ### Monitoring
+
 ```bash
 # Run smoke tests
 npm run smoke:test:production

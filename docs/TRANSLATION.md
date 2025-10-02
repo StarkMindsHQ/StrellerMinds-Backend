@@ -49,13 +49,11 @@ const message = await this.i18nService.translate('common.welcome', { lang });
 ## Translation Workflow
 
 1. **Extracting Strings**
-
    - Identify user-facing strings in the code
    - Create appropriate translation keys
    - Add translations to all language files
 
 2. **Adding New Languages**
-
    - Create a new translation file (e.g., `fr.json`)
    - Add the language to the supported languages list
    - Update the language selection UI
@@ -99,19 +97,16 @@ GET /i18n/translations
 ## Best Practices
 
 1. **Key Naming**
-
    - Use dot notation for nested keys
    - Use lowercase with underscores
    - Group related translations in namespaces
 
 2. **Variables**
-
    - Use named variables: `{{variableName}}`
    - Provide default values
    - Document variable usage
 
 3. **Maintenance**
-
    - Keep translation files in sync
    - Remove unused translations
    - Document new translation keys
@@ -158,13 +153,11 @@ fallbacks: {
 ## Troubleshooting
 
 1. **Missing Translations**
-
    - Check if the key exists in all language files
    - Verify the key is correctly referenced
    - Check for typos in the key name
 
 2. **RTL Issues**
-
    - Verify CSS direction property
    - Check text alignment
    - Test form inputs and buttons

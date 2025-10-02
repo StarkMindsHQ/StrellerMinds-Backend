@@ -7,12 +7,11 @@ import { MetricsService } from './metrics-service';
 @Controller('metrics')
 export class MetricsController {
   constructor(
-   @Inject('PROM_REGISTRY') private readonly registry: Registry,
+    @Inject('PROM_REGISTRY') private readonly registry: Registry,
     private readonly metricsService: MetricsService,
   ) {}
 
-
-    @Get()
+  @Get()
   async getMetrics(): Promise<string> {
     return await this.registry.metrics();
   }

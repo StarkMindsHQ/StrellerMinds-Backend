@@ -4,14 +4,14 @@ import { ApiProperty } from '@nestjs/swagger';
 
 enum SortOrder {
   ASC = 'asc',
-  DESC = 'desc'
+  DESC = 'desc',
 }
 
 enum SortField {
   TITLE = 'title',
   PRICE = 'price',
   CREATED_AT = 'createdAt',
-  RATING = 'rating'
+  RATING = 'rating',
 }
 
 export class CourseQueryDtoV2 {

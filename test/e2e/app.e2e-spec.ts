@@ -20,19 +20,14 @@ describe('AppController (e2e)', () => {
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+    return request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
   });
 
   it('/test-error/not-found (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/test-error/not-found')
-      .expect(404, {
-        statusCode: 404,
-        message: 'Resource not found',
-        error: 'Not Found',
-      });
+    return request(app.getHttpServer()).get('/test-error/not-found').expect(404, {
+      statusCode: 404,
+      message: 'Resource not found',
+      error: 'Not Found',
+    });
   });
 });

@@ -115,17 +115,16 @@ export class BaselineService {
   /**
    * Compare current performance against baseline
    */
-  async compareAgainstBaseline(
-    timeWindow: number = 3600000,
-  ): Promise<BaselineComparison> {
+  async compareAgainstBaseline(timeWindow: number = 3600000): Promise<BaselineComparison> {
     if (!this.currentBaseline) {
       throw new Error('No baseline available for comparison');
     }
 
     this.logger.debug('Comparing current performance against baseline');
 
-    const currentMetrics = this.performanceMonitoringService.getSystemPerformanceSummary(timeWindow);
-    
+    const currentMetrics =
+      this.performanceMonitoringService.getSystemPerformanceSummary(timeWindow);
+
     return {
       baselineName: this.currentBaseline.name,
       baselineVersion: this.currentBaseline.version,
@@ -154,8 +153,9 @@ export class BaselineService {
     const violations: BaselineViolation[] = [];
 
     // Check endpoint violations
-    comparison.endpointComparisons.forEach(endpoint => {
-      if (endpoint.responseTimeDeviation > 50) { // 50% deviation threshold
+    comparison.endpointComparisons.forEach((endpoint) => {
+      if (endpoint.responseTimeDeviation > 50) {
+        // 50% deviation threshold
         violations.push({
           type: 'RESPONSE_TIME_VIOLATION',
           endpoint: endpoint.endpoint,
@@ -166,7 +166,8 @@ export class BaselineService {
         });
       }
 
-      if (endpoint.errorRateDeviation > 100) { // 100% increase in error rate
+      if (endpoint.errorRateDeviation > 100) {
+        // 100% increase in error rate
         violations.push({
           type: 'ERROR_RATE_VIOLATION',
           endpoint: endpoint.endpoint,
@@ -194,8 +195,8 @@ export class BaselineService {
       violations,
       summary: {
         totalViolations: violations.length,
-        criticalViolations: violations.filter(v => v.severity === 'CRITICAL').length,
-        warningViolations: violations.filter(v => v.severity === 'WARNING').length,
+        criticalViolations: violations.filter((v) => v.severity === 'CRITICAL').length,
+        warningViolations: violations.filter((v) => v.severity === 'WARNING').length,
       },
     };
   }
@@ -212,17 +213,17 @@ export class BaselineService {
 
     try {
       this.logger.debug('Running scheduled baseline validation');
-      
+
       const validation = await this.validateAgainstBaseline();
-      
+
       if (!validation.isValid) {
         this.logger.warn(
           `Baseline validation failed: ${validation.violations.length} violations detected`,
-          { violations: validation.violations }
+          { violations: validation.violations },
         );
-        
+
         // Send alerts for critical violations
-        const criticalViolations = validation.violations.filter(v => v.severity === 'CRITICAL');
+        const criticalViolations = validation.violations.filter((v) => v.severity === 'CRITICAL');
         if (criticalViolations.length > 0) {
           // In production, integrate with alerting service
           this.logger.error('Critical baseline violations detected', { criticalViolations });
@@ -261,15 +262,15 @@ export class BaselineService {
 
     if (overallImprovement > improvementThreshold) {
       this.logger.log(
-        `Auto-updating baseline due to ${overallImprovement.toFixed(1)}% improvement`
+        `Auto-updating baseline due to ${overallImprovement.toFixed(1)}% improvement`,
       );
-      
+
       await this.createBaseline(
         `Auto-updated from ${this.currentBaseline.name}`,
         `Automatically updated due to ${overallImprovement.toFixed(1)}% performance improvement`,
-        this.generateVersion()
+        this.generateVersion(),
       );
-      
+
       return true;
     }
 
@@ -292,7 +293,7 @@ export class BaselineService {
     for (const endpoint of criticalEndpoints) {
       const stats = this.performanceMonitoringService.getEndpointPerformanceStats(
         endpoint.endpoint,
-        3600000 // 1 hour window
+        3600000, // 1 hour window
       );
 
       if (stats) {
@@ -350,11 +351,7 @@ export class BaselineService {
       nodeVersion: process.version,
       testDuration: 3600, // 1 hour
       sampleCount: 1000, // Placeholder
-      conditions: [
-        'Normal load conditions',
-        'No active deployments',
-        'Stable infrastructure',
-      ],
+      conditions: ['Normal load conditions', 'No active deployments', 'Stable infrastructure'],
     };
   }
 
@@ -363,9 +360,9 @@ export class BaselineService {
       return [];
     }
 
-    return this.currentBaseline.endpoints.map(baseline => {
+    return this.currentBaseline.endpoints.map((baseline) => {
       const current = currentMetrics.endpointBreakdown.find(
-        (e: any) => e.endpoint === baseline.endpoint
+        (e: any) => e.endpoint === baseline.endpoint,
       );
 
       if (!current) {
@@ -380,16 +377,20 @@ export class BaselineService {
         };
       }
 
-      const responseTimeDeviation = 
-        ((current.avgResponseTime - baseline.expectedResponseTime.p50) / baseline.expectedResponseTime.p50) * 100;
-      
-      const throughputDeviation = 
+      const responseTimeDeviation =
+        ((current.avgResponseTime - baseline.expectedResponseTime.p50) /
+          baseline.expectedResponseTime.p50) *
+        100;
+
+      const throughputDeviation =
         ((baseline.expectedThroughput - current.throughput) / baseline.expectedThroughput) * 100;
-      
-      const errorRateDeviation = 
-        baseline.expectedErrorRate > 0 
+
+      const errorRateDeviation =
+        baseline.expectedErrorRate > 0
           ? ((current.errorRate - baseline.expectedErrorRate) / baseline.expectedErrorRate) * 100
-          : current.errorRate > 0 ? 100 : 0;
+          : current.errorRate > 0
+            ? 100
+            : 0;
 
       return {
         endpoint: baseline.endpoint,
@@ -409,9 +410,10 @@ export class BaselineService {
     }
 
     const currentMemoryUsage = this.getCurrentMemoryUsage();
-    const memoryUsageDeviation = 
-      ((currentMemoryUsage - this.currentBaseline.system.expectedMemoryUsage) / 
-       this.currentBaseline.system.expectedMemoryUsage) * 100;
+    const memoryUsageDeviation =
+      ((currentMemoryUsage - this.currentBaseline.system.expectedMemoryUsage) /
+        this.currentBaseline.system.expectedMemoryUsage) *
+      100;
 
     return {
       baseline: this.currentBaseline.system,
@@ -429,7 +431,7 @@ export class BaselineService {
   private calculateOverallAssessment(currentMetrics: any): string {
     // Simplified assessment logic
     if (!currentMetrics.overallPerformance) return 'UNKNOWN';
-    
+
     const grade = currentMetrics.performanceGrade;
     if (grade === 'A' || grade === 'B') return 'EXCELLENT';
     if (grade === 'C') return 'GOOD';
@@ -439,26 +441,29 @@ export class BaselineService {
 
   private generateComparisonRecommendations(currentMetrics: any): string[] {
     const recommendations = [];
-    
+
     if (currentMetrics.recommendations) {
       recommendations.push(...currentMetrics.recommendations);
     }
-    
+
     return recommendations;
   }
 
   private calculateOverallImprovement(comparison: BaselineComparison): number {
     // Simplified improvement calculation
     const endpointImprovements = comparison.endpointComparisons
-      .filter(e => e.responseTimeDeviation < 0) // Negative deviation means improvement
-      .map(e => Math.abs(e.responseTimeDeviation));
-    
-    return endpointImprovements.length > 0 
+      .filter((e) => e.responseTimeDeviation < 0) // Negative deviation means improvement
+      .map((e) => Math.abs(e.responseTimeDeviation));
+
+    return endpointImprovements.length > 0
       ? endpointImprovements.reduce((a, b) => a + b, 0) / endpointImprovements.length
       : 0;
   }
 
-  private determineEndpointStatus(responseTimeDeviation: number, errorRateDeviation: number): string {
+  private determineEndpointStatus(
+    responseTimeDeviation: number,
+    errorRateDeviation: number,
+  ): string {
     if (responseTimeDeviation > 50 || errorRateDeviation > 100) return 'CRITICAL';
     if (responseTimeDeviation > 25 || errorRateDeviation > 50) return 'WARNING';
     return 'NORMAL';
@@ -478,15 +483,15 @@ export class BaselineService {
     // For now, save to file system
     const fs = require('fs');
     const path = require('path');
-    
+
     const baselinesDir = path.join(process.cwd(), 'test', 'performance', 'baselines');
     if (!fs.existsSync(baselinesDir)) {
       fs.mkdirSync(baselinesDir, { recursive: true });
     }
-    
+
     const filename = `baseline-${baseline.version}.json`;
     const filepath = path.join(baselinesDir, filename);
-    
+
     fs.writeFileSync(filepath, JSON.stringify(baseline, null, 2));
     this.logger.debug(`Baseline persisted to: ${filepath}`);
   }
@@ -497,11 +502,11 @@ export class BaselineService {
     try {
       const fs = require('fs');
       const path = require('path');
-      
+
       const baselinesDir = path.join(process.cwd(), 'test', 'performance', 'baselines');
       if (fs.existsSync(baselinesDir)) {
         const files = fs.readdirSync(baselinesDir).filter((f: string) => f.endsWith('.json'));
-        
+
         files.forEach((file: string) => {
           try {
             const filepath = path.join(baselinesDir, file);
@@ -511,12 +516,13 @@ export class BaselineService {
             this.logger.warn(`Failed to load baseline from ${file}:`, error.message);
           }
         });
-        
+
         // Set most recent as current
         if (this.baselineHistory.length > 0) {
-          this.currentBaseline = this.baselineHistory
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
-          
+          this.currentBaseline = this.baselineHistory.sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          )[0];
+
           this.logger.log(`Loaded current baseline: ${this.currentBaseline.name}`);
         }
       }

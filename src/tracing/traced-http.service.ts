@@ -20,10 +20,7 @@ export class TracedHttpService {
     private readonly tracingService: TracingService,
   ) {}
 
-  async get<T = any>(
-    url: string,
-    config?: TracedHttpRequestConfig,
-  ): Promise<AxiosResponse<T>> {
+  async get<T = any>(url: string, config?: TracedHttpRequestConfig): Promise<AxiosResponse<T>> {
     return this.request<T>('GET', url, undefined, config);
   }
 
@@ -43,10 +40,7 @@ export class TracedHttpService {
     return this.request<T>('PUT', url, data, config);
   }
 
-  async delete<T = any>(
-    url: string,
-    config?: TracedHttpRequestConfig,
-  ): Promise<AxiosResponse<T>> {
+  async delete<T = any>(url: string, config?: TracedHttpRequestConfig): Promise<AxiosResponse<T>> {
     return this.request<T>('DELETE', url, undefined, config);
   }
 
@@ -73,12 +67,12 @@ export class TracedHttpService {
     } = config;
 
     const spanName = `${serviceName}.${operation}`;
-    
+
     return this.tracingService.withSpan(
       spanName,
       async (span) => {
         const startTime = Date.now();
-        
+
         // Add request attributes
         span.setAttributes({
           'http.method': method.toUpperCase(),
@@ -92,7 +86,9 @@ export class TracedHttpService {
         if (axiosConfig.headers) {
           span.setAttributes({
             'http.request.headers.content-type': axiosConfig.headers['content-type'] || '',
-            'http.request.headers.authorization': axiosConfig.headers['authorization'] ? '[REDACTED]' : '',
+            'http.request.headers.authorization': axiosConfig.headers['authorization']
+              ? '[REDACTED]'
+              : '',
           });
         }
 
@@ -126,7 +122,7 @@ export class TracedHttpService {
           );
 
           const duration = Date.now() - startTime;
-          
+
           // Add response attributes
           span.setAttributes({
             'http.status_code': response.status,
@@ -171,7 +167,7 @@ export class TracedHttpService {
           return response;
         } catch (error) {
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'http.response.duration_ms': duration,
             'response.success': false,
@@ -212,16 +208,16 @@ export class TracedHttpService {
     return {
       get: <T = any>(url: string, config?: TracedHttpRequestConfig) =>
         this.get<T>(url, { ...config, serviceName }),
-      
+
       post: <T = any>(url: string, data?: any, config?: TracedHttpRequestConfig) =>
         this.post<T>(url, data, { ...config, serviceName }),
-      
+
       put: <T = any>(url: string, data?: any, config?: TracedHttpRequestConfig) =>
         this.put<T>(url, data, { ...config, serviceName }),
-      
+
       delete: <T = any>(url: string, config?: TracedHttpRequestConfig) =>
         this.delete<T>(url, { ...config, serviceName }),
-      
+
       patch: <T = any>(url: string, data?: any, config?: TracedHttpRequestConfig) =>
         this.patch<T>(url, data, { ...config, serviceName }),
     };

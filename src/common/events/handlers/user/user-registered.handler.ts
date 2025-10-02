@@ -56,7 +56,6 @@ export class UserRegisteredHandler extends EventHandler<UserRegisteredEvent> {
         userId: payload.userId,
         ...context,
       });
-
     } catch (error) {
       this.logger.error('Failed to process user registration', {
         userId: payload.userId,
@@ -110,7 +109,7 @@ export class UserRegisteredHandler extends EventHandler<UserRegisteredEvent> {
     causationId: string,
   ): Promise<void> {
     const verificationToken = this.generateVerificationToken();
-    
+
     const emailEvent = new EmailSendRequestedEvent(
       {
         emailId: uuidv4(),
@@ -169,7 +168,7 @@ export class UserRegisteredHandler extends EventHandler<UserRegisteredEvent> {
 
     for (const email of onboardingEmails) {
       const scheduledAt = new Date(Date.now() + email.delay);
-      
+
       const emailEvent = new EmailSendRequestedEvent(
         {
           emailId: uuidv4(),
@@ -205,10 +204,7 @@ export class UserRegisteredHandler extends EventHandler<UserRegisteredEvent> {
     }
   }
 
-  private async trackRegistrationAnalytics(
-    payload: any,
-    correlationId: string,
-  ): Promise<void> {
+  private async trackRegistrationAnalytics(payload: any, correlationId: string): Promise<void> {
     // This would integrate with your analytics system
     this.logger.debug('Tracking registration analytics', {
       userId: payload.userId,

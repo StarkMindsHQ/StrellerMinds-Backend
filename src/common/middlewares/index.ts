@@ -1,1 +1,1 @@
-export * from './sanitize.middleware'; 
+export * from './sanitize.middleware';

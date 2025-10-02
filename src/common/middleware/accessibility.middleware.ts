@@ -14,20 +14,21 @@ export class AccessibilityMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     // Add accessibility-related headers to all responses
     this.addAccessibilityHeaders(res);
-    
+
     // Check for accessibility preferences in request headers
     this.processAccessibilityPreferences(req, res);
-    
+
     next();
   }
 
   private addAccessibilityHeaders(res: Response): void {
     const accessibilityHeaders: AccessibilityHeaders = {
-      'X-Accessibility-Features': 'keyboard-navigation,screen-reader,high-contrast,reduced-motion,captions',
+      'X-Accessibility-Features':
+        'keyboard-navigation,screen-reader,high-contrast,reduced-motion,captions',
       'X-Screen-Reader-Optimized': 'true',
       'X-High-Contrast-Available': 'true',
       'X-Keyboard-Navigation': 'true',
-      'X-Reduced-Motion': 'supported'
+      'X-Reduced-Motion': 'supported',
     };
 
     Object.entries(accessibilityHeaders).forEach(([key, value]) => {
@@ -35,8 +36,9 @@ export class AccessibilityMiddleware implements NestMiddleware {
     });
 
     // Add CORS headers for accessibility tools
-    res.setHeader('Access-Control-Expose-Headers', 
-      'X-Accessibility-Features,X-Screen-Reader-Optimized,X-High-Contrast-Available'
+    res.setHeader(
+      'Access-Control-Expose-Headers',
+      'X-Accessibility-Features,X-Screen-Reader-Optimized,X-High-Contrast-Available',
     );
   }
 
@@ -81,10 +83,10 @@ export class AccessibilityMiddleware implements NestMiddleware {
       /Orca/i,
       /Dragon/i,
       /ZoomText/i,
-      /MAGic/i
+      /MAGic/i,
     ];
 
-    return screenReaderPatterns.some(pattern => pattern.test(userAgent));
+    return screenReaderPatterns.some((pattern) => pattern.test(userAgent));
   }
 
   private isRightToLeftLanguage(acceptLanguage: string): boolean {
@@ -106,13 +108,13 @@ export class AccessibilityResponseInterceptor implements NestInterceptor {
     const response = context.switchToHttp().getResponse();
 
     return next.handle().pipe(
-      map(data => {
+      map((data) => {
         // Add accessibility metadata to API responses
         if (data && typeof data === 'object') {
           return this.enhanceResponseWithAccessibilityData(data, request);
         }
         return data;
-      })
+      }),
     );
   }
 
@@ -126,7 +128,7 @@ export class AccessibilityResponseInterceptor implements NestInterceptor {
         screenReaderOptimized: true,
         structuredContent: true,
         alternativeFormats: ['audio', 'braille'],
-        keyboardShortcuts: this.getKeyboardShortcuts(request.path)
+        keyboardShortcuts: this.getKeyboardShortcuts(request.path),
       };
     }
 
@@ -137,7 +139,7 @@ export class AccessibilityResponseInterceptor implements NestInterceptor {
         currentPage: data.pagination.page,
         totalPages: data.pagination.totalPages,
         itemsPerPage: data.pagination.limit,
-        navigationInstructions: 'Use arrow keys or page numbers to navigate'
+        navigationInstructions: 'Use arrow keys or page numbers to navigate',
       };
     }
 
@@ -146,7 +148,7 @@ export class AccessibilityResponseInterceptor implements NestInterceptor {
       enhancedData._formAccessibility = {
         requiredFields: this.getRequiredFields(data),
         validationRules: this.getValidationRules(data),
-        keyboardInstructions: 'Use Tab to navigate between fields, Enter to submit'
+        keyboardInstructions: 'Use Tab to navigate between fields, Enter to submit',
       };
     }
 
@@ -156,19 +158,25 @@ export class AccessibilityResponseInterceptor implements NestInterceptor {
   private isScreenReaderRequest(request: any): boolean {
     const userAgent = request.get('User-Agent') || '';
     const acceptHeader = request.get('Accept') || '';
-    
-    return userAgent.includes('NVDA') || 
-           userAgent.includes('JAWS') || 
-           userAgent.includes('VoiceOver') ||
-           acceptHeader.includes('application/vnd.accessibility+json');
+
+    return (
+      userAgent.includes('NVDA') ||
+      userAgent.includes('JAWS') ||
+      userAgent.includes('VoiceOver') ||
+      acceptHeader.includes('application/vnd.accessibility+json')
+    );
   }
 
   private getKeyboardShortcuts(path: string): string[] {
     const shortcuts: { [key: string]: string[] } = {
-      '/courses': ['Tab: Navigate courses', 'Enter: View course details', 'Space: Enroll in course'],
+      '/courses': [
+        'Tab: Navigate courses',
+        'Enter: View course details',
+        'Space: Enroll in course',
+      ],
       '/lessons': ['Tab: Navigate lessons', 'Enter: Start lesson', 'Arrow keys: Navigate content'],
       '/forum': ['Tab: Navigate posts', 'Enter: View post', 'R: Reply to post'],
-      '/profile': ['Tab: Navigate settings', 'Enter: Edit field', 'Escape: Cancel editing']
+      '/profile': ['Tab: Navigate settings', 'Enter: Edit field', 'Escape: Cancel editing'],
     };
 
     return shortcuts[path] || ['Tab: Navigate', 'Enter: Activate', 'Escape: Cancel'];
@@ -177,9 +185,7 @@ export class AccessibilityResponseInterceptor implements NestInterceptor {
   private getRequiredFields(data: any): string[] {
     // Extract required field information from form data
     if (data.fields) {
-      return data.fields
-        .filter((field: any) => field.required)
-        .map((field: any) => field.name);
+      return data.fields.filter((field: any) => field.required).map((field: any) => field.name);
     }
     return [];
   }
@@ -187,7 +193,7 @@ export class AccessibilityResponseInterceptor implements NestInterceptor {
   private getValidationRules(data: any): { [key: string]: string } {
     // Extract validation rules for accessibility announcements
     const rules: { [key: string]: string } = {};
-    
+
     if (data.fields) {
       data.fields.forEach((field: any) => {
         if (field.validation) {
@@ -195,7 +201,7 @@ export class AccessibilityResponseInterceptor implements NestInterceptor {
         }
       });
     }
-    
+
     return rules;
   }
 }
@@ -214,7 +220,7 @@ export interface AccessibilityOptions {
   description?: string;
 }
 
-export const Accessible = (options: AccessibilityOptions) => 
+export const Accessible = (options: AccessibilityOptions) =>
   SetMetadata(ACCESSIBILITY_KEY, options);
 
 // Usage example:

@@ -23,8 +23,6 @@ export class ArchiveService {
     @InjectRepository(ArchivedUserProfile)
     private archivedProfileRepo: Repository<ArchivedUserProfile>,
 
-    
-
     @InjectRepository(ArchivedPayment)
     private archivedPaymentRepo: Repository<ArchivedPayment>,
 

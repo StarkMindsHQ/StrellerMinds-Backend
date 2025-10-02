@@ -6,20 +6,39 @@
  * All fields are documented for OpenAPI/Swagger UI.
  */
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Min, MaxLength, IsArray, ArrayMinSize, IsEnum } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+  MaxLength,
+  IsArray,
+  ArrayMinSize,
+  IsEnum,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from '../../users/entities/user.entity';
 import { CreateCourseModuleDto } from './create.course.moduledto';
 import { SubscriptionPlan } from '../../payment/entities/subscription.entity';
 
 export class CreateCourseDto {
-  @ApiProperty({ example: 'Introduction to Blockchain', maxLength: 255, description: 'Course title' })
+  @ApiProperty({
+    example: 'Introduction to Blockchain',
+    maxLength: 255,
+    description: 'Course title',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   title: string;
 
-  @ApiProperty({ example: 'Learn the basics of blockchain technology.', description: 'Course description' })
+  @ApiProperty({
+    example: 'Learn the basics of blockchain technology.',
+    description: 'Course description',
+  })
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -30,18 +49,28 @@ export class CreateCourseDto {
   @IsOptional()
   price?: number;
 
-  @ApiPropertyOptional({ example: 10, minimum: 0, description: 'Course duration in hours (optional)' })
+  @ApiPropertyOptional({
+    example: 10,
+    minimum: 0,
+    description: 'Course duration in hours (optional)',
+  })
   @IsNumber()
   @Min(0)
   @IsOptional()
   durationInHours?: number;
 
-  @ApiPropertyOptional({ example: 'draft', description: 'Course status (draft, published, archived)' })
+  @ApiPropertyOptional({
+    example: 'draft',
+    description: 'Course status (draft, published, archived)',
+  })
   @IsString()
   @IsOptional()
   status?: string;
 
-  @ApiPropertyOptional({ example: 'https://cdn.com/thumbnail.jpg', description: 'Course thumbnail URL (optional)' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.com/thumbnail.jpg',
+    description: 'Course thumbnail URL (optional)',
+  })
   @IsString()
   @IsOptional()
   thumbnail?: string;
@@ -51,7 +80,10 @@ export class CreateCourseDto {
   @IsBoolean()
   isPremium?: boolean;
 
-  @ApiPropertyOptional({ enum: SubscriptionPlan, description: 'Minimum subscription plan required' })
+  @ApiPropertyOptional({
+    enum: SubscriptionPlan,
+    description: 'Minimum subscription plan required',
+  })
   @IsOptional()
   @IsEnum(SubscriptionPlan)
   requiredPlan?: SubscriptionPlan;
@@ -69,7 +101,7 @@ export class CreateCourseDto {
   @ApiPropertyOptional({
     type: [String],
     description: 'Array of tag IDs (optional)',
-    example: ['uuid-tag-1', 'uuid-tag-2']
+    example: ['uuid-tag-1', 'uuid-tag-2'],
   })
   @IsOptional()
   @IsArray()
@@ -79,7 +111,7 @@ export class CreateCourseDto {
 
   @ApiPropertyOptional({
     type: [CreateCourseModuleDto],
-    description: 'Array of course modules (optional)'
+    description: 'Array of course modules (optional)',
   })
   @IsOptional()
   @IsArray()

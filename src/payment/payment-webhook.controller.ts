@@ -97,10 +97,7 @@ export class PaymentWebhookController {
    */
   private async handlePaymentIntentSucceeded(paymentIntent: any): Promise<void> {
     try {
-      await this.paymentService.updatePaymentFromWebhook(
-        paymentIntent.id,
-        PaymentStatus.COMPLETED,
-      );
+      await this.paymentService.updatePaymentFromWebhook(paymentIntent.id, PaymentStatus.COMPLETED);
       this.logger.log(`Payment intent succeeded: ${paymentIntent.id}`);
     } catch (error) {
       this.logger.error('Failed to handle payment intent succeeded', error);
@@ -112,10 +109,7 @@ export class PaymentWebhookController {
    */
   private async handlePaymentIntentFailed(paymentIntent: any): Promise<void> {
     try {
-      await this.paymentService.updatePaymentFromWebhook(
-        paymentIntent.id,
-        PaymentStatus.FAILED,
-      );
+      await this.paymentService.updatePaymentFromWebhook(paymentIntent.id, PaymentStatus.FAILED);
       this.logger.log(`Payment intent failed: ${paymentIntent.id}`);
     } catch (error) {
       this.logger.error('Failed to handle payment intent failed', error);
@@ -127,10 +121,7 @@ export class PaymentWebhookController {
    */
   private async handleInvoicePaymentSucceeded(invoice: any): Promise<void> {
     try {
-      await this.invoiceService.updateInvoiceFromWebhook(
-        invoice.id,
-        InvoiceStatus.PAID,
-      );
+      await this.invoiceService.updateInvoiceFromWebhook(invoice.id, InvoiceStatus.PAID);
       this.logger.log(`Invoice payment succeeded: ${invoice.id}`);
     } catch (error) {
       this.logger.error('Failed to handle invoice payment succeeded', error);
@@ -142,10 +133,7 @@ export class PaymentWebhookController {
    */
   private async handleInvoicePaymentFailed(invoice: any): Promise<void> {
     try {
-      await this.invoiceService.updateInvoiceFromWebhook(
-        invoice.id,
-        InvoiceStatus.OPEN,
-      );
+      await this.invoiceService.updateInvoiceFromWebhook(invoice.id, InvoiceStatus.OPEN);
       this.logger.log(`Invoice payment failed: ${invoice.id}`);
     } catch (error) {
       this.logger.error('Failed to handle invoice payment failed', error);
@@ -170,10 +158,7 @@ export class PaymentWebhookController {
   private async handleSubscriptionUpdated(subscription: any): Promise<void> {
     try {
       const status = this.mapStripeSubscriptionStatus(subscription.status);
-      await this.subscriptionService.updateSubscriptionFromWebhook(
-        subscription.id,
-        status,
-      );
+      await this.subscriptionService.updateSubscriptionFromWebhook(subscription.id, status);
       this.logger.log(`Subscription updated: ${subscription.id} - Status: ${status}`);
     } catch (error) {
       this.logger.error('Failed to handle subscription updated', error);
@@ -211,10 +196,7 @@ export class PaymentWebhookController {
    */
   private async handleInvoicePaid(invoice: any): Promise<void> {
     try {
-      await this.invoiceService.updateInvoiceFromWebhook(
-        invoice.id,
-        InvoiceStatus.PAID,
-      );
+      await this.invoiceService.updateInvoiceFromWebhook(invoice.id, InvoiceStatus.PAID);
       this.logger.log(`Invoice paid: ${invoice.id}`);
     } catch (error) {
       this.logger.error('Failed to handle invoice paid', error);
@@ -240,4 +222,4 @@ export class PaymentWebhookController {
         return SubscriptionStatus.INACTIVE;
     }
   }
-} 
+}

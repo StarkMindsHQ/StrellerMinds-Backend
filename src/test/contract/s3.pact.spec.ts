@@ -24,7 +24,10 @@ describe('S3 Pact', () => {
     );
 
     it('uploads successfully', async () => {
-      const res = await axios.put(`${provider.mockService.baseUrl}/my-bucket/my-object.txt`, 'Hello world');
+      const res = await axios.put(
+        `${provider.mockService.baseUrl}/my-bucket/my-object.txt`,
+        'Hello world',
+      );
       expect(res.status).toBe(200);
     });
   });

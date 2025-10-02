@@ -14,24 +14,16 @@ import {
 import { CredentialService } from './credential.service';
 import { CredentialHistoryQueryDto } from './dto/credential-history-query.dto';
 import { CredentialHistoryResponseDto } from './dto/credential-history-response.dto';
-import {
-  ApiBearerAuth,
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 /**
  * Custom decorator to extract the user object from the request.
  */
-export const User = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user;
-  },
-);
+export const User = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest();
+  return request.user;
+});
 
 @ApiTags('credentials')
 @Controller('credentials')

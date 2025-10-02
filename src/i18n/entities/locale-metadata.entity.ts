@@ -1,80 +1,87 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
 export enum LocaleStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  BETA = "beta",
-  DEPRECATED = "deprecated",
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  BETA = 'beta',
+  DEPRECATED = 'deprecated',
 }
 
-@Entity("locale_metadata")
-@Index(["code"])
-@Index(["status"])
+@Entity('locale_metadata')
+@Index(['code'])
+@Index(['status'])
 export class LocaleMetadata {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ unique: true })
-  code: string
+  code: string;
 
   @Column()
-  name: string
+  name: string;
 
   @Column()
-  nativeName: string
+  nativeName: string;
 
   @Column()
-  englishName: string
+  englishName: string;
 
   @Column({ length: 2 })
-  languageCode: string
+  languageCode: string;
 
   @Column({ length: 2, nullable: true })
-  countryCode?: string
+  countryCode?: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: LocaleStatus,
     default: LocaleStatus.ACTIVE,
   })
-  status: LocaleStatus
+  status: LocaleStatus;
 
   @Column({ default: false })
-  isRtl: boolean
+  isRtl: boolean;
 
-  @Column("jsonb")
+  @Column('jsonb')
   formatting: {
-    dateFormat: string
-    timeFormat: string
+    dateFormat: string;
+    timeFormat: string;
     numberFormat: {
-      decimal: string
-      thousands: string
-      currency: string
-    }
-    pluralRules: string[]
-  }
+      decimal: string;
+      thousands: string;
+      currency: string;
+    };
+    pluralRules: string[];
+  };
 
-  @Column("simple-array", { nullable: true })
-  fallbackLocales?: string[]
-
-  @Column({ default: 0 })
-  completionPercentage: number
+  @Column('simple-array', { nullable: true })
+  fallbackLocales?: string[];
 
   @Column({ default: 0 })
-  priority: number
+  completionPercentage: number;
 
-  @Column("jsonb", { nullable: true })
+  @Column({ default: 0 })
+  priority: number;
+
+  @Column('jsonb', { nullable: true })
   metadata?: {
-    translators?: string[]
-    reviewers?: string[]
-    lastSyncAt?: string
-    tmsProjectId?: string
-    notes?: string
-  }
+    translators?: string[];
+    reviewers?: string[];
+    lastSyncAt?: string;
+    tmsProjectId?: string;
+    notes?: string;
+  };
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

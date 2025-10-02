@@ -1,11 +1,11 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable } from '@nestjs/common';
 
 /**
  * Simple in-memory cache service for storing key-value pairs with optional TTL.
  */
 @Injectable()
 export class CacheService {
-  private cache: Map<string, { value: any; expiry: number }> = new Map()
+  private cache: Map<string, { value: any; expiry: number }> = new Map();
 
   /**
    * Get a value from the cache by key.
@@ -13,19 +13,19 @@ export class CacheService {
    * @returns The cached value or null if not found/expired
    */
   async get<T>(key: string): Promise<T | null> {
-    const item = this.cache.get(key)
+    const item = this.cache.get(key);
 
     if (!item) {
-      return null
+      return null;
     }
 
     // Check if item has expired
     if (item.expiry && item.expiry < Date.now()) {
-      this.cache.delete(key)
-      return null
+      this.cache.delete(key);
+      return null;
     }
 
-    return item.value as T
+    return item.value as T;
   }
 
   /**
@@ -35,8 +35,8 @@ export class CacheService {
    * @param ttlSeconds Time to live in seconds
    */
   async set(key: string, value: any, ttlSeconds?: number): Promise<void> {
-    const expiry = ttlSeconds ? Date.now() + ttlSeconds * 1000 : null
-    this.cache.set(key, { value, expiry })
+    const expiry = ttlSeconds ? Date.now() + ttlSeconds * 1000 : null;
+    this.cache.set(key, { value, expiry });
   }
 
   /**
@@ -44,14 +44,14 @@ export class CacheService {
    * @param key Cache key
    */
   async delete(key: string): Promise<void> {
-    this.cache.delete(key)
+    this.cache.delete(key);
   }
 
   /**
    * Clear the entire cache.
    */
   async clear(): Promise<void> {
-    this.cache.clear()
+    this.cache.clear();
   }
 
   /**
@@ -60,7 +60,7 @@ export class CacheService {
    * @returns Array of matching keys
    */
   async keys(pattern: string): Promise<string[]> {
-    const regex = new RegExp(pattern.replace("*", ".*"))
-    return Array.from(this.cache.keys()).filter((key) => regex.test(key))
+    const regex = new RegExp(pattern.replace('*', '.*'));
+    return Array.from(this.cache.keys()).filter((key) => regex.test(key));
   }
 }

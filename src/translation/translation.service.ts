@@ -21,7 +21,9 @@ export class TranslationService {
   }
 
   async createTranslation(dto: CreateTranslationDto) {
-    const exists = await this.translationRepo.findOne({ where: { key: dto.key, language: dto.language } });
+    const exists = await this.translationRepo.findOne({
+      where: { key: dto.key, language: dto.language },
+    });
     if (exists) return exists;
 
     const newTranslation = this.translationRepo.create(dto);
@@ -33,10 +35,13 @@ export class TranslationService {
       where: keys.map((key) => ({ key, language })),
     });
 
-    return keys.reduce((map, key) => {
-      const found = translations.find(t => t.key === key);
-      map[key] = found ? found.value : key; // fallback to key
-      return map;
-    }, {} as Record<string, string>);
+    return keys.reduce(
+      (map, key) => {
+        const found = translations.find((t) => t.key === key);
+        map[key] = found ? found.value : key; // fallback to key
+        return map;
+      },
+      {} as Record<string, string>,
+    );
   }
 }

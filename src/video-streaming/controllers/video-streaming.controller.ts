@@ -46,10 +46,7 @@ export class VideoStreamingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new video' })
   @ApiResponse({ status: 201, description: 'Video created successfully', type: Video })
-  async createVideo(
-    @Body() createVideoDto: CreateVideoDto,
-    @GetUser() user: User,
-  ) {
+  async createVideo(@Body() createVideoDto: CreateVideoDto, @GetUser() user: User) {
     return this.videoStreamingService.createVideo(createVideoDto, user);
   }
 
@@ -62,10 +59,7 @@ export class VideoStreamingController {
   @ApiParam({ name: 'id', description: 'Video ID' })
   @ApiResponse({ status: 200, description: 'Video uploaded successfully' })
   @ApiResponse({ status: 429, description: 'Too many video upload attempts' })
-  async uploadVideo(
-    @Param('id') videoId: string,
-    @Req() req: FastifyRequest,
-  ) {
+  async uploadVideo(@Param('id') videoId: string, @Req() req: FastifyRequest) {
     const part = await (req as any).file();
     if (!part) {
       throw new BadRequestException('Video file is required');
@@ -95,10 +89,7 @@ export class VideoStreamingController {
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ) {
-    return this.videoStreamingService.findVideos(
-      { status, visibility, search },
-      { page, limit },
-    );
+    return this.videoStreamingService.findVideos({ status, visibility, search }, { page, limit });
   }
 
   @Get(':id')
@@ -126,11 +117,7 @@ export class VideoStreamingController {
       country: request?.get('CF-IPCountry'), // CloudFlare country header
     };
 
-    return this.videoStreamingService.getVideoStreamingInfo(
-      videoId,
-      user?.id,
-      requestInfo,
-    );
+    return this.videoStreamingService.getVideoStreamingInfo(videoId, user?.id, requestInfo);
   }
 
   @Put(':id')
@@ -153,10 +140,7 @@ export class VideoStreamingController {
   @ApiOperation({ summary: 'Delete video' })
   @ApiParam({ name: 'id', description: 'Video ID' })
   @ApiResponse({ status: 200, description: 'Video deleted successfully' })
-  async deleteVideo(
-    @Param('id') videoId: string,
-    @GetUser() user: User,
-  ) {
+  async deleteVideo(@Param('id') videoId: string, @GetUser() user: User) {
     await this.videoStreamingService.deleteVideo(videoId, user.id);
     return { message: 'Video deleted successfully' };
   }
@@ -167,10 +151,7 @@ export class VideoStreamingController {
   @ApiOperation({ summary: 'Get video analytics' })
   @ApiParam({ name: 'id', description: 'Video ID' })
   @ApiResponse({ status: 200, description: 'Analytics retrieved successfully' })
-  async getVideoAnalytics(
-    @Param('id') videoId: string,
-    @GetUser() user: User,
-  ) {
+  async getVideoAnalytics(@Param('id') videoId: string, @GetUser() user: User) {
     return this.videoStreamingService.getVideoAnalytics(videoId, user.id);
   }
 
@@ -261,11 +242,11 @@ export class VideoStreamingController {
   @ApiResponse({ status: 200, description: 'Video qualities retrieved successfully' })
   async getVideoQualities(@Param('id') videoId: string) {
     const video = await this.videoStreamingService.findVideoById(videoId, ['qualityVariants']);
-    
+
     return {
       qualities: video.qualityVariants
-        .filter(q => q.status === 'completed')
-        .map(q => ({
+        .filter((q) => q.status === 'completed')
+        .map((q) => ({
           quality: q.quality,
           resolution: `${q.width}x${q.height}`,
           bitrate: q.bitrate,

@@ -1,7 +1,12 @@
 import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SubscriptionEntity, SubscriptionStatus, SubscriptionPlan, BillingCycle } from './entities/subscription.entity';
+import {
+  SubscriptionEntity,
+  SubscriptionStatus,
+  SubscriptionPlan,
+  BillingCycle,
+} from './entities/subscription.entity';
 import { StripeService } from './stripe.service';
 import { PaymentService } from './payment.service';
 import { InvoiceService } from './invoice.service';
@@ -117,11 +122,11 @@ export class SubscriptionService {
         currency: data.currency,
         currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
         currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
-        trialStart: stripeSubscription.trial_start 
-          ? new Date(stripeSubscription.trial_start * 1000) 
+        trialStart: stripeSubscription.trial_start
+          ? new Date(stripeSubscription.trial_start * 1000)
           : undefined,
-        trialEnd: stripeSubscription.trial_end 
-          ? new Date(stripeSubscription.trial_end * 1000) 
+        trialEnd: stripeSubscription.trial_end
+          ? new Date(stripeSubscription.trial_end * 1000)
           : undefined,
         features: this.getPlanFeatures(data.plan),
         metadata: data.metadata,
@@ -176,7 +181,7 @@ export class SubscriptionService {
    */
   async getActiveSubscriptionByUserId(userId: string): Promise<SubscriptionEntity | null> {
     return this.subscriptionRepository.findOne({
-      where: { 
+      where: {
         userId,
         status: SubscriptionStatus.ACTIVE,
       },
@@ -240,7 +245,9 @@ export class SubscriptionService {
       const subscription = await this.getSubscriptionById(data.subscriptionId);
 
       // Update subscription in Stripe
-      const stripeSubscription = await this.stripeService.getSubscription(subscription.stripeSubscriptionId);
+      const stripeSubscription = await this.stripeService.getSubscription(
+        subscription.stripeSubscriptionId,
+      );
 
       // Update local subscription record
       if (data.plan) subscription.plan = data.plan;
@@ -275,7 +282,9 @@ export class SubscriptionService {
       }
 
       // Reactivate subscription in Stripe
-      const stripeSubscription = await this.stripeService.getSubscription(subscription.stripeSubscriptionId);
+      const stripeSubscription = await this.stripeService.getSubscription(
+        subscription.stripeSubscriptionId,
+      );
 
       // Update subscription record
       subscription.status = SubscriptionStatus.ACTIVE;
@@ -362,10 +371,13 @@ export class SubscriptionService {
   /**
    * Get or create Stripe customer
    */
-  private async getOrCreateStripeCustomer(userId: string, customerData: {
-    email?: string;
-    name?: string;
-  }): Promise<any> {
+  private async getOrCreateStripeCustomer(
+    userId: string,
+    customerData: {
+      email?: string;
+      name?: string;
+    },
+  ): Promise<any> {
     // In a real implementation, you would check if the user already has a Stripe customer ID
     // For now, we'll create a new customer
     return this.stripeService.createCustomer({
@@ -456,4 +468,4 @@ export class SubscriptionService {
 
     return features[plan] || features[SubscriptionPlan.BASIC];
   }
-} 
+}

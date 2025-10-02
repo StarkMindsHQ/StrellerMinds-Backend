@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { parse } from 'json2csv'; 
+import { parse } from 'json2csv';
 import { Analytics } from './entities/analytics.entity';
 
 /**

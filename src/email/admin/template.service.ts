@@ -46,10 +46,7 @@ export class EmailTemplateService {
     return this.emailTemplateRepository.save(template);
   }
 
-  async update(
-    id: string,
-    updateTemplateDto: UpdateTemplateDto,
-  ): Promise<EmailTemplate> {
+  async update(id: string, updateTemplateDto: UpdateTemplateDto): Promise<EmailTemplate> {
     const template = await this.findOne(id);
 
     // Update the template properties

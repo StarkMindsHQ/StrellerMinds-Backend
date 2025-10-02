@@ -62,13 +62,17 @@ export class PaymentAnalyticsService {
    */
   async trackPayment(payment: PaymentEntity): Promise<void> {
     try {
-      this.logger.log(`Tracking payment: ${payment.id} - Amount: ${payment.amount} ${payment.currency}`);
-      
+      this.logger.log(
+        `Tracking payment: ${payment.id} - Amount: ${payment.amount} ${payment.currency}`,
+      );
+
       // In a real implementation, you might want to store analytics data in a separate table
       // or send it to an analytics service like Google Analytics, Mixpanel, etc.
-      
+
       // For now, we'll just log the payment for tracking
-      this.logger.log(`Payment tracked: ${payment.id} - Status: ${payment.status} - Type: ${payment.type}`);
+      this.logger.log(
+        `Payment tracked: ${payment.id} - Status: ${payment.status} - Type: ${payment.type}`,
+      );
     } catch (error) {
       this.logger.error('Failed to track payment', error);
     }
@@ -114,11 +118,7 @@ export class PaymentAnalyticsService {
     // Get revenue by payment type
     const revenueByType = await this.paymentRepository
       .createQueryBuilder('payment')
-      .select([
-        'payment.type',
-        'SUM(payment.amount) as revenue',
-        'COUNT(*) as payments',
-      ])
+      .select(['payment.type', 'SUM(payment.amount) as revenue', 'COUNT(*) as payments'])
       .where('payment.createdAt >= :startDate', { startDate })
       .andWhere('payment.status = :status', { status: PaymentStatus.COMPLETED })
       .groupBy('payment.type')
@@ -146,17 +146,17 @@ export class PaymentAnalyticsService {
       successfulPayments: parseInt(totalStats.successfulPayments) || 0,
       failedPayments: parseInt(totalStats.failedPayments) || 0,
       averagePaymentAmount: parseFloat(totalStats.averagePaymentAmount) || 0,
-      revenueByPeriod: revenueByPeriod.map(item => ({
+      revenueByPeriod: revenueByPeriod.map((item) => ({
         period: item.period,
         revenue: parseFloat(item.revenue) || 0,
         payments: parseInt(item.payments) || 0,
       })),
-      revenueByType: revenueByType.map(item => ({
+      revenueByType: revenueByType.map((item) => ({
         type: item.type as PaymentType,
         revenue: parseFloat(item.revenue) || 0,
         payments: parseInt(item.payments) || 0,
       })),
-      topPerformingProducts: topPerformingProducts.map(item => ({
+      topPerformingProducts: topPerformingProducts.map((item) => ({
         productId: item.productId,
         revenue: parseFloat(item.revenue) || 0,
         sales: parseInt(item.sales) || 0,
@@ -171,22 +171,14 @@ export class PaymentAnalyticsService {
     // Get subscription counts by status
     const subscriptionStats = await this.subscriptionRepository
       .createQueryBuilder('subscription')
-      .select([
-        'subscription.status',
-        'COUNT(*) as count',
-        'SUM(subscription.amount) as revenue',
-      ])
+      .select(['subscription.status', 'COUNT(*) as count', 'SUM(subscription.amount) as revenue'])
       .groupBy('subscription.status')
       .getRawMany();
 
     // Get subscriptions by plan
     const subscriptionsByPlan = await this.subscriptionRepository
       .createQueryBuilder('subscription')
-      .select([
-        'subscription.plan',
-        'COUNT(*) as count',
-        'SUM(subscription.amount) as revenue',
-      ])
+      .select(['subscription.plan', 'COUNT(*) as count', 'SUM(subscription.amount) as revenue'])
       .where('subscription.status = :status', { status: SubscriptionStatus.ACTIVE })
       .groupBy('subscription.plan')
       .getRawMany();
@@ -228,26 +220,42 @@ export class PaymentAnalyticsService {
     }
 
     // Calculate churn rate (simplified)
-    const totalSubscriptions = subscriptionStats.reduce((sum, stat) => sum + parseInt(stat.count), 0);
-    const cancelledSubscriptions = subscriptionStats.find(stat => stat.status === SubscriptionStatus.CANCELLED);
-    const churnRate = totalSubscriptions > 0 
-      ? (parseInt(cancelledSubscriptions?.count || '0') / totalSubscriptions) * 100 
-      : 0;
+    const totalSubscriptions = subscriptionStats.reduce(
+      (sum, stat) => sum + parseInt(stat.count),
+      0,
+    );
+    const cancelledSubscriptions = subscriptionStats.find(
+      (stat) => stat.status === SubscriptionStatus.CANCELLED,
+    );
+    const churnRate =
+      totalSubscriptions > 0
+        ? (parseInt(cancelledSubscriptions?.count || '0') / totalSubscriptions) * 100
+        : 0;
 
     // Calculate average subscription value
-    const totalRevenue = subscriptionStats.reduce((sum, stat) => sum + parseFloat(stat.revenue || '0'), 0);
+    const totalRevenue = subscriptionStats.reduce(
+      (sum, stat) => sum + parseFloat(stat.revenue || '0'),
+      0,
+    );
     const averageSubscriptionValue = totalSubscriptions > 0 ? totalRevenue / totalSubscriptions : 0;
 
     return {
       totalSubscriptions,
-      activeSubscriptions: parseInt(subscriptionStats.find(stat => stat.status === SubscriptionStatus.ACTIVE)?.count || '0'),
-      cancelledSubscriptions: parseInt(subscriptionStats.find(stat => stat.status === SubscriptionStatus.CANCELLED)?.count || '0'),
-      trialSubscriptions: parseInt(subscriptionStats.find(stat => stat.status === SubscriptionStatus.TRIAL)?.count || '0'),
+      activeSubscriptions: parseInt(
+        subscriptionStats.find((stat) => stat.status === SubscriptionStatus.ACTIVE)?.count || '0',
+      ),
+      cancelledSubscriptions: parseInt(
+        subscriptionStats.find((stat) => stat.status === SubscriptionStatus.CANCELLED)?.count ||
+          '0',
+      ),
+      trialSubscriptions: parseInt(
+        subscriptionStats.find((stat) => stat.status === SubscriptionStatus.TRIAL)?.count || '0',
+      ),
       monthlyRecurringRevenue,
       annualRecurringRevenue,
       churnRate,
       averageSubscriptionValue,
-      subscriptionsByPlan: subscriptionsByPlan.map(item => ({
+      subscriptionsByPlan: subscriptionsByPlan.map((item) => ({
         plan: item.plan,
         count: parseInt(item.count) || 0,
         revenue: parseFloat(item.revenue) || 0,
@@ -278,11 +286,18 @@ export class PaymentAnalyticsService {
 
     return {
       totalInvoices: invoiceStats.reduce((sum, stat) => sum + parseInt(stat.count), 0),
-      paidInvoices: parseInt(invoiceStats.find(stat => stat.status === InvoiceStatus.PAID)?.count || '0'),
+      paidInvoices: parseInt(
+        invoiceStats.find((stat) => stat.status === InvoiceStatus.PAID)?.count || '0',
+      ),
       overdueInvoices: overdueInvoices.length,
-      totalInvoiceAmount: invoiceStats.reduce((sum, stat) => sum + parseFloat(stat.totalAmount || '0'), 0),
-      averageInvoiceAmount: invoiceStats.reduce((sum, stat) => sum + parseFloat(stat.averageAmount || '0'), 0) / invoiceStats.length,
-      invoiceStats: invoiceStats.map(stat => ({
+      totalInvoiceAmount: invoiceStats.reduce(
+        (sum, stat) => sum + parseFloat(stat.totalAmount || '0'),
+        0,
+      ),
+      averageInvoiceAmount:
+        invoiceStats.reduce((sum, stat) => sum + parseFloat(stat.averageAmount || '0'), 0) /
+        invoiceStats.length,
+      invoiceStats: invoiceStats.map((stat) => ({
         status: stat.status,
         count: parseInt(stat.count) || 0,
         totalAmount: parseFloat(stat.totalAmount) || 0,
@@ -314,8 +329,11 @@ export class PaymentAnalyticsService {
     return {
       period: `${days} days`,
       totalRevenue: revenueTrends.reduce((sum, item) => sum + parseFloat(item.revenue || '0'), 0),
-      totalTransactions: revenueTrends.reduce((sum, item) => sum + parseInt(item.transactions || '0'), 0),
-      trends: revenueTrends.map(item => ({
+      totalTransactions: revenueTrends.reduce(
+        (sum, item) => sum + parseInt(item.transactions || '0'),
+        0,
+      ),
+      trends: revenueTrends.map((item) => ({
         date: item.date,
         revenue: parseFloat(item.revenue) || 0,
         transactions: parseInt(item.transactions) || 0,
@@ -342,14 +360,16 @@ export class PaymentAnalyticsService {
       .limit(100)
       .getRawMany();
 
-    const averageCustomerValue = customerStats.length > 0
-      ? customerStats.reduce((sum, customer) => sum + parseFloat(customer.totalSpent || '0'), 0) / customerStats.length
-      : 0;
+    const averageCustomerValue =
+      customerStats.length > 0
+        ? customerStats.reduce((sum, customer) => sum + parseFloat(customer.totalSpent || '0'), 0) /
+          customerStats.length
+        : 0;
 
     return {
       totalCustomers: customerStats.length,
       averageCustomerValue,
-      topCustomers: customerStats.slice(0, 10).map(customer => ({
+      topCustomers: customerStats.slice(0, 10).map((customer) => ({
         userId: customer.userId,
         totalPayments: parseInt(customer.totalPayments) || 0,
         totalSpent: parseFloat(customer.totalSpent) || 0,
@@ -363,7 +383,13 @@ export class PaymentAnalyticsService {
    * Get business intelligence dashboard data
    */
   async getBusinessIntelligence(): Promise<any> {
-    const [paymentAnalytics, subscriptionAnalytics, invoiceAnalytics, revenueTrends, customerAnalytics] = await Promise.all([
+    const [
+      paymentAnalytics,
+      subscriptionAnalytics,
+      invoiceAnalytics,
+      revenueTrends,
+      customerAnalytics,
+    ] = await Promise.all([
       this.getPaymentAnalytics(30),
       this.getSubscriptionAnalytics(),
       this.getInvoiceAnalytics(30),
@@ -398,4 +424,4 @@ export class PaymentAnalyticsService {
       .andWhere('invoice.status = :status', { status: InvoiceStatus.OPEN })
       .getMany();
   }
-} 
+}

@@ -20,21 +20,17 @@ describe('FeedbackController (e2e)', () => {
     await app.init();
 
     // Login as regular user
-    const userLoginResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        email: 'test@example.com',
-        password: 'password123',
-      });
+    const userLoginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+      email: 'test@example.com',
+      password: 'password123',
+    });
     authToken = userLoginResponse.body.access_token;
 
     // Login as admin
-    const adminLoginResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        email: 'admin@example.com',
-        password: 'admin123',
-      });
+    const adminLoginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+      email: 'admin@example.com',
+      password: 'admin123',
+    });
     adminToken = adminLoginResponse.body.access_token;
   });
 
@@ -191,4 +187,4 @@ describe('FeedbackController (e2e)', () => {
         .expect(403);
     });
   });
-}); 
+});

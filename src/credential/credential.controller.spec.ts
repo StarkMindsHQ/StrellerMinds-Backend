@@ -78,7 +78,9 @@ describe('CredentialController', () => {
 
       mockCredentialService.getUserCredentialHistory.mockRejectedValue(new Error('Database error'));
 
-      await expect(controller.getCredentialHistory(user, queryParams)).rejects.toThrow(HttpException);
+      await expect(controller.getCredentialHistory(user, queryParams)).rejects.toThrow(
+        HttpException,
+      );
     });
   });
 

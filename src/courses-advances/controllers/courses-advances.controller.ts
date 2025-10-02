@@ -19,9 +19,7 @@ import { Role } from 'src/role/roles.enum';
 
 @Controller('courses-advances')
 export class CoursesAdvancesController {
-  constructor(
-    private readonly coursesAdvancesService: CoursesAdvancesService,
-  ) {}
+  constructor(private readonly coursesAdvancesService: CoursesAdvancesService) {}
 
   @Post()
   @UseGuards(RolesGuard)
@@ -58,11 +56,7 @@ export class CoursesAdvancesController {
   @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.Instructor, Role.Admin)
-  update(
-    @Param('id') id: string,
-    @Body() updateCourseDto: UpdateCoursesAdvanceDto,
-    @Req() req,
-  ) {
+  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCoursesAdvanceDto, @Req() req) {
     return this.coursesAdvancesService.update(id, updateCourseDto, req.user.id);
   }
 

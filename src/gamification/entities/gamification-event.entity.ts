@@ -17,4 +17,4 @@ export class GamificationEvent {
 
   @CreateDateColumn()
   timestamp: Date;
-} 
+}

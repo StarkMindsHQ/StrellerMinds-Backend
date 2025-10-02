@@ -20,4 +20,4 @@ export class CreateNotificationSettingsDto {
   @IsOptional()
   @IsObject()
   rules?: Record<string, any>;
-} 
+}

@@ -39,18 +39,22 @@ export async function setupTracing() {
 
   const sdk = new NodeSDK({
     resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: process.env.OTEL_SERVICE_NAME || 'streller-minds-backend',
+      [SemanticResourceAttributes.SERVICE_NAME]:
+        process.env.OTEL_SERVICE_NAME || 'streller-minds-backend',
       ...(process.env.OTEL_RESOURCE_ATTRIBUTES
-        ? Object.fromEntries(process.env.OTEL_RESOURCE_ATTRIBUTES.split(',').map(p => p.split('=')))
+        ? Object.fromEntries(
+            process.env.OTEL_RESOURCE_ATTRIBUTES.split(',').map((p) => p.split('=')),
+          )
         : {}),
     }),
     traceExporter: getExporterByEnv(),
     instrumentations: [
-      new HttpInstrumentation(),      // captures http(s) - incoming & outgoing low-level
-      new ExpressInstrumentation(),   // captures express route names
-      new TypeORMInstrumentation({moduleVersionAttributeName: 'typeorm.version'}),
+      new HttpInstrumentation(), // captures http(s) - incoming & outgoing low-level
+      new ExpressInstrumentation(), // captures express route names
+      new TypeORMInstrumentation({ moduleVersionAttributeName: 'typeorm.version' }),
       new BullInstrumentation(),
-      new AxiosInstrumentation({ // Axios instrumentation automatically instruments axios requests
+      new AxiosInstrumentation({
+        // Axios instrumentation automatically instruments axios requests
         ignoreOutgoingUrls: [], // optionally list
       }),
     ],

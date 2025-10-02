@@ -13,10 +13,7 @@ export class BackupRetentionService {
 
   constructor(private readonly configService: ConfigService) {
     this.backupDir = this.configService.get<string>('BACKUP_DIR', './backups');
-    this.retentionDays = this.configService.get<number>(
-      'BACKUP_RETENTION_DAYS',
-      30,
-    );
+    this.retentionDays = this.configService.get<number>('BACKUP_RETENTION_DAYS', 30);
     this.monthlyRetentionMonths = this.configService.get<number>(
       'BACKUP_MONTHLY_RETENTION_MONTHS',
       12,
@@ -26,14 +23,10 @@ export class BackupRetentionService {
   async cleanupOldBackups(): Promise<void> {
     try {
       const files = await fs.readdir(this.backupDir);
-      const backupFiles = files.filter(
-        (file) => file.endsWith('.sql') || file.endsWith('.tar.gz'),
-      );
+      const backupFiles = files.filter((file) => file.endsWith('.sql') || file.endsWith('.tar.gz'));
 
       const now = new Date();
-      const cutoffDate = new Date(
-        now.getTime() - this.retentionDays * 24 * 60 * 60 * 1000,
-      );
+      const cutoffDate = new Date(now.getTime() - this.retentionDays * 24 * 60 * 60 * 1000);
       const monthlyCutoffDate = new Date(
         now.getTime() - this.monthlyRetentionMonths * 30 * 24 * 60 * 60 * 1000,
       );

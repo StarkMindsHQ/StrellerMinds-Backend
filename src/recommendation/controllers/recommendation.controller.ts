@@ -77,7 +77,7 @@ export class RecommendationController {
       const totalPages = Math.ceil(result.total / query.limit);
 
       return {
-        recommendations: result.recommendations.map(rec => this.mapToResponseDto(rec)),
+        recommendations: result.recommendations.map((rec) => this.mapToResponseDto(rec)),
         total: result.total,
         pagination: {
           page: Math.floor(query.offset / query.limit) + 1,
@@ -87,10 +87,7 @@ export class RecommendationController {
       };
     } catch (error) {
       this.logger.error(`Error getting recommendations for user ${user.id}:`, error);
-      throw new HttpException(
-        'Failed to get recommendations',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to get recommendations', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -130,7 +127,7 @@ export class RecommendationController {
       const generationTime = Date.now() - startTime;
 
       return {
-        recommendations: recommendations.map(rec => this.mapToResponseDto(rec)),
+        recommendations: recommendations.map((rec) => this.mapToResponseDto(rec)),
         generationTime,
       };
     } catch (error) {
@@ -163,8 +160,8 @@ export class RecommendationController {
         sortOrder: 'DESC',
       });
 
-      const recommendation = recommendations.recommendations.find(r => r.id === id);
-      
+      const recommendation = recommendations.recommendations.find((r) => r.id === id);
+
       if (!recommendation) {
         throw new HttpException('Recommendation not found', HttpStatus.NOT_FOUND);
       }
@@ -178,10 +175,7 @@ export class RecommendationController {
         throw error;
       }
       this.logger.error(`Error getting recommendation ${id}:`, error);
-      throw new HttpException(
-        'Failed to get recommendation',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to get recommendation', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -196,11 +190,7 @@ export class RecommendationController {
     @Body() body: { interactionType: 'view' | 'click' | 'dismiss'; metadata?: any },
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await this.recommendationService.recordInteraction(
-        id,
-        body.interactionType,
-        body.metadata,
-      );
+      await this.recommendationService.recordInteraction(id, body.interactionType, body.metadata);
 
       return {
         success: true,
@@ -208,10 +198,7 @@ export class RecommendationController {
       };
     } catch (error) {
       this.logger.error(`Error recording interaction for recommendation ${id}:`, error);
-      throw new HttpException(
-        'Failed to record interaction',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to record interaction', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -239,10 +226,7 @@ export class RecommendationController {
       };
     } catch (error) {
       this.logger.error(`Error recording feedback for recommendation ${id}:`, error);
-      throw new HttpException(
-        'Failed to record feedback',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to record feedback', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -264,10 +248,7 @@ export class RecommendationController {
       };
     } catch (error) {
       this.logger.error(`Error dismissing recommendation ${id}:`, error);
-      throw new HttpException(
-        'Failed to dismiss recommendation',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to dismiss recommendation', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -277,7 +258,11 @@ export class RecommendationController {
     status: 200,
     description: 'Returns user recommendation analytics',
   })
-  @ApiQuery({ name: 'days', required: false, description: 'Number of days to analyze (default: 30)' })
+  @ApiQuery({
+    name: 'days',
+    required: false,
+    description: 'Number of days to analyze (default: 30)',
+  })
   async getAnalyticsSummary(
     @GetUser() user: User,
     @Query('days') days: number = 30,
@@ -293,10 +278,7 @@ export class RecommendationController {
       return analytics;
     } catch (error) {
       this.logger.error(`Error getting analytics for user ${user.id}:`, error);
-      throw new HttpException(
-        'Failed to get analytics',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to get analytics', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -329,7 +311,7 @@ export class RecommendationController {
       });
 
       return {
-        recommendations: recommendations.map(rec => this.mapToResponseDto(rec)),
+        recommendations: recommendations.map((rec) => this.mapToResponseDto(rec)),
         baseCourse: {
           id: courseId,
           title: 'Course Title', // Would be fetched from course service
@@ -364,7 +346,10 @@ export class RecommendationController {
         );
         processed++;
       } catch (error) {
-        this.logger.error(`Error processing feedback for recommendation ${item.recommendationId}:`, error);
+        this.logger.error(
+          `Error processing feedback for recommendation ${item.recommendationId}:`,
+          error,
+        );
         failed++;
       }
     }
@@ -407,10 +392,7 @@ export class RecommendationController {
       };
     } catch (error) {
       this.logger.error('Error getting trending topics:', error);
-      throw new HttpException(
-        'Failed to get trending topics',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to get trending topics', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -421,18 +403,20 @@ export class RecommendationController {
     return {
       id: recommendation.id,
       courseId: recommendation.courseId,
-      course: recommendation.course ? {
-        id: recommendation.course.id,
-        title: recommendation.course.title,
-        description: recommendation.course.description,
-        difficulty: recommendation.course.difficulty,
-        duration: recommendation.course.duration,
-        rating: recommendation.course.rating,
-        tags: recommendation.course.tags,
-        skills: recommendation.course.skills,
-        instructor: recommendation.course.instructor,
-        thumbnailUrl: recommendation.course.thumbnailUrl,
-      } : undefined,
+      course: recommendation.course
+        ? {
+            id: recommendation.course.id,
+            title: recommendation.course.title,
+            description: recommendation.course.description,
+            difficulty: recommendation.course.difficulty,
+            duration: recommendation.course.duration,
+            rating: recommendation.course.rating,
+            tags: recommendation.course.tags,
+            skills: recommendation.course.skills,
+            instructor: recommendation.course.instructor,
+            thumbnailUrl: recommendation.course.thumbnailUrl,
+          }
+        : undefined,
       recommendationType: recommendation.recommendationType,
       reason: recommendation.reason,
       confidenceScore: recommendation.confidenceScore,

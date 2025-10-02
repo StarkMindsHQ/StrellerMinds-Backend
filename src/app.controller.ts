@@ -16,29 +16,16 @@ export class AppController {
   testError(@Param('type') type: string) {
     switch (type) {
       case 'not-found':
-        throw new CustomException(
-          ErrorCode.NOT_FOUND,
-          'Resource not found',
-          404
-        );
+        throw new CustomException(ErrorCode.NOT_FOUND, 'Resource not found', 404);
       case 'validation':
-        throw new CustomException(
-          ErrorCode.INVALID_INPUT,
-          'Validation failed',
-          400,
-          [
-            {
-              field: 'email',
-              message: 'Invalid email format'
-            }
-          ]
-        );
+        throw new CustomException(ErrorCode.INVALID_INPUT, 'Validation failed', 400, [
+          {
+            field: 'email',
+            message: 'Invalid email format',
+          },
+        ]);
       case 'unauthorized':
-        throw new CustomException(
-          ErrorCode.UNAUTHORIZED,
-          'Authentication required',
-          401
-        );
+        throw new CustomException(ErrorCode.UNAUTHORIZED, 'Authentication required', 401);
       default:
         return { message: 'Test endpoint working' };
     }

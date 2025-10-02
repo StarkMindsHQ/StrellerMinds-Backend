@@ -127,15 +127,15 @@ export class WinstonConfigService {
       formats.push(
         winston.format.printf(({ timestamp, level, message, metadata, stack }) => {
           let log = `${timestamp} [${level}] ${message}`;
-          
+
           if (metadata && Object.keys(metadata).length > 0) {
             log += ` ${JSON.stringify(metadata)}`;
           }
-          
+
           if (stack) {
             log += `\n${stack}`;
           }
-          
+
           return log;
         }),
       );
@@ -145,9 +145,6 @@ export class WinstonConfigService {
   }
 
   private getFileFormat(): winston.Logform.Format {
-    return winston.format.combine(
-      this.getBaseFormat(),
-      winston.format.json(),
-    );
+    return winston.format.combine(this.getBaseFormat(), winston.format.json());
   }
 }

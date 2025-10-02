@@ -48,8 +48,8 @@ export class HealthService {
       components.push(diskHealth);
 
       // Determine overall status
-      const hasDown = components.some(c => c.status === 'down');
-      const hasDegraded = components.some(c => c.status === 'degraded');
+      const hasDown = components.some((c) => c.status === 'down');
+      const hasDegraded = components.some((c) => c.status === 'degraded');
 
       let overallStatus: 'healthy' | 'unhealthy' | 'degraded';
       if (hasDown) {
@@ -147,7 +147,7 @@ export class HealthService {
     try {
       const fs = require('fs');
       const stats = fs.statSync('/');
-      
+
       return {
         name: 'disk',
         status: 'up',

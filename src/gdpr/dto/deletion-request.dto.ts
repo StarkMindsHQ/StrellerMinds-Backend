@@ -19,7 +19,11 @@ export class CreateDeletionRequestDto {
   dataTypes?: string[];
 
   /** Scheduled deletion date (optional) */
-  @ApiPropertyOptional({ description: 'Scheduled deletion date', type: String, format: 'date-time' })
+  @ApiPropertyOptional({
+    description: 'Scheduled deletion date',
+    type: String,
+    format: 'date-time',
+  })
   @IsOptional()
   @IsDateString()
   scheduledAt?: string;

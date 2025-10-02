@@ -3,11 +3,7 @@ import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import {
-  ConflictException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UserRole } from './enums/userRole.enum';
 import { AccountStatus } from './enums/accountStatus.enum';
 
@@ -124,44 +120,44 @@ describe('UsersService', () => {
   describe('Performance Tests', () => {
     it('should perform findAll with pagination efficiently', async () => {
       const startTime = Date.now();
-      
+
       repo.findAndCount.mockResolvedValue([[], 0]);
-      
+
       await service.findAll(1, 10);
-      
+
       const endTime = Date.now();
       const executionTime = endTime - startTime;
-      
+
       expect(executionTime).toBeLessThan(100);
     });
 
     it('should perform findOne with relations efficiently', async () => {
       const startTime = Date.now();
-      
+
       repo.findOne.mockResolvedValue(mockUser as User);
-      
+
       await service.findOne('test-id', ['profile', 'settings']);
-      
+
       const endTime = Date.now();
       const executionTime = endTime - startTime;
-      
+
       expect(executionTime).toBeLessThan(100);
     });
 
     it('should handle concurrent requests efficiently', async () => {
       const startTime = Date.now();
-      
+
       repo.findOne.mockResolvedValue(mockUser as User);
-      
-      const promises = Array(10).fill(null).map(() => 
-        service.findOne('test-id')
-      );
-      
+
+      const promises = Array(10)
+        .fill(null)
+        .map(() => service.findOne('test-id'));
+
       await Promise.all(promises);
-      
+
       const endTime = Date.now();
       const executionTime = endTime - startTime;
-      
+
       expect(executionTime).toBeLessThan(500);
     });
   });

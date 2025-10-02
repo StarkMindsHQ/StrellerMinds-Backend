@@ -8,9 +8,10 @@ export class VersionExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest();
 
-    const status = exception instanceof HttpException 
-      ? (exception as HttpException).getStatus() 
-      : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status =
+      exception instanceof HttpException
+        ? (exception as HttpException).getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const apiVersion = request.headers['api-version'] || 'v1';
 
@@ -19,9 +20,10 @@ export class VersionExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       apiVersion,
-      message: exception instanceof HttpException 
-        ? (exception as HttpException).getResponse() 
-        : 'Internal server error',
+      message:
+        exception instanceof HttpException
+          ? (exception as HttpException).getResponse()
+          : 'Internal server error',
     };
 
     response.status(status).json(errorResponse);

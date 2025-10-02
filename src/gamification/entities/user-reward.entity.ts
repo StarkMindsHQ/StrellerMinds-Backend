@@ -16,4 +16,4 @@ export class UserReward {
 
   @CreateDateColumn()
   dateGranted: Date;
-} 
+}

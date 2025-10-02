@@ -106,7 +106,7 @@ export class PaymentService {
   async processPayment(data: ProcessPaymentDto): Promise<PaymentEntity> {
     try {
       const payment = await this.getPaymentById(data.paymentId);
-      
+
       if (payment.status !== PaymentStatus.PENDING) {
         throw new BadRequestException(`Payment is not in pending status: ${payment.status}`);
       }
@@ -128,7 +128,7 @@ export class PaymentService {
       // Update payment record
       payment.status = status;
       payment.completedAt = status === PaymentStatus.COMPLETED ? new Date() : undefined;
-      
+
       if (status === PaymentStatus.FAILED) {
         payment.failureReason = paymentIntent.last_payment_error?.message || 'Payment failed';
       }
@@ -287,17 +287,22 @@ export class PaymentService {
   /**
    * Update payment status from webhook
    */
-  async updatePaymentFromWebhook(stripePaymentIntentId: string, status: PaymentStatus): Promise<PaymentEntity> {
+  async updatePaymentFromWebhook(
+    stripePaymentIntentId: string,
+    status: PaymentStatus,
+  ): Promise<PaymentEntity> {
     const payment = await this.paymentRepository.findOne({
       where: { stripePaymentIntentId },
     });
 
     if (!payment) {
-      throw new NotFoundException(`Payment not found for Stripe payment intent: ${stripePaymentIntentId}`);
+      throw new NotFoundException(
+        `Payment not found for Stripe payment intent: ${stripePaymentIntentId}`,
+      );
     }
 
     payment.status = status;
-    
+
     if (status === PaymentStatus.COMPLETED) {
       payment.completedAt = new Date();
     }
@@ -314,10 +319,13 @@ export class PaymentService {
   /**
    * Get or create Stripe customer
    */
-  private async getOrCreateStripeCustomer(userId: string, customerData: {
-    email?: string;
-    name?: string;
-  }): Promise<any> {
+  private async getOrCreateStripeCustomer(
+    userId: string,
+    customerData: {
+      email?: string;
+      name?: string;
+    },
+  ): Promise<any> {
     // In a real implementation, you would check if the user already has a Stripe customer ID
     // For now, we'll create a new customer
     return this.stripeService.createCustomer({
@@ -388,4 +396,4 @@ export class PaymentService {
       },
     });
   }
-} 
+}

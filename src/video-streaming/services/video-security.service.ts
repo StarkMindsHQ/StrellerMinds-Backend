@@ -134,12 +134,12 @@ export class VideoSecurityService {
         if (!request.userId) {
           return { allowed: false, reason: 'Authentication required' };
         }
-        
+
         // Check if user is the owner
         if (video.uploadedBy.id === request.userId) {
           return { allowed: true };
         }
-        
+
         return { allowed: false, reason: 'Access denied' };
 
       case VideoVisibility.UNLISTED:
@@ -150,13 +150,13 @@ export class VideoSecurityService {
         if (!request.userId) {
           return { allowed: false, reason: 'Authentication required for course content' };
         }
-        
+
         // Check if user is enrolled in the course
         const isEnrolled = await this.checkCourseEnrollment(video, request.userId);
         if (!isEnrolled) {
           return { allowed: false, reason: 'Course enrollment required' };
         }
-        
+
         return { allowed: true };
 
       default:
@@ -169,7 +169,7 @@ export class VideoSecurityService {
     request: VideoAccessRequest,
   ): Promise<{ allowed: boolean; reason?: string }> {
     const requireAuth = video.securitySettings?.requireAuth;
-    
+
     if (requireAuth && !request.userId) {
       return { allowed: false, reason: 'Authentication required' };
     }
@@ -197,7 +197,7 @@ export class VideoSecurityService {
     request: VideoAccessRequest,
   ): { allowed: boolean; reason?: string } {
     const allowedDomains = video.securitySettings?.allowedDomains;
-    
+
     if (!allowedDomains || allowedDomains.length === 0) {
       return { allowed: true };
     }
@@ -206,8 +206,8 @@ export class VideoSecurityService {
       return { allowed: false, reason: 'Domain verification required' };
     }
 
-    const isAllowed = allowedDomains.some(domain => 
-      request.domain === domain || request.domain.endsWith(`.${domain}`)
+    const isAllowed = allowedDomains.some(
+      (domain) => request.domain === domain || request.domain.endsWith(`.${domain}`),
     );
 
     if (!isAllowed) {
@@ -222,7 +222,7 @@ export class VideoSecurityService {
     request: VideoAccessRequest,
   ): { allowed: boolean; reason?: string } {
     const geoRestrictions = video.securitySettings?.geoRestrictions;
-    
+
     if (!geoRestrictions) {
       return { allowed: true };
     }
@@ -254,7 +254,7 @@ export class VideoSecurityService {
       // For now, return true as a placeholder
       return true;
     }
-    
+
     return false;
   }
 
@@ -278,7 +278,7 @@ export class VideoSecurityService {
   async validateAccessToken(token: string): Promise<VideoAccessToken | null> {
     try {
       const decoded = jwt.verify(token, this.jwtSecret) as VideoAccessToken;
-      
+
       // Check if token is expired
       if (decoded.expiresAt < Math.floor(Date.now() / 1000)) {
         return null;
@@ -297,16 +297,13 @@ export class VideoSecurityService {
     accessToken: string,
   ): Promise<string> {
     const expiryTime = video.securitySettings?.signedUrlExpiry || this.defaultTokenExpiry;
-    
+
     // Use CloudFront signed URLs for better security
-    const signedUrl = await this.cloudFrontService.generateSignedUrl(
-      video.s3Key,
-      {
-        expiresIn: expiryTime,
-        ipAddress: request.ipAddress,
-        userAgent: request.userAgent,
-      },
-    );
+    const signedUrl = await this.cloudFrontService.generateSignedUrl(video.s3Key, {
+      expiresIn: expiryTime,
+      ipAddress: request.ipAddress,
+      userAgent: request.userAgent,
+    });
 
     // Add access token as query parameter
     const separator = signedUrl.includes('?') ? '&' : '?';
@@ -319,7 +316,7 @@ export class VideoSecurityService {
     }
 
     const provider = video.securitySettings.drmProvider || 'widevine';
-    
+
     return {
       enabled: true,
       provider: provider as any,
@@ -357,7 +354,7 @@ export class VideoSecurityService {
     // Implementation to revoke access tokens
     // This could involve maintaining a blacklist of tokens
     // or updating the video's security settings
-    
+
     this.logger.log(`Access revoked for video: ${videoId}`, { userId });
   }
 
@@ -386,13 +383,7 @@ export class VideoSecurityService {
       throw new ForbiddenException('Embedding is not allowed for this video');
     }
 
-    const {
-      width = 640,
-      height = 360,
-      autoplay = false,
-      controls = true,
-      domain,
-    } = options;
+    const { width = 640, height = 360, autoplay = false, controls = true, domain } = options;
 
     const embedUrl = `${this.configService.get('FRONTEND_URL')}/embed/${video.id}`;
     const params = new URLSearchParams({

@@ -40,7 +40,12 @@ describe('CertificatesController', () => {
   });
 
   it('should create a certificate', async () => {
-    const dto = { certificateNumber: 'CERT123', issueDate: new Date(), userId: 'user1', courseId: 'course1' };
+    const dto = {
+      certificateNumber: 'CERT123',
+      issueDate: new Date(),
+      userId: 'user1',
+      courseId: 'course1',
+    };
     const result = await controller.create(dto as any);
     expect(result).toEqual(mockCertificate);
     expect(service.create).toHaveBeenCalledWith(dto);

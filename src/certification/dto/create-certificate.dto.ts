@@ -1,37 +1,37 @@
-import { IsString, IsUUID, IsOptional, IsNumber, IsObject, Min, Max } from "class-validator"
+import { IsString, IsUUID, IsOptional, IsNumber, IsObject, Min, Max } from 'class-validator';
 
 export class CreateCertificateDto {
   @IsUUID()
-  userId: string
+  userId: string;
 
   @IsUUID()
-  certificationTypeId: string
+  certificationTypeId: string;
 
   @IsString()
-  recipientName: string
+  recipientName: string;
 
   @IsString()
-  recipientEmail: string
+  recipientEmail: string;
 
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
-  score?: number
+  score?: number;
 
   @IsOptional()
   @IsObject()
   metadata?: {
-    courseId?: string
-    courseName?: string
-    instructorName?: string
-    completionDate?: Date
-    assessmentResults?: any[]
-    skillsValidated?: string[]
-    additionalInfo?: Record<string, any>
-  }
+    courseId?: string;
+    courseName?: string;
+    instructorName?: string;
+    completionDate?: Date;
+    assessmentResults?: any[];
+    skillsValidated?: string[];
+    additionalInfo?: Record<string, any>;
+  };
 
   @IsOptional()
   @IsUUID()
-  issuedBy?: string
+  issuedBy?: string;
 }

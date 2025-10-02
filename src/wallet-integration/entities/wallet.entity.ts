@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { Credential } from './credential.entity';
 
 /**
@@ -10,7 +17,7 @@ export enum WalletType {
   WALLETCONNECT = 'walletconnect',
   COINBASE = 'coinbase',
   PHANTOM = 'phantom',
-  TRUST = 'trust'
+  TRUST = 'trust',
 }
 
 /**
@@ -29,7 +36,11 @@ export class Wallet {
   address: string;
 
   /** Type of wallet provider */
-  @ApiProperty({ description: 'Type of wallet provider', enum: WalletType, example: WalletType.METAMASK })
+  @ApiProperty({
+    description: 'Type of wallet provider',
+    enum: WalletType,
+    example: WalletType.METAMASK,
+  })
   @Column({
     type: 'enum',
     enum: WalletType,
@@ -47,22 +58,38 @@ export class Wallet {
   isActive: boolean;
 
   /** Last connection date/time (optional) */
-  @ApiProperty({ description: 'Last connection date/time', required: false, type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Last connection date/time',
+    required: false,
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   @Column({ nullable: true })
   lastConnectedAt?: Date;
 
   /** Credentials associated with this wallet */
   @ApiProperty({ description: 'Credentials associated with this wallet', type: () => [Credential] })
-  @OneToMany(() => Credential, credential => credential.wallet)
+  @OneToMany(() => Credential, (credential) => credential.wallet)
   credentials: Credential[];
 
   /** Date/time when the wallet was created */
-  @ApiProperty({ description: 'Date/time when the wallet was created', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the wallet was created',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   @CreateDateColumn()
   createdAt: Date;
 
   /** Date/time when the wallet was last updated */
-  @ApiProperty({ description: 'Date/time when the wallet was last updated', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the wallet was last updated',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 }

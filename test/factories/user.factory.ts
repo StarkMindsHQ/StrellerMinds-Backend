@@ -7,7 +7,7 @@ export class UserFactory extends BaseFactory<User> {
   protected definition(): Partial<User> {
     const firstName = this.generateName().split(' ')[0];
     const lastName = this.generateName().split(' ')[1];
-    
+
     return {
       id: this.generateId(),
       email: this.generateEmail(),

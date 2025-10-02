@@ -1,145 +1,145 @@
-import { IsString, IsOptional, IsEnum, IsObject, IsArray } from "class-validator"
-import { ApiProperty } from "@nestjs/swagger"
-import { TranslationStatus } from "../entities/translation.entity"
+import { IsString, IsOptional, IsEnum, IsObject, IsArray } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { TranslationStatus } from '../entities/translation.entity';
 
 export class CreateTranslationDto {
-  @ApiProperty({ description: "Translation key" })
+  @ApiProperty({ description: 'Translation key' })
   @IsString()
-  key: string
+  key: string;
 
-  @ApiProperty({ description: "Locale code" })
+  @ApiProperty({ description: 'Locale code' })
   @IsString()
-  locale: string
+  locale: string;
 
-  @ApiProperty({ description: "Namespace" })
+  @ApiProperty({ description: 'Namespace' })
   @IsString()
-  namespace: string
+  namespace: string;
 
-  @ApiProperty({ description: "Translation value" })
+  @ApiProperty({ description: 'Translation value' })
   @IsString()
-  value: string
+  value: string;
 
-  @ApiProperty({ description: "Description of the translation", required: false })
+  @ApiProperty({ description: 'Description of the translation', required: false })
   @IsOptional()
   @IsString()
-  description?: string
+  description?: string;
 
-  @ApiProperty({ description: "Context information", required: false })
+  @ApiProperty({ description: 'Context information', required: false })
   @IsOptional()
   @IsString()
-  context?: string
+  context?: string;
 
-  @ApiProperty({ description: "Additional metadata", required: false })
+  @ApiProperty({ description: 'Additional metadata', required: false })
   @IsOptional()
   @IsObject()
-  metadata?: any
+  metadata?: any;
 }
 
 export class UpdateTranslationDto {
-  @ApiProperty({ description: "Translation value", required: false })
+  @ApiProperty({ description: 'Translation value', required: false })
   @IsOptional()
   @IsString()
-  value?: string
+  value?: string;
 
-  @ApiProperty({ description: "Description of the translation", required: false })
+  @ApiProperty({ description: 'Description of the translation', required: false })
   @IsOptional()
   @IsString()
-  description?: string
+  description?: string;
 
-  @ApiProperty({ description: "Context information", required: false })
+  @ApiProperty({ description: 'Context information', required: false })
   @IsOptional()
   @IsString()
-  context?: string
+  context?: string;
 
   @ApiProperty({ enum: TranslationStatus, required: false })
   @IsOptional()
   @IsEnum(TranslationStatus)
-  status?: TranslationStatus
+  status?: TranslationStatus;
 
-  @ApiProperty({ description: "Additional metadata", required: false })
+  @ApiProperty({ description: 'Additional metadata', required: false })
   @IsOptional()
   @IsObject()
-  metadata?: any
+  metadata?: any;
 }
 
 export class TranslationFiltersDto {
-  @ApiProperty({ description: "Locale code", required: false })
+  @ApiProperty({ description: 'Locale code', required: false })
   @IsOptional()
   @IsString()
-  locale?: string
+  locale?: string;
 
-  @ApiProperty({ description: "Namespace", required: false })
+  @ApiProperty({ description: 'Namespace', required: false })
   @IsOptional()
   @IsString()
-  namespace?: string
+  namespace?: string;
 
   @ApiProperty({ enum: TranslationStatus, required: false })
   @IsOptional()
   @IsEnum(TranslationStatus)
-  status?: TranslationStatus
+  status?: TranslationStatus;
 
-  @ApiProperty({ description: "Search term", required: false })
+  @ApiProperty({ description: 'Search term', required: false })
   @IsOptional()
   @IsString()
-  search?: string
+  search?: string;
 
-  @ApiProperty({ description: "Translation keys", required: false })
+  @ApiProperty({ description: 'Translation keys', required: false })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  keys?: string[]
+  keys?: string[];
 }
 
 export class SetUserLocaleDto {
-  @ApiProperty({ description: "Locale code" })
+  @ApiProperty({ description: 'Locale code' })
   @IsString()
-  locale: string
+  locale: string;
 
-  @ApiProperty({ description: "User preferences", required: false })
+  @ApiProperty({ description: 'User preferences', required: false })
   @IsOptional()
   @IsObject()
-  preferences?: any
+  preferences?: any;
 }
 
 export class TranslateDto {
-  @ApiProperty({ description: "Translation key" })
+  @ApiProperty({ description: 'Translation key' })
   @IsString()
-  key: string
+  key: string;
 
-  @ApiProperty({ description: "Locale code", required: false })
+  @ApiProperty({ description: 'Locale code', required: false })
   @IsOptional()
   @IsString()
-  locale?: string
+  locale?: string;
 
-  @ApiProperty({ description: "Namespace", required: false })
+  @ApiProperty({ description: 'Namespace', required: false })
   @IsOptional()
   @IsString()
-  namespace?: string
+  namespace?: string;
 
-  @ApiProperty({ description: "Translation arguments", required: false })
+  @ApiProperty({ description: 'Translation arguments', required: false })
   @IsOptional()
   @IsObject()
-  args?: any
+  args?: any;
 }
 
 export class TranslateMultipleDto {
-  @ApiProperty({ description: "Translation keys" })
+  @ApiProperty({ description: 'Translation keys' })
   @IsArray()
   @IsString({ each: true })
-  keys: string[]
+  keys: string[];
 
-  @ApiProperty({ description: "Locale code", required: false })
+  @ApiProperty({ description: 'Locale code', required: false })
   @IsOptional()
   @IsString()
-  locale?: string
+  locale?: string;
 
-  @ApiProperty({ description: "Namespace", required: false })
+  @ApiProperty({ description: 'Namespace', required: false })
   @IsOptional()
   @IsString()
-  namespace?: string
+  namespace?: string;
 
-  @ApiProperty({ description: "Translation arguments", required: false })
+  @ApiProperty({ description: 'Translation arguments', required: false })
   @IsOptional()
   @IsObject()
-  args?: any
+  args?: any;
 }

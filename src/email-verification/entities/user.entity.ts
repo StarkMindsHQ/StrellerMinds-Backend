@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
@@ -32,17 +38,32 @@ export class User {
   emailVerificationToken: string;
 
   /** Email verification token expiry (optional) */
-  @ApiPropertyOptional({ description: 'Email verification token expiry', type: String, format: 'date-time', example: '2025-06-30T12:00:00Z' })
+  @ApiPropertyOptional({
+    description: 'Email verification token expiry',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-30T12:00:00Z',
+  })
   @Column({ nullable: true })
   emailVerificationTokenExpiry: Date;
 
   /** Date/time when the user was created */
-  @ApiProperty({ description: 'Date/time when the user was created', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the user was created',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   @CreateDateColumn()
   createdAt: Date;
 
   /** Date/time when the user was last updated */
-  @ApiProperty({ description: 'Date/time when the user was last updated', type: String, format: 'date-time', example: '2025-06-29T12:10:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the user was last updated',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:10:00Z',
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 }

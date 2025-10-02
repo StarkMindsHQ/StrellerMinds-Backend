@@ -42,8 +42,7 @@ export class GdprService {
    */
   async generateComplianceReport(userId: string): Promise<any> {
     const consents = await this.consentService.getUserConsents(userId);
-    const deletionRequests =
-      await this.dataDeletionService.getDeletionRequests(userId);
+    const deletionRequests = await this.dataDeletionService.getDeletionRequests(userId);
 
     return {
       userId,
@@ -52,9 +51,7 @@ export class GdprService {
       activeDeletionRequests: deletionRequests.filter(
         (r) => r.status === 'pending' || r.status === 'in_progress',
       ).length,
-      completedDeletionRequests: deletionRequests.filter(
-        (r) => r.status === 'completed',
-      ).length,
+      completedDeletionRequests: deletionRequests.filter((r) => r.status === 'completed').length,
     };
   }
 }

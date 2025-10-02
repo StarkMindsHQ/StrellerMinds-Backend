@@ -25,4 +25,4 @@ describe('GamificationController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
-}); 
+});

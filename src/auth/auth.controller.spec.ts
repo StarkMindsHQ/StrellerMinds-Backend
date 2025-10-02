@@ -31,27 +31,29 @@ describe('AuthController', () => {
             register: jest.fn(),
             refreshToken: jest.fn(),
             changePassword: jest.fn(),
-          }
+          },
         },
         {
           provide: UsersService,
           useValue: {
             findByEmail: jest.fn().mockResolvedValue(null),
             create: jest.fn().mockResolvedValue({}),
-          }
+          },
         },
         {
           provide: PasswordValidationService,
           useValue: {
-            getPasswordRequirements: jest.fn().mockReturnValue([
-              'At least 8 characters long',
-              'Contains at least one uppercase letter',
-              'Contains at least one lowercase letter',
-              'Contains at least one number',
-              'Contains at least one special character',
-            ]),
-          }
-        }
+            getPasswordRequirements: jest
+              .fn()
+              .mockReturnValue([
+                'At least 8 characters long',
+                'Contains at least one uppercase letter',
+                'Contains at least one lowercase letter',
+                'Contains at least one number',
+                'Contains at least one special character',
+              ]),
+          },
+        },
       ],
     }).compile();
 
@@ -68,7 +70,12 @@ describe('AuthController', () => {
     it('should validate user and return login response', async () => {
       // Setup
       const mockUser = { id: 'user-id', email: 'test@example.com' };
-      const mockLoginResponse = { access_token: 'token', refresh_token: 'refresh', expires_in: 3600, user: mockUser };
+      const mockLoginResponse = {
+        access_token: 'token',
+        refresh_token: 'refresh',
+        expires_in: 3600,
+        user: mockUser,
+      };
 
       authService.validateUser.mockResolvedValue(mockUser);
       authService.login.mockResolvedValue(mockLoginResponse);
@@ -87,8 +94,9 @@ describe('AuthController', () => {
       authService.validateUser.mockResolvedValue(null);
 
       // Execute & Assert
-      await expect(controller.login({ email: 'test@example.com', password: 'wrong' }))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        controller.login({ email: 'test@example.com', password: 'wrong' }),
+      ).rejects.toThrow(UnauthorizedException);
 
       expect(authService.login).not.toHaveBeenCalled();
     });
@@ -101,31 +109,38 @@ describe('AuthController', () => {
         email: 'new@example.com',
         password: 'StrongP@ss123',
         firstName: 'John',
-        lastName: 'Doe'
+        lastName: 'Doe',
       };
 
-      const mockResponse = { access_token: 'token', refresh_token: 'refresh', expires_in: 3600, user: { id: 'new-id', email: 'new@example.com' } };
+      const mockResponse = {
+        access_token: 'token',
+        refresh_token: 'refresh',
+        expires_in: 3600,
+        user: { id: 'new-id', email: 'new@example.com' },
+      };
       authService.register.mockResolvedValue(mockResponse);
 
       // Execute
       const result = await controller.register(registerDto);
 
       // Assert
-      expect(authService.register).toHaveBeenCalledWith(
-        'new@example.com',
-        'StrongP@ss123',
-        { firstName: 'John', lastName: 'Doe' }
-      );
+      expect(authService.register).toHaveBeenCalledWith('new@example.com', 'StrongP@ss123', {
+        firstName: 'John',
+        lastName: 'Doe',
+      });
       expect(result).toEqual(mockResponse);
     });
 
     it('should propagate BadRequestException from authService.register', async () => {
       // Setup
-      authService.register.mockRejectedValue(new BadRequestException('Password does not meet requirements'));
+      authService.register.mockRejectedValue(
+        new BadRequestException('Password does not meet requirements'),
+      );
 
       // Execute & Assert
-      await expect(controller.register({ email: 'new@example.com', password: 'weak' }))
-        .rejects.toThrow(BadRequestException);
+      await expect(
+        controller.register({ email: 'new@example.com', password: 'weak' }),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -143,7 +158,7 @@ describe('AuthController', () => {
           'Contains at least one lowercase letter',
           'Contains at least one number',
           'Contains at least one special character',
-        ]
+        ],
       });
     });
   });
@@ -164,14 +179,15 @@ describe('AuthController', () => {
 
     it('should throw UnauthorizedException when userId or refreshToken is missing', async () => {
       // Execute & Assert
-      await expect(controller.refresh({ userId: 'user-id', refreshToken: undefined } as any))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        controller.refresh({ userId: 'user-id', refreshToken: undefined } as any),
+      ).rejects.toThrow(UnauthorizedException);
 
-      await expect(controller.refresh({ userId: undefined, refreshToken: 'refresh-token' } as any))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(
+        controller.refresh({ userId: undefined, refreshToken: 'refresh-token' } as any),
+      ).rejects.toThrow(UnauthorizedException);
 
-      await expect(controller.refresh({} as any))
-        .rejects.toThrow(UnauthorizedException);
+      await expect(controller.refresh({} as any)).rejects.toThrow(UnauthorizedException);
 
       expect(authService.refreshToken).not.toHaveBeenCalled();
     });
@@ -183,7 +199,7 @@ describe('AuthController', () => {
       const req = { user: { id: 'user-id' } };
       const changePasswordDto = {
         currentPassword: 'currentPass',
-        newPassword: 'NewStrongP@ss123'
+        newPassword: 'NewStrongP@ss123',
       };
       authService.changePassword.mockResolvedValue(true);
 
@@ -194,7 +210,7 @@ describe('AuthController', () => {
       expect(authService.changePassword).toHaveBeenCalledWith(
         'user-id',
         'currentPass',
-        'NewStrongP@ss123'
+        'NewStrongP@ss123',
       );
       expect(result).toBe(true);
     });
@@ -204,14 +220,18 @@ describe('AuthController', () => {
       const req = { user: { id: 'user-id' } };
 
       // Execute & Assert
-      await expect(controller.changePassword(req, { currentPassword: 'current', newPassword: undefined } as any))
-        .rejects.toThrow(BadRequestException);
+      await expect(
+        controller.changePassword(req, {
+          currentPassword: 'current',
+          newPassword: undefined,
+        } as any),
+      ).rejects.toThrow(BadRequestException);
 
-      await expect(controller.changePassword(req, { currentPassword: undefined, newPassword: 'new' } as any))
-        .rejects.toThrow(BadRequestException);
+      await expect(
+        controller.changePassword(req, { currentPassword: undefined, newPassword: 'new' } as any),
+      ).rejects.toThrow(BadRequestException);
 
-      await expect(controller.changePassword(req, {} as any))
-        .rejects.toThrow(BadRequestException);
+      await expect(controller.changePassword(req, {} as any)).rejects.toThrow(BadRequestException);
 
       expect(authService.changePassword).not.toHaveBeenCalled();
     });

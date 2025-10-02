@@ -15,7 +15,10 @@ import { SharedUtilityService } from '../common/services/shared-utility.service'
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
-export class CourseService extends BaseService<Course> implements ICourseService<Course, CreateCourseDto, UpdateCourseDto> {
+export class CourseService
+  extends BaseService<Course>
+  implements ICourseService<Course, CreateCourseDto, UpdateCourseDto>
+{
   constructor(
     @InjectRepository(Course)
     private readonly courseRepository: Repository<Course>,
@@ -37,17 +40,20 @@ export class CourseService extends BaseService<Course> implements ICourseService
       const sanitizedData = {
         ...createCourseDto,
         title: this.sharedUtilityService.sanitizeInput(createCourseDto.title),
-        description: createCourseDto.description ? this.sharedUtilityService.sanitizeInput(createCourseDto.description) : undefined,
+        description: createCourseDto.description
+          ? this.sharedUtilityService.sanitizeInput(createCourseDto.description)
+          : undefined,
         modules: Promise.resolve(createCourseDto.modules || []),
-        tags: Promise.resolve(
-          createCourseDto.tagIds?.map((id) => ({ id })) || [],
-        ),
+        tags: Promise.resolve(createCourseDto.tagIds?.map((id) => ({ id })) || []),
       };
 
       const course = await this.createEntity(sanitizedData);
 
       // Emit course created event for other services to handle
-      this.eventEmitter.emit('course.created', { course, instructorId: createCourseDto.instructorId });
+      this.eventEmitter.emit('course.created', {
+        course,
+        instructorId: createCourseDto.instructorId,
+      });
 
       return course;
     } catch (error) {
@@ -77,7 +83,8 @@ export class CourseService extends BaseService<Course> implements ICourseService
   public async findOne(id: string, relations: string[] = []): Promise<Course> {
     try {
       // Use query builder to optimize relations and avoid N+1 queries
-      const queryBuilder = this.courseRepository.createQueryBuilder('course')
+      const queryBuilder = this.courseRepository
+        .createQueryBuilder('course')
         .leftJoinAndSelect('course.instructor', 'instructor')
         .leftJoinAndSelect('course.category', 'category')
         .where('course.id = :id', { id });
@@ -86,13 +93,14 @@ export class CourseService extends BaseService<Course> implements ICourseService
       if (relations.includes('modules')) {
         queryBuilder.leftJoinAndSelect('course.modules', 'modules');
       }
-      
+
       if (relations.includes('tags')) {
         queryBuilder.leftJoinAndSelect('course.tags', 'tags');
       }
-      
+
       if (relations.includes('reviews')) {
-        queryBuilder.leftJoinAndSelect('course.reviews', 'reviews')
+        queryBuilder
+          .leftJoinAndSelect('course.reviews', 'reviews')
           .leftJoinAndSelect('reviews.user', 'reviewUser');
       }
 
@@ -101,7 +109,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
       if (!course) {
         throw new NotFoundException(`Course with ID ${id} not found`);
       }
-      
+
       return course;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
@@ -114,7 +122,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
    */
   public async findCoursesWithRelations(
     options?: PaginationOptions,
-    relations: string[] = []
+    relations: string[] = [],
   ): Promise<PaginatedResult<Course>> {
     try {
       const page = options?.page || 1;
@@ -122,7 +130,8 @@ export class CourseService extends BaseService<Course> implements ICourseService
       const skip = (page - 1) * limit;
 
       // Build query with all necessary relations to avoid N+1
-      let queryBuilder = this.courseRepository.createQueryBuilder('course')
+      let queryBuilder = this.courseRepository
+        .createQueryBuilder('course')
         .leftJoinAndSelect('course.instructor', 'instructor')
         .leftJoinAndSelect('course.category', 'category');
 
@@ -130,13 +139,14 @@ export class CourseService extends BaseService<Course> implements ICourseService
       if (relations.includes('modules')) {
         queryBuilder = queryBuilder.leftJoinAndSelect('course.modules', 'modules');
       }
-      
+
       if (relations.includes('tags')) {
         queryBuilder = queryBuilder.leftJoinAndSelect('course.tags', 'tags');
       }
-      
+
       if (relations.includes('reviews')) {
-        queryBuilder = queryBuilder.leftJoinAndSelect('course.reviews', 'reviews')
+        queryBuilder = queryBuilder
+          .leftJoinAndSelect('course.reviews', 'reviews')
           .leftJoinAndSelect('reviews.user', 'reviewUser');
       }
 
@@ -144,10 +154,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
       queryBuilder = queryBuilder.orderBy('course.createdAt', 'DESC');
 
       // Get results with pagination
-      const [courses, total] = await queryBuilder
-        .skip(skip)
-        .take(limit)
-        .getManyAndCount();
+      const [courses, total] = await queryBuilder.skip(skip).take(limit).getManyAndCount();
 
       return {
         items: courses,
@@ -167,7 +174,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
   public async findByInstructor(
     instructorId: string,
     options?: PaginationOptions,
-    relations: string[] = []
+    relations: string[] = [],
   ): Promise<PaginatedResult<Course>> {
     try {
       const page = options?.page || 1;
@@ -175,7 +182,8 @@ export class CourseService extends BaseService<Course> implements ICourseService
       const skip = (page - 1) * limit;
 
       // Build query with all necessary relations to avoid N+1
-      let queryBuilder = this.courseRepository.createQueryBuilder('course')
+      let queryBuilder = this.courseRepository
+        .createQueryBuilder('course')
         .leftJoinAndSelect('course.instructor', 'instructor')
         .leftJoinAndSelect('course.category', 'category')
         .where('instructor.id = :instructorId', { instructorId });
@@ -184,13 +192,14 @@ export class CourseService extends BaseService<Course> implements ICourseService
       if (relations.includes('modules')) {
         queryBuilder = queryBuilder.leftJoinAndSelect('course.modules', 'modules');
       }
-      
+
       if (relations.includes('tags')) {
         queryBuilder = queryBuilder.leftJoinAndSelect('course.tags', 'tags');
       }
-      
+
       if (relations.includes('reviews')) {
-        queryBuilder = queryBuilder.leftJoinAndSelect('course.reviews', 'reviews')
+        queryBuilder = queryBuilder
+          .leftJoinAndSelect('course.reviews', 'reviews')
           .leftJoinAndSelect('reviews.user', 'reviewUser');
       }
 
@@ -198,10 +207,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
       queryBuilder = queryBuilder.orderBy('course.createdAt', 'DESC');
 
       // Get results with pagination
-      const [courses, total] = await queryBuilder
-        .skip(skip)
-        .take(limit)
-        .getManyAndCount();
+      const [courses, total] = await queryBuilder.skip(skip).take(limit).getManyAndCount();
 
       return {
         data: courses,
@@ -221,7 +227,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
   public async findByCategory(
     categoryId: string,
     options?: PaginationOptions,
-    relations: string[] = []
+    relations: string[] = [],
   ): Promise<PaginatedResult<Course>> {
     try {
       const page = options?.page || 1;
@@ -229,7 +235,8 @@ export class CourseService extends BaseService<Course> implements ICourseService
       const skip = (page - 1) * limit;
 
       // Build query with all necessary relations to avoid N+1
-      let queryBuilder = this.courseRepository.createQueryBuilder('course')
+      let queryBuilder = this.courseRepository
+        .createQueryBuilder('course')
         .leftJoinAndSelect('course.instructor', 'instructor')
         .leftJoinAndSelect('course.category', 'category')
         .where('category.id = :categoryId', { categoryId });
@@ -238,13 +245,14 @@ export class CourseService extends BaseService<Course> implements ICourseService
       if (relations.includes('modules')) {
         queryBuilder = queryBuilder.leftJoinAndSelect('course.modules', 'modules');
       }
-      
+
       if (relations.includes('tags')) {
         queryBuilder = queryBuilder.leftJoinAndSelect('course.tags', 'tags');
       }
-      
+
       if (relations.includes('reviews')) {
-        queryBuilder = queryBuilder.leftJoinAndSelect('course.reviews', 'reviews')
+        queryBuilder = queryBuilder
+          .leftJoinAndSelect('course.reviews', 'reviews')
           .leftJoinAndSelect('reviews.user', 'reviewUser');
       }
 
@@ -252,10 +260,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
       queryBuilder = queryBuilder.orderBy('course.createdAt', 'DESC');
 
       // Get results with pagination
-      const [courses, total] = await queryBuilder
-        .skip(skip)
-        .take(limit)
-        .getManyAndCount();
+      const [courses, total] = await queryBuilder.skip(skip).take(limit).getManyAndCount();
 
       return {
         data: courses,
@@ -286,7 +291,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
           'COUNT(DISTINCT lessons.id) as lessonCount',
           'COUNT(DISTINCT reviews.id) as reviewCount',
           'COUNT(DISTINCT userProgress.id) as enrollmentCount',
-          'AVG(reviews.rating) as averageRating'
+          'AVG(reviews.rating) as averageRating',
         ])
         .where('course.id = :courseId', { courseId })
         .groupBy('course.id')
@@ -298,7 +303,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
         lessonCount: parseInt(result?.lessoncount) || 0,
         reviewCount: parseInt(result?.reviewcount) || 0,
         enrollmentCount: parseInt(result?.enrollmentcount) || 0,
-        averageRating: parseFloat(result?.averagerating) || 0
+        averageRating: parseFloat(result?.averagerating) || 0,
       };
     } catch (error) {
       return this.handleError(error, 'getting course statistics');
@@ -308,13 +313,11 @@ export class CourseService extends BaseService<Course> implements ICourseService
   /**
    * Get popular courses with optimized query
    */
-  public async getPopularCourses(
-    limit: number = 10,
-    relations: string[] = []
-  ): Promise<Course[]> {
+  public async getPopularCourses(limit: number = 10, relations: string[] = []): Promise<Course[]> {
     try {
       // Build query with all necessary relations to avoid N+1
-      let queryBuilder = this.courseRepository.createQueryBuilder('course')
+      let queryBuilder = this.courseRepository
+        .createQueryBuilder('course')
         .leftJoinAndSelect('course.instructor', 'instructor')
         .leftJoinAndSelect('course.category', 'category')
         .leftJoin('course.userProgress', 'userProgress')
@@ -325,7 +328,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
           'instructor.lastName',
           'category.id',
           'category.name',
-          'COUNT(userProgress.id) as enrollmentCount'
+          'COUNT(userProgress.id) as enrollmentCount',
         ])
         .groupBy('course.id, instructor.id, category.id')
         .orderBy('enrollmentCount', 'DESC')
@@ -335,7 +338,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
       if (relations.includes('modules')) {
         queryBuilder = queryBuilder.leftJoinAndSelect('course.modules', 'modules');
       }
-      
+
       if (relations.includes('tags')) {
         queryBuilder = queryBuilder.leftJoinAndSelect('course.tags', 'tags');
       }
@@ -350,10 +353,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
   /**
    * Update course by ID
    */
-  public async update(
-    id: string,
-    updateCourseDto: UpdateCourseDto,
-  ): Promise<Course> {
+  public async update(id: string, updateCourseDto: UpdateCourseDto): Promise<Course> {
     try {
       // Validate update data
       this.validateCourseUpdateData(updateCourseDto);
@@ -361,11 +361,13 @@ export class CourseService extends BaseService<Course> implements ICourseService
       // Sanitize input data
       const sanitizedData = this.sharedUtilityService.removeEmptyValues({
         ...updateCourseDto,
-        title: updateCourseDto.title ? this.sharedUtilityService.sanitizeInput(updateCourseDto.title) : undefined,
-        description: updateCourseDto.description ? this.sharedUtilityService.sanitizeInput(updateCourseDto.description) : undefined,
-        modules: updateCourseDto.modules
-          ? Promise.resolve(updateCourseDto.modules)
+        title: updateCourseDto.title
+          ? this.sharedUtilityService.sanitizeInput(updateCourseDto.title)
           : undefined,
+        description: updateCourseDto.description
+          ? this.sharedUtilityService.sanitizeInput(updateCourseDto.description)
+          : undefined,
+        modules: updateCourseDto.modules ? Promise.resolve(updateCourseDto.modules) : undefined,
         tags: updateCourseDto.tagIds
           ? Promise.resolve(updateCourseDto.tagIds.map((id) => ({ id })))
           : undefined,
@@ -389,7 +391,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
   public async delete(id: string): Promise<void> {
     try {
       await this.deleteEntity(id);
-      
+
       // Emit course deleted event
       this.eventEmitter.emit('course.deleted', { courseId: id });
     } catch (error) {
@@ -404,7 +406,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
   async enrollUser(courseId: string, userId: string): Promise<void> {
     try {
       const course = await this.findOne(courseId);
-      
+
       // Check if user is already enrolled
       const isEnrolled = await this.isUserEnrolled(courseId, userId);
       if (isEnrolled) {
@@ -413,7 +415,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
 
       // Add enrollment logic here
       // This would typically involve creating an enrollment record
-      
+
       // Emit enrollment event
       this.eventEmitter.emit('course.enrollment.created', { courseId, userId });
     } catch (error) {
@@ -428,7 +430,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
   async unenrollUser(courseId: string, userId: string): Promise<void> {
     try {
       const course = await this.findOne(courseId);
-      
+
       // Check if user is enrolled
       const isEnrolled = await this.isUserEnrolled(courseId, userId);
       if (!isEnrolled) {
@@ -436,7 +438,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
       }
 
       // Remove enrollment logic here
-      
+
       // Emit unenrollment event
       this.eventEmitter.emit('course.enrollment.removed', { courseId, userId });
     } catch (error) {
@@ -464,7 +466,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
           'user.lastName',
           'user.email',
           'profile.avatar',
-          'profile.bio'
+          'profile.bio',
         ])
         .getOne();
 
@@ -473,14 +475,16 @@ export class CourseService extends BaseService<Course> implements ICourseService
       }
 
       // Return user information from progress relations
-      return users.userProgress?.map(progress => ({
-        id: progress.user.id,
-        firstName: progress.user.firstName,
-        lastName: progress.user.lastName,
-        email: progress.user.email,
-        avatar: progress.user.profile?.avatar,
-        bio: progress.user.profile?.bio,
-      })) || [];
+      return (
+        users.userProgress?.map((progress) => ({
+          id: progress.user.id,
+          firstName: progress.user.firstName,
+          lastName: progress.user.lastName,
+          email: progress.user.email,
+          avatar: progress.user.profile?.avatar,
+          bio: progress.user.profile?.bio,
+        })) || []
+      );
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       return this.handleError(error, 'getting enrolled users');
@@ -493,7 +497,7 @@ export class CourseService extends BaseService<Course> implements ICourseService
   async getCourseProgress(courseId: string, userId: string): Promise<number> {
     try {
       await this.findOne(courseId);
-      
+
       // This would typically calculate progress based on completed modules
       // For now, return 0
       return 0;
@@ -512,7 +516,9 @@ export class CourseService extends BaseService<Course> implements ICourseService
       // For now, return false
       return false;
     } catch (error) {
-      this.logger.error(`Error checking enrollment for course ${courseId} and user ${userId}: ${error.message}`);
+      this.logger.error(
+        `Error checking enrollment for course ${courseId} and user ${userId}: ${error.message}`,
+      );
       return false;
     }
   }

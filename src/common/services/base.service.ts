@@ -1,4 +1,9 @@
-import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository, FindOptionsWhere, FindManyOptions } from 'typeorm';
 
 export interface PaginationOptions {
@@ -45,11 +50,11 @@ export abstract class BaseService<T> {
         where: { id } as FindOptionsWhere<T>,
         relations,
       });
-      
+
       if (!entity) {
         throw new NotFoundException(`Entity with ID ${id} not found`);
       }
-      
+
       return entity;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
@@ -61,17 +66,17 @@ export abstract class BaseService<T> {
    * Find entities with pagination and filtering
    */
   protected async findEntitiesWithPagination(
-    options: FindManyOptions<T> & PaginationOptions
+    options: FindManyOptions<T> & PaginationOptions,
   ): Promise<PaginatedResult<T>> {
     try {
-      const { 
-        page = 1, 
-        limit = this.defaultPageSize, 
-        sortBy, 
-        sortOrder = 'ASC', 
-        ...findOptions 
+      const {
+        page = 1,
+        limit = this.defaultPageSize,
+        sortBy,
+        sortOrder = 'ASC',
+        ...findOptions
       } = options;
-      
+
       // Ensure page and limit are within reasonable bounds
       const safePage = Math.max(1, page);
       const safeLimit = Math.min(Math.max(1, limit), this.maxPageSize);
@@ -159,11 +164,11 @@ export abstract class BaseService<T> {
   protected handleError(error: any, operation: string, context?: string): never {
     const contextInfo = context ? ` in ${context}` : '';
     this.logger.error(`Error during ${operation}${contextInfo}: ${error.message}`, error.stack);
-    
+
     if (error instanceof NotFoundException || error instanceof InternalServerErrorException) {
       throw error;
     }
-    
+
     throw new InternalServerErrorException(`Error during ${operation}`);
   }
 }

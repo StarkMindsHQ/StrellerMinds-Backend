@@ -1,11 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Test } from '@nestjs/testing';
+import type { TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import type { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from './email.service';
 import { EmailLog } from './entities/email-log.entity';
 import { EmailPreference } from './entities/email-preference.entity';
 import { EmailTemplate } from './entities/email-template.entity';
+import { JwtService } from '@nestjs/jwt';
+import '@jest/globals';
 
 describe('EmailService (tracking)', () => {
   let service: EmailService;
@@ -23,9 +27,11 @@ describe('EmailService (tracking)', () => {
           useValue: {
             findOne: jest.fn(),
             update: jest.fn(),
+            createQueryBuilder: jest.fn(),
           },
         },
         { provide: 'BullQueue_email', useValue: { add: jest.fn() } },
+        { provide: JwtService, useValue: null },
       ],
     }).compile();
 
@@ -40,15 +46,19 @@ describe('EmailService (tracking)', () => {
         trackingToken: 'tok',
         openCount: 0,
         firstOpenedAt: null,
-      } as any;
+      };
       emailLogRepo.findOne.mockResolvedValue(existing as EmailLog);
-      emailLogRepo.update.mockResolvedValue({} as any);
+      emailLogRepo.update.mockResolvedValue({});
 
       await service.markEmailAsOpened('tok', { userAgent: 'ua', ipAddress: '127.0.0.1' });
 
       expect(emailLogRepo.update).toHaveBeenCalledWith(
         { id: '1' },
-        expect.objectContaining({ openCount: 1, openedAt: expect.any(Date), firstOpenedAt: expect.any(Date) }),
+        expect.objectContaining({
+          openCount: 1,
+          openedAt: expect.any(Date),
+          firstOpenedAt: expect.any(Date),
+        }),
       );
     });
 
@@ -69,7 +79,10 @@ describe('EmailService (tracking)', () => {
       emailLogRepo.findOne.mockResolvedValue(existing as EmailLog);
       emailLogRepo.update.mockResolvedValue({} as any);
 
-      await service.markEmailAsClicked('tok', 'https://example.com', { userAgent: 'ua', ipAddress: '127.0.0.1' });
+      await service.markEmailAsClicked('tok', 'https://example.com', {
+        userAgent: 'ua',
+        ipAddress: '127.0.0.1',
+      });
 
       expect(emailLogRepo.update).toHaveBeenCalledWith(
         { id: '1' },
@@ -83,7 +96,7 @@ describe('EmailService (tracking)', () => {
     });
   });
 
-  describe('getEmailAnalytics', () => {
+  describe('getEmailLogAnalytics', () => {
     it('returns safe analytics shape', async () => {
       const log: Partial<EmailLog> = {
         id: '1',
@@ -97,22 +110,80 @@ describe('EmailService (tracking)', () => {
         clickEvents: [{ clickedAt: new Date().toISOString(), url: 'https://x.com' }],
       } as any;
       emailLogRepo.findOne.mockResolvedValue(log as EmailLog);
-      const result = await service.getEmailAnalytics('1');
+      const result = await service.getEmailLogAnalytics('1');
       expect(result).toMatchObject({ id: '1', clicked: true, clickCount: 2 });
       expect(result).not.toHaveProperty('trackingToken');
     });
+
+    it('throws NotFoundException for non-existent email', async () => {
+      emailLogRepo.findOne.mockResolvedValue(null);
+      await expect(service.getEmailLogAnalytics('non-existent')).rejects.toThrow('Email not found');
+    });
+  });
+
+  describe('getDailyEmailStats', () => {
+    it('should return daily email statistics for a date range', async () => {
+      const mockQueryBuilder = {
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getRawMany: jest.fn().mockResolvedValue([
+          { date: '2023-01-01', totalEmails: 10, sent: 8, failed: 2, bounced: 0 },
+          { date: '2023-01-02', totalEmails: 15, sent: 12, failed: 3, bounced: 0 },
+        ]),
+      };
+
+      emailLogRepo.createQueryBuilder.mockReturnValue(mockQueryBuilder as any);
+
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-01-31');
+      const result = await service.getDailyEmailStats(startDate, endDate);
+
+      expect(emailLogRepo.createQueryBuilder).toHaveBeenCalled();
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith('log.createdAt BETWEEN :start AND :end', {
+        start: startDate,
+        end: endDate,
+      });
+      expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
+      expect(result).toEqual([
+        { date: '2023-01-01', totalEmails: 10, sent: 8, failed: 2, bounced: 0 },
+        { date: '2023-01-02', totalEmails: 15, sent: 12, failed: 3, bounced: 0 },
+      ]);
+    });
+
+    it('should filter by template name when provided', async () => {
+      const mockQueryBuilder = {
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getRawMany: jest
+          .fn()
+          .mockResolvedValue([
+            { date: '2023-01-01', totalEmails: 5, sent: 4, failed: 1, bounced: 0 },
+          ]),
+      };
+
+      emailLogRepo.createQueryBuilder.mockReturnValue(mockQueryBuilder as any);
+
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-01-31');
+      const result = await service.getDailyEmailStats(startDate, endDate, 'verification');
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('log.templateName = :templateName', {
+        templateName: 'verification',
+      });
+      expect(result).toEqual([
+        { date: '2023-01-01', totalEmails: 5, sent: 4, failed: 1, bounced: 0 },
+      ]);
+    });
   });
 });
-
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { EmailService } from './email.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { EmailTemplate } from './entities/email-template.entity';
-import { EmailLog } from './entities/email-log.entity';
-import { EmailPreference } from './entities/email-preference.entity';
-import { Queue } from 'bull';
-import { JwtService } from '@nestjs/jwt';
 
 describe('EmailService.verifyUnsubscribeToken', () => {
   let service: EmailService;
@@ -134,7 +205,7 @@ describe('EmailService.verifyUnsubscribeToken', () => {
       providers: [
         EmailService,
         { provide: ConfigService, useValue: config },
-        { provide: 'BullQueue_email', useValue: { add: jest.fn() } as Partial<Queue> },
+        { provide: 'BullQueue_email', useValue: { add: jest.fn() } as any },
         { provide: getRepositoryToken(EmailTemplate), useValue: {} },
         { provide: getRepositoryToken(EmailLog), useValue: {} },
         { provide: getRepositoryToken(EmailPreference), useValue: {} },
@@ -152,24 +223,17 @@ describe('EmailService.verifyUnsubscribeToken', () => {
   });
 
   it('returns false on invalid token', async () => {
-    jwt.verify.mockImplementation(() => { throw new Error('bad'); });
+    jwt.verify.mockImplementation(() => {
+      throw new Error('bad');
+    });
     const ok = await service.verifyUnsubscribeToken('user@example.com', 'tok');
     expect(ok).toBe(false);
   });
 });
 
-import { Test, TestingModule } from '@nestjs/testing';
-import { EmailService } from './email.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { EmailTemplate } from './entities/email-template.entity';
-import { EmailLog } from './entities/email-log.entity';
-import { EmailPreference } from './entities/email-preference.entity';
-import { ConfigService } from '@nestjs/config';
-import { Queue } from 'bull';
-
 describe('EmailService', () => {
   let service: EmailService;
-  let mockQueue: Queue;
+  let mockQueue: any;
 
   const mockEmailTemplateRepo = {
     findOne: jest.fn(),
@@ -179,6 +243,7 @@ describe('EmailService', () => {
     save: jest.fn(),
     update: jest.fn(),
     findOne: jest.fn(),
+    createQueryBuilder: jest.fn(),
   };
   const mockEmailPreferenceRepo = {
     findOne: jest.fn(),
@@ -200,6 +265,7 @@ describe('EmailService', () => {
         { provide: getRepositoryToken(EmailLog), useValue: mockEmailLogRepo },
         { provide: getRepositoryToken(EmailPreference), useValue: mockEmailPreferenceRepo },
         { provide: 'BullQueue_email', useValue: mockQueue },
+        { provide: JwtService, useValue: null },
       ],
     }).compile();
 
@@ -245,7 +311,10 @@ describe('EmailService', () => {
     });
 
     it('should update existing preference', async () => {
-      mockEmailPreferenceRepo.findOne.mockResolvedValue({ email: 'user@example.com', optOut: false });
+      mockEmailPreferenceRepo.findOne.mockResolvedValue({
+        email: 'user@example.com',
+        optOut: false,
+      });
       await service.updateEmailPreference('user@example.com', 'email-verification', true);
       expect(mockEmailPreferenceRepo.save).toHaveBeenCalled();
     });
@@ -256,6 +325,65 @@ describe('EmailService', () => {
       mockEmailTemplateRepo.findOne.mockResolvedValue({ content: '<p>Hello</p>' });
       const template = await service.getTemplate('email-verification');
       expect(template).toBe('<p>Hello</p>');
+    });
+  });
+
+  describe('getEmailAnalytics', () => {
+    it('should return aggregated analytics for a date range', async () => {
+      const mockQueryBuilder = {
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        addGroupBy: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getRawMany: jest.fn().mockResolvedValue([
+          { templateName: 'verification', count: 10, status: 'sent' },
+          { templateName: 'verification', count: 2, status: 'failed' },
+        ]),
+      };
+
+      mockEmailLogRepo.createQueryBuilder.mockReturnValue(mockQueryBuilder as any);
+
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-01-31');
+      const result = await service.getEmailAnalytics(startDate, endDate, 'verification');
+
+      expect(mockEmailLogRepo.createQueryBuilder).toHaveBeenCalled();
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'log.createdAt BETWEEN :startDate AND :endDate',
+        { startDate, endDate },
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('log.templateName = :templateName', {
+        templateName: 'verification',
+      });
+      expect(result).toEqual([
+        { templateName: 'verification', count: 10, status: 'sent' },
+        { templateName: 'verification', count: 2, status: 'failed' },
+      ]);
+    });
+
+    it('should return analytics without template filter when templateName is not provided', async () => {
+      const mockQueryBuilder = {
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        addGroupBy: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getRawMany: jest
+          .fn()
+          .mockResolvedValue([{ templateName: 'verification', count: 10, status: 'sent' }]),
+      };
+
+      mockEmailLogRepo.createQueryBuilder.mockReturnValue(mockQueryBuilder as any);
+
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-01-31');
+      const result = await service.getEmailAnalytics(startDate, endDate);
+
+      expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
+      expect(result).toEqual([{ templateName: 'verification', count: 10, status: 'sent' }]);
     });
   });
 });

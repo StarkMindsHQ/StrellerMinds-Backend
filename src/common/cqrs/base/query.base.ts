@@ -62,10 +62,7 @@ export interface QueryResult<T = any> {
 export abstract class QueryHandler<TQuery extends Query = Query, TResult = any> {
   abstract handle(query: TQuery): Promise<QueryResult<TResult>>;
 
-  protected createSuccessResult<T>(
-    data: T,
-    metadata?: QueryResult['metadata'],
-  ): QueryResult<T> {
+  protected createSuccessResult<T>(data: T, metadata?: QueryResult['metadata']): QueryResult<T> {
     return {
       success: true,
       data,

@@ -28,10 +28,7 @@ module.exports = {
 
     // Best practices
     '@typescript-eslint/no-unused-vars': ['error'],
-    '@typescript-eslint/consistent-type-imports': [
-      'error',
-      { prefer: 'type-imports' },
-    ],
+    '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 
     // Prettier
     'prettier/prettier': [

@@ -52,10 +52,7 @@ class ConfigurationManager extends EventEmitter {
 
     if (this.configPath.endsWith('.json')) {
       return JSON.parse(content);
-    } else if (
-      this.configPath.endsWith('.yaml') ||
-      this.configPath.endsWith('.yml')
-    ) {
+    } else if (this.configPath.endsWith('.yaml') || this.configPath.endsWith('.yml')) {
       // You would need to install yaml parser
       // const yaml = require('yaml');
       // return yaml.parse(content);
@@ -66,30 +63,24 @@ class ConfigurationManager extends EventEmitter {
   }
 
   private validateConfiguration(config: any): void {
-    const environment =
-      config.app?.environment || process.env.NODE_ENV || 'development';
+    const environment = config.app?.environment || process.env.NODE_ENV || 'development';
 
     // General validation
     const { error: generalError } = configSchema.validate(config, {
       abortEarly: false,
     });
     if (generalError) {
-      throw new Error(
-        `Configuration validation failed: ${generalError.message}`,
-      );
+      throw new Error(`Configuration validation failed: ${generalError.message}`);
     }
 
     // Environment-specific validation
-    const envSchema =
-      environmentSchemas[environment as keyof typeof environmentSchemas];
+    const envSchema = environmentSchemas[environment as keyof typeof environmentSchemas];
     if (envSchema) {
       const { error: envError } = envSchema.validate(config, {
         abortEarly: false,
       });
       if (envError) {
-        throw new Error(
-          `Environment-specific validation failed: ${envError.message}`,
-        );
+        throw new Error(`Environment-specific validation failed: ${envError.message}`);
       }
     }
   }

@@ -65,7 +65,6 @@ export class MetricsCollectorService {
       // OS metrics
       const osMetrics = await this.getOSMetrics();
       this.logger.debug('OS metrics collected', osMetrics);
-
     } catch (error) {
       this.logger.error('Failed to collect system metrics:', error);
       throw error;
@@ -75,11 +74,10 @@ export class MetricsCollectorService {
   private async collectDatabaseMetrics(): Promise<void> {
     try {
       await this.metricsService.updateDatabaseMetrics();
-      
+
       // Additional database metrics
       const dbMetrics = await this.getDetailedDatabaseMetrics();
       this.logger.debug('Database metrics collected', dbMetrics);
-
     } catch (error) {
       this.logger.error('Failed to collect database metrics:', error);
       throw error;
@@ -141,7 +139,7 @@ export class MetricsCollectorService {
   private async getOSMetrics(): Promise<Record<string, any>> {
     try {
       const os = require('os');
-      
+
       return {
         loadAverage: os.loadavg(),
         totalMemory: os.totalmem(),
@@ -233,11 +231,10 @@ export class MetricsCollectorService {
     };
   } {
     const total = this.collectionHistory.length;
-    const successful = this.collectionHistory.filter(h => h.success).length;
+    const successful = this.collectionHistory.filter((h) => h.success).length;
     const failed = total - successful;
-    const averageDuration = total > 0 
-      ? this.collectionHistory.reduce((sum, h) => sum + h.duration, 0) / total 
-      : 0;
+    const averageDuration =
+      total > 0 ? this.collectionHistory.reduce((sum, h) => sum + h.duration, 0) / total : 0;
 
     return {
       totalCollections: total,

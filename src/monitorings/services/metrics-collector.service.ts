@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { MetricData, ObservabilityMetrics, SystemMetrics, ApplicationMetrics } from '../interfaces/observability.interface';
-import { MonitoringConfig } from '../interfaces/monitoring-config.interface';
+import { SystemMetrics, ApplicationMetrics } from '../interfaces/observability.interface';
+import { MonitoringConfig, MetricData } from '../interfaces/monitoring-config.interface';
 import * as os from 'os';
 import * as process from 'process';
 
@@ -13,7 +13,7 @@ export class MetricsCollectorService {
   private responseTimes: number[] = [];
   private errorCounts = new Map<string, number>();
 
-  constructor(private readonly config: MonitoringConfig) {}
+  constructor(@Inject('MonitoringConfig') private readonly config: MonitoringConfig) {}
 
   @Cron(CronExpression.EVERY_30_SECONDS)
   async collectSystemMetrics(): Promise<void> {
@@ -31,18 +31,25 @@ export class MetricsCollectorService {
 
       // Store application metrics
       this.storeMetric('request_count', applicationMetrics.requestCount, { type: 'application' });
-      this.storeMetric('response_time_avg', applicationMetrics.responseTime.average, { type: 'application' });
+      this.storeMetric('response_time_avg', applicationMetrics.responseTime.average, {
+        type: 'application',
+      });
       this.storeMetric('error_rate', applicationMetrics.errorRate, { type: 'application' });
-      this.storeMetric('active_connections', applicationMetrics.activeConnections, { type: 'application' });
+      this.storeMetric('active_connections', applicationMetrics.activeConnections, {
+        type: 'application',
+      });
 
       this.logger.debug('System and application metrics collected successfully');
-    } catch (error) {
-      this.logger.error('Failed to collect metrics', error.stack);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error('Failed to collect metrics', error.stack);
+      } else {
+        this.logger.error('Failed to collect metrics', String(error));
+      }
     }
   }
 
   private async getSystemMetrics(): Promise<SystemMetrics> {
-    const cpus = os.cpus();
     const totalMem = os.totalmem();
     const freeMem = os.freemem();
     const usedMem = totalMem - freeMem;
@@ -58,21 +65,19 @@ export class MetricsCollectorService {
         bytesIn: 0, // Would need platform-specific implementation
         bytesOut: 0,
         packetsIn: 0,
-        packetsOut: 0
+        packetsOut: 0,
       },
-      uptime: os.uptime()
+      uptime: os.uptime(),
     };
   }
 
   private async getApplicationMetrics(): Promise<ApplicationMetrics> {
-    const memUsage = process.memoryUsage();
-    
     return {
       requestCount: this.getTotalRequestCount(),
       responseTime: this.calculateResponseTimeMetrics(),
       errorRate: this.calculateErrorRate(),
       activeConnections: 0, // Would need to track active connections
-      throughput: this.calculateThroughput()
+      throughput: this.calculateThroughput(),
     };
   }
 
@@ -112,13 +117,16 @@ export class MetricsCollectorService {
       p95: sorted[Math.floor(len * 0.95)],
       p99: sorted[Math.floor(len * 0.99)],
       min: sorted[0],
-      max: sorted[len - 1]
+      max: sorted[len - 1],
     };
   }
 
   private calculateErrorRate(): number {
     const totalRequests = this.getTotalRequestCount();
-    const totalErrors = Array.from(this.errorCounts.values()).reduce((sum, count) => sum + count, 0);
+    const totalErrors = Array.from(this.errorCounts.values()).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
     return totalRequests > 0 ? (totalErrors / totalRequests) * 100 : 0;
   }
 
@@ -126,11 +134,12 @@ export class MetricsCollectorService {
     // Calculate requests per second over the last minute
     const now = Date.now();
     const oneMinuteAgo = now - 60000;
-    
+
     const recentMetrics = this.metrics.filter(
-      metric => metric.timestamp.getTime() > oneMinuteAgo && metric.metricName === 'request_count'
+      (metric) =>
+        metric.timestamp.getTime() > oneMinuteAgo && metric.metricName === 'request_count',
     );
-    
+
     return recentMetrics.length > 0 ? recentMetrics[recentMetrics.length - 1].value / 60 : 0;
   }
 
@@ -140,26 +149,26 @@ export class MetricsCollectorService {
       metricName: name,
       value,
       tags,
-      unit: this.getMetricUnit(name)
+      unit: this.getMetricUnit(name),
     };
 
     this.metrics.push(metric);
-    
+
     // Keep only recent metrics (last hour)
     const oneHourAgo = Date.now() - 3600000;
-    this.metrics = this.metrics.filter(m => m.timestamp.getTime() > oneHourAgo);
+    this.metrics = this.metrics.filter((m) => m.timestamp.getTime() > oneHourAgo);
   }
 
   private getMetricUnit(metricName: string): string {
     const unitMap: Record<string, string> = {
-      'cpu_usage': '%',
-      'memory_usage': '%',
-      'disk_usage': '%',
-      'response_time_avg': 'ms',
-      'error_rate': '%',
-      'uptime': 's',
-      'request_count': 'count',
-      'active_connections': 'count'
+      cpu_usage: '%',
+      memory_usage: '%',
+      disk_usage: '%',
+      response_time_avg: 'ms',
+      error_rate: '%',
+      uptime: 's',
+      request_count: 'count',
+      active_connections: 'count',
     };
     return unitMap[metricName] || 'count';
   }
@@ -172,7 +181,7 @@ export class MetricsCollectorService {
 
   recordResponseTime(responseTime: number): void {
     this.responseTimes.push(responseTime);
-    
+
     // Keep only recent response times (last 1000 requests)
     if (this.responseTimes.length > 1000) {
       this.responseTimes = this.responseTimes.slice(-1000);
@@ -186,10 +195,19 @@ export class MetricsCollectorService {
 
   getMetrics(since?: Date): MetricData[] {
     if (!since) return [...this.metrics];
-    return this.metrics.filter(m => m.timestamp >= since);
+    return this.metrics.filter((m) => m.timestamp >= since);
   }
 
   getMetricsByName(name: string, since?: Date): MetricData[] {
-    return this.getMetrics(since).filter(m => m.metricName === name);
+    return this.getMetrics(since).filter((m) => m.metricName === name);
+  }
+
+  getAggregatedMetrics() {
+    return {
+      requests: Object.fromEntries(this.requestCounts),
+      totalRequests: this.getTotalRequestCount(),
+      responseTimes: this.responseTimes,
+      errors: Object.fromEntries(this.errorCounts),
+    };
   }
 }

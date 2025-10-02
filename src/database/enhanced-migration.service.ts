@@ -87,7 +87,7 @@ export class EnhancedMigrationService implements OnModuleInit {
       createBackup?: boolean;
       monitorProgress?: boolean;
       rollbackOnFailure?: boolean;
-    } = {}
+    } = {},
   ): Promise<MigrationMetadata> {
     const {
       validateBefore = true,
@@ -110,7 +110,9 @@ export class EnhancedMigrationService implements OnModuleInit {
     if (validateBefore) {
       const validationResult = await this.validateMigration(migrationName);
       if (!validationResult.isValid) {
-        const error = new Error(`Migration validation failed: ${validationResult.errors.join(', ')}`);
+        const error = new Error(
+          `Migration validation failed: ${validationResult.errors.join(', ')}`,
+        );
         this.eventEmitter.emit('migration.validation_failed', { migrationName, validationResult });
         throw error;
       }
@@ -163,7 +165,6 @@ export class EnhancedMigrationService implements OnModuleInit {
       this.logger.log(`✅ Migration ${migrationName} completed successfully in ${executionTime}ms`);
 
       return metadata;
-
     } catch (error) {
       status = 'failed';
       const executionTime = Date.now() - startTime;
@@ -244,18 +245,25 @@ export class EnhancedMigrationService implements OnModuleInit {
       validationResult.dataIntegrityChecks.push(...dbValidation);
 
       // Check for failed checks
-      const failedChecks = validationResult.dataIntegrityChecks.filter(check => check.status === 'fail');
+      const failedChecks = validationResult.dataIntegrityChecks.filter(
+        (check) => check.status === 'fail',
+      );
       if (failedChecks.length > 0) {
-        validationResult.errors.push(`Data integrity checks failed: ${failedChecks.map(c => c.message).join(', ')}`);
+        validationResult.errors.push(
+          `Data integrity checks failed: ${failedChecks.map((c) => c.message).join(', ')}`,
+        );
         validationResult.isValid = false;
       }
 
       // Check for warnings
-      const warningChecks = validationResult.dataIntegrityChecks.filter(check => check.status === 'warning');
+      const warningChecks = validationResult.dataIntegrityChecks.filter(
+        (check) => check.status === 'warning',
+      );
       if (warningChecks.length > 0) {
-        validationResult.warnings.push(`Data integrity warnings: ${warningChecks.map(c => c.message).join(', ')}`);
+        validationResult.warnings.push(
+          `Data integrity warnings: ${warningChecks.map((c) => c.message).join(', ')}`,
+        );
       }
-
     } catch (error) {
       validationResult.errors.push(`Validation error: ${error.message}`);
       validationResult.isValid = false;
@@ -267,16 +275,13 @@ export class EnhancedMigrationService implements OnModuleInit {
   /**
    * Enhanced rollback with validation and monitoring
    */
-  async rollbackMigration(
-    migrationName: string,
-    backupPath?: string
-  ): Promise<void> {
+  async rollbackMigration(migrationName: string, backupPath?: string): Promise<void> {
     this.logger.log(`🔄 Rolling back migration: ${migrationName}`);
 
     this.eventEmitter.emit('migration.rollback_started', { migrationName, timestamp: new Date() });
 
     const queryRunner = this.dataSource.createQueryRunner();
-    
+
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -294,10 +299,7 @@ export class EnhancedMigrationService implements OnModuleInit {
       }
 
       // Remove from migrations table
-      await queryRunner.query(
-        'DELETE FROM migrations WHERE name = $1',
-        [migrationName]
-      );
+      await queryRunner.query('DELETE FROM migrations WHERE name = $1', [migrationName]);
 
       await queryRunner.commitTransaction();
 
@@ -310,11 +312,10 @@ export class EnhancedMigrationService implements OnModuleInit {
 
       this.eventEmitter.emit('migration.rollback_completed', { migrationName });
       this.logger.log(`✅ Migration ${migrationName} rolled back successfully`);
-
     } catch (error) {
       await queryRunner.rollbackTransaction();
       this.logger.error(`❌ Rollback failed: ${error.message}`);
-      
+
       // Attempt to restore from backup if available
       if (backupPath && fs.existsSync(backupPath)) {
         try {
@@ -327,7 +328,6 @@ export class EnhancedMigrationService implements OnModuleInit {
 
       this.eventEmitter.emit('migration.rollback_failed', { migrationName, error: error.message });
       throw error;
-
     } finally {
       await queryRunner.release();
     }
@@ -351,17 +351,18 @@ export class EnhancedMigrationService implements OnModuleInit {
     };
   }> {
     const migrations = Array.from(this.migrationHistory.values());
-    
-    const pending = migrations.filter(m => m.status === 'pending');
-    const running = migrations.filter(m => m.status === 'running');
-    const completed = migrations.filter(m => m.status === 'completed');
-    const failed = migrations.filter(m => m.status === 'failed');
-    const rolledBack = migrations.filter(m => m.status === 'rolled_back');
+
+    const pending = migrations.filter((m) => m.status === 'pending');
+    const running = migrations.filter((m) => m.status === 'running');
+    const completed = migrations.filter((m) => m.status === 'completed');
+    const failed = migrations.filter((m) => m.status === 'failed');
+    const rolledBack = migrations.filter((m) => m.status === 'rolled_back');
 
     const total = migrations.length;
-    const avgExecutionTime = completed.length > 0 
-      ? completed.reduce((sum, m) => sum + m.executionTime, 0) / completed.length 
-      : 0;
+    const avgExecutionTime =
+      completed.length > 0
+        ? completed.reduce((sum, m) => sum + m.executionTime, 0) / completed.length
+        : 0;
 
     return {
       pending,
@@ -422,7 +423,7 @@ export class EnhancedMigrationService implements OnModuleInit {
       // Dynamic import of migration
       const migrationModule = await import(migrationPath);
       const migrationClass = Object.values(migrationModule)[0] as any;
-      
+
       if (migrationClass && typeof migrationClass === 'function') {
         return new migrationClass();
       }
@@ -436,10 +437,10 @@ export class EnhancedMigrationService implements OnModuleInit {
 
   private async executeMigrationUp(
     migration: MigrationInterface,
-    monitorProgress: boolean
+    monitorProgress: boolean,
   ): Promise<void> {
     const queryRunner = this.dataSource.createQueryRunner();
-    
+
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
@@ -472,7 +473,6 @@ export class EnhancedMigrationService implements OnModuleInit {
           message: 'Migration completed successfully',
         });
       }
-
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -484,10 +484,10 @@ export class EnhancedMigrationService implements OnModuleInit {
   private async createMigrationBackup(migrationName: string): Promise<string> {
     const timestamp = new Date().getTime();
     const backupPath = path.join(this.backupDir, `${migrationName}_${timestamp}.sql`);
-    
+
     // Create backup logic here
     // This would typically use pg_dump or similar tool
-    
+
     return backupPath;
   }
 

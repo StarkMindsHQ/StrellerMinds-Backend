@@ -1,17 +1,17 @@
 import {
-    Controller,
-    Post,
-    Get,
-    Put,
-    Delete,
-    Body,
-    Param,
-    Query,
-    UseGuards,
-    Request,
-    HttpStatus,
-    HttpCode,
-  } from '@nestjs/common';
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+  Request,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { WalletService } from '../services/wallet.service';
 import { ConnectWalletDto } from '../dto/connect-wallet.dto';
@@ -48,7 +48,7 @@ export class WalletController {
    * Disconnect the authenticated user's wallet.
    */
   @Post('disconnect')
-  @ApiOperation({ summary: 'Disconnect the authenticated user\'s wallet' })
+  @ApiOperation({ summary: "Disconnect the authenticated user's wallet" })
   @ApiResponse({ status: 204, description: 'Wallet disconnected successfully.' })
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -62,13 +62,10 @@ export class WalletController {
    * @returns List of credentials
    */
   @Get('credentials')
-  @ApiOperation({ summary: 'Get credentials for the authenticated user\'s wallet' })
+  @ApiOperation({ summary: "Get credentials for the authenticated user's wallet" })
   @ApiResponse({ status: 200, description: 'List of credentials.' })
   @UseGuards(JwtAuthGuard)
-  async getCredentials(
-    @Request() req,
-    @Query() filters: CredentialFilterDto
-  ) {
+  async getCredentials(@Request() req, @Query() filters: CredentialFilterDto) {
     return await this.walletService.getWalletCredentials(req.user.walletId, filters);
   }
 
@@ -92,14 +89,11 @@ export class WalletController {
    */
   @BlockchainRateLimit.credentialShare()
   @Post('credentials/share')
-  @ApiOperation({ summary: 'Share credentials from the authenticated user\'s wallet' })
+  @ApiOperation({ summary: "Share credentials from the authenticated user's wallet" })
   @ApiResponse({ status: 201, description: 'Credentials shared successfully.' })
   @ApiResponse({ status: 429, description: 'Too many credential sharing attempts' })
   @UseGuards(JwtAuthGuard)
-  async shareCredentials(
-    @Request() req,
-    @Body() shareDto: ShareCredentialDto
-  ) {
+  async shareCredentials(@Request() req, @Body() shareDto: ShareCredentialDto) {
     return await this.walletService.shareCredentials(req.user.walletId, shareDto);
   }
 
@@ -112,10 +106,7 @@ export class WalletController {
   @ApiResponse({ status: 204, description: 'Credential share revoked.' })
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async revokeCredentialShare(
-    @Request() req,
-    @Param('id') credentialId: string
-  ) {
+  async revokeCredentialShare(@Request() req, @Param('id') credentialId: string) {
     await this.walletService.revokeCredentialShare(credentialId, req.user.walletId);
   }
 

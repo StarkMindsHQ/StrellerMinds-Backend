@@ -7,8 +7,8 @@ receivers:
         endpoint: 0.0.0.0:4318
         cors:
           allowed_origins:
-            - "http://*"
-            - "https://*"
+            - 'http://*'
+            - 'https://*'
 
   # Prometheus metrics receiver
   prometheus:
@@ -74,7 +74,7 @@ exporters:
 
   # Prometheus metrics exporter
   prometheus:
-    endpoint: "0.0.0.0:8889"
+    endpoint: '0.0.0.0:8889'
     namespace: strellerminds
 
   # Logging exporter for debugging

@@ -1,24 +1,24 @@
-import { IsBoolean, IsOptional, IsObject } from "class-validator"
-import type { NotificationChannel, NotificationType } from "../entities/notification.entity"
+import { IsBoolean, IsOptional, IsObject } from 'class-validator';
+import type { NotificationChannel, NotificationType } from '../entities/notification.entity';
 
 export class UpdateNotificationPreferenceDto {
   @IsOptional()
   @IsBoolean()
-  emailEnabled?: boolean
+  emailEnabled?: boolean;
 
   @IsOptional()
   @IsBoolean()
-  smsEnabled?: boolean
+  smsEnabled?: boolean;
 
   @IsOptional()
   @IsBoolean()
-  inAppEnabled?: boolean
+  inAppEnabled?: boolean;
 
   @IsOptional()
   @IsBoolean()
-  pushEnabled?: boolean
+  pushEnabled?: boolean;
 
   @IsOptional()
   @IsObject()
-  typePreferences?: { [key in NotificationType]?: NotificationChannel[] }
+  typePreferences?: { [key in NotificationType]?: NotificationChannel[] };
 }

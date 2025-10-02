@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -13,8 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { AccountStatus } from '../enums/accountStatus.enum';
 import { AuditLogService } from 'src/audit/services/audit.log.service';
 import { AccountDeletionConfirmationService } from './account.deletion.confirmation.service';
-
-
 
 /**
  * Service responsible for handling user account deletion process
@@ -37,10 +30,7 @@ export class UserDeletionService {
     private readonly configService: ConfigService,
   ) {
     // Get data retention period from config (days)
-    this.dataRetentionPeriod = this.configService.get<number>(
-      'DATA_RETENTION_PERIOD',
-      30,
-    );
+    this.dataRetentionPeriod = this.configService.get<number>('DATA_RETENTION_PERIOD', 30);
   }
 
   /**
@@ -48,10 +38,7 @@ export class UserDeletionService {
    * @param userId User ID to deactivate
    * @param requestingUserId User ID requesting the deactivation
    */
-  async deactivateAccount(
-    userId: string,
-    requestingUserId: string,
-  ): Promise<void> {
+  async deactivateAccount(userId: string, requestingUserId: string): Promise<void> {
     const user = await this.findUserOrFail(userId);
 
     // Begin transaction
@@ -93,19 +80,14 @@ export class UserDeletionService {
    * @param userId User ID to delete
    * @param requestingUserId User ID requesting the deletion
    */
-  async requestAccountDeletion(
-    userId: string,
-    requestingUserId: string,
-  ): Promise<void> {
+  async requestAccountDeletion(userId: string, requestingUserId: string): Promise<void> {
     const user = await this.findUserOrFail(userId);
 
     // Ensure user is authorized to delete this account
     if (userId !== requestingUserId) {
       const requestingUser = await this.findUserOrFail(requestingUserId);
       if (requestingUser.role !== 'ADMIN') {
-        throw new BadRequestException(
-          'You are not authorized to delete this account',
-        );
+        throw new BadRequestException('You are not authorized to delete this account');
       }
     }
 
@@ -144,13 +126,9 @@ export class UserDeletionService {
    * @param userId User ID to delete
    * @param confirmationToken Confirmation token
    */
-  async confirmAccountDeletion(
-    userId: string,
-    confirmationToken: string,
-  ): Promise<void> {
+  async confirmAccountDeletion(userId: string, confirmationToken: string): Promise<void> {
     // Validate confirmation token
-    const isValid = await this.confirmationService.validateAndDeleteAccount(confirmationToken,
-    );
+    const isValid = await this.confirmationService.validateAndDeleteAccount(confirmationToken);
 
     if (!isValid) {
       throw new BadRequestException('Invalid or expired confirmation token');
@@ -164,10 +142,7 @@ export class UserDeletionService {
    * @param userId User ID to delete
    * @param requestingUserId User ID requesting the deletion
    */
-  async performAccountDeletion(
-    userId: string,
-    requestingUserId: string,
-  ): Promise<void> {
+  async performAccountDeletion(userId: string, requestingUserId: string): Promise<void> {
     const user = await this.findUserOrFail(userId);
 
     // Begin transaction for atomic operations
@@ -240,10 +215,7 @@ export class UserDeletionService {
    * @param userId User ID
    * @param queryRunner Transaction query runner
    */
-  private async preserveBlockchainCredentials(
-    userId: string,
-    queryRunner: any,
-  ): Promise<void> {
+  private async preserveBlockchainCredentials(userId: string, queryRunner: any): Promise<void> {
     const walletInfo = await this.walletInfoRepository.findOne({
       where: { user: { id: userId } },
     });

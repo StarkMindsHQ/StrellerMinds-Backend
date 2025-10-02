@@ -48,11 +48,11 @@ describe('User Settings Accessibility', () => {
   it('should have proper heading structure', async () => {
     const { container } = render(<UserSettingsPage />);
     const headings = container.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    
+
     // Check that there's only one h1
     const h1Elements = container.querySelectorAll('h1');
     expect(h1Elements).toHaveLength(1);
-    
+
     // Check heading hierarchy
     let previousLevel = 0;
     headings.forEach((heading) => {
@@ -65,12 +65,12 @@ describe('User Settings Accessibility', () => {
   it('should have accessible form labels', () => {
     const { container } = render(<UserSettingsPage />);
     const inputs = container.querySelectorAll('input, select, textarea');
-    
+
     inputs.forEach((input) => {
       const label = container.querySelector(`label[for="${input.id}"]`);
       const ariaLabel = input.getAttribute('aria-label');
       const ariaLabelledBy = input.getAttribute('aria-labelledby');
-      
+
       expect(
         label || ariaLabel || ariaLabelledBy
       ).toBeTruthy();
@@ -95,13 +95,13 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '16'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Build application
         run: npm run build
-      
+
       - name: Run Lighthouse CI
         run: |
           npm install -g @lhci/cli
@@ -115,6 +115,7 @@ jobs:
 ### Keyboard Navigation Testing
 
 #### Test Checklist
+
 - [ ] All interactive elements are reachable via Tab key
 - [ ] Tab order is logical and intuitive
 - [ ] Focus indicators are clearly visible
@@ -124,6 +125,7 @@ jobs:
 - [ ] Arrow keys work in menus and lists
 
 #### Testing Steps
+
 1. **Start with a fresh page load**
 2. **Use only the keyboard** (disconnect mouse if necessary)
 3. **Press Tab repeatedly** and verify:
@@ -138,6 +140,7 @@ jobs:
 ### Screen Reader Testing
 
 #### NVDA Testing (Windows)
+
 1. **Download and install NVDA** (free)
 2. **Start NVDA** and turn off your monitor
 3. **Navigate the site** using only audio feedback
@@ -148,6 +151,7 @@ jobs:
    - Content reading
 
 #### Testing Script Example
+
 ```
 1. Load the course enrollment page
 2. Use H key to navigate through headings
@@ -161,6 +165,7 @@ jobs:
 ### Visual Testing
 
 #### Color Contrast Testing
+
 1. **Use WebAIM Contrast Checker**
 2. **Test all text/background combinations**
 3. **Verify minimum ratios**:
@@ -169,6 +174,7 @@ jobs:
    - UI components: 3:1
 
 #### Color Blindness Testing
+
 1. **Use browser extensions** (Stark, Colorblinding)
 2. **Test with different types**:
    - Protanopia (red-blind)
@@ -177,6 +183,7 @@ jobs:
 3. **Verify information isn't conveyed by color alone**
 
 #### Zoom Testing
+
 1. **Set browser zoom to 200%**
 2. **Verify all content is still accessible**
 3. **Check for horizontal scrolling**
@@ -185,6 +192,7 @@ jobs:
 ## User Testing with Disabled Users
 
 ### Recruiting Participants
+
 - Partner with disability organizations
 - Use accessibility-focused recruiting platforms
 - Ensure diverse representation of disabilities
@@ -193,11 +201,13 @@ jobs:
 ### Testing Session Structure
 
 #### Pre-Session (15 minutes)
+
 - Technical setup and assistive technology check
 - Brief introduction to the platform
 - Consent and recording permissions
 
 #### Main Session (45 minutes)
+
 - **Task 1**: Account creation and profile setup
 - **Task 2**: Course browsing and enrollment
 - **Task 3**: Lesson completion and progress tracking
@@ -205,6 +215,7 @@ jobs:
 - **Task 5**: Certificate generation and download
 
 #### Post-Session (15 minutes)
+
 - Feedback discussion
 - Accessibility feature suggestions
 - Overall experience rating
@@ -212,18 +223,22 @@ jobs:
 ### Sample Testing Tasks
 
 #### Task 1: Account Creation
+
 **Scenario**: "You're interested in learning about blockchain technology. Create an account on StrellerMinds."
 
 **Success Criteria**:
+
 - User can navigate to registration form
 - All form fields are properly labeled
 - Error messages are clear and actionable
 - Account creation completes successfully
 
 #### Task 2: Course Enrollment
+
 **Scenario**: "Find and enroll in a beginner blockchain course."
 
 **Success Criteria**:
+
 - User can browse course catalog
 - Course information is accessible
 - Enrollment process is clear
@@ -232,12 +247,14 @@ jobs:
 ### Data Collection
 
 #### Quantitative Metrics
+
 - Task completion rates
 - Time to complete tasks
 - Number of errors encountered
 - Accessibility feature usage
 
 #### Qualitative Feedback
+
 - User satisfaction ratings
 - Specific accessibility barriers
 - Suggestions for improvement
@@ -246,6 +263,7 @@ jobs:
 ## Accessibility Testing Checklist
 
 ### Page-Level Testing
+
 - [ ] Page has a descriptive title
 - [ ] Page has proper heading structure (h1-h6)
 - [ ] All images have appropriate alt text
@@ -257,6 +275,7 @@ jobs:
 - [ ] No content flashes more than 3 times per second
 
 ### Form Testing
+
 - [ ] All form controls have labels
 - [ ] Required fields are clearly indicated
 - [ ] Error messages are descriptive and helpful
@@ -265,6 +284,7 @@ jobs:
 - [ ] Success messages are announced to screen readers
 
 ### Interactive Element Testing
+
 - [ ] Buttons have descriptive text or labels
 - [ ] Custom controls have appropriate ARIA attributes
 - [ ] Dropdown menus are keyboard accessible
@@ -273,6 +293,7 @@ jobs:
 - [ ] Dynamic content changes are announced
 
 ### Media Testing
+
 - [ ] Videos have captions
 - [ ] Audio content has transcripts
 - [ ] Auto-playing media can be paused
@@ -282,6 +303,7 @@ jobs:
 ## Reporting and Documentation
 
 ### Accessibility Issue Template
+
 ```markdown
 ## Accessibility Issue Report
 
@@ -290,32 +312,40 @@ jobs:
 **WCAG Guideline**: [e.g., 2.1.1 Keyboard]
 
 ### Description
+
 Brief description of the accessibility barrier.
 
 ### Steps to Reproduce
+
 1. Step one
 2. Step two
 3. Step three
 
 ### Expected Behavior
+
 What should happen for accessibility compliance.
 
 ### Actual Behavior
+
 What currently happens.
 
 ### Assistive Technology Used
+
 - Screen reader: [NVDA / JAWS / VoiceOver / etc.]
 - Browser: [Chrome / Firefox / Safari / etc.]
 - Operating System: [Windows / macOS / etc.]
 
 ### Suggested Solution
+
 Recommended approach to fix the issue.
 
 ### Screenshots/Videos
+
 Attach relevant media if applicable.
 ```
 
 ### Testing Report Template
+
 ```markdown
 ## Accessibility Testing Report
 
@@ -324,6 +354,7 @@ Attach relevant media if applicable.
 **Testing Method**: [Automated / Manual / User Testing]
 
 ### Summary
+
 - Total issues found: X
 - Critical issues: X
 - High priority issues: X
@@ -331,6 +362,7 @@ Attach relevant media if applicable.
 - Low priority issues: X
 
 ### Test Coverage
+
 - [ ] Keyboard navigation
 - [ ] Screen reader compatibility
 - [ ] Color contrast
@@ -339,16 +371,19 @@ Attach relevant media if applicable.
 - [ ] Media accessibility
 
 ### Key Findings
+
 1. [Finding 1]
 2. [Finding 2]
 3. [Finding 3]
 
 ### Recommendations
+
 1. [Recommendation 1]
 2. [Recommendation 2]
 3. [Recommendation 3]
 
 ### Next Steps
+
 - [ ] Fix critical issues
 - [ ] Retest affected areas
 - [ ] Update documentation
@@ -357,4 +392,4 @@ Attach relevant media if applicable.
 
 ---
 
-*This testing guide should be updated regularly as new accessibility standards emerge and testing tools evolve.*
+_This testing guide should be updated regularly as new accessibility standards emerge and testing tools evolve._

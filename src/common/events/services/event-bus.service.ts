@@ -74,15 +74,10 @@ export class EventBusService implements IEventBus, OnModuleInit, OnModuleDestroy
       });
 
       // Store event in event store
-      await this.eventStore.appendEvents(
-        event.aggregateId,
-        event.aggregateType,
-        [event],
-        {
-          correlationId: event.metadata.correlationId,
-          causationId: event.metadata.causationId,
-        },
-      );
+      await this.eventStore.appendEvents(event.aggregateId, event.aggregateType, [event], {
+        correlationId: event.metadata.correlationId,
+        causationId: event.metadata.causationId,
+      });
 
       // Emit event for immediate processing
       this.eventEmitter.emit(event.eventType, event);
@@ -125,7 +120,7 @@ export class EventBusService implements IEventBus, OnModuleInit, OnModuleDestroy
 
       // Group events by aggregate for batch storage
       const eventsByAggregate = new Map<string, DomainEvent[]>();
-      
+
       for (const event of events) {
         const key = `${event.aggregateType}:${event.aggregateId}`;
         if (!eventsByAggregate.has(key)) {
@@ -141,7 +136,7 @@ export class EventBusService implements IEventBus, OnModuleInit, OnModuleDestroy
       }
 
       // Emit and queue all events
-      const queueJobs = events.map(event => ({
+      const queueJobs = events.map((event) => ({
         name: 'process-event',
         data: { eventData: event.toJSON() },
         opts: {
@@ -161,7 +156,7 @@ export class EventBusService implements IEventBus, OnModuleInit, OnModuleDestroy
       this.logger.debug(`Successfully published ${events.length} events`);
     } catch (error) {
       this.logger.error(`Failed to publish events batch`, error.stack);
-      events.forEach(event => this.updateMetrics(event, 'failed'));
+      events.forEach((event) => this.updateMetrics(event, 'failed'));
       throw error;
     }
   }
@@ -197,11 +192,13 @@ export class EventBusService implements IEventBus, OnModuleInit, OnModuleDestroy
       return;
     }
 
-    const index = subscriptions.findIndex(sub => sub.handler === handler);
+    const index = subscriptions.findIndex((sub) => sub.handler === handler);
     if (index !== -1) {
       subscriptions.splice(index, 1);
       this.eventEmitter.removeListener(eventType, handler.handle.bind(handler));
-      this.logger.debug(`Unsubscribed handler ${handler.metadata.handlerName} from event ${eventType}`);
+      this.logger.debug(
+        `Unsubscribed handler ${handler.metadata.handlerName} from event ${eventType}`,
+      );
     }
   }
 
@@ -227,24 +224,29 @@ export class EventBusService implements IEventBus, OnModuleInit, OnModuleDestroy
     this.logger.debug('Event Bus metrics cleared');
   }
 
-  private async processEvent<T extends DomainEvent>(event: T, handler: EventHandler<T>): Promise<void> {
+  private async processEvent<T extends DomainEvent>(
+    event: T,
+    handler: EventHandler<T>,
+  ): Promise<void> {
     const startTime = Date.now();
-    
+
     try {
       await handler.handleWithRetry(event);
-      
+
       const processingTime = Date.now() - startTime;
       this.processingTimes.push(processingTime);
-      
+
       // Keep only last 1000 processing times for average calculation
       if (this.processingTimes.length > 1000) {
         this.processingTimes = this.processingTimes.slice(-1000);
       }
-      
+
       this.updateMetrics(event, 'processed');
       this.updateHandlerMetrics(handler.metadata.handlerName);
-      
-      this.logger.debug(`Event processed successfully: ${event.eventType} by ${handler.metadata.handlerName}`);
+
+      this.logger.debug(
+        `Event processed successfully: ${event.eventType} by ${handler.metadata.handlerName}`,
+      );
     } catch (error) {
       this.updateMetrics(event, 'failed');
       this.logger.error(
@@ -268,7 +270,8 @@ export class EventBusService implements IEventBus, OnModuleInit, OnModuleDestroy
         break;
     }
 
-    this.metrics.eventsByType[event.eventType] = (this.metrics.eventsByType[event.eventType] || 0) + 1;
+    this.metrics.eventsByType[event.eventType] =
+      (this.metrics.eventsByType[event.eventType] || 0) + 1;
     this.metrics.lastEventTimestamp = new Date();
   }
 
@@ -280,7 +283,7 @@ export class EventBusService implements IEventBus, OnModuleInit, OnModuleDestroy
     if (this.processingTimes.length === 0) {
       return 0;
     }
-    
+
     const sum = this.processingTimes.reduce((acc, time) => acc + time, 0);
     return sum / this.processingTimes.length;
   }

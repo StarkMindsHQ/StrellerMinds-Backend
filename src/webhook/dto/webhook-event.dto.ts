@@ -1,21 +1,21 @@
-import { IsString, IsObject, IsOptional, IsUUID } from "class-validator"
+import { IsString, IsObject, IsOptional, IsUUID } from 'class-validator';
 
 export class WebhookEventDto {
   @IsString()
-  event: string
+  event: string;
 
   @IsObject()
-  data: any
+  data: any;
 
   @IsOptional()
   @IsUUID()
-  entityId?: string
+  entityId?: string;
 
   @IsOptional()
   @IsString()
-  entityType?: string
+  entityType?: string;
 
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>;
 }

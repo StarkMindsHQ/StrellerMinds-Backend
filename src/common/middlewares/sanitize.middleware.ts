@@ -22,4 +22,4 @@ export class SanitizeMiddleware implements NestMiddleware {
     if (req.params) req.params = sanitizeObject(req.params);
     next();
   }
-} 
+}

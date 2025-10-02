@@ -9,7 +9,9 @@ async function generateOpenAPISpec() {
   const app = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
     .setTitle('Mentor Grading API')
-    .setDescription('APIs for mentors to grade student assignments and provide feedback. Admin API for course management.')
+    .setDescription(
+      'APIs for mentors to grade student assignments and provide feedback. Admin API for course management.',
+    )
     .setVersion(pkg.version)
     .addBearerAuth()
     .build();

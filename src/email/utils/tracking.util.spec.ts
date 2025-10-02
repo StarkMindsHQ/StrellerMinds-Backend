@@ -86,5 +86,3 @@ describe('EmailTrackingUtil', () => {
     expect(out).toContain('/email/track/open/tok.png');
   });
 });
-
-

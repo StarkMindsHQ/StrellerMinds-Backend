@@ -5,7 +5,12 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNumber, IsOptional, Min, Max, IsObject } from 'class-validator';
 
 export class UpdateProgressDto {
-  @ApiProperty({ example: 50, minimum: 0, maximum: 100, description: 'Progress percentage (0-100)' })
+  @ApiProperty({
+    example: 50,
+    minimum: 0,
+    maximum: 100,
+    description: 'Progress percentage (0-100)',
+  })
   @IsNumber()
   @Min(0)
   @Max(100)

@@ -39,7 +39,7 @@ export class TracingService {
     kind: SpanKind = SpanKind.INTERNAL,
   ): Promise<T> {
     const span = this.createSpan(name, attributes, kind);
-    
+
     try {
       const result = await fn(span);
       span.setStatus({ code: SpanStatusCode.OK });
@@ -64,12 +64,16 @@ export class TracingService {
     operation: string,
     attributes: Record<string, any> = {},
   ): Span {
-    return this.createSpan(`${serviceName}.${operation}`, {
-      'service.type': 'external',
-      'service.name': serviceName,
-      'operation.name': operation,
-      ...attributes,
-    }, SpanKind.CLIENT);
+    return this.createSpan(
+      `${serviceName}.${operation}`,
+      {
+        'service.type': 'external',
+        'service.name': serviceName,
+        'operation.name': operation,
+        ...attributes,
+      },
+      SpanKind.CLIENT,
+    );
   }
 
   /**
@@ -80,12 +84,16 @@ export class TracingService {
     table?: string,
     attributes: Record<string, any> = {},
   ): Span {
-    return this.createSpan(`db.${operation}`, {
-      'db.system': 'postgresql',
-      'db.operation': operation,
-      'db.sql.table': table,
-      ...attributes,
-    }, SpanKind.CLIENT);
+    return this.createSpan(
+      `db.${operation}`,
+      {
+        'db.system': 'postgresql',
+        'db.operation': operation,
+        'db.sql.table': table,
+        ...attributes,
+      },
+      SpanKind.CLIENT,
+    );
   }
 
   /**
@@ -96,12 +104,16 @@ export class TracingService {
     operation: string,
     attributes: Record<string, any> = {},
   ): Span {
-    return this.createSpan(`queue.${queueName}.${operation}`, {
-      'messaging.system': 'redis',
-      'messaging.destination': queueName,
-      'messaging.operation': operation,
-      ...attributes,
-    }, SpanKind.CLIENT);
+    return this.createSpan(
+      `queue.${queueName}.${operation}`,
+      {
+        'messaging.system': 'redis',
+        'messaging.destination': queueName,
+        'messaging.operation': operation,
+        ...attributes,
+      },
+      SpanKind.CLIENT,
+    );
   }
 
   /**
@@ -169,19 +181,23 @@ export class TracingService {
     kind: SpanKind = SpanKind.INTERNAL,
   ): Span {
     const parentSpan = trace.getActiveSpan();
-    const span = this.tracer.startSpan(name, {
-      kind,
-      attributes: {
-        'service.name': this.tracingConfigService.getConfig().serviceName,
-        ...attributes,
+    const span = this.tracer.startSpan(
+      name,
+      {
+        kind,
+        attributes: {
+          'service.name': this.tracingConfigService.getConfig().serviceName,
+          ...attributes,
+        },
       },
-    }, parentSpan ? trace.setSpan(context.active(), parentSpan) : undefined);
+      parentSpan ? trace.setSpan(context.active(), parentSpan) : undefined,
+    );
 
-    this.logger.debug(`Created child span: ${name}`, { 
+    this.logger.debug(`Created child span: ${name}`, {
       spanId: span.spanContext().spanId,
       traceId: span.spanContext().traceId,
     });
-    
+
     return span;
   }
 
@@ -210,25 +226,29 @@ export class TracingService {
     operation: string,
     attributes: Record<string, any> = {},
   ): Span {
-    return this.createSpan(`blockchain.${blockchain}.${operation}`, {
-      'blockchain.name': blockchain,
-      'blockchain.operation': operation,
-      ...attributes,
-    }, SpanKind.CLIENT);
+    return this.createSpan(
+      `blockchain.${blockchain}.${operation}`,
+      {
+        'blockchain.name': blockchain,
+        'blockchain.operation': operation,
+        ...attributes,
+      },
+      SpanKind.CLIENT,
+    );
   }
 
   /**
    * Create a span for file operations
    */
-  createFileSpan(
-    operation: string,
-    fileName?: string,
-    attributes: Record<string, any> = {},
-  ): Span {
-    return this.createSpan(`file.${operation}`, {
-      'file.operation': operation,
-      'file.name': fileName,
-      ...attributes,
-    }, SpanKind.CLIENT);
+  createFileSpan(operation: string, fileName?: string, attributes: Record<string, any> = {}): Span {
+    return this.createSpan(
+      `file.${operation}`,
+      {
+        'file.operation': operation,
+        'file.name': fileName,
+        ...attributes,
+      },
+      SpanKind.CLIENT,
+    );
   }
 }

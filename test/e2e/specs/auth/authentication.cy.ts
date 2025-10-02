@@ -15,13 +15,13 @@ describe('Authentication Flow', () => {
       };
 
       cy.navigateTo('register');
-      
+
       // Fill registration form
       cy.fillForm(userData);
-      
+
       // Submit form
       cy.get('[data-cy=register-button]').click();
-      
+
       // Check for successful registration
       cy.checkToast('Registration successful', 'success');
       cy.url().should('include', '/dashboard');
@@ -31,19 +31,21 @@ describe('Authentication Flow', () => {
 
     it('should show validation errors for invalid data', () => {
       cy.navigateTo('register');
-      
+
       // Try to submit empty form
       cy.get('[data-cy=register-button]').click();
-      
+
       // Check validation errors
       cy.get('[data-cy=email-error]').should('be.visible').and('contain.text', 'Email is required');
-      cy.get('[data-cy=password-error]').should('be.visible').and('contain.text', 'Password is required');
+      cy.get('[data-cy=password-error]')
+        .should('be.visible')
+        .and('contain.text', 'Password is required');
       cy.get('[data-cy=name-error]').should('be.visible').and('contain.text', 'Name is required');
     });
 
     it('should show error for invalid email format', () => {
       cy.navigateTo('register');
-      
+
       cy.fillForm({
         email: 'invalid-email',
         password: 'password123',
@@ -51,15 +53,17 @@ describe('Authentication Flow', () => {
         firstName: 'Test',
         lastName: 'User',
       });
-      
+
       cy.get('[data-cy=register-button]').click();
-      
-      cy.get('[data-cy=email-error]').should('be.visible').and('contain.text', 'Invalid email format');
+
+      cy.get('[data-cy=email-error]')
+        .should('be.visible')
+        .and('contain.text', 'Invalid email format');
     });
 
     it('should show error for weak password', () => {
       cy.navigateTo('register');
-      
+
       cy.fillForm({
         email: 'test@example.com',
         password: '123',
@@ -67,10 +71,12 @@ describe('Authentication Flow', () => {
         firstName: 'Test',
         lastName: 'User',
       });
-      
+
       cy.get('[data-cy=register-button]').click();
-      
-      cy.get('[data-cy=password-error]').should('be.visible').and('contain.text', 'Password must be at least 8 characters');
+
+      cy.get('[data-cy=password-error]')
+        .should('be.visible')
+        .and('contain.text', 'Password must be at least 8 characters');
     });
 
     it('should show error for duplicate email', () => {
@@ -85,12 +91,12 @@ describe('Authentication Flow', () => {
       // Create user via API first
       cy.registerViaAPI(userData);
       cy.logout();
-      
+
       // Try to register with same email
       cy.navigateTo('register');
       cy.fillForm(userData);
       cy.get('[data-cy=register-button]').click();
-      
+
       cy.checkToast('Email already exists', 'error');
     });
   });
@@ -108,14 +114,14 @@ describe('Authentication Flow', () => {
 
     it('should login with valid credentials', () => {
       cy.navigateTo('login');
-      
+
       cy.fillForm({
         email: 'testuser@example.com',
         password: 'password123',
       });
-      
+
       cy.get('[data-cy=login-button]').click();
-      
+
       // Check successful login
       cy.checkToast('Login successful', 'success');
       cy.url().should('include', '/dashboard');
@@ -124,46 +130,46 @@ describe('Authentication Flow', () => {
 
     it('should show error for invalid credentials', () => {
       cy.navigateTo('login');
-      
+
       cy.fillForm({
         email: 'testuser@example.com',
         password: 'wrongpassword',
       });
-      
+
       cy.get('[data-cy=login-button]').click();
-      
+
       cy.checkToast('Invalid credentials', 'error');
       cy.url().should('include', '/login');
     });
 
     it('should show error for non-existent user', () => {
       cy.navigateTo('login');
-      
+
       cy.fillForm({
         email: 'nonexistent@example.com',
         password: 'password123',
       });
-      
+
       cy.get('[data-cy=login-button]').click();
-      
+
       cy.checkToast('Invalid credentials', 'error');
     });
 
     it('should show validation errors for empty fields', () => {
       cy.navigateTo('login');
-      
+
       cy.get('[data-cy=login-button]').click();
-      
+
       cy.get('[data-cy=email-error]').should('be.visible');
       cy.get('[data-cy=password-error]').should('be.visible');
     });
 
     it('should remember user session after page refresh', () => {
       cy.loginViaUI('testuser@example.com', 'password123');
-      
+
       // Refresh page
       cy.reload();
-      
+
       // Should still be logged in
       cy.get('[data-cy=user-menu]').should('be.visible');
       cy.url().should('include', '/dashboard');
@@ -183,17 +189,17 @@ describe('Authentication Flow', () => {
     it('should send password reset email', () => {
       cy.navigateTo('login');
       cy.get('[data-cy=forgot-password-link]').click();
-      
+
       cy.url().should('include', '/forgot-password');
-      
+
       cy.fillForm({
         email: 'testuser@example.com',
       });
-      
+
       cy.get('[data-cy=send-reset-button]').click();
-      
+
       cy.checkToast('Password reset email sent', 'success');
-      
+
       // Check that email was sent
       cy.checkEmail('Password Reset').then((email) => {
         expect(email.to).to.include('testuser@example.com');
@@ -204,13 +210,13 @@ describe('Authentication Flow', () => {
     it('should not reveal if email does not exist', () => {
       cy.navigateTo('login');
       cy.get('[data-cy=forgot-password-link]').click();
-      
+
       cy.fillForm({
         email: 'nonexistent@example.com',
       });
-      
+
       cy.get('[data-cy=send-reset-button]').click();
-      
+
       // Should show same success message for security
       cy.checkToast('Password reset email sent', 'success');
     });
@@ -234,11 +240,11 @@ describe('Authentication Flow', () => {
     it('should logout successfully', () => {
       cy.get('[data-cy=user-menu]').click();
       cy.get('[data-cy=logout-button]').click();
-      
+
       // Should redirect to home page
       cy.url().should('not.include', '/dashboard');
       cy.get('[data-cy=login-button]').should('be.visible');
-      
+
       // Should clear user session
       cy.window().then((win) => {
         expect(win.localStorage.getItem('access_token')).to.be.null;
@@ -251,10 +257,10 @@ describe('Authentication Flow', () => {
       cy.window().then((win) => {
         win.localStorage.setItem('access_token', 'expired-token');
       });
-      
+
       // Try to access protected route
       cy.visit('/dashboard');
-      
+
       // Should redirect to login
       cy.url().should('include', '/login');
       cy.checkToast('Session expired', 'warning');
@@ -264,22 +270,25 @@ describe('Authentication Flow', () => {
   describe('Social Authentication', () => {
     it('should handle Google OAuth flow', () => {
       cy.navigateTo('login');
-      
+
       // Mock Google OAuth response
       cy.window().then((win) => {
         // Simulate successful Google OAuth
-        win.postMessage({
-          type: 'GOOGLE_AUTH_SUCCESS',
-          user: {
-            email: 'google@example.com',
-            name: 'Google User',
-            provider: 'google',
+        win.postMessage(
+          {
+            type: 'GOOGLE_AUTH_SUCCESS',
+            user: {
+              email: 'google@example.com',
+              name: 'Google User',
+              provider: 'google',
+            },
           },
-        }, '*');
+          '*',
+        );
       });
-      
+
       cy.get('[data-cy=google-login-button]').click();
-      
+
       // Should redirect to dashboard
       cy.url().should('include', '/dashboard');
       cy.get('[data-cy=user-menu]').should('be.visible');
@@ -287,17 +296,20 @@ describe('Authentication Flow', () => {
 
     it('should handle OAuth errors', () => {
       cy.navigateTo('login');
-      
+
       // Mock OAuth error
       cy.window().then((win) => {
-        win.postMessage({
-          type: 'GOOGLE_AUTH_ERROR',
-          error: 'access_denied',
-        }, '*');
+        win.postMessage(
+          {
+            type: 'GOOGLE_AUTH_ERROR',
+            error: 'access_denied',
+          },
+          '*',
+        );
       });
-      
+
       cy.get('[data-cy=google-login-button]').click();
-      
+
       cy.checkToast('Authentication failed', 'error');
       cy.url().should('include', '/login');
     });
@@ -316,14 +328,14 @@ describe('Authentication Flow', () => {
 
     it('should support keyboard navigation', () => {
       cy.navigateTo('login');
-      
+
       // Tab through form elements
       cy.get('body').tab();
       cy.focused().should('have.attr', 'data-cy', 'email-input');
-      
+
       cy.focused().tab();
       cy.focused().should('have.attr', 'data-cy', 'password-input');
-      
+
       cy.focused().tab();
       cy.focused().should('have.attr', 'data-cy', 'login-button');
     });
@@ -341,12 +353,12 @@ describe('Authentication Flow', () => {
     it('should handle login request quickly', () => {
       cy.registerViaAPI();
       cy.logout();
-      
+
       cy.navigateTo('login');
-      
+
       const startTime = Date.now();
       cy.loginViaUI();
-      
+
       cy.then(() => {
         const endTime = Date.now();
         const loginTime = endTime - startTime;

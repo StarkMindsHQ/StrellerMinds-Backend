@@ -7,7 +7,7 @@ metadata:
     app: analytics-platform
     component: cleanup
 spec:
-  schedule: "0 2 * * *"  # Daily at 2 AM
+  schedule: '0 2 * * *' # Daily at 2 AM
   jobTemplate:
     spec:
       template:
@@ -23,37 +23,37 @@ spec:
             runAsUser: 1000
             fsGroup: 2000
           containers:
-          - name: cleanup
-            image: analytics-platform/cleanup:latest
-            env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: analytics-platform-secrets
-                  key: DATABASE_URL
-            - name: REDIS_HOST
-              value: "redis-service"
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: analytics-platform-secrets
-                  key: REDIS_PASSWORD
-            - name: CLEANUP_DAYS
-              value: "30"
-            command:
-            - /bin/sh
-            - -c
-            - |
-              echo "Starting cleanup job..."
-              npm run cleanup:old-data
-              echo "Cleanup completed successfully"
-            resources:
-              requests:
-                memory: "128Mi"
-                cpu: "100m"
-              limits:
-                memory: "256Mi"
-                cpu: "200m"
+            - name: cleanup
+              image: analytics-platform/cleanup:latest
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: analytics-platform-secrets
+                      key: DATABASE_URL
+                - name: REDIS_HOST
+                  value: 'redis-service'
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: analytics-platform-secrets
+                      key: REDIS_PASSWORD
+                - name: CLEANUP_DAYS
+                  value: '30'
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "Starting cleanup job..."
+                  npm run cleanup:old-data
+                  echo "Cleanup completed successfully"
+              resources:
+                requests:
+                  memory: '128Mi'
+                  cpu: '100m'
+                limits:
+                  memory: '256Mi'
+                  cpu: '200m'
           nodeSelector:
             kubernetes.io/os: linux
   successfulJobsHistoryLimit: 3

@@ -66,9 +66,9 @@ describe('Certificate Generation Integration Tests', () => {
       })
       .expect(201);
 
-    testStudent = await userRepository.findOne({
+    testStudent = (await userRepository.findOne({
       where: { email: 'student@example.com' },
-    }) as User;
+    })) as User;
     studentToken = studentResponse.body.access_token;
 
     // Create instructor
@@ -83,9 +83,9 @@ describe('Certificate Generation Integration Tests', () => {
       })
       .expect(201);
 
-    testInstructor = await userRepository.findOne({
+    testInstructor = (await userRepository.findOne({
       where: { email: 'instructor@example.com' },
-    }) as User;
+    })) as User;
     instructorToken = instructorResponse.body.access_token;
   }
 

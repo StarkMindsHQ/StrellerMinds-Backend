@@ -4,7 +4,12 @@ import { RecommendationController } from '../controllers/recommendation.controll
 import { RecommendationEngineService } from '../services/recommendation-engine.service';
 import { RecommendationAnalyticsService } from '../services/recommendation-analytics.service';
 import { User } from '../../users/entities/user.entity';
-import { Recommendation, RecommendationType, RecommendationReason, RecommendationStatus } from '../entities/recommendation.entity';
+import {
+  Recommendation,
+  RecommendationType,
+  RecommendationReason,
+  RecommendationStatus,
+} from '../entities/recommendation.entity';
 
 describe('RecommendationController', () => {
   let controller: RecommendationController;
@@ -25,7 +30,7 @@ describe('RecommendationController', () => {
     recommendationType: RecommendationType.CONTENT_BASED,
     reason: RecommendationReason.SKILL_BASED,
     confidenceScore: 0.85,
-    relevanceScore: 0.80,
+    relevanceScore: 0.8,
     priority: 4,
     explanation: 'Recommended based on your skills',
     status: RecommendationStatus.ACTIVE,
@@ -111,7 +116,9 @@ describe('RecommendationController', () => {
         sortOrder: 'DESC' as 'DESC',
       };
 
-      jest.spyOn(recommendationService, 'getRecommendations').mockRejectedValue(new Error('Service error'));
+      jest
+        .spyOn(recommendationService, 'getRecommendations')
+        .mockRejectedValue(new Error('Service error'));
 
       // Act & Assert
       await expect(controller.getRecommendations(mockUser, query)).rejects.toThrow(HttpException);
@@ -128,7 +135,9 @@ describe('RecommendationController', () => {
         deviceType: 'desktop',
       };
 
-      jest.spyOn(recommendationService, 'generateRecommendations').mockResolvedValue([mockRecommendation]);
+      jest
+        .spyOn(recommendationService, 'generateRecommendations')
+        .mockResolvedValue([mockRecommendation]);
 
       // Act
       const result = await controller.generateRecommendations(mockUser, request);
@@ -167,7 +176,7 @@ describe('RecommendationController', () => {
         expect.objectContaining({
           limit: 10,
           minConfidence: 0.1,
-        })
+        }),
       );
     });
   });
@@ -190,7 +199,10 @@ describe('RecommendationController', () => {
       // Assert
       expect(result).toBeDefined();
       expect(result.id).toBe(recommendationId);
-      expect(recommendationService.recordInteraction).toHaveBeenCalledWith(recommendationId, 'view');
+      expect(recommendationService.recordInteraction).toHaveBeenCalledWith(
+        recommendationId,
+        'view',
+      );
     });
 
     it('should throw 404 when recommendation not found', async () => {
@@ -205,7 +217,7 @@ describe('RecommendationController', () => {
 
       // Act & Assert
       await expect(controller.getRecommendation(mockUser, recommendationId)).rejects.toThrow(
-        new HttpException('Recommendation not found', HttpStatus.NOT_FOUND)
+        new HttpException('Recommendation not found', HttpStatus.NOT_FOUND),
       );
     });
   });
@@ -232,7 +244,7 @@ describe('RecommendationController', () => {
       expect(recommendationService.recordInteraction).toHaveBeenCalledWith(
         recommendationId,
         'click',
-        body.metadata
+        body.metadata,
       );
     });
 
@@ -241,10 +253,14 @@ describe('RecommendationController', () => {
       const recommendationId = 'rec-1';
       const body = { interactionType: 'click' as 'click' };
 
-      jest.spyOn(recommendationService, 'recordInteraction').mockRejectedValue(new Error('Service error'));
+      jest
+        .spyOn(recommendationService, 'recordInteraction')
+        .mockRejectedValue(new Error('Service error'));
 
       // Act & Assert
-      await expect(controller.recordInteraction(mockUser, recommendationId, body)).rejects.toThrow(HttpException);
+      await expect(controller.recordInteraction(mockUser, recommendationId, body)).rejects.toThrow(
+        HttpException,
+      );
     });
   });
 
@@ -272,7 +288,7 @@ describe('RecommendationController', () => {
         recommendationId,
         feedback.score,
         feedback.feedbackType,
-        feedback.comment
+        feedback.comment,
       );
     });
   });
@@ -292,7 +308,10 @@ describe('RecommendationController', () => {
         success: true,
         message: 'Recommendation dismissed successfully',
       });
-      expect(recommendationService.recordInteraction).toHaveBeenCalledWith(recommendationId, 'dismiss');
+      expect(recommendationService.recordInteraction).toHaveBeenCalledWith(
+        recommendationId,
+        'dismiss',
+      );
     });
   });
 
@@ -347,7 +366,9 @@ describe('RecommendationController', () => {
       const courseId = 'course-1';
       const limit = 5;
 
-      jest.spyOn(recommendationService, 'generateRecommendations').mockResolvedValue([mockRecommendation]);
+      jest
+        .spyOn(recommendationService, 'generateRecommendations')
+        .mockResolvedValue([mockRecommendation]);
 
       // Act
       const result = await controller.getSimilarCourseRecommendations(mockUser, courseId, limit);
@@ -409,7 +430,8 @@ describe('RecommendationController', () => {
         },
       ];
 
-      jest.spyOn(recommendationService, 'provideFeedback')
+      jest
+        .spyOn(recommendationService, 'provideFeedback')
         .mockResolvedValueOnce()
         .mockRejectedValueOnce(new Error('Service error'));
 
@@ -476,11 +498,13 @@ describe('RecommendationController', () => {
         sortOrder: 'DESC' as 'DESC',
       };
 
-      jest.spyOn(recommendationService, 'getRecommendations').mockRejectedValue(new Error('Unexpected error'));
+      jest
+        .spyOn(recommendationService, 'getRecommendations')
+        .mockRejectedValue(new Error('Unexpected error'));
 
       // Act & Assert
       await expect(controller.getRecommendations(mockUser, query)).rejects.toThrow(
-        new HttpException('Failed to get recommendations', HttpStatus.INTERNAL_SERVER_ERROR)
+        new HttpException('Failed to get recommendations', HttpStatus.INTERNAL_SERVER_ERROR),
       );
     });
 
@@ -495,7 +519,9 @@ describe('RecommendationController', () => {
       jest.spyOn(recommendationService, 'getRecommendations').mockResolvedValue(serviceResult);
 
       // Act & Assert
-      await expect(controller.getRecommendation(mockUser, recommendationId)).rejects.toThrow(HttpException);
+      await expect(controller.getRecommendation(mockUser, recommendationId)).rejects.toThrow(
+        HttpException,
+      );
     });
   });
 });

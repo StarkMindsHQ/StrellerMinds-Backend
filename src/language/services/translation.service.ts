@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from "@nestjs/common"
-import type { TranslationRepository } from "../repositories/translation.repository"
-import type { TranslationKeyRepository } from "../repositories/translation-key.repository"
-import type { LanguageRepository } from "../repositories/language.repository"
-import type { Translation } from "../entities/translation.entity"
-import type { CacheService } from "./cache.service"
-import type { EventEmitterService } from "./event-emitter.service"
+import { Injectable, NotFoundException } from '@nestjs/common';
+import type { TranslationRepository } from '../repositories/translation.repository';
+import type { TranslationKeyRepository } from '../repositories/translation-key.repository';
+import type { LanguageRepository } from '../repositories/language.repository';
+import type { Translation } from '../entities/translation.entity';
+import type { CacheService } from './cache.service';
+import type { EventEmitterService } from './event-emitter.service';
 
 /**
  * Service for managing content translations in multiple languages.
@@ -19,13 +19,13 @@ export class TranslationService {
     private readonly eventEmitter: EventEmitterService,
   ) {}
 
-  private readonly CACHE_PREFIX = "translations:"
+  private readonly CACHE_PREFIX = 'translations:';
 
   /**
    * Get all translations in the system.
    */
   async getAllTranslations(): Promise<Translation[]> {
-    return this.translationRepository.findAll()
+    return this.translationRepository.findAll();
   }
 
   /**
@@ -33,11 +33,11 @@ export class TranslationService {
    * @param id - The ID of the translation.
    */
   async getTranslationById(id: string): Promise<Translation> {
-    const translation = await this.translationRepository.findById(id)
+    const translation = await this.translationRepository.findById(id);
     if (!translation) {
-      throw new NotFoundException(`Translation with ID ${id} not found`)
+      throw new NotFoundException(`Translation with ID ${id} not found`);
     }
-    return translation
+    return translation;
   }
 
   /**
@@ -45,30 +45,30 @@ export class TranslationService {
    * @param languageCode - The code of the language.
    */
   async getTranslationsByLanguage(languageCode: string): Promise<Record<string, string>> {
-    const cacheKey = `${this.CACHE_PREFIX}${languageCode}`
-    const cached = await this.cacheService.get<Record<string, string>>(cacheKey)
+    const cacheKey = `${this.CACHE_PREFIX}${languageCode}`;
+    const cached = await this.cacheService.get<Record<string, string>>(cacheKey);
 
     if (cached) {
-      return cached
+      return cached;
     }
 
-    const language = await this.languageRepository.findByCode(languageCode)
+    const language = await this.languageRepository.findByCode(languageCode);
     if (!language) {
-      throw new NotFoundException(`Language with code ${languageCode} not found`)
+      throw new NotFoundException(`Language with code ${languageCode} not found`);
     }
 
-    const translations = await this.translationRepository.findByLanguage(language.id)
+    const translations = await this.translationRepository.findByLanguage(language.id);
 
     // Convert to key-value format
-    const result: Record<string, string> = {}
+    const result: Record<string, string> = {};
     for (const translation of translations) {
-      result[translation.translationKey.key] = translation.value
+      result[translation.translationKey.key] = translation.value;
     }
 
     // Cache for 1 hour
-    await this.cacheService.set(cacheKey, result, 3600)
+    await this.cacheService.set(cacheKey, result, 3600);
 
-    return result
+    return result;
   }
 
   /**
@@ -76,31 +76,34 @@ export class TranslationService {
    * @param languageCode - The code of the language.
    * @param category - The category of the translations.
    */
-  async getTranslationsByCategory(languageCode: string, category: string): Promise<Record<string, string>> {
-    const cacheKey = `${this.CACHE_PREFIX}${languageCode}:${category}`
-    const cached = await this.cacheService.get<Record<string, string>>(cacheKey)
+  async getTranslationsByCategory(
+    languageCode: string,
+    category: string,
+  ): Promise<Record<string, string>> {
+    const cacheKey = `${this.CACHE_PREFIX}${languageCode}:${category}`;
+    const cached = await this.cacheService.get<Record<string, string>>(cacheKey);
 
     if (cached) {
-      return cached
+      return cached;
     }
 
-    const language = await this.languageRepository.findByCode(languageCode)
+    const language = await this.languageRepository.findByCode(languageCode);
     if (!language) {
-      throw new NotFoundException(`Language with code ${languageCode} not found`)
+      throw new NotFoundException(`Language with code ${languageCode} not found`);
     }
 
-    const translations = await this.translationRepository.findByCategory(language.id, category)
+    const translations = await this.translationRepository.findByCategory(language.id, category);
 
     // Convert to key-value format
-    const result: Record<string, string> = {}
+    const result: Record<string, string> = {};
     for (const translation of translations) {
-      result[translation.translationKey.key] = translation.value
+      result[translation.translationKey.key] = translation.value;
     }
 
     // Cache for 1 hour
-    await this.cacheService.set(cacheKey, result, 3600)
+    await this.cacheService.set(cacheKey, result, 3600);
 
-    return result
+    return result;
   }
 
   // async createTranslation(createDto: CreateTranslationDto): Promise<Translation> {
@@ -182,23 +185,27 @@ export class TranslationService {
    * @param id - The ID of the translation to delete.
    */
   async deleteTranslation(id: string): Promise<void> {
-    const translation = await this.translationRepository.findById(id)
+    const translation = await this.translationRepository.findById(id);
     if (!translation) {
-      throw new NotFoundException(`Translation with ID ${id} not found`)
+      throw new NotFoundException(`Translation with ID ${id} not found`);
     }
 
     // Get language and category before deletion for cache invalidation
-    const language = await this.languageRepository.findById(translation.languageId)
-    const translationKey = await this.translationKeyRepository.findById(translation.translationKeyId)
+    const language = await this.languageRepository.findById(translation.languageId);
+    const translationKey = await this.translationKeyRepository.findById(
+      translation.translationKeyId,
+    );
 
-    await this.translationRepository.remove(id)
+    await this.translationRepository.remove(id);
 
     // Invalidate cache
-    await this.cacheService.delete(`${this.CACHE_PREFIX}${language.code}`)
-    await this.cacheService.delete(`${this.CACHE_PREFIX}${language.code}:${translationKey.category}`)
+    await this.cacheService.delete(`${this.CACHE_PREFIX}${language.code}`);
+    await this.cacheService.delete(
+      `${this.CACHE_PREFIX}${language.code}:${translationKey.category}`,
+    );
 
     // Emit event
-    this.eventEmitter.emit("translation.deleted", { id, languageCode: language.code })
+    this.eventEmitter.emit('translation.deleted', { id, languageCode: language.code });
   }
 
   // async bulkCreateTranslations(createDtos: CreateTranslationDto[]): Promise<Translation[]> {

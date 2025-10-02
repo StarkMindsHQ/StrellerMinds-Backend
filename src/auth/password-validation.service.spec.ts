@@ -18,12 +18,12 @@ describe('PasswordValidationService', () => {
 
   describe('validatePassword', () => {
     it('should return valid for a strong password', () => {
-  // Use a more complex password that will score higher with zxcvbn
-  const result = service.validatePassword('Purple-MONKEY-Dishwasher-42');
-  expect(result.isValid).toBe(true);
-  expect(result.errors).toHaveLength(0);
-  expect(result.score).toBeGreaterThanOrEqual(3);
-});
+      // Use a more complex password that will score higher with zxcvbn
+      const result = service.validatePassword('Purple-MONKEY-Dishwasher-42');
+      expect(result.isValid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+      expect(result.score).toBeGreaterThanOrEqual(3);
+    });
 
     it('should reject passwords that are too short', () => {
       const result = service.validatePassword('Short1!');

@@ -57,7 +57,7 @@ export class MigrationMonitoringService implements OnModuleInit {
   private readonly logger = new Logger(MigrationMonitoringService.name);
   private readonly metricsDir = path.join(process.cwd(), 'migration-metrics');
   private readonly alertsDir = path.join(process.cwd(), 'migration-alerts');
-  
+
   private metrics: MigrationMetrics = {
     totalMigrations: 0,
     successfulMigrations: 0,
@@ -92,7 +92,7 @@ export class MigrationMonitoringService implements OnModuleInit {
   async onModuleInit() {
     // Start monitoring
     this.logger.log('🚀 Migration monitoring service initialized');
-    
+
     // Emit initial health check
     this.eventEmitter.emit('migration.monitoring.initialized', {
       timestamp: new Date(),
@@ -109,7 +109,7 @@ export class MigrationMonitoringService implements OnModuleInit {
     this.logger.log(`📊 Migration started: ${payload.migrationName}`);
     this.metrics.totalMigrations++;
     this.updateHealthStatus();
-    
+
     // Emit monitoring event
     this.eventEmitter.emit('migration.monitoring.started', {
       migrationName: payload.migrationName,
@@ -123,14 +123,14 @@ export class MigrationMonitoringService implements OnModuleInit {
     this.logger.log(`✅ Migration completed: ${payload.migrationName}`);
     this.metrics.successfulMigrations++;
     this.metrics.lastMigrationTime = new Date();
-    
+
     // Update execution time metrics
     const executionTime = payload.metadata.executionTime || 0;
     this.updateExecutionTimeMetrics(executionTime);
-    
+
     // Update health status
     this.updateHealthStatus();
-    
+
     // Emit monitoring event
     this.eventEmitter.emit('migration.monitoring.completed', {
       migrationName: payload.migrationName,
@@ -143,13 +143,17 @@ export class MigrationMonitoringService implements OnModuleInit {
   handleMigrationFailed(payload: { migrationName: string; error: string; metadata: any }) {
     this.logger.error(`❌ Migration failed: ${payload.migrationName}`);
     this.metrics.failedMigrations++;
-    
+
     // Create alert
-    this.createAlert('error', `Migration ${payload.migrationName} failed: ${payload.error}`, payload.migrationName);
-    
+    this.createAlert(
+      'error',
+      `Migration ${payload.migrationName} failed: ${payload.error}`,
+      payload.migrationName,
+    );
+
     // Update health status
     this.updateHealthStatus();
-    
+
     // Emit monitoring event
     this.eventEmitter.emit('migration.monitoring.failed', {
       migrationName: payload.migrationName,
@@ -162,7 +166,7 @@ export class MigrationMonitoringService implements OnModuleInit {
   @OnEvent('migration.rollback_started')
   handleRollbackStarted(payload: { migrationName: string; timestamp: Date }) {
     this.logger.log(`🔄 Rollback started: ${payload.migrationName}`);
-    
+
     // Emit monitoring event
     this.eventEmitter.emit('migration.monitoring.rollback_started', {
       migrationName: payload.migrationName,
@@ -174,10 +178,10 @@ export class MigrationMonitoringService implements OnModuleInit {
   handleRollbackCompleted(payload: { migrationName: string }) {
     this.logger.log(`✅ Rollback completed: ${payload.migrationName}`);
     this.metrics.rollbackCount++;
-    
+
     // Update health status
     this.updateHealthStatus();
-    
+
     // Emit monitoring event
     this.eventEmitter.emit('migration.monitoring.rollback_completed', {
       migrationName: payload.migrationName,
@@ -188,13 +192,17 @@ export class MigrationMonitoringService implements OnModuleInit {
   @OnEvent('migration.rollback_failed')
   handleRollbackFailed(payload: { migrationName: string; error: string }) {
     this.logger.error(`❌ Rollback failed: ${payload.migrationName}`);
-    
+
     // Create critical alert
-    this.createAlert('critical', `Rollback failed for ${payload.migrationName}: ${payload.error}`, payload.migrationName);
-    
+    this.createAlert(
+      'critical',
+      `Rollback failed for ${payload.migrationName}: ${payload.error}`,
+      payload.migrationName,
+    );
+
     // Update health status
     this.updateHealthStatus();
-    
+
     // Emit monitoring event
     this.eventEmitter.emit('migration.monitoring.rollback_failed', {
       migrationName: payload.migrationName,
@@ -206,13 +214,18 @@ export class MigrationMonitoringService implements OnModuleInit {
   handleValidationFailed(payload: { migrationName: string; validationResult: any }) {
     this.logger.warn(`⚠️ Validation failed: ${payload.migrationName}`);
     this.metrics.validationFailures++;
-    
+
     // Create warning alert
-    this.createAlert('warning', `Validation failed for ${payload.migrationName}`, payload.migrationName, payload.validationResult);
-    
+    this.createAlert(
+      'warning',
+      `Validation failed for ${payload.migrationName}`,
+      payload.migrationName,
+      payload.validationResult,
+    );
+
     // Update health status
     this.updateHealthStatus();
-    
+
     // Emit monitoring event
     this.eventEmitter.emit('migration.monitoring.validation_failed', {
       migrationName: payload.migrationName,
@@ -226,7 +239,7 @@ export class MigrationMonitoringService implements OnModuleInit {
     if (payload.progress % 25 === 0) {
       this.logger.log(`📈 Migration progress: ${payload.migrationName} - ${payload.progress}%`);
     }
-    
+
     // Emit monitoring event
     this.eventEmitter.emit('migration.monitoring.progress', {
       migrationName: payload.migrationName,
@@ -250,7 +263,7 @@ export class MigrationMonitoringService implements OnModuleInit {
     if (includeAcknowledged) {
       return [...this.alerts];
     }
-    return this.alerts.filter(alert => !alert.acknowledged);
+    return this.alerts.filter((alert) => !alert.acknowledged);
   }
 
   /**
@@ -273,12 +286,12 @@ export class MigrationMonitoringService implements OnModuleInit {
    * Acknowledge an alert
    */
   acknowledgeAlert(alertId: string, acknowledgedBy: string): boolean {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a) => a.id === alertId);
     if (alert) {
       alert.acknowledged = true;
       alert.acknowledgedBy = acknowledgedBy;
       alert.acknowledgedAt = new Date();
-      
+
       this.saveAlerts();
       this.logger.log(`Alert ${alertId} acknowledged by ${acknowledgedBy}`);
       return true;
@@ -293,7 +306,7 @@ export class MigrationMonitoringService implements OnModuleInit {
     type: MigrationAlert['type'],
     message: string,
     migrationName?: string,
-    details?: any
+    details?: any,
   ): void {
     const alert: MigrationAlert = {
       id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -324,7 +337,7 @@ export class MigrationMonitoringService implements OnModuleInit {
     };
 
     this.performanceData.push(performanceRecord);
-    
+
     // Keep only last 1000 records
     if (this.performanceData.length > 1000) {
       this.performanceData = this.performanceData.slice(-1000);
@@ -336,7 +349,10 @@ export class MigrationMonitoringService implements OnModuleInit {
   /**
    * Generate migration report
    */
-  generateReport(startDate: Date, endDate: Date): {
+  generateReport(
+    startDate: Date,
+    endDate: Date,
+  ): {
     period: { start: Date; end: Date };
     metrics: MigrationMetrics;
     alerts: MigrationAlert[];
@@ -345,11 +361,11 @@ export class MigrationMonitoringService implements OnModuleInit {
     recommendations: string[];
   } {
     const periodAlerts = this.alerts.filter(
-      alert => alert.timestamp >= startDate && alert.timestamp <= endDate
+      (alert) => alert.timestamp >= startDate && alert.timestamp <= endDate,
     );
 
     const periodPerformance = this.performanceData.filter(
-      perf => perf.timestamp >= startDate && perf.timestamp <= endDate
+      (perf) => perf.timestamp >= startDate && perf.timestamp <= endDate,
     );
 
     const recommendations = this.generateRecommendations();
@@ -389,21 +405,19 @@ export class MigrationMonitoringService implements OnModuleInit {
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   cleanupOldData(): void {
     this.logger.log('🧹 Cleaning up old monitoring data');
-    
+
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     // Clean up old performance data
-    this.performanceData = this.performanceData.filter(
-      perf => perf.timestamp >= thirtyDaysAgo
-    );
+    this.performanceData = this.performanceData.filter((perf) => perf.timestamp >= thirtyDaysAgo);
 
     // Clean up old alerts (keep acknowledged ones for 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    
+
     this.alerts = this.alerts.filter(
-      alert => !alert.acknowledged || alert.acknowledgedAt! >= sevenDaysAgo
+      (alert) => !alert.acknowledged || alert.acknowledgedAt! >= sevenDaysAgo,
     );
 
     this.saveData();
@@ -416,10 +430,10 @@ export class MigrationMonitoringService implements OnModuleInit {
   @Cron(CronExpression.EVERY_5_MINUTES)
   performHealthCheck(): void {
     this.logger.log('🏥 Performing migration health check');
-    
+
     this.updateHealthStatus();
     this.saveData();
-    
+
     // Emit health check event
     this.eventEmitter.emit('migration.monitoring.health_check', {
       timestamp: new Date(),
@@ -431,13 +445,15 @@ export class MigrationMonitoringService implements OnModuleInit {
 
   private updateExecutionTimeMetrics(executionTime: number): void {
     this.metrics.totalExecutionTime += executionTime;
-    this.metrics.averageExecutionTime = this.metrics.totalExecutionTime / this.metrics.successfulMigrations;
+    this.metrics.averageExecutionTime =
+      this.metrics.totalExecutionTime / this.metrics.successfulMigrations;
   }
 
   private updateHealthStatus(): void {
     const totalMigrations = this.metrics.totalMigrations;
-    const successRate = totalMigrations > 0 ? this.metrics.successfulMigrations / totalMigrations : 1;
-    
+    const successRate =
+      totalMigrations > 0 ? this.metrics.successfulMigrations / totalMigrations : 1;
+
     // Update migration health
     if (successRate >= 0.95) {
       this.healthStatus.checks.migrations = 'healthy';
@@ -467,9 +483,9 @@ export class MigrationMonitoringService implements OnModuleInit {
 
     // Determine overall health status
     const checkStatuses = Object.values(this.healthStatus.checks);
-    if (checkStatuses.every(status => status === 'healthy')) {
+    if (checkStatuses.every((status) => status === 'healthy')) {
       this.healthStatus.status = 'healthy';
-    } else if (checkStatuses.some(status => status === 'unhealthy')) {
+    } else if (checkStatuses.some((status) => status === 'unhealthy')) {
       this.healthStatus.status = 'unhealthy';
     } else {
       this.healthStatus.status = 'degraded';
@@ -495,7 +511,7 @@ export class MigrationMonitoringService implements OnModuleInit {
       issues.push(`${this.metrics.rollbackCount} rollbacks have occurred`);
     }
 
-    const unacknowledgedAlerts = this.alerts.filter(alert => !alert.acknowledged);
+    const unacknowledgedAlerts = this.alerts.filter((alert) => !alert.acknowledged);
     if (unacknowledgedAlerts.length > 0) {
       issues.push(`${unacknowledgedAlerts.length} unacknowledged alerts`);
     }
@@ -518,11 +534,14 @@ export class MigrationMonitoringService implements OnModuleInit {
       recommendations.push('Analyze rollback patterns to prevent future failures');
     }
 
-    if (this.metrics.averageExecutionTime > 30000) { // 30 seconds
+    if (this.metrics.averageExecutionTime > 30000) {
+      // 30 seconds
       recommendations.push('Optimize migration performance - consider breaking large migrations');
     }
 
-    const criticalAlerts = this.alerts.filter(alert => alert.type === 'critical' && !alert.acknowledged);
+    const criticalAlerts = this.alerts.filter(
+      (alert) => alert.type === 'critical' && !alert.acknowledged,
+    );
     if (criticalAlerts.length > 0) {
       recommendations.push('Address critical alerts immediately');
     }
@@ -532,10 +551,12 @@ export class MigrationMonitoringService implements OnModuleInit {
 
   private convertToCSV(data: any): string {
     // Simple CSV conversion - in practice, you'd use a proper CSV library
-    return 'timestamp,type,message\n' +
-      Object.entries(data).map(([key, value]) => 
-        `${new Date().toISOString()},${key},${JSON.stringify(value)}`
-      ).join('\n');
+    return (
+      'timestamp,type,message\n' +
+      Object.entries(data)
+        .map(([key, value]) => `${new Date().toISOString()},${key},${JSON.stringify(value)}`)
+        .join('\n')
+    );
   }
 
   private ensureDirectories(): void {
@@ -576,7 +597,6 @@ export class MigrationMonitoringService implements OnModuleInit {
           timestamp: new Date(perf.timestamp),
         }));
       }
-
     } catch (error) {
       this.logger.error('Failed to load historical monitoring data:', error.message);
     }

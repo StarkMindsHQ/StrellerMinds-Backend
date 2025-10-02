@@ -27,13 +27,7 @@ import { PasswordValidationService } from './password-validation.service';
 import { PasswordRequirementsDto } from './dto/password-requirements.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import {
-  ApiBearerAuth,
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBody,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { UsersService } from 'src/users/services/users.service';
 import { RateLimitGuard } from 'src/common/guards/rate-limiter.guard';
 import { AuthRateLimit } from 'src/common/decorators/rate-limit.decorator';
@@ -62,10 +56,7 @@ export class AuthController {
   @ApiResponse({ status: 429, description: 'Too many login attempts' })
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: LoginDto) {
-    const user = await this.jwtLocalStrategy.validateUser(
-      body.email,
-      body.password,
-    );
+    const user = await this.jwtLocalStrategy.validateUser(body.email, body.password);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -137,10 +128,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Password reset successful' })
   @ApiResponse({ status: 429, description: 'Too many password reset attempts' })
   async resetPassword(@Body() resetDto: ResetPasswordDto) {
-    return this.jwtLocalStrategy.resetPassword(
-      resetDto.token,
-      resetDto.newPassword,
-    );
+    return this.jwtLocalStrategy.resetPassword(resetDto.token, resetDto.newPassword);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -155,16 +143,10 @@ export class AuthController {
     const { currentPassword, newPassword } = body;
 
     if (!currentPassword || !newPassword) {
-      throw new BadRequestException(
-        'Current password and new password are required',
-      );
+      throw new BadRequestException('Current password and new password are required');
     }
 
-    return this.jwtLocalStrategy.changePassword(
-      userId,
-      currentPassword,
-      newPassword,
-    );
+    return this.jwtLocalStrategy.changePassword(userId, currentPassword, newPassword);
   }
 
   @Post('logout')
@@ -218,10 +200,7 @@ export class AuthController {
 
   // Account linking (example)
   @Post('link')
-  async linkAccount(
-    @Query('provider') provider: string,
-    @Body() credentials: any,
-  ) {
+  async linkAccount(@Query('provider') provider: string, @Body() credentials: any) {
     try {
       return await this.authService.register(provider, credentials);
     } catch (error) {

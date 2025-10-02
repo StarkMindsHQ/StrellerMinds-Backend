@@ -7,4 +7,3 @@ export class PasswordRequirementsDto {
   @ApiProperty({ type: [String], description: 'List of password requirements' })
   requirements: string[];
 }
-

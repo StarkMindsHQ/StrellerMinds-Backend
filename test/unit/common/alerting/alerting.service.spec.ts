@@ -13,8 +13,8 @@ const jest = {
     return mockFn;
   },
   spyOn: () => ({
-    mockImplementation: () => {}
-  })
+    mockImplementation: () => {},
+  }),
 };
 
 import { AlertingService } from '../../../../src/common/alerting/alerting.service';
@@ -28,22 +28,22 @@ describe('AlertingService', () => {
   const mockConfigService = {
     get: (key: string, defaultValue?: any) => {
       const config: Record<string, any> = {
-        'ALERTING_ENABLED': true,
-        'SLACK_ALERTS_ENABLED': true,
-        'SLACK_WEBHOOK_URL': 'https://hooks.slack.com/test',
-        'SLACK_ALERT_CHANNEL': '#alerts',
-        'WEBHOOK_ALERTS_ENABLED': true,
-        'WEBHOOK_ALERT_URL': 'https://webhook.test/alerts',
-        'EMAIL_ALERTS_ENABLED': false,
-        'ERROR_RATE_THRESHOLD': 0.05,
-        'RESPONSE_TIME_THRESHOLD': 5000,
-        'CATEGORY_ERROR_THRESHOLDS': JSON.stringify({
-          'AUTHENTICATION': { rate: 0.1, severity: 'high' },
-          'VALIDATION': { rate: 0.05, severity: 'medium' },
+        ALERTING_ENABLED: true,
+        SLACK_ALERTS_ENABLED: true,
+        SLACK_WEBHOOK_URL: 'https://hooks.slack.com/test',
+        SLACK_ALERT_CHANNEL: '#alerts',
+        WEBHOOK_ALERTS_ENABLED: true,
+        WEBHOOK_ALERT_URL: 'https://webhook.test/alerts',
+        EMAIL_ALERTS_ENABLED: false,
+        ERROR_RATE_THRESHOLD: 0.05,
+        RESPONSE_TIME_THRESHOLD: 5000,
+        CATEGORY_ERROR_THRESHOLDS: JSON.stringify({
+          AUTHENTICATION: { rate: 0.1, severity: 'high' },
+          VALIDATION: { rate: 0.05, severity: 'medium' },
         }),
-        'ALERT_RATE_LIMITING_ENABLED': true,
-        'MAX_ALERTS_PER_HOUR': 10,
-        'ALERT_COOLDOWN_MINUTES': 5,
+        ALERT_RATE_LIMITING_ENABLED: true,
+        MAX_ALERTS_PER_HOUR: 10,
+        ALERT_COOLDOWN_MINUTES: 5,
       };
       return config[key] ?? defaultValue;
     },
@@ -63,11 +63,7 @@ describe('AlertingService', () => {
     } as unknown as LoggerService;
 
     // Create service instance
-    service = new AlertingService(
-      mockConfigService as any,
-      mockHttpService as any,
-      loggerService
-    );
+    service = new AlertingService(mockConfigService as any, mockHttpService as any, loggerService);
   });
 
   it('should be defined', () => {
@@ -147,7 +143,7 @@ describe('AlertingService', () => {
       };
 
       const result = (service as any).shouldSendAlert('test-alert');
-      
+
       // Restore original config
       mockConfigService.get = originalGet;
 

@@ -53,6 +53,7 @@ cp development.env.example .env.development
 ```
 
 Key environment variables:
+
 ```env
 TRACING_ENABLED=true
 TRACING_SERVICE_NAME=strellerminds-backend
@@ -97,15 +98,15 @@ export class MyService {
         'operation.type': 'business_logic',
         'user.id': '123',
       });
-      
+
       // Your business logic here
       const result = await this.doSomething();
-      
+
       span.setAttributes({
         'operation.success': true,
         'operation.result_count': result.length,
       });
-      
+
       return result;
     });
   }
@@ -142,16 +143,12 @@ export class UserService {
   constructor(private readonly tracedDbService: TracedDatabaseService) {}
 
   async findUser(id: string) {
-    return this.tracedDbService.query(
-      'SELECT * FROM users WHERE id = $1',
-      [id],
-      {
-        table: 'users',
-        operation: 'select',
-        includeParams: true,
-        includeResult: true,
-      }
-    );
+    return this.tracedDbService.query('SELECT * FROM users WHERE id = $1', [id], {
+      table: 'users',
+      operation: 'select',
+      includeParams: true,
+      includeResult: true,
+    });
   }
 }
 ```
@@ -220,6 +217,7 @@ export interface TracingConfig {
 ### Grafana Dashboards
 
 Pre-configured dashboards include:
+
 - Request rate and response time
 - Error rate monitoring
 - Database query performance
@@ -230,6 +228,7 @@ Pre-configured dashboards include:
 ### Prometheus Alerts
 
 Configured alerts for:
+
 - High error rates (>5%)
 - Slow response times (>2s)
 - Database query issues (>1s)
@@ -268,6 +267,7 @@ processors:
 ### Data Privacy
 
 Sensitive data is automatically filtered:
+
 - Authorization headers are redacted
 - Database parameters are masked
 - Payment card numbers are hidden

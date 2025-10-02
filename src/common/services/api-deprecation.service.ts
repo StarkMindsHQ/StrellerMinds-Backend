@@ -46,13 +46,16 @@ export class ApiDeprecationService {
    */
   scheduleDeprecation(schedule: Omit<DeprecationSchedule, 'notificationsSent'>): void {
     const existingSchedule = this.deprecationSchedules.find(
-      s => s.version === schedule.version && 
-           s.endpoint === schedule.endpoint && 
-           s.method === schedule.method
+      (s) =>
+        s.version === schedule.version &&
+        s.endpoint === schedule.endpoint &&
+        s.method === schedule.method,
     );
 
     if (existingSchedule) {
-      this.logger.warn(`Deprecation schedule already exists for ${schedule.method} ${schedule.endpoint} in ${schedule.version}`);
+      this.logger.warn(
+        `Deprecation schedule already exists for ${schedule.method} ${schedule.endpoint} in ${schedule.version}`,
+      );
       return;
     }
 
@@ -61,7 +64,9 @@ export class ApiDeprecationService {
       notificationsSent: false,
     });
 
-    this.logger.log(`Scheduled deprecation for ${schedule.method} ${schedule.endpoint} in ${schedule.version}`);
+    this.logger.log(
+      `Scheduled deprecation for ${schedule.method} ${schedule.endpoint} in ${schedule.version}`,
+    );
   }
 
   /**
@@ -69,21 +74,29 @@ export class ApiDeprecationService {
    */
   isDeprecated(version: string, endpoint: string, method: string): boolean {
     return this.deprecationSchedules.some(
-      schedule => schedule.version === version && 
-                 schedule.endpoint === endpoint && 
-                 schedule.method === method
+      (schedule) =>
+        schedule.version === version &&
+        schedule.endpoint === endpoint &&
+        schedule.method === method,
     );
   }
 
   /**
    * Get deprecation information for an endpoint
    */
-  getDeprecationInfo(version: string, endpoint: string, method: string): DeprecationSchedule | null {
-    return this.deprecationSchedules.find(
-      schedule => schedule.version === version && 
-                 schedule.endpoint === endpoint && 
-                 schedule.method === method
-    ) || null;
+  getDeprecationInfo(
+    version: string,
+    endpoint: string,
+    method: string,
+  ): DeprecationSchedule | null {
+    return (
+      this.deprecationSchedules.find(
+        (schedule) =>
+          schedule.version === version &&
+          schedule.endpoint === endpoint &&
+          schedule.method === method,
+      ) || null
+    );
   }
 
   /**
@@ -101,7 +114,7 @@ export class ApiDeprecationService {
     cutoffDate.setDate(cutoffDate.getDate() + days);
 
     return this.deprecationSchedules.filter(
-      schedule => new Date(schedule.removedIn) <= cutoffDate
+      (schedule) => new Date(schedule.removedIn) <= cutoffDate,
     );
   }
 
@@ -110,9 +123,7 @@ export class ApiDeprecationService {
    */
   getOverdueDeprecations(): DeprecationSchedule[] {
     const now = new Date();
-    return this.deprecationSchedules.filter(
-      schedule => new Date(schedule.removedIn) < now
-    );
+    return this.deprecationSchedules.filter((schedule) => new Date(schedule.removedIn) < now);
   }
 
   /**
@@ -120,7 +131,7 @@ export class ApiDeprecationService {
    */
   generateDeprecationNotification(schedule: DeprecationSchedule): DeprecationNotification {
     const daysUntilRemoval = Math.ceil(
-      (new Date(schedule.removedIn).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+      (new Date(schedule.removedIn).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
     );
 
     let type: 'warning' | 'deprecation' | 'removal';
@@ -173,7 +184,7 @@ export class ApiDeprecationService {
     const overdueDeprecations = this.getOverdueDeprecations();
 
     // Get usage statistics for deprecated endpoints
-    const deprecatedEndpoints = this.deprecationSchedules.map(s => ({
+    const deprecatedEndpoints = this.deprecationSchedules.map((s) => ({
       endpoint: s.endpoint,
       version: s.version,
       method: s.method,
@@ -186,9 +197,10 @@ export class ApiDeprecationService {
         totalDeprecations,
         upcomingDeprecations: upcomingDeprecations.length,
         overdueDeprecations: overdueDeprecations.length,
-        highImpactDeprecations: this.deprecationSchedules.filter(s => s.impact === 'high').length,
-        mediumImpactDeprecations: this.deprecationSchedules.filter(s => s.impact === 'medium').length,
-        lowImpactDeprecations: this.deprecationSchedules.filter(s => s.impact === 'low').length,
+        highImpactDeprecations: this.deprecationSchedules.filter((s) => s.impact === 'high').length,
+        mediumImpactDeprecations: this.deprecationSchedules.filter((s) => s.impact === 'medium')
+          .length,
+        lowImpactDeprecations: this.deprecationSchedules.filter((s) => s.impact === 'low').length,
       },
       usageStats,
       deprecationTimeline: this.generateDeprecationTimeline(),
@@ -212,14 +224,22 @@ export class ApiDeprecationService {
         method: schedule.method,
         deprecationDate: schedule.deprecatedIn,
         removalDate: schedule.removedIn,
-        status: now < deprecationDate ? 'scheduled' : 
-                now >= deprecationDate && now < removalDate ? 'deprecated' : 'removed',
+        status:
+          now < deprecationDate
+            ? 'scheduled'
+            : now >= deprecationDate && now < removalDate
+              ? 'deprecated'
+              : 'removed',
         impact: schedule.impact,
-        daysUntilRemoval: Math.ceil((removalDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+        daysUntilRemoval: Math.ceil(
+          (removalDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+        ),
       });
     }
 
-    return timeline.sort((a, b) => new Date(a.removalDate).getTime() - new Date(b.removalDate).getTime());
+    return timeline.sort(
+      (a, b) => new Date(a.removalDate).getTime() - new Date(b.removalDate).getTime(),
+    );
   }
 
   /**
@@ -232,16 +252,16 @@ export class ApiDeprecationService {
     return {
       summary: {
         totalDeprecations: this.deprecationSchedules.length,
-        activeDeprecations: this.deprecationSchedules.filter(s => 
-          new Date(s.deprecatedIn) <= new Date() && new Date(s.removedIn) > new Date()
+        activeDeprecations: this.deprecationSchedules.filter(
+          (s) => new Date(s.deprecatedIn) <= new Date() && new Date(s.removedIn) > new Date(),
         ).length,
-        completedRemovals: this.deprecationSchedules.filter(s => 
-          new Date(s.removedIn) <= new Date()
+        completedRemovals: this.deprecationSchedules.filter(
+          (s) => new Date(s.removedIn) <= new Date(),
         ).length,
       },
       timeline,
       recommendations: this.generateDeprecationRecommendations(),
-      migrationGuides: this.deprecationSchedules.map(s => ({
+      migrationGuides: this.deprecationSchedules.map((s) => ({
         from: s.version,
         endpoint: s.endpoint,
         guide: s.migrationGuide,
@@ -253,7 +273,7 @@ export class ApiDeprecationService {
 
   private async sendNotification(schedule: DeprecationSchedule): Promise<void> {
     const notification = this.generateDeprecationNotification(schedule);
-    
+
     // Log the notification
     this.logger.warn(`Deprecation notification sent: ${notification.message}`, {
       version: notification.version,
@@ -316,7 +336,7 @@ export class ApiDeprecationService {
       recommendations.push('Prepare for endpoint removal');
     }
 
-    const highImpactDeprecations = this.deprecationSchedules.filter(s => s.impact === 'high');
+    const highImpactDeprecations = this.deprecationSchedules.filter((s) => s.impact === 'high');
     if (highImpactDeprecations.length > 0) {
       recommendations.push('High-impact deprecations detected - plan carefully');
       recommendations.push('Provide comprehensive migration support');
@@ -365,4 +385,4 @@ export class ApiDeprecationService {
       },
     ];
   }
-} 
+}

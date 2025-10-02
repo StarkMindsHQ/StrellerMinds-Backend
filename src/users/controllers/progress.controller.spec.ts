@@ -56,27 +56,16 @@ describe('ProgressController', () => {
       );
 
       expect(result).toEqual(expectedResult);
-      expect(service.updateLessonProgress).toHaveBeenCalledWith(
-        'user1',
-        'course1',
-        'lesson1',
-        50,
-        { timeSpent: 1200 },
-      );
+      expect(service.updateLessonProgress).toHaveBeenCalledWith('user1', 'course1', 'lesson1', 50, {
+        timeSpent: 1200,
+      });
     });
 
     it('should handle errors appropriately', async () => {
-      mockProgressService.updateLessonProgress.mockRejectedValue(
-        new Error('Database error'),
-      );
+      mockProgressService.updateLessonProgress.mockRejectedValue(new Error('Database error'));
 
       await expect(
-        controller.updateLessonProgress(
-          mockRequest,
-          'course1',
-          'lesson1',
-          mockUpdateProgressDto,
-        ),
+        controller.updateLessonProgress(mockRequest, 'course1', 'lesson1', mockUpdateProgressDto),
       ).rejects.toThrow(HttpException);
     });
   });
@@ -103,13 +92,11 @@ describe('ProgressController', () => {
     });
 
     it('should handle errors appropriately', async () => {
-      mockProgressService.getCourseProgress.mockRejectedValue(
-        new Error('Database error'),
-      );
+      mockProgressService.getCourseProgress.mockRejectedValue(new Error('Database error'));
 
-      await expect(
-        controller.getCourseProgress(mockRequest, 'course1'),
-      ).rejects.toThrow(HttpException);
+      await expect(controller.getCourseProgress(mockRequest, 'course1')).rejects.toThrow(
+        HttpException,
+      );
     });
   });
 
@@ -137,13 +124,9 @@ describe('ProgressController', () => {
     });
 
     it('should handle errors appropriately', async () => {
-      mockProgressService.getUserProgress.mockRejectedValue(
-        new Error('Database error'),
-      );
+      mockProgressService.getUserProgress.mockRejectedValue(new Error('Database error'));
 
-      await expect(controller.getUserProgress(mockRequest)).rejects.toThrow(
-        HttpException,
-      );
+      await expect(controller.getUserProgress(mockRequest)).rejects.toThrow(HttpException);
     });
   });
 
@@ -162,13 +145,9 @@ describe('ProgressController', () => {
     });
 
     it('should handle errors appropriately', async () => {
-      mockProgressService.syncProgress.mockRejectedValue(
-        new Error('Database error'),
-      );
+      mockProgressService.syncProgress.mockRejectedValue(new Error('Database error'));
 
-      await expect(
-        controller.syncProgress(mockRequest, 'course1'),
-      ).rejects.toThrow(HttpException);
+      await expect(controller.syncProgress(mockRequest, 'course1')).rejects.toThrow(HttpException);
     });
   });
 
@@ -190,13 +169,9 @@ describe('ProgressController', () => {
     });
 
     it('should handle errors appropriately', async () => {
-      mockProgressService.getCourseProgress.mockRejectedValue(
-        new Error('Database error'),
-      );
+      mockProgressService.getCourseProgress.mockRejectedValue(new Error('Database error'));
 
-      await expect(
-        controller.getCourseProgressAdmin('course1'),
-      ).rejects.toThrow(HttpException);
+      await expect(controller.getCourseProgressAdmin('course1')).rejects.toThrow(HttpException);
     });
   });
-}); 
+});

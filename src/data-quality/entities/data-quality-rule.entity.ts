@@ -1,95 +1,102 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
 export enum RuleType {
-  COMPLETENESS = "completeness",
-  ACCURACY = "accuracy",
-  CONSISTENCY = "consistency",
-  VALIDITY = "validity",
-  UNIQUENESS = "uniqueness",
-  TIMELINESS = "timeliness",
-  CONFORMITY = "conformity",
+  COMPLETENESS = 'completeness',
+  ACCURACY = 'accuracy',
+  CONSISTENCY = 'consistency',
+  VALIDITY = 'validity',
+  UNIQUENESS = 'uniqueness',
+  TIMELINESS = 'timeliness',
+  CONFORMITY = 'conformity',
 }
 
 export enum RuleSeverity {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-  CRITICAL = "critical",
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
 }
 
 export enum RuleStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  DRAFT = "draft",
-  DEPRECATED = "deprecated",
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  DRAFT = 'draft',
+  DEPRECATED = 'deprecated',
 }
 
-@Entity("data_quality_rules")
-@Index(["entityType", "status"])
-@Index(["ruleType", "severity"])
+@Entity('data_quality_rules')
+@Index(['entityType', 'status'])
+@Index(['ruleType', 'severity'])
 export class DataQualityRule {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  name: string
+  name: string;
 
-  @Column("text")
-  description: string
+  @Column('text')
+  description: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: RuleType,
   })
-  ruleType: RuleType
+  ruleType: RuleType;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: RuleSeverity,
     default: RuleSeverity.MEDIUM,
   })
-  severity: RuleSeverity
+  severity: RuleSeverity;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: RuleStatus,
     default: RuleStatus.ACTIVE,
   })
-  status: RuleStatus
+  status: RuleStatus;
 
   @Column()
-  entityType: string
+  entityType: string;
 
-  @Column("jsonb")
-  conditions: Record<string, any>
+  @Column('jsonb')
+  conditions: Record<string, any>;
 
-  @Column("jsonb", { nullable: true })
-  parameters?: Record<string, any>
+  @Column('jsonb', { nullable: true })
+  parameters?: Record<string, any>;
 
-  @Column("text", { nullable: true })
-  sqlQuery?: string
+  @Column('text', { nullable: true })
+  sqlQuery?: string;
 
-  @Column("text", { nullable: true })
-  errorMessage?: string
+  @Column('text', { nullable: true })
+  errorMessage?: string;
 
   @Column({ default: 0 })
-  threshold: number
+  threshold: number;
 
   @Column({ default: false })
-  autoFix: boolean
+  autoFix: boolean;
 
-  @Column("jsonb", { nullable: true })
-  fixActions?: Record<string, any>
-
-  @Column({ nullable: true })
-  createdBy?: string
+  @Column('jsonb', { nullable: true })
+  fixActions?: Record<string, any>;
 
   @Column({ nullable: true })
-  updatedBy?: string
+  createdBy?: string;
+
+  @Column({ nullable: true })
+  updatedBy?: string;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

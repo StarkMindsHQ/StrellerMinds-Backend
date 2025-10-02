@@ -167,7 +167,9 @@ export class EmailService {
    * @returns The template content
    */
   async getTemplate(templateName: string): Promise<string> {
-    const dbTemplate = await this.emailTemplateRepository.findOne({ where: { name: templateName } });
+    const dbTemplate = await this.emailTemplateRepository.findOne({
+      where: { name: templateName },
+    });
     if (dbTemplate) return dbTemplate.content;
 
     const templatePath = path.join(process.cwd(), 'src/email/templates', `${templateName}.hbs`);
@@ -195,13 +197,17 @@ export class EmailService {
   ): Promise<boolean> {
     if (Array.isArray(recipient)) {
       for (const email of recipient) {
-        const preference = await this.emailPreferenceRepository.findOne({ where: { email, optOut: true } });
+        const preference = await this.emailPreferenceRepository.findOne({
+          where: { email, optOut: true },
+        });
         if (preference) return true;
       }
       return false;
     }
 
-    const preference = await this.emailPreferenceRepository.findOne({ where: { email: recipient, optOut: true } });
+    const preference = await this.emailPreferenceRepository.findOne({
+      where: { email: recipient, optOut: true },
+    });
     return !!preference;
   }
 
@@ -212,7 +218,11 @@ export class EmailService {
    * @param optOut - Whether the user opts out
    * @returns The updated EmailPreference entity
    */
-  async updateEmailPreference(email: string, emailType: string, optOut: boolean): Promise<EmailPreference> {
+  async updateEmailPreference(
+    email: string,
+    emailType: string,
+    optOut: boolean,
+  ): Promise<EmailPreference> {
     let preference = await this.emailPreferenceRepository.findOne({ where: { email } });
 
     if (preference) {
@@ -255,7 +265,11 @@ export class EmailService {
    * @param verificationToken - Verification token
    * @returns True if the email was successfully sent, false otherwise
    */
-  async sendVerificationEmail(user: any, verificationCode: string, verificationToken: string): Promise<boolean> {
+  async sendVerificationEmail(
+    user: any,
+    verificationCode: string,
+    verificationToken: string,
+  ): Promise<boolean> {
     const verificationUrl = `${this.configService.get<string>('FRONTEND_URL')}/verify-email?token=${verificationToken}`;
     const unsubscribeUrl = `${this.configService.get<string>('FRONTEND_URL')}/preferences?email=${user.email}`;
 
@@ -423,7 +437,7 @@ export class EmailService {
   /**
    * Get analytics for a specific email log
    */
-  async getEmailAnalytics(emailId: string): Promise<any> {
+  async getEmailLogAnalytics(emailId: string): Promise<any> {
     const emailLog = await this.emailLogRepository.findOne({ where: { id: emailId } });
     if (!emailLog) {
       throw new NotFoundException('Email not found');
@@ -449,12 +463,16 @@ export class EmailService {
    * @param token - Unsubscribe token
    * @returns True if the token is valid, false otherwise
    */
-   async verifyUnsubscribeToken(email: string, token: string): Promise<boolean> {
+  async verifyUnsubscribeToken(email: string, token: string): Promise<boolean> {
     try {
-      const secret = this.configService.get<string>('UNSUBSCRIBE_JWT_SECRET') || this.configService.get<string>('JWT_SECRET');
-      const payload = (this.jwtService
-        ? this.jwtService.verify(token, { secret })
-        : (await import('jsonwebtoken')).verify(token, secret)) as any;
+      const secret =
+        this.configService.get<string>('UNSUBSCRIBE_JWT_SECRET') ||
+        this.configService.get<string>('JWT_SECRET');
+      const payload = (
+        this.jwtService
+          ? this.jwtService.verify(token, { secret })
+          : (await import('jsonwebtoken')).verify(token, secret)
+      ) as any;
       return !!payload && (payload.email === email || payload.sub === email);
     } catch (err) {
       this.logger.warn(`Invalid unsubscribe token for ${email}: ${err?.message}`);
@@ -469,9 +487,23 @@ export class EmailService {
    * @param templateName - Optional template name
    * @returns Daily email statistics
    */
-   async getDailyEmailStats(start: Date, end: Date, templateName?: string): Promise<any> {
-    // Implement your logic here or return a mock for now
-    return [];
+  async getDailyEmailStats(start: Date, end: Date, templateName?: string): Promise<any> {
+    const query = this.emailLogRepository
+      .createQueryBuilder('log')
+      .select('DATE(log.createdAt)', 'date')
+      .addSelect('COUNT(*)', 'totalEmails')
+      .addSelect("SUM(CASE WHEN log.status = 'sent' THEN 1 ELSE 0 END)", 'sent')
+      .addSelect("SUM(CASE WHEN log.status = 'failed' THEN 1 ELSE 0 END)", 'failed')
+      .addSelect("SUM(CASE WHEN log.status = 'bounced' THEN 1 ELSE 0 END)", 'bounced')
+      .where('log.createdAt BETWEEN :start AND :end', { start, end })
+      .groupBy('DATE(log.createdAt)')
+      .orderBy('DATE(log.createdAt)', 'ASC');
+
+    if (templateName) {
+      query.andWhere('log.templateName = :templateName', { templateName });
+    }
+
+    return query.getRawMany();
   }
 
   /**
@@ -479,7 +511,7 @@ export class EmailService {
    * @param email - User email address
    * @returns Array of email preferences
    */
-   async getUserPreferences(email: string): Promise<{ emailType: EmailType; optedOut: boolean }[]> {
+  async getUserPreferences(email: string): Promise<{ emailType: EmailType; optedOut: boolean }[]> {
     const preferences = await this.emailPreferenceRepository.find({ where: { email } });
 
     return Object.values(EmailType).map((type) => {

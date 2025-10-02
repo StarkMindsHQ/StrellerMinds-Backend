@@ -159,7 +159,9 @@ export interface ISearchableService<T> {
 /**
  * Interface for services that handle user-related operations
  */
-export interface IUserService<T> extends ICrudService<T, CreateUserDto, UpdateUserDto>, ISearchableService<T> {
+export interface IUserService<T>
+  extends ICrudService<T, CreateUserDto, UpdateUserDto>,
+    ISearchableService<T> {
   updatePassword(userId: string, hashedPassword: string): Promise<void>;
   updateRefreshToken(userId: string, refreshToken: string | null): Promise<void>;
   validateCredentials(email: string, password: string): Promise<boolean>;
@@ -168,7 +170,8 @@ export interface IUserService<T> extends ICrudService<T, CreateUserDto, UpdateUs
 /**
  * Interface for services that handle course-related operations
  */
-export interface ICourseService<T, CreateDto, UpdateDto> extends ICrudService<T, CreateDto, UpdateDto> {
+export interface ICourseService<T, CreateDto, UpdateDto>
+  extends ICrudService<T, CreateDto, UpdateDto> {
   enrollUser(courseId: string, userId: string): Promise<void>;
   unenrollUser(courseId: string, userId: string): Promise<void>;
   getEnrolledUsers(courseId: string): Promise<UserDto[]>;
@@ -205,18 +208,34 @@ export interface IPaymentService {
   getPaymentStatus(paymentId: string): Promise<PaymentResult['status']>;
   validatePaymentMethod(paymentMethod: PaymentMethod): Promise<boolean>;
   getPaymentMethod(customerId: string): Promise<PaymentMethod[]>;
-  createPaymentMethod(customerId: string, paymentMethod: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod>;
+  createPaymentMethod(
+    customerId: string,
+    paymentMethod: Omit<PaymentMethod, 'id'>,
+  ): Promise<PaymentMethod>;
 }
 
 /**
  * Interface for services that handle notification operations
  */
 export interface INotificationService {
-  sendNotification(userId: string, message: string, type: NotificationDto['type'], metadata?: NotificationMetadata): Promise<void>;
-  sendBulkNotification(userIds: string[], message: string, type: NotificationDto['type'], metadata?: NotificationMetadata): Promise<void>;
+  sendNotification(
+    userId: string,
+    message: string,
+    type: NotificationDto['type'],
+    metadata?: NotificationMetadata,
+  ): Promise<void>;
+  sendBulkNotification(
+    userIds: string[],
+    message: string,
+    type: NotificationDto['type'],
+    metadata?: NotificationMetadata,
+  ): Promise<void>;
   markAsRead(notificationId: string): Promise<void>;
   markAllAsRead(userId: string): Promise<void>;
-  getUserNotifications(userId: string, options?: PaginationOptions): Promise<PaginatedResult<NotificationDto>>;
+  getUserNotifications(
+    userId: string,
+    options?: PaginationOptions,
+  ): Promise<PaginatedResult<NotificationDto>>;
   getUnreadCount(userId: string): Promise<number>;
   deleteNotification(notificationId: string): Promise<void>;
 }
@@ -225,9 +244,21 @@ export interface INotificationService {
  * Interface for services that handle audit logging
  */
 export interface IAuditService {
-  logAction(userId: string, action: string, resource: string, resourceId?: string, details?: Record<string, any>): Promise<void>;
-  getAuditLogs(filters?: Partial<AuditLogDto>, options?: PaginationOptions): Promise<PaginatedResult<AuditLogDto>>;
-  exportAuditLogs(format: 'json' | 'csv' | 'xlsx', dateRange?: { start: Date; end: Date }): Promise<Buffer>;
+  logAction(
+    userId: string,
+    action: string,
+    resource: string,
+    resourceId?: string,
+    details?: Record<string, any>,
+  ): Promise<void>;
+  getAuditLogs(
+    filters?: Partial<AuditLogDto>,
+    options?: PaginationOptions,
+  ): Promise<PaginatedResult<AuditLogDto>>;
+  exportAuditLogs(
+    format: 'json' | 'csv' | 'xlsx',
+    dateRange?: { start: Date; end: Date },
+  ): Promise<Buffer>;
   getAuditLogById(logId: string): Promise<AuditLogDto>;
   deleteAuditLogs(dateRange: { start: Date; end: Date }): Promise<number>;
 }

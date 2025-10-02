@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { create } from 'ipfs-http-client';
-import NodeCache  from 'node-cache';
+import NodeCache from 'node-cache';
 import { of as hashOf } from 'ipfs-only-hash';
 import { ApiTags } from '@nestjs/swagger';
 

@@ -16,4 +16,4 @@ export class SafeStringPipe implements PipeTransform {
     }
     return value;
   }
-} 
+}

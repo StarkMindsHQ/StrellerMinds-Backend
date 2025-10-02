@@ -59,9 +59,7 @@ export class EventAnalyticsService {
   private lastMetricsUpdate: Date | null = null;
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-  constructor(
-    @Inject('EVENT_STORE') private readonly eventStore: IEventStore,
-  ) {}
+  constructor(@Inject('EVENT_STORE') private readonly eventStore: IEventStore) {}
 
   async getEventMetrics(forceRefresh = false): Promise<EventMetrics> {
     if (!forceRefresh && this.isCacheValid()) {
@@ -78,9 +76,9 @@ export class EventAnalyticsService {
 
       // Get all events for analysis
       const allEvents = await this.eventStore.getAllEvents();
-      const eventsToday = allEvents.filter(e => e.timestamp >= today);
-      const eventsThisWeek = allEvents.filter(e => e.timestamp >= thisWeek);
-      const eventsThisMonth = allEvents.filter(e => e.timestamp >= thisMonth);
+      const eventsToday = allEvents.filter((e) => e.timestamp >= today);
+      const eventsThisWeek = allEvents.filter((e) => e.timestamp >= thisWeek);
+      const eventsThisMonth = allEvents.filter((e) => e.timestamp >= thisMonth);
 
       // Calculate metrics
       const metrics: EventMetrics = {
@@ -122,9 +120,7 @@ export class EventAnalyticsService {
         toTimestamp: now,
       });
 
-      const lastEvent = recentEvents.length > 0 
-        ? recentEvents[recentEvents.length - 1] 
-        : null;
+      const lastEvent = recentEvents.length > 0 ? recentEvents[recentEvents.length - 1] : null;
 
       return {
         eventStoreHealth: {
@@ -164,20 +160,18 @@ export class EventAnalyticsService {
       });
 
       const trends: EventTrend[] = [];
-      
+
       for (let i = 0; i < days; i++) {
         const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
         const nextDate = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-        
-        const dayEvents = events.filter(e => 
-          e.timestamp >= date && e.timestamp < nextDate
-        );
+
+        const dayEvents = events.filter((e) => e.timestamp >= date && e.timestamp < nextDate);
 
         const uniqueAggregates = new Set(
-          dayEvents.map(e => `${e.aggregateType}:${e.aggregateId}`)
+          dayEvents.map((e) => `${e.aggregateType}:${e.aggregateId}`),
         ).size;
 
-        const eventTypes = [...new Set(dayEvents.map(e => e.eventType))];
+        const eventTypes = [...new Set(dayEvents.map((e) => e.eventType))];
 
         trends.push({
           period: date.toISOString().split('T')[0],
@@ -226,9 +220,11 @@ export class EventAnalyticsService {
   }
 
   private isCacheValid(): boolean {
-    return this.cachedMetrics !== null && 
-           this.lastMetricsUpdate !== null && 
-           (Date.now() - this.lastMetricsUpdate.getTime()) < this.CACHE_TTL;
+    return (
+      this.cachedMetrics !== null &&
+      this.lastMetricsUpdate !== null &&
+      Date.now() - this.lastMetricsUpdate.getTime() < this.CACHE_TTL
+    );
   }
 
   private calculateEventsByType(events: any[]): Record<string, number> {
@@ -249,7 +245,7 @@ export class EventAnalyticsService {
 
   private calculateEventsPerHour(events: any[]): Array<{ hour: string; count: number }> {
     const hourCounts: Record<string, number> = {};
-    
+
     for (const event of events) {
       const hour = event.timestamp.getHours().toString().padStart(2, '0');
       hourCounts[hour] = (hourCounts[hour] || 0) + 1;
@@ -263,7 +259,7 @@ export class EventAnalyticsService {
 
   private calculateEventsPerDay(events: any[]): Array<{ date: string; count: number }> {
     const dayCounts: Record<string, number> = {};
-    
+
     for (const event of events) {
       const date = event.timestamp.toISOString().split('T')[0];
       dayCounts[date] = (dayCounts[date] || 0) + 1;
@@ -274,7 +270,7 @@ export class EventAnalyticsService {
 
   private calculateTopAggregates(events: any[], limit = 10) {
     const aggregateCounts: Record<string, number> = {};
-    
+
     for (const event of events) {
       const key = `${event.aggregateType}:${event.aggregateId}`;
       aggregateCounts[key] = (aggregateCounts[key] || 0) + 1;
@@ -293,7 +289,7 @@ export class EventAnalyticsService {
     return events
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit)
-      .map(event => ({
+      .map((event) => ({
         eventId: event.eventId,
         eventType: event.eventType,
         aggregateType: event.aggregateType,

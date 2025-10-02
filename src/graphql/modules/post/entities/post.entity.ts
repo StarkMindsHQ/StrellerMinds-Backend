@@ -1,75 +1,79 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { ObjectType, Field, ID } from "@nestjs/graphql"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 
-import { User } from "../../user/entities/user.entity"
+import { User } from '../../user/entities/user.entity';
 
 export enum PostStatus {
-  DRAFT = "draft",
-  PUBLISHED = "published",
-  ARCHIVED = "archived",
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  ARCHIVED = 'archived',
 }
 
-@Entity("posts")
+@Entity('posts')
 @ObjectType()
 export class Post {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)
-  id: string
+  id: string;
 
   @Column()
   @Field()
-  title: string
+  title: string;
 
-  @Column("text")
+  @Column('text')
   @Field()
-  content: string
+  content: string;
 
   @Column({ nullable: true })
   @Field({ nullable: true })
-  excerpt?: string
+  excerpt?: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: PostStatus,
     default: PostStatus.DRAFT,
   })
   @Field(() => String)
-  status: PostStatus
+  status: PostStatus;
 
-  @Column("simple-array", { nullable: true })
+  @Column('simple-array', { nullable: true })
   @Field(() => [String], { nullable: true })
-  tags?: string[]
+  tags?: string[];
 
   @Column({ nullable: true })
   @Field({ nullable: true })
-  featuredImage?: string
+  featuredImage?: string;
 
   @Column({ default: 0 })
   @Field()
-  viewCount: number
+  viewCount: number;
 
   @Column({ default: 0 })
   @Field()
-  likeCount: number
+  likeCount: number;
 
-  @ManyToOne(
-    () => User,
-    (user) => user.posts,
-  )
+  @ManyToOne(() => User, (user) => user.posts)
   @Field(() => User)
-  author: User
+  author: User;
 
   @Column()
-  authorId: string
+  authorId: string;
 
   @CreateDateColumn()
   @Field()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
   @Field()
-  updatedAt: Date
+  updatedAt: Date;
 
   @Field({ nullable: true })
-  publishedAt?: Date
+  publishedAt?: Date;
 }

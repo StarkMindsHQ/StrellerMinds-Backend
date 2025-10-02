@@ -11,9 +11,9 @@ describe('GlobalExceptionsFilter', () => {
 
   beforeEach(async () => {
     mockI18nService = {
-      translate: jest.fn().mockImplementation((key: string) => 
-        Promise.resolve(`translated-${key}`)
-      ),
+      translate: jest
+        .fn()
+        .mockImplementation((key: string) => Promise.resolve(`translated-${key}`)),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -46,7 +46,7 @@ describe('GlobalExceptionsFilter', () => {
     const exception = new CustomException(
       ErrorCode.NOT_FOUND,
       'Resource not found',
-      HttpStatus.NOT_FOUND
+      HttpStatus.NOT_FOUND,
     );
 
     await filter.catch(exception, mockArgumentsHost);
@@ -60,7 +60,7 @@ describe('GlobalExceptionsFilter', () => {
         message: expect.any(String),
         timestamp: expect.any(String),
         path: '/test',
-      })
+      }),
     );
   });
 
@@ -78,7 +78,7 @@ describe('GlobalExceptionsFilter', () => {
         message: expect.any(String),
         timestamp: expect.any(String),
         path: '/test',
-      })
+      }),
     );
   });
 
@@ -96,7 +96,7 @@ describe('GlobalExceptionsFilter', () => {
         message: expect.any(String),
         timestamp: expect.any(String),
         path: '/test',
-      })
+      }),
     );
   });
 
@@ -111,7 +111,7 @@ describe('GlobalExceptionsFilter', () => {
     expect(response.json).toHaveBeenCalledWith(
       expect.objectContaining({
         stack: 'Test stack trace',
-      })
+      }),
     );
   });
 
@@ -126,7 +126,7 @@ describe('GlobalExceptionsFilter', () => {
     expect(response.json).toHaveBeenCalledWith(
       expect.not.objectContaining({
         stack: expect.any(String),
-      })
+      }),
     );
   });
 });

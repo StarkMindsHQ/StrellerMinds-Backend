@@ -94,7 +94,7 @@ describe('WalletService', () => {
       expect(mockEthereumProvider.verifySignature).toHaveBeenCalledWith(
         connectDto.address,
         connectDto.message,
-        connectDto.signature
+        connectDto.signature,
       );
     });
 
@@ -108,9 +108,7 @@ describe('WalletService', () => {
 
       mockEthereumProvider.verifySignature.mockResolvedValue(false);
 
-      await expect(service.connectWallet(connectDto)).rejects.toThrow(
-        'Invalid wallet signature'
-      );
+      await expect(service.connectWallet(connectDto)).rejects.toThrow('Invalid wallet signature');
     });
   });
 

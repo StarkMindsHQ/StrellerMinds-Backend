@@ -6,13 +6,8 @@ export class EmailAnalyticsController {
   constructor(private readonly emailService: EmailService) {}
 
   @Get('overview')
-  async getOverview(
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
-  ) {
-    const start = new Date(
-      startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    );
+  async getOverview(@Query('startDate') startDate: string, @Query('endDate') endDate: string) {
+    const start = new Date(startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
     const end = new Date(endDate || new Date());
 
     const analytics = await this.emailService.getEmailAnalytics(start, end);
@@ -27,9 +22,7 @@ export class EmailAnalyticsController {
     }, 0);
 
     const totalClicked = analytics.reduce((sum, item) => {
-      return (
-        sum + (item.status === 'clicked' ? Number.parseInt(item.count) : 0)
-      );
+      return sum + (item.status === 'clicked' ? Number.parseInt(item.count) : 0);
     }, 0);
 
     const totalFailed = analytics.reduce((sum, item) => {
@@ -57,9 +50,7 @@ export class EmailAnalyticsController {
     @Query('endDate') endDate: string,
     @Query('templateName') templateName: string,
   ) {
-    const start = new Date(
-      startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    );
+    const start = new Date(startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
     const end = new Date(endDate || new Date());
 
     return this.emailService.getEmailAnalytics(start, end, templateName);
@@ -71,9 +62,7 @@ export class EmailAnalyticsController {
     @Query('endDate') endDate: string,
     @Query('templateName') templateName?: string,
   ) {
-    const start = new Date(
-      startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    );
+    const start = new Date(startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
     const end = new Date(endDate || new Date());
 
     // Get daily stats for the date range

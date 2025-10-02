@@ -6,7 +6,12 @@ import { RecommendationAnalyticsService } from '../services/recommendation-analy
 import { MLPersonalizationService } from '../services/ml-personalization.service';
 import { ContentSimilarityService } from '../services/content-similarity.service';
 import { CollaborativeFilteringService } from '../services/collaborative-filtering.service';
-import { Recommendation, RecommendationType, RecommendationReason, RecommendationStatus } from '../entities/recommendation.entity';
+import {
+  Recommendation,
+  RecommendationType,
+  RecommendationReason,
+  RecommendationStatus,
+} from '../entities/recommendation.entity';
 import { UserInteraction, InteractionType } from '../entities/user-interaction.entity';
 import { User } from '../../users/entities/user.entity';
 import { Course } from '../../courses/entities/course.entity';
@@ -52,7 +57,7 @@ describe('RecommendationEngineService', () => {
     recommendationType: RecommendationType.CONTENT_BASED,
     reason: RecommendationReason.SKILL_BASED,
     confidenceScore: 0.85,
-    relevanceScore: 0.80,
+    relevanceScore: 0.8,
     priority: 4,
     explanation: 'Recommended based on your React skills',
     status: RecommendationStatus.ACTIVE,
@@ -150,8 +155,12 @@ describe('RecommendationEngineService', () => {
     }).compile();
 
     service = module.get<RecommendationEngineService>(RecommendationEngineService);
-    recommendationRepository = module.get<Repository<Recommendation>>(getRepositoryToken(Recommendation));
-    interactionRepository = module.get<Repository<UserInteraction>>(getRepositoryToken(UserInteraction));
+    recommendationRepository = module.get<Repository<Recommendation>>(
+      getRepositoryToken(Recommendation),
+    );
+    interactionRepository = module.get<Repository<UserInteraction>>(
+      getRepositoryToken(UserInteraction),
+    );
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
     courseRepository = module.get<Repository<Course>>(getRepositoryToken(Course));
     analyticsService = module.get<RecommendationAnalyticsService>(RecommendationAnalyticsService);
@@ -241,7 +250,9 @@ describe('RecommendationEngineService', () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.generateRecommendations(request)).rejects.toThrow('User nonexistent-user not found');
+      await expect(service.generateRecommendations(request)).rejects.toThrow(
+        'User nonexistent-user not found',
+      );
     });
 
     it('should handle empty recommendations gracefully', async () => {
@@ -291,7 +302,9 @@ describe('RecommendationEngineService', () => {
         getMany: jest.fn().mockResolvedValue([mockRecommendation]),
       };
 
-      jest.spyOn(recommendationRepository, 'createQueryBuilder').mockReturnValue(mockQueryBuilder as any);
+      jest
+        .spyOn(recommendationRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
 
       // Act
       const result = await service.getRecommendations(userId, query);
@@ -300,8 +313,13 @@ describe('RecommendationEngineService', () => {
       expect(result).toBeDefined();
       expect(result.recommendations).toHaveLength(1);
       expect(result.total).toBe(1);
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith('recommendation.userId = :userId', { userId });
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('recommendation.recommendationType = :type', { type: query.type });
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith('recommendation.userId = :userId', {
+        userId,
+      });
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'recommendation.recommendationType = :type',
+        { type: query.type },
+      );
     });
 
     it('should apply default filters when none specified', async () => {
@@ -325,14 +343,18 @@ describe('RecommendationEngineService', () => {
         getMany: jest.fn().mockResolvedValue([]),
       };
 
-      jest.spyOn(recommendationRepository, 'createQueryBuilder').mockReturnValue(mockQueryBuilder as any);
+      jest
+        .spyOn(recommendationRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
 
       // Act
       const result = await service.getRecommendations(userId, query);
 
       // Assert
       expect(result).toBeDefined();
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('recommendation.status = :status', { status: RecommendationStatus.ACTIVE });
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('recommendation.status = :status', {
+        status: RecommendationStatus.ACTIVE,
+      });
     });
   });
 
@@ -352,7 +374,9 @@ describe('RecommendationEngineService', () => {
       await service.recordInteraction(recommendationId, interactionType, metadata);
 
       // Assert
-      expect(recommendationRepository.findOne).toHaveBeenCalledWith({ where: { id: recommendationId } });
+      expect(recommendationRepository.findOne).toHaveBeenCalledWith({
+        where: { id: recommendationId },
+      });
       expect(recommendationRepository.save).toHaveBeenCalled();
       expect(analyticsService.trackRecommendationInteraction).toHaveBeenCalledWith({
         recommendationId,
@@ -412,7 +436,7 @@ describe('RecommendationEngineService', () => {
 
       // Act & Assert
       await expect(service.recordInteraction(recommendationId, interactionType)).rejects.toThrow(
-        `Recommendation ${recommendationId} not found`
+        `Recommendation ${recommendationId} not found`,
       );
     });
   });
@@ -450,7 +474,7 @@ describe('RecommendationEngineService', () => {
       expect(mlService.updateModelWithFeedback).toHaveBeenCalledWith(
         mockRecommendation.userId,
         recommendationId,
-        score
+        score,
       );
     });
 
@@ -463,7 +487,7 @@ describe('RecommendationEngineService', () => {
 
       // Act & Assert
       await expect(service.provideFeedback(recommendationId, score)).rejects.toThrow(
-        `Recommendation ${recommendationId} not found`
+        `Recommendation ${recommendationId} not found`,
       );
     });
   });
@@ -555,7 +579,9 @@ describe('RecommendationEngineService', () => {
       // Assert
       expect(result.length).toBeLessThanOrEqual(recommendations.length);
       // Should not have more than 3 of the same type
-      const contentBasedCount = result.filter(r => r.recommendationType === RecommendationType.CONTENT_BASED).length;
+      const contentBasedCount = result.filter(
+        (r) => r.recommendationType === RecommendationType.CONTENT_BASED,
+      ).length;
       expect(contentBasedCount).toBeLessThanOrEqual(3);
     });
   });
@@ -568,10 +594,14 @@ describe('RecommendationEngineService', () => {
         limit: 5,
       };
 
-      jest.spyOn(userRepository, 'findOne').mockRejectedValue(new Error('Database connection failed'));
+      jest
+        .spyOn(userRepository, 'findOne')
+        .mockRejectedValue(new Error('Database connection failed'));
 
       // Act & Assert
-      await expect(service.generateRecommendations(request)).rejects.toThrow('Database connection failed');
+      await expect(service.generateRecommendations(request)).rejects.toThrow(
+        'Database connection failed',
+      );
     });
 
     it('should handle service errors in recommendation generation', async () => {
@@ -583,7 +613,9 @@ describe('RecommendationEngineService', () => {
 
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser);
       jest.spyOn(interactionRepository, 'find').mockResolvedValue([]);
-      jest.spyOn(collaborativeService, 'generateRecommendations').mockRejectedValue(new Error('ML service unavailable'));
+      jest
+        .spyOn(collaborativeService, 'generateRecommendations')
+        .mockRejectedValue(new Error('ML service unavailable'));
       jest.spyOn(similarityService, 'generateContentBasedRecommendations').mockResolvedValue([]);
       jest.spyOn(mlService, 'generatePersonalizedRecommendations').mockResolvedValue([]);
 
@@ -614,10 +646,18 @@ describe('RecommendationEngineService', () => {
 
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser);
       jest.spyOn(interactionRepository, 'find').mockResolvedValue([]);
-      jest.spyOn(collaborativeService, 'generateRecommendations').mockResolvedValue(largeMockRecommendations.slice(0, 40));
-      jest.spyOn(similarityService, 'generateContentBasedRecommendations').mockResolvedValue(largeMockRecommendations.slice(40, 70));
-      jest.spyOn(mlService, 'generatePersonalizedRecommendations').mockResolvedValue(largeMockRecommendations.slice(70, 100));
-      jest.spyOn(recommendationRepository, 'save').mockResolvedValue(largeMockRecommendations as any);
+      jest
+        .spyOn(collaborativeService, 'generateRecommendations')
+        .mockResolvedValue(largeMockRecommendations.slice(0, 40));
+      jest
+        .spyOn(similarityService, 'generateContentBasedRecommendations')
+        .mockResolvedValue(largeMockRecommendations.slice(40, 70));
+      jest
+        .spyOn(mlService, 'generatePersonalizedRecommendations')
+        .mockResolvedValue(largeMockRecommendations.slice(70, 100));
+      jest
+        .spyOn(recommendationRepository, 'save')
+        .mockResolvedValue(largeMockRecommendations as any);
 
       const startTime = Date.now();
 
@@ -627,7 +667,7 @@ describe('RecommendationEngineService', () => {
       // Assert
       const endTime = Date.now();
       const executionTime = endTime - startTime;
-      
+
       expect(result).toBeDefined();
       expect(executionTime).toBeLessThan(5000); // Should complete within 5 seconds
       expect(result.length).toBeLessThanOrEqual(100);

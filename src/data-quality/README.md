@@ -5,6 +5,7 @@ A comprehensive data quality management system for the StrellerMinds platform th
 ## Features
 
 ### ✅ Data Quality Monitoring
+
 - Real-time quality score tracking
 - Automated threshold monitoring
 - Performance metrics and trends
@@ -12,18 +13,21 @@ A comprehensive data quality management system for the StrellerMinds platform th
 - Alert system for critical issues
 
 ### ✅ Data Validation Rules
+
 - Seven validation types: completeness, accuracy, consistency, validity, uniqueness, timeliness, conformity
 - Configurable severity levels (low, medium, high, critical)
 - Custom validation conditions
 - Auto-fix capabilities
 
 ### ✅ Data Cleansing Processes
+
 - Automated data cleaning operations
 - Configurable cleansing rules
 - Backup of original data
 - Batch processing support
 
 ### ✅ Data Governance Framework
+
 - Policy management and enforcement
 - Data classification system
 - Compliance validation
@@ -31,6 +35,7 @@ A comprehensive data quality management system for the StrellerMinds platform th
 - Data lineage mapping
 
 ### ✅ Data Quality Reporting
+
 - Comprehensive quality reports
 - Scheduled report generation
 - Email notifications and webhooks
@@ -91,12 +96,12 @@ export class UserService {
 
   async validateUsers(users: User[]) {
     const result = await this.dataQualityService.checkDataQuality('user', users);
-    
+
     if (!result.passed) {
       console.log(`Quality issues found: ${result.issues.length}`);
       console.log(`Overall score: ${result.score}%`);
     }
-    
+
     return result;
   }
 }
@@ -113,7 +118,7 @@ export class DashboardService {
 
   async getDashboard() {
     const dashboard = await this.monitoringService.getDashboard();
-    
+
     return {
       overallScore: dashboard.overallScore,
       healthStatus: dashboard.healthStatus,
@@ -172,6 +177,7 @@ DQ_ENABLE_PROFILING=false
 ## Available Decorators
 
 ### Basic Validation
+
 - `@RequiredField(message?, severity?)` - Ensures field is not empty
 - `@OptionalField()` - Marks field as optional
 - `@ValidString(minLength?, maxLength?, severity?)` - String validation
@@ -181,6 +187,7 @@ DQ_ENABLE_PROFILING=false
 - `@ValidUUID(severity?)` - UUID validation
 
 ### Format Validation
+
 - `@ValidEmail(severity?)` - Email format validation
 - `@ValidPhoneNumber(severity?)` - Phone number validation
 - `@ValidURL(severity?)` - URL format validation
@@ -189,6 +196,7 @@ DQ_ENABLE_PROFILING=false
 - `@ValidPattern(pattern, message?, severity?)` - Custom regex pattern
 
 ### Advanced Validation
+
 - `@ValidEnum(enumObject, severity?)` - Enum validation
 - `@UniqueField(scope?, severity?)` - Uniqueness validation
 - `@TimelyField(maxAgeHours, severity?)` - Timeliness validation
@@ -197,6 +205,7 @@ DQ_ENABLE_PROFILING=false
 ## API Endpoints
 
 ### Data Quality Management
+
 - `GET /data-quality/dashboard` - Get quality dashboard
 - `GET /data-quality/rules` - List quality rules
 - `POST /data-quality/rules` - Create quality rule
@@ -205,12 +214,14 @@ DQ_ENABLE_PROFILING=false
 - `POST /data-quality/check` - Perform quality check
 
 ### Data Governance
+
 - `GET /data-governance/policies` - List governance policies
 - `POST /data-governance/policies` - Create governance policy
 - `GET /data-governance/compliance/:entityType` - Check compliance
 - `GET /data-governance/lineage/:entity` - Get data lineage
 
 ### Data Validation
+
 - `POST /data-validation/validate` - Validate data
 - `POST /data-validation/bulk-validate` - Bulk validation
 
@@ -261,6 +272,7 @@ npm run test -- data-quality-flow.spec.ts
 ## Architecture
 
 ### Services
+
 - **DataQualityService** - Core quality checking logic
 - **DataValidationService** - Validation rule implementations
 - **DataCleansingService** - Data cleaning operations
@@ -269,6 +281,7 @@ npm run test -- data-quality-flow.spec.ts
 - **DataQualityReportingService** - Report generation
 
 ### Entities
+
 - **DataQualityRule** - Quality validation rules
 - **DataQualityMetric** - Quality metrics and scores
 - **DataQualityIssue** - Quality issues and violations
@@ -277,6 +290,7 @@ npm run test -- data-quality-flow.spec.ts
 - **DataQualityReport** - Generated quality reports
 
 ### Background Jobs
+
 - Quality check processing
 - Data cleansing operations
 - Monitoring and alerting
@@ -304,11 +318,13 @@ npm run test -- data-quality-flow.spec.ts
 ### Debugging
 
 Enable debug logging:
+
 ```bash
 DEBUG=data-quality:* npm run start:dev
 ```
 
 Check system health:
+
 ```bash
 curl http://localhost:3000/data-quality/health
 ```

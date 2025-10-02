@@ -125,10 +125,12 @@ describe('GlobalExceptionsFilter', () => {
       });
 
       expect(loggerService.error).toHaveBeenCalledWith('Custom Exception', expect.any(Object));
-      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(expect.objectContaining({
-        errorCode: ErrorCode.INTERNAL_ERROR,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      }));
+      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          errorCode: ErrorCode.INTERNAL_ERROR,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        }),
+      );
     });
 
     it('should handle HttpException with validation errors', async () => {
@@ -165,17 +167,16 @@ describe('GlobalExceptionsFilter', () => {
       });
 
       expect(loggerService.warn).toHaveBeenCalledWith('Validation Error', expect.any(Object));
-      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(expect.objectContaining({
-        errorCode: ErrorCode.INVALID_INPUT,
-        statusCode: HttpStatus.BAD_REQUEST,
-      }));
+      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          errorCode: ErrorCode.INVALID_INPUT,
+          statusCode: HttpStatus.BAD_REQUEST,
+        }),
+      );
     });
 
     it('should handle HttpException without validation errors', async () => {
-      const httpException = new HttpException(
-        'Not Found',
-        HttpStatus.NOT_FOUND,
-      );
+      const httpException = new HttpException('Not Found', HttpStatus.NOT_FOUND);
 
       await filter.catch(httpException, mockHost);
 
@@ -190,10 +191,12 @@ describe('GlobalExceptionsFilter', () => {
       });
 
       expect(loggerService.error).toHaveBeenCalledWith('HTTP Exception', expect.any(Object));
-      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(expect.objectContaining({
-        errorCode: ErrorCode.INTERNAL_ERROR,
-        statusCode: HttpStatus.NOT_FOUND,
-      }));
+      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          errorCode: ErrorCode.INTERNAL_ERROR,
+          statusCode: HttpStatus.NOT_FOUND,
+        }),
+      );
     });
 
     it('should handle unknown errors', async () => {
@@ -217,11 +220,13 @@ describe('GlobalExceptionsFilter', () => {
         unknownError,
         expect.any(Object),
       );
-      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(expect.objectContaining({
-        errorCode: ErrorCode.INTERNAL_ERROR,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        stackTrace: unknownError.stack,
-      }));
+      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          errorCode: ErrorCode.INTERNAL_ERROR,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          stackTrace: unknownError.stack,
+        }),
+      );
     });
 
     it('should handle non-Error unknown errors', async () => {
@@ -244,16 +249,18 @@ describe('GlobalExceptionsFilter', () => {
         expect.any(Error),
         expect.any(Object),
       );
-      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(expect.objectContaining({
-        errorCode: ErrorCode.INTERNAL_ERROR,
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      }));
+      expect(errorDashboardService.addErrorLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          errorCode: ErrorCode.INTERNAL_ERROR,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        }),
+      );
     });
 
     it('should include stack trace in development environment', async () => {
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
-      
+
       const error = new Error('Test error');
       await filter.catch(error, mockHost);
 
@@ -269,7 +276,7 @@ describe('GlobalExceptionsFilter', () => {
     it('should not include stack trace in production environment', async () => {
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'production';
-      
+
       const error = new Error('Test error');
       await filter.catch(error, mockHost);
 
@@ -285,7 +292,7 @@ describe('GlobalExceptionsFilter', () => {
     it('should use existing correlation ID if provided', async () => {
       const correlationId = 'test-correlation-id';
       mockRequest.headers['x-correlation-id'] = correlationId;
-      
+
       const error = new Error('Test error');
       await filter.catch(error, mockHost);
 

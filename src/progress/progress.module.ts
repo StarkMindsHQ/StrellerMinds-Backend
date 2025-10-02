@@ -12,6 +12,6 @@ import { ApiTags } from '@nestjs/swagger';
   imports: [TypeOrmModule.forFeature([Progress])],
   controllers: [ProgressController],
   providers: [ProgressService],
-  exports:[ProgressService]
+  exports: [ProgressService],
 })
 export class ProgressModule {}

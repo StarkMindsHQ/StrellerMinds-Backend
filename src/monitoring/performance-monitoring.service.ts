@@ -41,7 +41,7 @@ export class PerformanceMonitoringService {
   private readonly logger = new Logger(PerformanceMonitoringService.name);
   private performanceHistory: PerformanceMetric[] = [];
   private readonly maxHistorySize = 10000;
-  
+
   private readonly thresholds: PerformanceThresholds = {
     responseTime: {
       warning: 1000, // 1 second
@@ -93,7 +93,7 @@ export class PerformanceMonitoringService {
 
     // Store in memory (consider using Redis for production)
     this.performanceHistory.push(metric);
-    
+
     // Maintain history size
     if (this.performanceHistory.length > this.maxHistorySize) {
       this.performanceHistory = this.performanceHistory.slice(-this.maxHistorySize);
@@ -172,11 +172,11 @@ export class PerformanceMonitoringService {
     const endpointStats = Object.keys(endpointGroups).map((endpoint) => ({
       endpoint,
       requestCount: endpointGroups[endpoint].length,
-      avgResponseTime: this.calculateAverage(
-        endpointGroups[endpoint].map((m) => m.responseTime),
-      ),
-      errorRate: (endpointGroups[endpoint].filter((m) => m.statusCode >= 400).length /
-        endpointGroups[endpoint].length) * 100,
+      avgResponseTime: this.calculateAverage(endpointGroups[endpoint].map((m) => m.responseTime)),
+      errorRate:
+        (endpointGroups[endpoint].filter((m) => m.statusCode >= 400).length /
+          endpointGroups[endpoint].length) *
+        100,
     }));
 
     return {
@@ -204,15 +204,15 @@ export class PerformanceMonitoringService {
   async performScheduledAnalysis(): Promise<void> {
     try {
       this.logger.debug('Running scheduled performance analysis');
-      
+
       const summary = this.getSystemPerformanceSummary(300000); // Last 5 minutes
-      
+
       // Check for performance degradation
       await this.checkPerformanceDegradation(summary);
-      
+
       // Update performance metrics
       this.updateAggregatedMetrics(summary);
-      
+
       this.logger.debug('Scheduled performance analysis completed');
     } catch (error) {
       this.logger.error('Error in scheduled performance analysis:', error);
@@ -274,15 +274,16 @@ export class PerformanceMonitoringService {
     if (!summary.overallPerformance) return;
 
     const { overallPerformance } = summary;
-    
+
     // Compare with historical averages (simplified)
     const historicalAvg = this.calculateHistoricalAverage();
-    
+
     if (historicalAvg && overallPerformance.averageResponseTime > historicalAvg * 1.5) {
       await this.alertingService.sendAlert('PERFORMANCE_DEGRADATION', {
         currentAvg: overallPerformance.averageResponseTime,
         historicalAvg,
-        degradationPercent: ((overallPerformance.averageResponseTime - historicalAvg) / historicalAvg) * 100,
+        degradationPercent:
+          ((overallPerformance.averageResponseTime - historicalAvg) / historicalAvg) * 100,
         timestamp: new Date(),
       });
     }
@@ -309,8 +310,8 @@ export class PerformanceMonitoringService {
   private calculateCurrentErrorRate(): number {
     const recentMetrics = this.performanceHistory.slice(-100); // Last 100 requests
     if (recentMetrics.length === 0) return 0;
-    
-    const errorCount = recentMetrics.filter(m => m.statusCode >= 400).length;
+
+    const errorCount = recentMetrics.filter((m) => m.statusCode >= 400).length;
     return (errorCount / recentMetrics.length) * 100;
   }
 
@@ -321,9 +322,7 @@ export class PerformanceMonitoringService {
   private calculateMedian(numbers: number[]): number {
     const sorted = numbers.slice().sort((a, b) => a - b);
     const middle = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0
-      ? (sorted[middle - 1] + sorted[middle]) / 2
-      : sorted[middle];
+    return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
   }
 
   private calculatePercentile(numbers: number[], percentile: number): number {
@@ -334,7 +333,7 @@ export class PerformanceMonitoringService {
 
   private calculateStatusCodeDistribution(metrics: PerformanceMetric[]): any {
     const distribution = {};
-    metrics.forEach(metric => {
+    metrics.forEach((metric) => {
       const code = metric.statusCode.toString();
       distribution[code] = (distribution[code] || 0) + 1;
     });
@@ -351,9 +350,9 @@ export class PerformanceMonitoringService {
   }
 
   private calculatePerformanceGrade(metrics: PerformanceMetric[]): string {
-    const avgResponseTime = this.calculateAverage(metrics.map(m => m.responseTime));
-    const errorRate = (metrics.filter(m => m.statusCode >= 400).length / metrics.length) * 100;
-    
+    const avgResponseTime = this.calculateAverage(metrics.map((m) => m.responseTime));
+    const errorRate = (metrics.filter((m) => m.statusCode >= 400).length / metrics.length) * 100;
+
     if (avgResponseTime < 500 && errorRate < 0.1) return 'A';
     if (avgResponseTime < 1000 && errorRate < 0.5) return 'B';
     if (avgResponseTime < 2000 && errorRate < 1) return 'C';
@@ -363,31 +362,33 @@ export class PerformanceMonitoringService {
 
   private generatePerformanceRecommendations(metrics: PerformanceMetric[]): string[] {
     const recommendations = [];
-    const avgResponseTime = this.calculateAverage(metrics.map(m => m.responseTime));
-    const errorRate = (metrics.filter(m => m.statusCode >= 400).length / metrics.length) * 100;
-    const avgMemoryUsage = this.calculateAverage(metrics.map(m => m.memoryUsage));
-    
+    const avgResponseTime = this.calculateAverage(metrics.map((m) => m.responseTime));
+    const errorRate = (metrics.filter((m) => m.statusCode >= 400).length / metrics.length) * 100;
+    const avgMemoryUsage = this.calculateAverage(metrics.map((m) => m.memoryUsage));
+
     if (avgResponseTime > 1000) {
       recommendations.push('Consider implementing caching to reduce response times');
       recommendations.push('Review database queries for optimization opportunities');
     }
-    
+
     if (errorRate > 1) {
       recommendations.push('Investigate and fix sources of errors to improve reliability');
     }
-    
+
     if (avgMemoryUsage > 70) {
-      recommendations.push('Monitor memory usage and consider optimizing memory-intensive operations');
+      recommendations.push(
+        'Monitor memory usage and consider optimizing memory-intensive operations',
+      );
     }
-    
+
     return recommendations;
   }
 
   private calculateHistoricalAverage(): number | null {
     if (this.performanceHistory.length < 100) return null;
-    
+
     const historicalMetrics = this.performanceHistory.slice(0, -100); // Exclude recent metrics
-    return this.calculateAverage(historicalMetrics.map(m => m.responseTime));
+    return this.calculateAverage(historicalMetrics.map((m) => m.responseTime));
   }
 
   private updateAggregatedMetrics(summary: any): void {

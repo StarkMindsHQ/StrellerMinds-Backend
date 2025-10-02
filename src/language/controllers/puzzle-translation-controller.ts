@@ -1,20 +1,20 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common"
-import type { PuzzleTranslationService } from "../services/puzzle-translation.service"
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import type { PuzzleTranslationService } from '../services/puzzle-translation.service';
 // import { CreatePuzzleTranslationDto } from "../dto/create-puzzle-translation.dto"
 // import { UpdatePuzzleTranslationDto } from "../dto/update-puzzle-translation.dto"
 // import { ApprovePuzzleTranslationDto } from "../dto/approve-puzzle-translation.dto"
 // import { LanguageGuard } from "../guards/language.guard"
-import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from "@nestjs/swagger"
+import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags("Multi-Language Puzzle")
-@Controller("puzzles")
+@ApiTags('Multi-Language Puzzle')
+@Controller('puzzles')
 export class PuzzleTranslationController {
   constructor(private readonly puzzleTranslationService: PuzzleTranslationService) {}
 
   @ApiOperation({ summary: 'Get puzzle translation by ID' })
   @ApiParam({ name: 'id', description: 'Puzzle translation ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns the puzzle translation with the specified ID',
   })
   @Get('translation/:id')
@@ -26,31 +26,38 @@ export class PuzzleTranslationController {
     };
   }
 
-  @ApiOperation({ summary: "Get puzzle in a specific language" })
-  @ApiParam({ name: "puzzleId", description: "Puzzle ID" })
-  @ApiParam({ name: "languageCode", description: "Language code (e.g., en, es, fr)" })
+  @ApiOperation({ summary: 'Get puzzle in a specific language' })
+  @ApiParam({ name: 'puzzleId', description: 'Puzzle ID' })
+  @ApiParam({ name: 'languageCode', description: 'Language code (e.g., en, es, fr)' })
   @ApiResponse({
     status: 200,
-    description: "Returns the puzzle in the specified language",
+    description: 'Returns the puzzle in the specified language',
   })
-  @Get(":puzzleId/:languageCode")
-  async getPuzzleTranslation(@Param('puzzleId') puzzleId: string, @Param('languageCode') languageCode: string) {
-    const translation = await this.puzzleTranslationService.getPuzzleTranslation(puzzleId, languageCode)
+  @Get(':puzzleId/:languageCode')
+  async getPuzzleTranslation(
+    @Param('puzzleId') puzzleId: string,
+    @Param('languageCode') languageCode: string,
+  ) {
+    const translation = await this.puzzleTranslationService.getPuzzleTranslation(
+      puzzleId,
+      languageCode,
+    );
     return {
       success: true,
       data: translation,
-    }
+    };
   }
 
   @ApiOperation({ summary: 'Get all puzzle translations for a language' })
   @ApiParam({ name: 'languageCode', description: 'Language code (e.g., en, es, fr)' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns all puzzle translations for the specified language',
   })
   @Get('language/:languageCode')
   async getPuzzleTranslationsByLanguage(@Param('languageCode') languageCode: string) {
-    const translations = await this.puzzleTranslationService.getPuzzleTranslationsByLanguage(languageCode);
+    const translations =
+      await this.puzzleTranslationService.getPuzzleTranslationsByLanguage(languageCode);
     return {
       success: true,
       data: translations,
@@ -58,8 +65,8 @@ export class PuzzleTranslationController {
   }
 
   // @ApiOperation({ summary: 'Create a new puzzle translation' })
-  // @ApiResponse({ 
-  //   status: 201, 
+  // @ApiResponse({
+  //   status: 201,
   //   description: 'Creates a new puzzle translation',
   // })
   // @Post('translate')
@@ -71,13 +78,13 @@ export class PuzzleTranslationController {
   //   };
   // }
 
-  @ApiOperation({ summary: "Update a puzzle translation" })
-  @ApiParam({ name: "id", description: "Puzzle translation ID" })
+  @ApiOperation({ summary: 'Update a puzzle translation' })
+  @ApiParam({ name: 'id', description: 'Puzzle translation ID' })
   @ApiResponse({
     status: 200,
-    description: "Updates an existing puzzle translation",
+    description: 'Updates an existing puzzle translation',
   })
-  @Patch("translate/:id")
+  @Patch('translate/:id')
   // async updatePuzzleTranslation(@Param('id') id: string, @Body() updateDto: UpdatePuzzleTranslationDto) {
   //   const translation = await this.puzzleTranslationService.updatePuzzleTranslation(id, updateDto)
   //   return {
@@ -85,11 +92,10 @@ export class PuzzleTranslationController {
   //     data: translation,
   //   }
   // }
-
   @ApiOperation({ summary: 'Delete a puzzle translation' })
   @ApiParam({ name: 'id', description: 'Puzzle translation ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Deletes a puzzle translation',
   })
   @Delete('translate/:id')

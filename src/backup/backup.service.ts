@@ -61,19 +61,14 @@ export class BackupService {
     try {
       const result = await this.createDatabaseBackup();
       if (result.success) {
-        this.logger.log(
-          `Scheduled backup completed successfully: ${result.backupPath}`,
-        );
+        this.logger.log(`Scheduled backup completed successfully: ${result.backupPath}`);
         await this.retentionService.cleanupOldBackups();
       } else {
         this.logger.error(`Scheduled backup failed: ${result.error}`);
         await this.sendBackupFailureAlert(result.error);
       }
     } catch (error) {
-      this.logger.error(
-        `Scheduled backup error: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Scheduled backup error: ${error.message}`, error.stack);
       await this.sendBackupFailureAlert(error.message);
     }
   }
@@ -84,17 +79,12 @@ export class BackupService {
     try {
       const result = await this.createApplicationDataBackup();
       if (result.success) {
-        this.logger.log(
-          `Application data backup completed: ${result.backupPath}`,
-        );
+        this.logger.log(`Application data backup completed: ${result.backupPath}`);
       } else {
         this.logger.error(`Application data backup failed: ${result.error}`);
       }
     } catch (error) {
-      this.logger.error(
-        `Application data backup error: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Application data backup error: ${error.message}`, error.stack);
     }
   }
 
@@ -113,9 +103,7 @@ export class BackupService {
 
       const command = `pg_dump -h ${this.dbConfig.host} -p ${this.dbConfig.port} -U ${this.dbConfig.username} -d ${this.dbConfig.database} -f "${backupPath}" --verbose --no-password`;
 
-      this.logger.log(
-        `Executing backup command for database: ${this.dbConfig.database}`,
-      );
+      this.logger.log(`Executing backup command for database: ${this.dbConfig.database}`);
       await execAsync(command, { env });
 
       // Get backup file size
@@ -127,8 +115,7 @@ export class BackupService {
       );
 
       // Verify backup
-      const isValid =
-        await this.verificationService.verifyDatabaseBackup(backupPath);
+      const isValid = await this.verificationService.verifyDatabaseBackup(backupPath);
       if (!isValid) {
         await this.sendBackupFailureAlert('Backup verification failed');
         throw new Error('Backup verification failed');
@@ -141,10 +128,7 @@ export class BackupService {
         duration,
       };
     } catch (error) {
-      this.logger.error(
-        `Database backup failed: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Database backup failed: ${error.message}`, error.stack);
       await this.sendBackupFailureAlert(error.message);
       return {
         success: false,
@@ -164,10 +148,7 @@ export class BackupService {
 
     try {
       // Use the variables in the tar command or remove them if not needed
-      const uploadDir = this.configService.get<string>(
-        'UPLOAD_DIR',
-        './uploads',
-      );
+      const uploadDir = this.configService.get<string>('UPLOAD_DIR', './uploads');
       const logsDir = './logs';
 
       // Create tar.gz archive of application data using the variables
@@ -190,10 +171,7 @@ export class BackupService {
         duration,
       };
     } catch (error) {
-      this.logger.error(
-        `Application data backup failed: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Application data backup failed: ${error.message}`, error.stack);
       return {
         success: false,
         error: error.message,
@@ -207,9 +185,7 @@ export class BackupService {
   async listBackups(): Promise<string[]> {
     try {
       const files = await fs.readdir(this.backupDir);
-      return files.filter(
-        (file) => file.endsWith('.sql') || file.endsWith('.tar.gz'),
-      );
+      return files.filter((file) => file.endsWith('.sql') || file.endsWith('.tar.gz'));
     } catch (error) {
       this.logger.error(`Failed to list backups: ${error.message}`);
       return [];

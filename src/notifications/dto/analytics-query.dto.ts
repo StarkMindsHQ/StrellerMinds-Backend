@@ -1,20 +1,20 @@
-import { IsOptional, IsEnum, IsDateString } from "class-validator"
-import { NotificationChannel, NotificationType } from "../entities/notification.entity"
+import { IsOptional, IsEnum, IsDateString } from 'class-validator';
+import { NotificationChannel, NotificationType } from '../entities/notification.entity';
 
 export class NotificationAnalyticsQueryDto {
   @IsOptional()
   @IsEnum(NotificationType)
-  notificationType?: NotificationType
+  notificationType?: NotificationType;
 
   @IsOptional()
   @IsEnum(NotificationChannel)
-  channel?: NotificationChannel
+  channel?: NotificationChannel;
 
   @IsOptional()
   @IsDateString()
-  startDate?: string
+  startDate?: string;
 
   @IsOptional()
   @IsDateString()
-  endDate?: string
+  endDate?: string;
 }

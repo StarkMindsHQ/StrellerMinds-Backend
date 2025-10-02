@@ -15,19 +15,19 @@ export abstract class BaseFactory<T> {
    */
   create(options: FactoryOptions = {}): T {
     const { overrides = {}, traits = [] } = options;
-    
+
     let data = this.definition();
-    
+
     // Apply traits
-    traits.forEach(trait => {
+    traits.forEach((trait) => {
       if (this.traits[trait]) {
         data = { ...data, ...this.traits[trait]() };
       }
     });
-    
+
     // Apply overrides
     data = { ...data, ...overrides };
-    
+
     return data as T;
   }
 

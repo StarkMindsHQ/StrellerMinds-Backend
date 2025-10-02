@@ -1,5 +1,5 @@
-import { IsOptional, IsString, IsBoolean, IsNumber, MaxLength } from "class-validator"
-import { ApiPropertyOptional } from "@nestjs/swagger"
+import { IsOptional, IsString, IsBoolean, IsNumber, MaxLength } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateLanguageDto {
   @ApiPropertyOptional({ description: 'Language code (e.g., en, es, fr)' })
@@ -14,7 +14,9 @@ export class UpdateLanguageDto {
   @MaxLength(100)
   name?: string;
 
-  @ApiPropertyOptional({ description: 'Language name in its native form (e.g., English, Español, Français)' })
+  @ApiPropertyOptional({
+    description: 'Language name in its native form (e.g., English, Español, Français)',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(100)
@@ -45,7 +47,6 @@ export class UpdateLanguageDto {
   @IsNumber()
   sortOrder?: number;
 
-  @ApiPropertyOptional({ description: 'Additional metadata'})
-  metadata?: string
-
+  @ApiPropertyOptional({ description: 'Additional metadata' })
+  metadata?: string;
 }

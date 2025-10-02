@@ -35,9 +35,7 @@ describe('GradesService', () => {
   });
 
   it('should create a grade and notify student', async () => {
-    const saveSpy = jest
-      .spyOn(gradeRepository, 'save')
-      .mockResolvedValueOnce({ id: 1 } as any);
+    const saveSpy = jest.spyOn(gradeRepository, 'save').mockResolvedValueOnce({ id: 1 } as any);
     await service.createGrade(1, { grade: 95, feedback: 'Great job!' }, {
       id: 2,
       role: 'mentor',

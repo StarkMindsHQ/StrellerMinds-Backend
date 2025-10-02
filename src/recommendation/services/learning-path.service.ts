@@ -1,11 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { LearningPath, LearningPathStep, LearningPathStatus, StepType } from '../entities/learning-path.entity';
+import {
+  LearningPath,
+  LearningPathStep,
+  LearningPathStatus,
+  StepType,
+} from '../entities/learning-path.entity';
 import { User } from '../../users/entities/user.entity';
 import { Course } from '../../courses/entities/course.entity';
 import { UserInteraction, InteractionType } from '../entities/user-interaction.entity';
-import { CreateLearningPathDto, UpdateLearningPathDto, GetLearningPathsQueryDto } from '../dto/learning-path.dto';
+import {
+  CreateLearningPathDto,
+  UpdateLearningPathDto,
+  GetLearningPathsQueryDto,
+} from '../dto/learning-path.dto';
 import { RecommendationAnalyticsService } from './recommendation-analytics.service';
 import { ContentSimilarityService } from './content-similarity.service';
 
@@ -69,26 +78,36 @@ export class LearningPathService {
     try {
       // Analyze user's current skills and progress
       const userProfile = await this.analyzeUserProfile(userId);
-      
+
       // Find relevant courses for the target skills
       const candidateCourses = await this.findRelevantCourses(goal.targetSkills, goal.preferences);
-      
+
       // Filter and sequence courses based on prerequisites and difficulty
-      const sequencedCourses = await this.sequenceCourses(candidateCourses, userProfile, goal, options);
-      
+      const sequencedCourses = await this.sequenceCourses(
+        candidateCourses,
+        userProfile,
+        goal,
+        options,
+      );
+
       // Create learning path entity
       const learningPath = await this.createLearningPathEntity(userId, goal, sequencedCourses);
-      
+
       // Generate learning path steps
-      const steps = await this.generateLearningPathSteps(learningPath.id, sequencedCourses, goal, options);
-      
+      const steps = await this.generateLearningPathSteps(
+        learningPath.id,
+        sequencedCourses,
+        goal,
+        options,
+      );
+
       // Save the complete learning path
       learningPath.steps = steps;
       learningPath.totalSteps = steps.length;
       learningPath.estimatedDuration = this.calculateEstimatedDuration(steps);
-      
+
       const savedPath = await this.learningPathRepository.save(learningPath);
-      
+
       // Track analytics
       await this.analyticsService.trackRecommendationGeneration({
         userId,
@@ -100,7 +119,6 @@ export class LearningPathService {
 
       this.logger.log(`Generated learning path with ${steps.length} steps for user ${userId}`);
       return savedPath;
-
     } catch (error) {
       this.logger.error(`Error generating learning path for user ${userId}:`, error);
       throw error;
@@ -110,7 +128,10 @@ export class LearningPathService {
   /**
    * Get learning paths for a user
    */
-  async getUserLearningPaths(userId: string, query: GetLearningPathsQueryDto): Promise<{
+  async getUserLearningPaths(
+    userId: string,
+    query: GetLearningPathsQueryDto,
+  ): Promise<{
     paths: LearningPath[];
     total: number;
   }> {
@@ -156,7 +177,7 @@ export class LearningPathService {
       throw new Error(`Learning path ${pathId} not found`);
     }
 
-    const step = path.steps.find(s => s.id === stepId);
+    const step = path.steps.find((s) => s.id === stepId);
     if (!step) {
       throw new Error(`Step ${stepId} not found in learning path`);
     }
@@ -167,7 +188,7 @@ export class LearningPathService {
     await this.stepRepository.save(step);
 
     // Update path progress
-    const completedSteps = path.steps.filter(s => s.completed).length;
+    const completedSteps = path.steps.filter((s) => s.completed).length;
     path.completedSteps = completedSteps;
     path.progressPercentage = (completedSteps / path.totalSteps) * 100;
 
@@ -200,25 +221,25 @@ export class LearningPathService {
 
     // Analyze user's recent performance
     const userPerformance = await this.analyzeUserPerformance(path.userId, path.steps);
-    
+
     // Identify areas where user is struggling or excelling
     const adaptations = await this.identifyAdaptations(path, userPerformance);
-    
+
     // Apply adaptations
     if (adaptations.length > 0) {
       await this.applyAdaptations(path, adaptations);
-      
+
       // Update path metadata
       path.metadata = {
         ...path.metadata,
-        adaptations: adaptations.map(a => ({
+        adaptations: adaptations.map((a) => ({
           type: a.type,
           reason: a.reason,
           appliedAt: new Date(),
         })),
         lastAdaptedAt: new Date(),
       };
-      
+
       await this.learningPathRepository.save(path);
     }
 
@@ -228,7 +249,10 @@ export class LearningPathService {
   /**
    * Get learning path recommendations based on user's interests and goals
    */
-  async getPathRecommendations(userId: string, limit: number = 5): Promise<{
+  async getPathRecommendations(
+    userId: string,
+    limit: number = 5,
+  ): Promise<{
     skillBasedPaths: LearningGoal[];
     trendingPaths: LearningGoal[];
     continuationPaths: LearningGoal[];
@@ -247,13 +271,21 @@ export class LearningPathService {
     });
 
     // Generate skill-based path recommendations
-    const skillBasedPaths = await this.generateSkillBasedPathRecommendations(user, interactions, limit);
-    
+    const skillBasedPaths = await this.generateSkillBasedPathRecommendations(
+      user,
+      interactions,
+      limit,
+    );
+
     // Generate trending path recommendations
     const trendingPaths = await this.generateTrendingPathRecommendations(limit);
-    
+
     // Generate continuation path recommendations
-    const continuationPaths = await this.generateContinuationPathRecommendations(user, interactions, limit);
+    const continuationPaths = await this.generateContinuationPathRecommendations(
+      user,
+      interactions,
+      limit,
+    );
 
     return {
       skillBasedPaths,
@@ -284,12 +316,12 @@ export class LearningPathService {
     // Extract current skills from completed courses
     const currentSkills = new Set<string>();
     const skillLevels: Record<string, number> = {};
-    
+
     interactions
-      .filter(i => i.interactionType === InteractionType.COMPLETE && i.course)
-      .forEach(i => {
+      .filter((i) => i.interactionType === InteractionType.COMPLETE && i.course)
+      .forEach((i) => {
         if (i.course?.skills) {
-          i.course.skills.forEach(skill => {
+          i.course.skills.forEach((skill) => {
             currentSkills.add(skill);
             skillLevels[skill] = (skillLevels[skill] || 0) + 1;
           });
@@ -297,8 +329,12 @@ export class LearningPathService {
       });
 
     // Calculate completion rate
-    const enrollments = interactions.filter(i => i.interactionType === InteractionType.ENROLL).length;
-    const completions = interactions.filter(i => i.interactionType === InteractionType.COMPLETE).length;
+    const enrollments = interactions.filter(
+      (i) => i.interactionType === InteractionType.ENROLL,
+    ).length;
+    const completions = interactions.filter(
+      (i) => i.interactionType === InteractionType.COMPLETE,
+    ).length;
     const completionRate = enrollments > 0 ? completions / enrollments : 0;
 
     // Analyze learning style based on interaction patterns
@@ -327,7 +363,8 @@ export class LearningPathService {
     targetSkills: string[],
     preferences: LearningGoal['preferences'],
   ): Promise<Course[]> {
-    const queryBuilder = this.courseRepository.createQueryBuilder('course')
+    const queryBuilder = this.courseRepository
+      .createQueryBuilder('course')
       .where('course.isActive = :isActive', { isActive: true });
 
     // Filter by skills
@@ -377,9 +414,9 @@ export class LearningPathService {
   ): Promise<Course[]> {
     // Group courses by difficulty level
     const coursesByDifficulty = {
-      beginner: courses.filter(c => c.difficulty === 'beginner'),
-      intermediate: courses.filter(c => c.difficulty === 'intermediate'),
-      advanced: courses.filter(c => c.difficulty === 'advanced'),
+      beginner: courses.filter((c) => c.difficulty === 'beginner'),
+      intermediate: courses.filter((c) => c.difficulty === 'intermediate'),
+      advanced: courses.filter((c) => c.difficulty === 'advanced'),
     };
 
     const sequencedCourses: Course[] = [];
@@ -388,20 +425,20 @@ export class LearningPathService {
 
     // Start with appropriate difficulty level
     let currentDifficulty = userCurrentLevel;
-    
+
     // Add courses progressively
     while (sequencedCourses.length < options.maxCourses && currentDifficulty) {
       const availableCourses = coursesByDifficulty[currentDifficulty];
-      
+
       if (availableCourses.length > 0) {
         // Select best courses for current level
         const selectedCourses = this.selectBestCoursesForLevel(
           availableCourses,
           userProfile,
           goal,
-          Math.min(3, options.maxCourses - sequencedCourses.length)
+          Math.min(3, options.maxCourses - sequencedCourses.length),
         );
-        
+
         sequencedCourses.push(...selectedCourses);
       }
 
@@ -428,7 +465,7 @@ export class LearningPathService {
     maxCourses: number,
   ): Course[] {
     // Score courses based on relevance to user's goals and profile
-    const scoredCourses = courses.map(course => ({
+    const scoredCourses = courses.map((course) => ({
       course,
       score: this.calculateCourseRelevanceScore(course, userProfile, goal),
     }));
@@ -437,7 +474,7 @@ export class LearningPathService {
     return scoredCourses
       .sort((a, b) => b.score - a.score)
       .slice(0, maxCourses)
-      .map(sc => sc.course);
+      .map((sc) => sc.course);
   }
 
   /**
@@ -451,9 +488,8 @@ export class LearningPathService {
     let score = 0;
 
     // Skill alignment (40% weight)
-    const skillOverlap = course.skills?.filter(skill => 
-      goal.targetSkills.includes(skill)
-    ).length || 0;
+    const skillOverlap =
+      course.skills?.filter((skill) => goal.targetSkills.includes(skill)).length || 0;
     const skillScore = skillOverlap / Math.max(goal.targetSkills.length, 1);
     score += skillScore * 0.4;
 
@@ -462,9 +498,8 @@ export class LearningPathService {
     score += ratingScore * 0.2;
 
     // User's current skill level alignment (20% weight)
-    const userHasPrereqs = course.prerequisites?.every(prereq => 
-      userProfile.currentSkills.includes(prereq)
-    ) ?? true;
+    const userHasPrereqs =
+      course.prerequisites?.every((prereq) => userProfile.currentSkills.includes(prereq)) ?? true;
     score += userHasPrereqs ? 0.2 : 0;
 
     // Duration preference (10% weight)
@@ -592,14 +627,17 @@ export class LearningPathService {
   /**
    * Analyze user performance for adaptation
    */
-  private async analyzeUserPerformance(userId: string, steps: LearningPathStep[]): Promise<{
+  private async analyzeUserPerformance(
+    userId: string,
+    steps: LearningPathStep[],
+  ): Promise<{
     strugglingAreas: string[];
     excellingAreas: string[];
     averageCompletionTime: number;
     completionRate: number;
   }> {
     // Analyze completion patterns and times
-    const completedSteps = steps.filter(s => s.completed);
+    const completedSteps = steps.filter((s) => s.completed);
     const totalSteps = steps.length;
     const completionRate = totalSteps > 0 ? completedSteps.length / totalSteps : 0;
 
@@ -608,14 +646,15 @@ export class LearningPathService {
     const excellingAreas: string[] = [];
 
     // Calculate average completion time
-    const averageCompletionTime = completedSteps.length > 0
-      ? completedSteps.reduce((sum, step) => {
-          if (step.completedAt && step.createdAt) {
-            return sum + (step.completedAt.getTime() - step.createdAt.getTime());
-          }
-          return sum;
-        }, 0) / completedSteps.length
-      : 0;
+    const averageCompletionTime =
+      completedSteps.length > 0
+        ? completedSteps.reduce((sum, step) => {
+            if (step.completedAt && step.createdAt) {
+              return sum + (step.completedAt.getTime() - step.createdAt.getTime());
+            }
+            return sum;
+          }, 0) / completedSteps.length
+        : 0;
 
     return {
       strugglingAreas,
@@ -628,12 +667,17 @@ export class LearningPathService {
   /**
    * Identify adaptations needed for learning path
    */
-  private async identifyAdaptations(path: LearningPath, performance: any): Promise<Array<{
-    type: 'add_support' | 'skip_redundant' | 'adjust_pace' | 'change_difficulty';
-    reason: string;
-    stepId?: string;
-    newSteps?: Partial<LearningPathStep>[];
-  }>> {
+  private async identifyAdaptations(
+    path: LearningPath,
+    performance: any,
+  ): Promise<
+    Array<{
+      type: 'add_support' | 'skip_redundant' | 'adjust_pace' | 'change_difficulty';
+      reason: string;
+      stepId?: string;
+      newSteps?: Partial<LearningPathStep>[];
+    }>
+  > {
     const adaptations: any[] = [];
 
     // If completion rate is low, add support materials
@@ -688,9 +732,9 @@ export class LearningPathService {
     // Analyze user's skill gaps and interests
     const userSkills = user.skills || [];
     const desiredSkills = user.desiredSkills || [];
-    const skillGaps = desiredSkills.filter(skill => !userSkills.includes(skill));
+    const skillGaps = desiredSkills.filter((skill) => !userSkills.includes(skill));
 
-    return skillGaps.slice(0, limit).map(skill => ({
+    return skillGaps.slice(0, limit).map((skill) => ({
       targetSkills: [skill],
       currentLevel: 'beginner' as const,
       targetLevel: 'intermediate' as const,
@@ -709,7 +753,7 @@ export class LearningPathService {
     // Get trending skills/topics from recent course enrollments
     const trendingSkills = ['React', 'Python', 'Machine Learning', 'DevOps', 'Cloud Computing'];
 
-    return trendingSkills.slice(0, limit).map(skill => ({
+    return trendingSkills.slice(0, limit).map((skill) => ({
       targetSkills: [skill],
       currentLevel: 'beginner' as const,
       targetLevel: 'advanced' as const,
@@ -731,12 +775,12 @@ export class LearningPathService {
   ): Promise<LearningGoal[]> {
     // Find skills user has started learning but not mastered
     const inProgressSkills = interactions
-      .filter(i => i.interactionType === InteractionType.START && i.course?.skills)
-      .flatMap(i => i.course!.skills!)
+      .filter((i) => i.interactionType === InteractionType.START && i.course?.skills)
+      .flatMap((i) => i.course!.skills!)
       .filter((skill, index, arr) => arr.indexOf(skill) === index)
       .slice(0, limit);
 
-    return inProgressSkills.map(skill => ({
+    return inProgressSkills.map((skill) => ({
       targetSkills: [skill],
       currentLevel: 'intermediate' as const,
       targetLevel: 'advanced' as const,
@@ -753,13 +797,20 @@ export class LearningPathService {
    */
   private determineLearningStyle(interactions: UserInteraction[]): string {
     // Analyze interaction patterns to determine learning style
-    const videoInteractions = interactions.filter(i => i.metadata?.contentType === 'video').length;
-    const textInteractions = interactions.filter(i => i.metadata?.contentType === 'text').length;
-    const practiceInteractions = interactions.filter(i => i.metadata?.contentType === 'practice').length;
+    const videoInteractions = interactions.filter(
+      (i) => i.metadata?.contentType === 'video',
+    ).length;
+    const textInteractions = interactions.filter((i) => i.metadata?.contentType === 'text').length;
+    const practiceInteractions = interactions.filter(
+      (i) => i.metadata?.contentType === 'practice',
+    ).length;
 
     if (videoInteractions > textInteractions && videoInteractions > practiceInteractions) {
       return 'visual';
-    } else if (practiceInteractions > videoInteractions && practiceInteractions > textInteractions) {
+    } else if (
+      practiceInteractions > videoInteractions &&
+      practiceInteractions > textInteractions
+    ) {
       return 'kinesthetic';
     } else {
       return 'reading';
@@ -769,18 +820,19 @@ export class LearningPathService {
   private determinePreferredDifficulty(interactions: UserInteraction[]): string {
     // Analyze completion rates by difficulty to determine preference
     const completedCourses = interactions
-      .filter(i => i.interactionType === InteractionType.COMPLETE && i.course)
-      .map(i => i.course!);
+      .filter((i) => i.interactionType === InteractionType.COMPLETE && i.course)
+      .map((i) => i.course!);
 
     const difficultyCompletions = {
-      beginner: completedCourses.filter(c => c.difficulty === 'beginner').length,
-      intermediate: completedCourses.filter(c => c.difficulty === 'intermediate').length,
-      advanced: completedCourses.filter(c => c.difficulty === 'advanced').length,
+      beginner: completedCourses.filter((c) => c.difficulty === 'beginner').length,
+      intermediate: completedCourses.filter((c) => c.difficulty === 'intermediate').length,
+      advanced: completedCourses.filter((c) => c.difficulty === 'advanced').length,
     };
 
     const maxCompletions = Math.max(...Object.values(difficultyCompletions));
-    const preferredDifficulty = Object.entries(difficultyCompletions)
-      .find(([_, count]) => count === maxCompletions)?.[0] || 'beginner';
+    const preferredDifficulty =
+      Object.entries(difficultyCompletions).find(([_, count]) => count === maxCompletions)?.[0] ||
+      'beginner';
 
     return preferredDifficulty;
   }

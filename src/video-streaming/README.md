@@ -5,6 +5,7 @@ This module provides comprehensive video streaming capabilities for the Streller
 ## Features
 
 ### 🎥 Video Processing
+
 - **Adaptive Streaming**: Automatic generation of multiple quality variants (240p to 4K)
 - **HLS & DASH Support**: Industry-standard streaming protocols
 - **Thumbnail Generation**: Automatic thumbnail creation at multiple timestamps
@@ -12,6 +13,7 @@ This module provides comprehensive video streaming capabilities for the Streller
 - **Watermarking**: Configurable video watermarks for branding
 
 ### 🔒 Security Features
+
 - **Signed URLs**: Time-limited access with CloudFront signed URLs
 - **Domain Restrictions**: Limit video access to specific domains
 - **Geographic Restrictions**: Country-based access control
@@ -20,6 +22,7 @@ This module provides comprehensive video streaming capabilities for the Streller
 - **Embed Protection**: Configurable embedding permissions
 
 ### 📊 Analytics & Monitoring
+
 - **Engagement Metrics**: View counts, watch time, completion rates
 - **Performance Metrics**: Load times, buffer events, quality changes
 - **Geographic Analytics**: Views by country and region
@@ -28,6 +31,7 @@ This module provides comprehensive video streaming capabilities for the Streller
 - **Real-time Tracking**: Live analytics event collection
 
 ### ☁️ Cloud Infrastructure
+
 - **AWS CloudFront**: Global CDN for fast video delivery
 - **S3 Storage**: Scalable video storage with lifecycle management
 - **Adaptive Bitrate**: Automatic quality switching based on bandwidth
@@ -51,11 +55,13 @@ This module provides comprehensive video streaming capabilities for the Streller
 ## Installation
 
 1. **Install Dependencies**
+
 ```bash
 npm install @aws-sdk/client-s3 @aws-sdk/client-cloudfront fluent-ffmpeg
 ```
 
 2. **Configure Environment Variables**
+
 ```bash
 # AWS Configuration
 AWS_CLOUDFRONT_DISTRIBUTION_ID=E1234567890ABC
@@ -74,6 +80,7 @@ VIDEO_DRM_ENABLED=false
 ```
 
 3. **Install FFmpeg**
+
 ```bash
 # Ubuntu/Debian
 sudo apt update && sudo apt install ffmpeg
@@ -94,23 +101,26 @@ RUN apk add --no-cache ffmpeg
 import { VideoStreamingService } from './video-streaming.service';
 
 // Create video metadata
-const video = await videoStreamingService.createVideo({
-  title: 'My Course Video',
-  description: 'Introduction to the course',
-  originalFilename: 'intro.mp4',
-  visibility: VideoVisibility.COURSE_ONLY,
-  processingSettings: {
-    adaptiveStreaming: true,
-    qualityLevels: ['720p', '480p', '360p'],
-    generateThumbnails: true,
-    thumbnailCount: 5,
+const video = await videoStreamingService.createVideo(
+  {
+    title: 'My Course Video',
+    description: 'Introduction to the course',
+    originalFilename: 'intro.mp4',
+    visibility: VideoVisibility.COURSE_ONLY,
+    processingSettings: {
+      adaptiveStreaming: true,
+      qualityLevels: ['720p', '480p', '360p'],
+      generateThumbnails: true,
+      thumbnailCount: 5,
+    },
+    securitySettings: {
+      requireAuth: true,
+      allowedDomains: ['yourdomain.com'],
+      signedUrlExpiry: 3600,
+    },
   },
-  securitySettings: {
-    requireAuth: true,
-    allowedDomains: ['yourdomain.com'],
-    signedUrlExpiry: 3600,
-  },
-}, user);
+  user,
+);
 
 // Upload video file
 await videoStreamingService.uploadVideoFile(video.id, file);
@@ -120,15 +130,11 @@ await videoStreamingService.uploadVideoFile(video.id, file);
 
 ```typescript
 // Get streaming URLs and security tokens
-const streamingInfo = await videoStreamingService.getVideoStreamingInfo(
-  videoId,
-  userId,
-  {
-    ipAddress: '192.168.1.1',
-    userAgent: 'Mozilla/5.0...',
-    domain: 'yourdomain.com',
-  }
-);
+const streamingInfo = await videoStreamingService.getVideoStreamingInfo(videoId, userId, {
+  ipAddress: '192.168.1.1',
+  userAgent: 'Mozilla/5.0...',
+  domain: 'yourdomain.com',
+});
 
 // Use in video player
 const player = new VideoPlayer({
@@ -177,6 +183,7 @@ console.log('Quality:', analytics.quality);
 ## API Endpoints
 
 ### Video Management
+
 - `POST /video-streaming` - Create video
 - `POST /video-streaming/:id/upload` - Upload video file
 - `GET /video-streaming` - List videos
@@ -186,6 +193,7 @@ console.log('Quality:', analytics.quality);
 - `DELETE /video-streaming/:id` - Delete video
 
 ### Analytics
+
 - `POST /video-analytics/events` - Record analytics event
 - `GET /video-analytics/videos/:id/engagement` - Engagement metrics
 - `GET /video-analytics/videos/:id/performance` - Performance metrics
@@ -195,12 +203,14 @@ console.log('Quality:', analytics.quality);
 - `GET /video-analytics/videos/:id/dashboard` - Complete dashboard
 
 ### Security
+
 - `POST /video-streaming/:id/access-token` - Generate access token
 - `GET /video-streaming/:id/embed` - Get embed code
 
 ## Configuration
 
 ### Video Quality Levels
+
 ```typescript
 const qualitySettings = {
   '240p': { width: 426, height: 240, bitrate: 400 },
@@ -212,6 +222,7 @@ const qualitySettings = {
 ```
 
 ### Security Settings
+
 ```typescript
 const securitySettings = {
   requireAuth: true,

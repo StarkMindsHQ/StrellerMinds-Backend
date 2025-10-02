@@ -82,18 +82,10 @@ describe('ProgressService', () => {
     }).compile();
 
     service = module.get<ProgressService>(ProgressService);
-    progressRepository = module.get<Repository<UserProgress>>(
-      getRepositoryToken(UserProgress),
-    );
-    courseRepository = module.get<Repository<Course>>(
-      getRepositoryToken(Course),
-    );
-    lessonRepository = module.get<Repository<Lesson>>(
-      getRepositoryToken(Lesson),
-    );
-    moduleRepository = module.get<Repository<CourseModule>>(
-      getRepositoryToken(CourseModule),
-    );
+    progressRepository = module.get<Repository<UserProgress>>(getRepositoryToken(UserProgress));
+    courseRepository = module.get<Repository<Course>>(getRepositoryToken(Course));
+    lessonRepository = module.get<Repository<Lesson>>(getRepositoryToken(Lesson));
+    moduleRepository = module.get<Repository<CourseModule>>(getRepositoryToken(CourseModule));
   });
 
   describe('updateLessonProgress', () => {
@@ -103,12 +95,7 @@ describe('ProgressService', () => {
       jest.spyOn(progressRepository, 'create').mockReturnValue(mockUserProgress as any);
       jest.spyOn(progressRepository, 'save').mockResolvedValue(mockUserProgress as any);
 
-      const result = await service.updateLessonProgress(
-        'user1',
-        'course1',
-        'lesson1',
-        50,
-      );
+      const result = await service.updateLessonProgress('user1', 'course1', 'lesson1', 50);
 
       expect(result).toBeDefined();
       expect(progressRepository.create).toHaveBeenCalled();
@@ -118,9 +105,9 @@ describe('ProgressService', () => {
     it('should throw NotFoundException if lesson not found', async () => {
       jest.spyOn(lessonRepository, 'findOne').mockResolvedValue(null);
 
-      await expect(
-        service.updateLessonProgress('user1', 'course1', 'lesson1', 50),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.updateLessonProgress('user1', 'course1', 'lesson1', 50)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException if lesson does not belong to course', async () => {
@@ -129,9 +116,9 @@ describe('ProgressService', () => {
         module: { id: 'module1', courseId: 'different-course' },
       } as any);
 
-      await expect(
-        service.updateLessonProgress('user1', 'course1', 'lesson1', 50),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.updateLessonProgress('user1', 'course1', 'lesson1', 50)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -157,9 +144,9 @@ describe('ProgressService', () => {
     it('should throw NotFoundException if course not found', async () => {
       jest.spyOn(courseRepository, 'findOne').mockResolvedValue(null);
 
-      await expect(
-        service.getCourseProgress('user1', 'course1'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getCourseProgress('user1', 'course1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -199,9 +186,7 @@ describe('ProgressService', () => {
     it('should throw NotFoundException if course not found', async () => {
       jest.spyOn(courseRepository, 'findOne').mockResolvedValue(null);
 
-      await expect(
-        service.syncProgress('user1', 'course1'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.syncProgress('user1', 'course1')).rejects.toThrow(NotFoundException);
     });
   });
-}); 
+});

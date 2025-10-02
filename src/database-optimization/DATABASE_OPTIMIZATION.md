@@ -15,28 +15,33 @@ The system automatically monitors all database queries and logs those that excee
 ### 2. Database Connection Pool Monitoring
 
 The system monitors database connection pool metrics including:
+
 - Total connections
 - Active connections
 - Idle connections
 - Waiting requests
 
 This is implemented in:
+
 - `src/monitoring/database-monitoring.service.ts` - Connection pool metrics collection
 - `src/config/database.config.ts` - Connection pool configuration
 
 ### 3. Database Query Caching
 
 A query caching service is implemented to cache frequently accessed data:
+
 - LRU cache with configurable TTL (default 5 minutes)
 - Cache statistics tracking (hits, misses, evictions)
 - Pattern-based cache invalidation
 
 Implemented in:
+
 - `src/database-optimization/services/query-cache.service.ts` - Core caching service
 
 ### 4. Database Performance Dashboard
 
 A comprehensive dashboard API provides real-time database performance metrics:
+
 - Performance summary with query statistics
 - Slow query tracking
 - Connection pool metrics
@@ -44,17 +49,20 @@ A comprehensive dashboard API provides real-time database performance metrics:
 - Top tables by usage
 
 Implemented in:
+
 - `src/database-optimization/controllers/database-dashboard.controller.ts` - Dashboard API endpoints
 - `src/database-optimization/services/database-dashboard.service.ts` - Dashboard data service
 
 ### 5. N+1 Query Pattern Optimization
 
 The course service has been optimized to prevent N+1 query issues:
+
 - Query builder with pre-loaded relations
 - Optimized methods for common query patterns
 - Efficient data fetching for related entities
 
 Implemented in:
+
 - `src/courses/courses.service.ts` - Optimized course service methods
 
 ## API Endpoints
@@ -62,33 +70,43 @@ Implemented in:
 The database dashboard provides the following endpoints:
 
 ### Performance Summary
+
 ```
 GET /database-dashboard/performance-summary
 ```
+
 Returns overall database performance metrics.
 
 ### Slow Queries
+
 ```
 GET /database-dashboard/slow-queries
 ```
+
 Returns detected slow queries with execution times.
 
 ### Connection Pool Metrics
+
 ```
 GET /database-dashboard/connection-pool
 ```
+
 Returns current connection pool statistics.
 
 ### Cache Statistics
+
 ```
 GET /database-dashboard/cache-stats
 ```
+
 Returns query cache statistics.
 
 ### Top Tables
+
 ```
 GET /database-dashboard/top-tables
 ```
+
 Returns most frequently accessed database tables.
 
 ## Configuration
@@ -112,7 +130,7 @@ import { QueryCacheService } from './database-optimization/services/query-cache.
 const result = await queryCacheService.executeWithCache(
   'SELECT * FROM courses WHERE category_id = $1',
   [categoryId],
-  { ttl: 300000 } // 5 minutes cache
+  { ttl: 300000 }, // 5 minutes cache
 );
 
 // Get cache statistics
@@ -143,6 +161,7 @@ const poolMetrics = await databaseDashboardService.getConnectionPoolMetrics();
 ## Monitoring and Alerting
 
 The system provides built-in monitoring capabilities:
+
 - Real-time performance metrics dashboard
 - Slow query logging and tracking
 - Connection pool health monitoring

@@ -1,9 +1,9 @@
-import { IsUUID } from "class-validator"
+import { IsUUID } from 'class-validator';
 
 export class StartAssessmentDto {
   @IsUUID()
-  assessmentId: string
+  assessmentId: string;
 
   @IsUUID()
-  userId: string
+  userId: string;
 }

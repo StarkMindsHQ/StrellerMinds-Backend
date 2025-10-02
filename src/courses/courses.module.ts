@@ -24,15 +24,7 @@ import { BillingModule } from '../billing/billing.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Course,
-      CourseModule,
-      Category,
-      Tag,
-      CourseReview,
-      User,
-      Lesson,
-    ]),
+    TypeOrmModule.forFeature([Course, CourseModule, Category, Tag, CourseReview, User, Lesson]),
     UsersModule,
     EmailModule,
     CommonModule, // Import CommonModule for shared services

@@ -46,21 +46,22 @@ export class DatabaseDashboardService {
     try {
       // Get query metrics from monitoring service
       const queryMetrics = this.databaseMonitoringService.getQueryMetrics();
-      
+
       // Get connection pool metrics
       const connectionPoolMetrics = await this.databaseMonitoringService.getConnectionPoolMetrics();
-      
+
       // Get cache stats
       const cacheStats = this.queryCacheService.getStats();
-      
+
       // Calculate cache hit rate
-      const cacheHitRate = cacheStats.hits + cacheStats.misses > 0 
-        ? (cacheStats.hits / (cacheStats.hits + cacheStats.misses)) * 100 
-        : 0;
-      
+      const cacheHitRate =
+        cacheStats.hits + cacheStats.misses > 0
+          ? (cacheStats.hits / (cacheStats.hits + cacheStats.misses)) * 100
+          : 0;
+
       // Get top slow queries
       const slowQueries = await this.databaseMonitoringService.getSlowQueries(5, hours);
-      const topSlowQueries = slowQueries.map(q => ({
+      const topSlowQueries = slowQueries.map((q) => ({
         query: q.query.substring(0, 100) + (q.query.length > 100 ? '...' : ''),
         executionTime: q.executionTime,
         timestamp: q.timestamp,
@@ -115,7 +116,7 @@ export class DatabaseDashboardService {
       `;
 
       const result = await this.dataSource.query(query, [limit]);
-      
+
       return result.map((row: any) => ({
         tableName: `${row.schemaname}.${row.tablename}`,
         readCount: parseInt(row.read_count) || 0,

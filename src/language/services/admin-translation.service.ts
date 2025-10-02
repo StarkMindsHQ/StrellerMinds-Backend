@@ -1,13 +1,13 @@
-import { Injectable, NotFoundException } from "@nestjs/common"
-import type { LanguageRepository } from "../repositories/language.repository"
-import type { TranslationRepository } from "../repositories/translation.repository"
-import type { TranslationKeyRepository } from "../repositories/translation-key.repository"
-import type { PuzzleTranslationRepository } from "../repositories/puzzle-translation.repository"
-import type { Language } from "../entities/language.entity"
-import type { CreateLanguageDto } from "../dto/create-language.dto"
-import type { UpdateLanguageDto } from "../dto/update-language.dto"
-import type { CacheService } from "./cache.service"
-import type { EventEmitterService } from "./event-emitter.service"
+import { Injectable, NotFoundException } from '@nestjs/common';
+import type { LanguageRepository } from '../repositories/language.repository';
+import type { TranslationRepository } from '../repositories/translation.repository';
+import type { TranslationKeyRepository } from '../repositories/translation-key.repository';
+import type { PuzzleTranslationRepository } from '../repositories/puzzle-translation.repository';
+import type { Language } from '../entities/language.entity';
+import type { CreateLanguageDto } from '../dto/create-language.dto';
+import type { UpdateLanguageDto } from '../dto/update-language.dto';
+import type { CacheService } from './cache.service';
+import type { EventEmitterService } from './event-emitter.service';
 
 /**
  * Service for admin-level language and translation management.
@@ -28,7 +28,7 @@ export class AdminTranslationService {
    * Get all languages in the system.
    */
   async getAllLanguages(): Promise<Language[]> {
-    return this.languageRepository.findAll()
+    return this.languageRepository.findAll();
   }
 
   /**
@@ -36,11 +36,11 @@ export class AdminTranslationService {
    * @param id Language UUID
    */
   async getLanguageById(id: string): Promise<Language> {
-    const language = await this.languageRepository.findById(id)
+    const language = await this.languageRepository.findById(id);
     if (!language) {
-      throw new NotFoundException(`Language with ID ${id} not found`)
+      throw new NotFoundException(`Language with ID ${id} not found`);
     }
-    return language
+    return language;
   }
 
   /**
@@ -48,11 +48,11 @@ export class AdminTranslationService {
    * @param code Language code
    */
   async getLanguageByCode(code: string): Promise<Language> {
-    const language = await this.languageRepository.findByCode(code)
+    const language = await this.languageRepository.findByCode(code);
     if (!language) {
-      throw new NotFoundException(`Language with code ${code} not found`)
+      throw new NotFoundException(`Language with code ${code} not found`);
     }
-    return language
+    return language;
   }
 
   /**
@@ -61,14 +61,14 @@ export class AdminTranslationService {
    */
   async createLanguage(createDto: CreateLanguageDto): Promise<Language> {
     // Check if language with the same code already exists
-    const existingLanguage = await this.languageRepository.findByCode(createDto.code)
+    const existingLanguage = await this.languageRepository.findByCode(createDto.code);
     if (existingLanguage) {
-      throw new Error(`Language with code ${createDto.code} already exists`)
+      throw new Error(`Language with code ${createDto.code} already exists`);
     }
 
     // If this is the first language, make it the default
-    const languages = await this.languageRepository.findAll()
-    const isDefault = languages.length === 0 ? true : createDto.isDefault
+    const languages = await this.languageRepository.findAll();
+    const isDefault = languages.length === 0 ? true : createDto.isDefault;
 
     const newLanguage = await this.languageRepository.create({
       code: createDto.code,
@@ -80,17 +80,17 @@ export class AdminTranslationService {
       description: createDto.description,
       sortOrder: createDto.sortOrder || 0,
       metadata: createDto.metadata,
-    })
+    });
 
     // If this language is set as default, update other languages
     if (isDefault) {
-      await this.setDefaultLanguage(newLanguage.id)
+      await this.setDefaultLanguage(newLanguage.id);
     }
 
     // Emit event
-    this.eventEmitter.emit("admin.language.created", newLanguage)
+    this.eventEmitter.emit('admin.language.created', newLanguage);
 
-    return newLanguage
+    return newLanguage;
   }
 
   /**
@@ -99,16 +99,16 @@ export class AdminTranslationService {
    * @param updateDto DTO for language update
    */
   async updateLanguage(id: string, updateDto: UpdateLanguageDto): Promise<Language> {
-    const language = await this.languageRepository.findById(id)
+    const language = await this.languageRepository.findById(id);
     if (!language) {
-      throw new NotFoundException(`Language with ID ${id} not found`)
+      throw new NotFoundException(`Language with ID ${id} not found`);
     }
 
     // If updating the code, check if it already exists
     if (updateDto.code && updateDto.code !== language.code) {
-      const existingLanguage = await this.languageRepository.findByCode(updateDto.code)
+      const existingLanguage = await this.languageRepository.findByCode(updateDto.code);
       if (existingLanguage) {
-        throw new Error(`Language with code ${updateDto.code} already exists`)
+        throw new Error(`Language with code ${updateDto.code} already exists`);
       }
     }
 
@@ -121,20 +121,20 @@ export class AdminTranslationService {
       description: updateDto.description,
       sortOrder: updateDto.sortOrder,
       metadata: updateDto.metadata,
-    })
+    });
 
     // If this language is set as default, update other languages
     if (updateDto.isDefault) {
-      await this.setDefaultLanguage(id)
+      await this.setDefaultLanguage(id);
     }
 
     // Clear all caches related to this language
-    await this.clearLanguageCaches(language.code)
+    await this.clearLanguageCaches(language.code);
 
     // Emit event
-    this.eventEmitter.emit("admin.language.updated", updatedLanguage)
+    this.eventEmitter.emit('admin.language.updated', updatedLanguage);
 
-    return updatedLanguage
+    return updatedLanguage;
   }
 
   /**
@@ -142,24 +142,24 @@ export class AdminTranslationService {
    * @param id Language UUID
    */
   async deleteLanguage(id: string): Promise<void> {
-    const language = await this.languageRepository.findById(id)
+    const language = await this.languageRepository.findById(id);
     if (!language) {
-      throw new NotFoundException(`Language with ID ${id} not found`)
+      throw new NotFoundException(`Language with ID ${id} not found`);
     }
 
     // Don't allow deleting the default language
     if (language.isDefault) {
-      throw new Error("Cannot delete the default language")
+      throw new Error('Cannot delete the default language');
     }
 
     // Clear all caches related to this language
-    await this.clearLanguageCaches(language.code)
+    await this.clearLanguageCaches(language.code);
 
     // Delete the language (cascading delete will remove related translations)
-    await this.languageRepository.remove(id)
+    await this.languageRepository.remove(id);
 
     // Emit event
-    this.eventEmitter.emit("admin.language.deleted", { id, code: language.code })
+    this.eventEmitter.emit('admin.language.deleted', { id, code: language.code });
   }
 
   /**
@@ -167,34 +167,34 @@ export class AdminTranslationService {
    * @param id Language UUID
    */
   async setDefaultLanguage(id: string): Promise<Language> {
-    const language = await this.languageRepository.findById(id)
+    const language = await this.languageRepository.findById(id);
     if (!language) {
-      throw new NotFoundException(`Language with ID ${id} not found`)
+      throw new NotFoundException(`Language with ID ${id} not found`);
     }
 
     // Set this language as default and all others as non-default
-    const updatedLanguage = await this.languageRepository.setDefault(id)
+    const updatedLanguage = await this.languageRepository.setDefault(id);
 
     // Clear all caches
-    await this.cacheService.clear()
+    await this.cacheService.clear();
 
     // Emit event
-    this.eventEmitter.emit("admin.language.setDefault", updatedLanguage)
+    this.eventEmitter.emit('admin.language.setDefault', updatedLanguage);
 
-    return updatedLanguage
+    return updatedLanguage;
   }
 
   /**
    * Get translation statistics for all languages.
    */
   async getTranslationStats(): Promise<any> {
-    const languages = await this.languageRepository.findAll()
-    const translationKeys = await this.translationKeyRepository.findAll()
+    const languages = await this.languageRepository.findAll();
+    const translationKeys = await this.translationKeyRepository.findAll();
 
-    const stats = []
+    const stats = [];
 
     for (const language of languages) {
-      const translations = await this.translationRepository.findByLanguage(language.id)
+      const translations = await this.translationRepository.findByLanguage(language.id);
 
       stats.push({
         language: {
@@ -206,37 +206,37 @@ export class AdminTranslationService {
         translatedKeys: translations.length,
         missingKeys: translationKeys.length - translations.length,
         completionPercentage: Math.round((translations.length / translationKeys.length) * 100),
-      })
+      });
     }
 
-    return stats
+    return stats;
   }
 
   private async clearLanguageCaches(languageCode: string): Promise<void> {
     // Clear translation caches
-    await this.cacheService.delete(`translations:${languageCode}`)
+    await this.cacheService.delete(`translations:${languageCode}`);
 
     // Clear category caches
-    const categories = await this.translationKeyRepository.findAll()
-    const uniqueCategories = [...new Set(categories.map((key) => key.category))]
+    const categories = await this.translationKeyRepository.findAll();
+    const uniqueCategories = [...new Set(categories.map((key) => key.category))];
 
     for (const category of uniqueCategories) {
-      await this.cacheService.delete(`translations:${languageCode}:${category}`)
+      await this.cacheService.delete(`translations:${languageCode}:${category}`);
     }
 
     // Clear puzzle translation caches
     const puzzleTranslations = await this.puzzleTranslationRepository.findByLanguage(
       (await this.languageRepository.findByCode(languageCode)).id,
-    )
+    );
 
     for (const translation of puzzleTranslations) {
-      await this.cacheService.delete(`puzzle_translation:${translation.puzzleId}:${languageCode}`)
+      await this.cacheService.delete(`puzzle_translation:${translation.puzzleId}:${languageCode}`);
     }
 
     // Clear user language caches (will be regenerated on next request)
-    const cacheKeys = await this.cacheService.keys("user_language:*")
+    const cacheKeys = await this.cacheService.keys('user_language:*');
     for (const key of cacheKeys) {
-      await this.cacheService.delete(key)
+      await this.cacheService.delete(key);
     }
   }
 }

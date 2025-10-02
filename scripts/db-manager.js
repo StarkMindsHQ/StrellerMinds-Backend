@@ -33,16 +33,16 @@ class DatabaseManager {
 
   async runMigrations() {
     console.log('🚀 Running database migrations...');
-    
+
     try {
       await this.initialize();
       const migrations = await this.dataSource.runMigrations();
-      
+
       if (migrations.length === 0) {
         console.log('✅ No pending migrations found');
       } else {
         console.log(`✅ Successfully ran ${migrations.length} migrations:`);
-        migrations.forEach(migration => {
+        migrations.forEach((migration) => {
           console.log(`   - ${migration.name}`);
         });
       }
@@ -54,7 +54,7 @@ class DatabaseManager {
 
   async revertMigration() {
     console.log('🔄 Reverting last migration...');
-    
+
     try {
       await this.initialize();
       await this.dataSource.undoLastMigration();
@@ -67,11 +67,11 @@ class DatabaseManager {
 
   async showMigrations() {
     console.log('📋 Migration status:');
-    
+
     try {
       await this.initialize();
       const migrations = await this.dataSource.showMigrations();
-      
+
       if (migrations) {
         console.log('⚠️  There are pending migrations');
       } else {
@@ -85,15 +85,15 @@ class DatabaseManager {
 
   async validateSchema() {
     console.log('🔍 Validating database schema...');
-    
+
     try {
       await this.initialize();
-      
+
       // Run schema analysis
       const SchemaAnalyzer = require('./schema-analysis');
       const analyzer = new SchemaAnalyzer();
       await analyzer.analyze();
-      
+
       console.log('✅ Schema validation completed');
     } catch (error) {
       console.error('❌ Schema validation failed:', error.message);
@@ -103,26 +103,26 @@ class DatabaseManager {
 
   async optimizeDatabase() {
     console.log('⚡ Optimizing database performance...');
-    
+
     try {
       await this.initialize();
       const queryRunner = this.dataSource.createQueryRunner();
-      
+
       try {
         await queryRunner.connect();
-        
+
         // Update table statistics
         console.log('   Updating table statistics...');
         await queryRunner.query('ANALYZE;');
-        
+
         // Vacuum tables
         console.log('   Vacuuming tables...');
         await queryRunner.query('VACUUM;');
-        
+
         // Reindex tables
         console.log('   Reindexing tables...');
         await queryRunner.query('REINDEX DATABASE CONCURRENTLY;');
-        
+
         console.log('✅ Database optimization completed');
       } finally {
         await queryRunner.release();
@@ -135,26 +135,31 @@ class DatabaseManager {
 
   async createBackup(filename) {
     console.log(`💾 Creating database backup: ${filename}`);
-    
+
     try {
       const backupDir = path.join(process.cwd(), 'database-backups');
       if (!fs.existsSync(backupDir)) {
         fs.mkdirSync(backupDir, { recursive: true });
       }
-      
+
       const backupPath = path.join(backupDir, filename || `backup-${Date.now()}.sql`);
-      
+
       // Use pg_dump for PostgreSQL backup
       const { spawn } = require('child_process');
       const pgDump = spawn('pg_dump', [
-        '-h', process.env.DATABASE_HOST || 'localhost',
-        '-p', process.env.DATABASE_PORT || '5432',
-        '-U', process.env.DATABASE_USER || 'postgres',
-        '-d', process.env.DATABASE_NAME || 'streller_minds',
-        '-f', backupPath,
-        '--verbose'
+        '-h',
+        process.env.DATABASE_HOST || 'localhost',
+        '-p',
+        process.env.DATABASE_PORT || '5432',
+        '-U',
+        process.env.DATABASE_USER || 'postgres',
+        '-d',
+        process.env.DATABASE_NAME || 'streller_minds',
+        '-f',
+        backupPath,
+        '--verbose',
       ]);
-      
+
       return new Promise((resolve, reject) => {
         pgDump.on('close', (code) => {
           if (code === 0) {
@@ -164,7 +169,7 @@ class DatabaseManager {
             reject(new Error(`pg_dump failed with code ${code}`));
           }
         });
-        
+
         pgDump.on('error', (error) => {
           reject(new Error(`Failed to start pg_dump: ${error.message}`));
         });
@@ -177,23 +182,28 @@ class DatabaseManager {
 
   async restoreBackup(backupPath) {
     console.log(`📥 Restoring database from backup: ${backupPath}`);
-    
+
     try {
       if (!fs.existsSync(backupPath)) {
         throw new Error(`Backup file not found: ${backupPath}`);
       }
-      
+
       // Use psql for PostgreSQL restore
       const { spawn } = require('child_process');
       const psql = spawn('psql', [
-        '-h', process.env.DATABASE_HOST || 'localhost',
-        '-p', process.env.DATABASE_PORT || '5432',
-        '-U', process.env.DATABASE_USER || 'postgres',
-        '-d', process.env.DATABASE_NAME || 'streller_minds',
-        '-f', backupPath,
-        '--verbose'
+        '-h',
+        process.env.DATABASE_HOST || 'localhost',
+        '-p',
+        process.env.DATABASE_PORT || '5432',
+        '-U',
+        process.env.DATABASE_USER || 'postgres',
+        '-d',
+        process.env.DATABASE_NAME || 'streller_minds',
+        '-f',
+        backupPath,
+        '--verbose',
       ]);
-      
+
       return new Promise((resolve, reject) => {
         psql.on('close', (code) => {
           if (code === 0) {
@@ -203,7 +213,7 @@ class DatabaseManager {
             reject(new Error(`psql failed with code ${code}`));
           }
         });
-        
+
         psql.on('error', (error) => {
           reject(new Error(`Failed to start psql: ${error.message}`));
         });
@@ -216,24 +226,24 @@ class DatabaseManager {
 
   async checkHealth() {
     console.log('🏥 Checking database health...');
-    
+
     try {
       await this.initialize();
       const queryRunner = this.dataSource.createQueryRunner();
-      
+
       try {
         await queryRunner.connect();
-        
+
         // Check connection
         const result = await queryRunner.query('SELECT NOW() as current_time');
         console.log(`✅ Database connection: OK (${result[0].current_time})`);
-        
+
         // Check database size
         const sizeResult = await queryRunner.query(`
           SELECT pg_size_pretty(pg_database_size(current_database())) as size
         `);
         console.log(`📊 Database size: ${sizeResult[0].size}`);
-        
+
         // Check active connections
         const connectionsResult = await queryRunner.query(`
           SELECT count(*) as active_connections 
@@ -241,7 +251,7 @@ class DatabaseManager {
           WHERE state = 'active'
         `);
         console.log(`🔗 Active connections: ${connectionsResult[0].active_connections}`);
-        
+
         // Check for long-running queries
         const longQueriesResult = await queryRunner.query(`
           SELECT count(*) as long_queries 
@@ -250,7 +260,7 @@ class DatabaseManager {
           AND query_start < NOW() - INTERVAL '5 minutes'
         `);
         console.log(`⏱️  Long-running queries: ${longQueriesResult[0].long_queries}`);
-        
+
         console.log('✅ Database health check completed');
       } finally {
         await queryRunner.release();
@@ -263,10 +273,10 @@ class DatabaseManager {
 
   async generateMigration(name) {
     console.log(`📝 Generating migration: ${name}`);
-    
+
     try {
       await this.initialize();
-      
+
       // This would typically use TypeORM CLI
       const timestamp = Date.now();
       const migrationName = `${timestamp}-${name}`;
@@ -275,9 +285,9 @@ class DatabaseManager {
         'src',
         'database',
         'migrations',
-        `${migrationName}.ts`
+        `${migrationName}.ts`,
       );
-      
+
       const migrationTemplate = `import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class ${name}${timestamp} implements MigrationInterface {
@@ -292,7 +302,7 @@ export class ${name}${timestamp} implements MigrationInterface {
   }
 }
 `;
-      
+
       fs.writeFileSync(migrationPath, migrationTemplate);
       console.log(`✅ Migration created: ${migrationPath}`);
     } catch (error) {

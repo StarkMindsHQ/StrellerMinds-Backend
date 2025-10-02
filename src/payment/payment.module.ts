@@ -39,4 +39,4 @@ import { PaymentWebhookController } from './payment-webhook.controller';
     StripeService,
   ],
 })
-export class PaymentModule {} 
+export class PaymentModule {}

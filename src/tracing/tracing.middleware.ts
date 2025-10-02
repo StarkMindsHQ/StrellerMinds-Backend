@@ -18,7 +18,7 @@ export class TracingMiddleware implements NestMiddleware {
 
     // Extract trace context from incoming headers
     const extractedContext = this.tracingService.extractTraceContext(req.headers);
-    
+
     // Create root span for the HTTP request
     const span = this.tracingService.createSpan(`HTTP ${method}`, {
       'http.method': method,
@@ -61,9 +61,9 @@ export class TracingMiddleware implements NestMiddleware {
 
       // Override res.end to capture response metrics
       const originalEnd = res.end;
-      res.end = function(chunk?: any, encoding?: any) {
+      res.end = function (chunk?: any, encoding?: any) {
         const duration = Date.now() - startTime;
-        
+
         span.setAttributes({
           'http.status_code': res.statusCode,
           'http.response.duration_ms': duration,

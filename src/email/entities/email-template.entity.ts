@@ -1,14 +1,20 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing an email template.
  */
-@Entity("email_templates")
+@Entity('email_templates')
 export class EmailTemplate {
   /** Unique ID for the email template */
   @ApiProperty({ description: 'Unique ID for the email template', example: 'uuid-v4' })
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   /** Template name (unique) */
@@ -23,7 +29,7 @@ export class EmailTemplate {
 
   /** Email content (HTML/text) */
   @ApiProperty({ description: 'Email content (HTML/text)', example: '<h1>Welcome!</h1>' })
-  @Column("text")
+  @Column('text')
   content: string;
 
   /** Description (optional) */
@@ -37,13 +43,22 @@ export class EmailTemplate {
   isActive: boolean;
 
   /** Date/time when the template was created */
-  @ApiProperty({ description: 'Date/time when the template was created', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the template was created',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   @CreateDateColumn()
   createdAt: Date;
 
   /** Date/time when the template was last updated */
-  @ApiProperty({ description: 'Date/time when the template was last updated', type: String, format: 'date-time', example: '2025-06-29T12:10:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the template was last updated',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:10:00Z',
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 }
-

@@ -31,16 +31,11 @@ export class PaymentCompletedEvent extends DomainEvent {
     private readonly payload: PaymentCompletedPayload,
     metadata: Partial<DomainEventMetadata> = {},
   ) {
-    super(
-      payload.paymentId,
-      'Payment',
-      1,
-      {
-        ...metadata,
-        userId: payload.userId,
-        correlationId: metadata.correlationId,
-      },
-    );
+    super(payload.paymentId, 'Payment', 1, {
+      ...metadata,
+      userId: payload.userId,
+      correlationId: metadata.correlationId,
+    });
   }
 
   getPayload(): PaymentCompletedPayload {

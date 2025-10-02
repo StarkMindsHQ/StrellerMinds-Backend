@@ -55,7 +55,10 @@ export class EnrollInCourseCommand extends Command {
       }
     }
 
-    if (this.payload.paymentMethod && !['stripe', 'stellar', 'crypto'].includes(this.payload.paymentMethod)) {
+    if (
+      this.payload.paymentMethod &&
+      !['stripe', 'stellar', 'crypto'].includes(this.payload.paymentMethod)
+    ) {
       throw new Error('Invalid payment method');
     }
   }

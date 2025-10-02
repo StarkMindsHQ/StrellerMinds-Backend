@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   Server,
   Keypair,
@@ -48,7 +45,9 @@ export class StellarService {
     } catch (err) {
       this.logger.error('Error creating trustline', err?.response?.data || err);
       await this.logBlockchainAction('createTrustline', { assetCode, issuer }, null, err);
-      throw new Error(`Blockchain error: ${err.response?.data?.extras?.result_codes?.operations || err.message}`);
+      throw new Error(
+        `Blockchain error: ${err.response?.data?.extras?.result_codes?.operations || err.message}`,
+      );
     }
   }
 
@@ -98,12 +97,21 @@ export class StellarService {
       const { data } = await axios.post(url, payload);
       this.logger.log(`Soroban RPC [${method}] success`, data);
 
-      await this.logBlockchainAction('invokeSmartContract', { contractAddress, method, args }, data);
+      await this.logBlockchainAction(
+        'invokeSmartContract',
+        { contractAddress, method, args },
+        data,
+      );
 
       return data;
     } catch (err) {
       this.logger.error(`Soroban RPC failed: ${method}`, err?.response?.data || err);
-      await this.logBlockchainAction('invokeSmartContract', { contractAddress, method, args }, null, err);
+      await this.logBlockchainAction(
+        'invokeSmartContract',
+        { contractAddress, method, args },
+        null,
+        err,
+      );
       throw new Error('Soroban contract invocation failed.');
     }
   }
@@ -116,13 +124,18 @@ export class StellarService {
       --network futurenet \
       --id ${contractId} \
       --fn ${method} \
-      ${args.map(arg => `--arg ${arg}`).join(' ')}`;
+      ${args.map((arg) => `--arg ${arg}`).join(' ')}`;
 
     return new Promise((resolve, reject) => {
       exec(command, async (err, stdout, stderr) => {
         if (err) {
           this.logger.error(`Soroban CLI error: ${stderr}`);
-          await this.logBlockchainAction('invokeViaCli', { contractId, method, args }, null, stderr);
+          await this.logBlockchainAction(
+            'invokeViaCli',
+            { contractId, method, args },
+            null,
+            stderr,
+          );
           return reject(stderr);
         }
 
@@ -136,12 +149,7 @@ export class StellarService {
   /**
    * Log any blockchain operation (can be extended to DB or file-based)
    */
-  async logBlockchainAction(
-    action: string,
-    payload: any,
-    result: any,
-    error?: any,
-  ) {
+  async logBlockchainAction(action: string, payload: any, result: any, error?: any) {
     this.logger.log({
       action,
       method: payload?.method,

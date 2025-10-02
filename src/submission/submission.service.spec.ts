@@ -106,7 +106,9 @@ describe('SubmissionService', () => {
       };
       mockRepo.findOne.mockResolvedValue(submission);
 
-      await expect(service.update('1', { textContent: 'Late' })).rejects.toThrow(BadRequestException);
+      await expect(service.update('1', { textContent: 'Late' })).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 });

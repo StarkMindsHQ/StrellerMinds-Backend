@@ -7,19 +7,19 @@ metadata:
     app: analytics-platform-api
     service: api
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-type: 'nlb'
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: 'http'
 spec:
   type: LoadBalancer
   ports:
-  - port: 80
-    targetPort: 3000
-    protocol: TCP
-    name: http
-  - port: 9090
-    targetPort: 9090
-    protocol: TCP
-    name: metrics
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+    - port: 9090
+      targetPort: 9090
+      protocol: TCP
+      name: metrics
   selector:
     app: analytics-platform-api
   sessionAffinity: None
@@ -36,9 +36,9 @@ spec:
   type: ClusterIP
   clusterIP: None
   ports:
-  - port: 3000
-    targetPort: 3000
-    protocol: TCP
-    name: http
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+      name: http
   selector:
     app: analytics-platform-api

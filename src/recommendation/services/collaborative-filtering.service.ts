@@ -4,7 +4,11 @@ import { Repository } from 'typeorm';
 import { UserInteraction, InteractionType } from '../entities/user-interaction.entity';
 import { User } from '../../users/entities/user.entity';
 import { Course } from '../../courses/entities/course.entity';
-import { Recommendation, RecommendationType, RecommendationReason } from '../entities/recommendation.entity';
+import {
+  Recommendation,
+  RecommendationType,
+  RecommendationReason,
+} from '../entities/recommendation.entity';
 import { RecommendationContext } from './recommendation-engine.service';
 
 interface UserSimilarity {
@@ -53,26 +57,33 @@ export class CollaborativeFilteringService {
     options: { limit: number; minConfidence: number },
   ): Promise<Partial<Recommendation>[]> {
     try {
-      this.logger.log(`Generating collaborative filtering recommendations for user ${context.userId}`);
+      this.logger.log(
+        `Generating collaborative filtering recommendations for user ${context.userId}`,
+      );
 
       // Get user-based collaborative filtering recommendations
-      const userBasedRecs = await this.getUserBasedRecommendations(context, Math.ceil(options.limit * 0.6));
-      
+      const userBasedRecs = await this.getUserBasedRecommendations(
+        context,
+        Math.ceil(options.limit * 0.6),
+      );
+
       // Get item-based collaborative filtering recommendations
-      const itemBasedRecs = await this.getItemBasedRecommendations(context, Math.ceil(options.limit * 0.4));
-      
+      const itemBasedRecs = await this.getItemBasedRecommendations(
+        context,
+        Math.ceil(options.limit * 0.4),
+      );
+
       // Combine and rank recommendations
       const combinedRecs = [...userBasedRecs, ...itemBasedRecs];
       const rankedRecs = this.rankCollaborativeRecommendations(combinedRecs);
-      
+
       // Filter by confidence and limit
       const filteredRecs = rankedRecs
-        .filter(rec => rec.score >= options.minConfidence)
+        .filter((rec) => rec.score >= options.minConfidence)
         .slice(0, options.limit);
 
       // Convert to recommendation format
-      return filteredRecs.map(rec => this.createRecommendation(rec, context));
-
+      return filteredRecs.map((rec) => this.createRecommendation(rec, context));
     } catch (error) {
       this.logger.error('Error generating collaborative filtering recommendations:', error);
       return [];
@@ -98,7 +109,7 @@ export class CollaborativeFilteringService {
       }
 
       // Get all other users who have interacted with similar content
-      const courseIds = userInteractions.map(i => i.courseId).filter(Boolean);
+      const courseIds = userInteractions.map((i) => i.courseId).filter(Boolean);
       const otherUsers = await this.interactionRepository
         .createQueryBuilder('interaction')
         .select('DISTINCT interaction.userId')
@@ -108,12 +119,13 @@ export class CollaborativeFilteringService {
 
       // Calculate similarity with each user
       const similarities: UserSimilarity[] = [];
-      
+
       for (const { userId: otherUserId } of otherUsers) {
         const otherInteractions = await this.getUserInteractions(otherUserId);
         const similarity = this.calculateUserSimilarity(userInteractions, otherInteractions);
-        
-        if (similarity.similarity > 0.1) { // Only include users with meaningful similarity
+
+        if (similarity.similarity > 0.1) {
+          // Only include users with meaningful similarity
           similarities.push({
             userId: otherUserId,
             similarity: similarity.similarity,
@@ -125,9 +137,8 @@ export class CollaborativeFilteringService {
       // Sort by similarity and cache
       similarities.sort((a, b) => b.similarity - a.similarity);
       this.userSimilarityCache.set(cacheKey, similarities);
-      
-      return similarities.slice(0, limit);
 
+      return similarities.slice(0, limit);
     } catch (error) {
       this.logger.error(`Error finding similar users for ${userId}:`, error);
       return [];
@@ -156,7 +167,7 @@ export class CollaborativeFilteringService {
         return [];
       }
 
-      const userIds = courseUsers.map(u => u.userId);
+      const userIds = courseUsers.map((u) => u.userId);
 
       // Get other courses these users interacted with
       const otherCourses = await this.interactionRepository
@@ -168,7 +179,7 @@ export class CollaborativeFilteringService {
 
       // Calculate similarity with each course
       const similarities: ItemSimilarity[] = [];
-      
+
       for (const { courseId: otherCourseId } of otherCourses) {
         const otherCourseUsers = await this.interactionRepository.find({
           where: { courseId: otherCourseId },
@@ -177,7 +188,7 @@ export class CollaborativeFilteringService {
 
         const similarity = this.calculateItemSimilarity(
           userIds,
-          otherCourseUsers.map(u => u.userId)
+          otherCourseUsers.map((u) => u.userId),
         );
 
         if (similarity.similarity > 0.1) {
@@ -192,9 +203,8 @@ export class CollaborativeFilteringService {
       // Sort by similarity and cache
       similarities.sort((a, b) => b.similarity - a.similarity);
       this.itemSimilarityCache.set(cacheKey, similarities);
-      
-      return similarities.slice(0, limit);
 
+      return similarities.slice(0, limit);
     } catch (error) {
       this.logger.error(`Error finding similar items for ${courseId}:`, error);
       return [];
@@ -210,29 +220,33 @@ export class CollaborativeFilteringService {
   ): Promise<CollaborativeRecommendation[]> {
     // Find similar users
     const similarUsers = await this.findSimilarUsers(context.userId, 50);
-    
+
     if (similarUsers.length === 0) {
       return [];
     }
 
     // Get courses that similar users liked but current user hasn't interacted with
     const userCourseIds = new Set(
-      context.recentInteractions?.map(i => i.courseId).filter(Boolean) || []
+      context.recentInteractions?.map((i) => i.courseId).filter(Boolean) || [],
     );
 
-    const recommendations = new Map<string, {
-      score: number;
-      count: number;
-      similarUsers: string[];
-    }>();
+    const recommendations = new Map<
+      string,
+      {
+        score: number;
+        count: number;
+        similarUsers: string[];
+      }
+    >();
 
-    for (const similarUser of similarUsers.slice(0, 20)) { // Top 20 similar users
+    for (const similarUser of similarUsers.slice(0, 20)) {
+      // Top 20 similar users
       const similarUserInteractions = await this.getUserInteractions(similarUser.userId);
-      
+
       // Find highly rated interactions from similar users
-      const positiveInteractions = similarUserInteractions.filter(interaction =>
-        this.isPositiveInteraction(interaction) && 
-        !userCourseIds.has(interaction.courseId)
+      const positiveInteractions = similarUserInteractions.filter(
+        (interaction) =>
+          this.isPositiveInteraction(interaction) && !userCourseIds.has(interaction.courseId),
       );
 
       for (const interaction of positiveInteractions) {
@@ -251,17 +265,17 @@ export class CollaborativeFilteringService {
         existing.score += weightedScore;
         existing.count += 1;
         existing.similarUsers.push(similarUser.userId);
-        
+
         recommendations.set(interaction.courseId, existing);
       }
     }
 
     // Convert to recommendation format and sort
     const result: CollaborativeRecommendation[] = [];
-    
+
     for (const [courseId, data] of recommendations.entries()) {
       const normalizedScore = data.score / Math.max(data.count, 1);
-      
+
       result.push({
         courseId,
         score: normalizedScore,
@@ -270,9 +284,7 @@ export class CollaborativeFilteringService {
       });
     }
 
-    return result
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
+    return result.sort((a, b) => b.score - a.score).slice(0, limit);
   }
 
   /**
@@ -285,24 +297,27 @@ export class CollaborativeFilteringService {
     // Get courses user has positively interacted with
     const userInteractions = context.recentInteractions || [];
     const positiveCourses = userInteractions
-      .filter(i => this.isPositiveInteraction(i) && i.courseId)
-      .map(i => i.courseId!)
+      .filter((i) => this.isPositiveInteraction(i) && i.courseId)
+      .map((i) => i.courseId!)
       .slice(0, 10); // Consider top 10 courses
 
     if (positiveCourses.length === 0) {
       return [];
     }
 
-    const recommendations = new Map<string, {
-      score: number;
-      count: number;
-      similarItems: string[];
-    }>();
+    const recommendations = new Map<
+      string,
+      {
+        score: number;
+        count: number;
+        similarItems: string[];
+      }
+    >();
 
     // For each course user liked, find similar courses
     for (const courseId of positiveCourses) {
       const similarItems = await this.findSimilarItems(courseId, 20);
-      
+
       for (const similarItem of similarItems) {
         // Skip if user already interacted with this course
         if (positiveCourses.includes(similarItem.courseId)) continue;
@@ -316,17 +331,17 @@ export class CollaborativeFilteringService {
         existing.score += similarItem.similarity;
         existing.count += 1;
         existing.similarItems.push(courseId);
-        
+
         recommendations.set(similarItem.courseId, existing);
       }
     }
 
     // Convert to recommendation format and sort
     const result: CollaborativeRecommendation[] = [];
-    
+
     for (const [courseId, data] of recommendations.entries()) {
       const normalizedScore = data.score / Math.max(data.count, 1);
-      
+
       result.push({
         courseId,
         score: normalizedScore,
@@ -335,9 +350,7 @@ export class CollaborativeFilteringService {
       });
     }
 
-    return result
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
+    return result.sort((a, b) => b.score - a.score).slice(0, limit);
   }
 
   /**
@@ -364,30 +377,30 @@ export class CollaborativeFilteringService {
     const user2Courses = new Map<string, number>();
 
     // Build weighted interaction maps
-    user1Interactions.forEach(interaction => {
+    user1Interactions.forEach((interaction) => {
       if (interaction.courseId) {
         const weight = this.getInteractionWeight(interaction);
         user1Courses.set(
           interaction.courseId,
-          (user1Courses.get(interaction.courseId) || 0) + weight
+          (user1Courses.get(interaction.courseId) || 0) + weight,
         );
       }
     });
 
-    user2Interactions.forEach(interaction => {
+    user2Interactions.forEach((interaction) => {
       if (interaction.courseId) {
         const weight = this.getInteractionWeight(interaction);
         user2Courses.set(
           interaction.courseId,
-          (user2Courses.get(interaction.courseId) || 0) + weight
+          (user2Courses.get(interaction.courseId) || 0) + weight,
         );
       }
     });
 
     // Find common courses
-    const commonCourses = new Set([...user1Courses.keys()].filter(courseId => 
-      user2Courses.has(courseId)
-    ));
+    const commonCourses = new Set(
+      [...user1Courses.keys()].filter((courseId) => user2Courses.has(courseId)),
+    );
 
     if (commonCourses.size === 0) {
       return { similarity: 0, commonInteractions: 0 };
@@ -400,19 +413,18 @@ export class CollaborativeFilteringService {
 
     // Calculate for all courses (not just common ones)
     const allCourses = new Set([...user1Courses.keys(), ...user2Courses.keys()]);
-    
+
     for (const courseId of allCourses) {
       const rating1 = user1Courses.get(courseId) || 0;
       const rating2 = user2Courses.get(courseId) || 0;
-      
+
       dotProduct += rating1 * rating2;
       norm1 += rating1 * rating1;
       norm2 += rating2 * rating2;
     }
 
-    const similarity = (norm1 > 0 && norm2 > 0) 
-      ? dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2))
-      : 0;
+    const similarity =
+      norm1 > 0 && norm2 > 0 ? dotProduct / (Math.sqrt(norm1) * Math.sqrt(norm2)) : 0;
 
     return {
       similarity: Math.max(0, Math.min(1, similarity)),
@@ -429,13 +441,13 @@ export class CollaborativeFilteringService {
   ): { similarity: number; commonUsers: number } {
     const users1Set = new Set(item1Users);
     const users2Set = new Set(item2Users);
-    
+
     // Calculate Jaccard similarity
-    const intersection = new Set([...users1Set].filter(userId => users2Set.has(userId)));
+    const intersection = new Set([...users1Set].filter((userId) => users2Set.has(userId)));
     const union = new Set([...users1Set, ...users2Set]);
-    
+
     const similarity = union.size > 0 ? intersection.size / union.size : 0;
-    
+
     return {
       similarity,
       commonUsers: intersection.size,
@@ -460,7 +472,7 @@ export class CollaborativeFilteringService {
     };
 
     let baseWeight = weights[interaction.interactionType] || 0.1;
-    
+
     // Apply additional weighting based on interaction metadata
     if (interaction.weightedValue) {
       baseWeight *= interaction.weightedValue;
@@ -482,8 +494,10 @@ export class CollaborativeFilteringService {
       InteractionType.PROGRESS,
     ];
 
-    return positiveTypes.includes(interaction.interactionType) ||
-           (interaction.weightedValue && interaction.weightedValue > 0.5);
+    return (
+      positiveTypes.includes(interaction.interactionType) ||
+      (interaction.weightedValue && interaction.weightedValue > 0.5)
+    );
   }
 
   /**
@@ -494,15 +508,15 @@ export class CollaborativeFilteringService {
   ): CollaborativeRecommendation[] {
     // Remove duplicates and combine scores
     const combined = new Map<string, CollaborativeRecommendation>();
-    
-    recommendations.forEach(rec => {
+
+    recommendations.forEach((rec) => {
       const existing = combined.get(rec.courseId);
-      
+
       if (existing) {
         // Combine scores using weighted average
         existing.score = (existing.score + rec.score) / 2;
         existing.reason = `${existing.reason} and ${rec.reason}`;
-        
+
         if (rec.similarUsers) {
           existing.similarUsers = [...(existing.similarUsers || []), ...rec.similarUsers];
         }
@@ -526,7 +540,7 @@ export class CollaborativeFilteringService {
   ): Partial<Recommendation> {
     const hasUserBased = colabRec.similarUsers && colabRec.similarUsers.length > 0;
     const hasItemBased = colabRec.similarItems && colabRec.similarItems.length > 0;
-    
+
     let reason: RecommendationReason;
     if (hasUserBased && hasItemBased) {
       reason = RecommendationReason.COLLABORATIVE_FILTERING;

@@ -3,122 +3,122 @@ config:
   phases:
     - duration: 60
       arrivalRate: 15
-      name: "Course API Load Test"
+      name: 'Course API Load Test'
     - duration: 120
       arrivalRate: 15
       rampTo: 40
-      name: "Course Ramp-up"
+      name: 'Course Ramp-up'
     - duration: 240
       arrivalRate: 40
-      name: "Course Sustained Load"
-  
+      name: 'Course Sustained Load'
+
   ensure:
     maxErrorRate: 1.5
     maxResponseTime: 3000
-  
+
   variables:
     searchTerms:
-      - "blockchain"
-      - "stellar"
-      - "cryptocurrency"
-      - "smart contracts"
-      - "defi"
+      - 'blockchain'
+      - 'stellar'
+      - 'cryptocurrency'
+      - 'smart contracts'
+      - 'defi'
     categories:
-      - "beginner"
-      - "intermediate"
-      - "advanced"
+      - 'beginner'
+      - 'intermediate'
+      - 'advanced'
 
 scenarios:
-  - name: "Course Browsing"
+  - name: 'Course Browsing'
     weight: 50
     flow:
       # Get courses with pagination
       - get:
-          url: "/courses"
+          url: '/courses'
           qs:
-            page: "{{ $randomInt(1, 5) }}"
+            page: '{{ $randomInt(1, 5) }}'
             limit: 20
           expect:
             - statusCode: 200
-            - hasProperty: "data"
-      
+            - hasProperty: 'data'
+
       - think: 1
-      
+
       # Get course categories
       - get:
-          url: "/courses/categories"
-          expect:
-            - statusCode: 200
-      
-      - think: 2
-      
-      # Get featured courses
-      - get:
-          url: "/courses/featured"
+          url: '/courses/categories'
           expect:
             - statusCode: 200
 
-  - name: "Course Search"
+      - think: 2
+
+      # Get featured courses
+      - get:
+          url: '/courses/featured'
+          expect:
+            - statusCode: 200
+
+  - name: 'Course Search'
     weight: 30
     flow:
       - get:
-          url: "/courses/search"
+          url: '/courses/search'
           qs:
-            q: "{{ searchTerms }}"
+            q: '{{ searchTerms }}'
             page: 1
             limit: 10
-            category: "{{ categories }}"
+            category: '{{ categories }}'
           expect:
             - statusCode: 200
-            - hasProperty: "data"
-      
+            - hasProperty: 'data'
+
       - think: 1
-      
+
       # Advanced search
       - get:
-          url: "/courses/search"
+          url: '/courses/search'
           qs:
-            q: "{{ searchTerms }}"
-            difficulty: "{{ categories }}"
-            sortBy: "rating"
-            order: "desc"
+            q: '{{ searchTerms }}'
+            difficulty: '{{ categories }}'
+            sortBy: 'rating'
+            order: 'desc'
           expect:
             - statusCode: 200
 
-  - name: "Course Details"
+  - name: 'Course Details'
     weight: 20
     flow:
       # First get course list to get valid IDs
       - get:
-          url: "/courses"
+          url: '/courses'
           qs:
             limit: 5
           capture:
-            - json: "$.data[0].id"
-              as: "courseId"
+            - json: '$.data[0].id'
+              as: 'courseId'
           expect:
             - statusCode: 200
-      
+
       - think: 1
-      
+
       # Get course details
       - get:
-          url: "/courses/{{ courseId }}"
+          url: '/courses/{{ courseId }}'
           expect:
             - statusCode: 200
-            - hasProperty: "id"
-      
+            - hasProperty: 'id'
+
       - think: 2
-      
+
       # Get course modules
       - get:
-          url: "/courses/{{ courseId }}/modules"
+          url: '/courses/{{ courseId }}/modules'
           expect:
             - statusCode: 200
-      
+
       # Get course reviews
       - get:
-          url: "/courses/{{ courseId }}/reviews"
+          url: '/courses/{{ courseId }}/reviews'
           qs:
             page: 1
             limit: 10

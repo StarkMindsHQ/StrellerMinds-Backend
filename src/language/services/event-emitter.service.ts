@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common"
-import type { EventEmitter2 } from "@nestjs/event-emitter"
+import { Injectable } from '@nestjs/common';
+import type { EventEmitter2 } from '@nestjs/event-emitter';
 
 /**
  * Service for emitting application events using EventEmitter2.
@@ -15,6 +15,6 @@ export class EventEmitterService {
    * @returns True if event listeners were notified
    */
   emit(event: string, payload: any): boolean {
-    return this.eventEmitter.emit(event, payload)
+    return this.eventEmitter.emit(event, payload);
   }
 }

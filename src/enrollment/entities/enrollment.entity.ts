@@ -18,14 +18,28 @@ export class Enrollment {
   courseId: string;
 
   /** Date/time when enrolled */
-  @ApiProperty({ description: 'Date/time when enrolled', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date/time when enrolled',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   enrolledAt: Date;
 
   /** Enrollment status */
-  @ApiProperty({ enum: ['ENROLLED', 'UNENROLLED'], description: 'Enrollment status', example: 'ENROLLED' })
+  @ApiProperty({
+    enum: ['ENROLLED', 'UNENROLLED'],
+    description: 'Enrollment status',
+    example: 'ENROLLED',
+  })
   status: 'ENROLLED' | 'UNENROLLED';
 
   /** Payment status (optional) */
-  @ApiProperty({ enum: ['PENDING', 'PAID'], required: false, description: 'Payment status', example: 'PAID' })
+  @ApiProperty({
+    enum: ['PENDING', 'PAID'],
+    required: false,
+    description: 'Payment status',
+    example: 'PAID',
+  })
   paymentStatus?: 'PENDING' | 'PAID';
 }

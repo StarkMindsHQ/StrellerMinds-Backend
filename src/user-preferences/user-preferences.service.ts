@@ -98,10 +98,10 @@ export class UserPreferencesService {
       ...preferences.analytics,
       usageStats: {
         ...(preferences.analytics?.usageStats || {}),
-        [action]: ((preferences.analytics?.usageStats?.[action] || 0) + 1),
+        [action]: (preferences.analytics?.usageStats?.[action] || 0) + 1,
       },
       lastUpdated: new Date(),
     };
     await this.preferencesRepo.save(preferences);
   }
-} 
+}

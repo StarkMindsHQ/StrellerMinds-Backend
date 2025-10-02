@@ -206,10 +206,7 @@ export class AwsCloudFrontService {
     }
   }
 
-  async generateSignedUrl(
-    key: string,
-    options: SignedUrlOptions = {},
-  ): Promise<string> {
+  async generateSignedUrl(key: string, options: SignedUrlOptions = {}): Promise<string> {
     try {
       const expiresIn = options.expiresIn || this.config.signedUrlExpiry;
 
@@ -292,7 +289,7 @@ export class AwsCloudFrontService {
         InvalidationBatch: {
           Paths: {
             Quantity: paths.length,
-            Items: paths.map(path => `/${path}`),
+            Items: paths.map((path) => `/${path}`),
           },
           CallerReference: `invalidation-${Date.now()}`,
         },
@@ -325,11 +322,7 @@ export class AwsCloudFrontService {
     }
   }
 
-  generateVideoKey(
-    videoId: string,
-    quality?: string,
-    format: string = 'mp4',
-  ): string {
+  generateVideoKey(videoId: string, quality?: string, format: string = 'mp4'): string {
     const timestamp = Date.now();
     const qualityPrefix = quality ? `${quality}/` : '';
     return `videos/${videoId}/${qualityPrefix}${timestamp}.${format}`;

@@ -16,9 +16,20 @@ export class IpfsController {
    * @returns The CID of the stored content.
    */
   @Post('add')
-  @ApiOperation({ summary: 'Add content to IPFS', description: 'Stores content on IPFS and returns the CID.' })
-  @ApiBody({ schema: { properties: { content: { type: 'string', description: 'Content to store on IPFS' } } } })
-  @ApiResponse({ status: 201, description: 'Content added to IPFS', schema: { properties: { cid: { type: 'string', description: 'Content Identifier (CID)' } } } })
+  @ApiOperation({
+    summary: 'Add content to IPFS',
+    description: 'Stores content on IPFS and returns the CID.',
+  })
+  @ApiBody({
+    schema: {
+      properties: { content: { type: 'string', description: 'Content to store on IPFS' } },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Content added to IPFS',
+    schema: { properties: { cid: { type: 'string', description: 'Content Identifier (CID)' } } },
+  })
   async addContent(@Body('content') content: string) {
     const cid = await this.ipfsService.addFile(Buffer.from(content));
     return { cid };
@@ -30,9 +41,16 @@ export class IpfsController {
    * @returns The content retrieved from IPFS.
    */
   @Get('get/:cid')
-  @ApiOperation({ summary: 'Get content from IPFS', description: 'Retrieves content from IPFS using the CID.' })
+  @ApiOperation({
+    summary: 'Get content from IPFS',
+    description: 'Retrieves content from IPFS using the CID.',
+  })
   @ApiParam({ name: 'cid', description: 'Content Identifier (CID)' })
-  @ApiResponse({ status: 200, description: 'Content retrieved from IPFS', schema: { properties: { content: { type: 'string', description: 'Content from IPFS' } } } })
+  @ApiResponse({
+    status: 200,
+    description: 'Content retrieved from IPFS',
+    schema: { properties: { content: { type: 'string', description: 'Content from IPFS' } } },
+  })
   async getContent(@Param('cid') cid: string) {
     const content = await this.ipfsService.getFile(cid);
     return { content };

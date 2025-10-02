@@ -54,7 +54,7 @@ export function initTracing(): void {
           enabled: true,
         },
       }),
-      
+
       // Explicit HTTP instrumentation with enhanced configuration
       new HttpInstrumentation({
         enabled: true,
@@ -78,7 +78,7 @@ export function initTracing(): void {
           return req.url?.includes('/health') || req.url?.includes('/metrics');
         },
       }),
-      
+
       // Explicit PostgreSQL instrumentation with enhanced configuration
       new PgInstrumentation({
         enabled: true,
@@ -102,10 +102,12 @@ export function initTracing(): void {
         },
         // Ignore connection pool queries to reduce noise
         ignoreIncomingRequestHook: (request) => {
-          return request.text?.includes('pg_stat_activity') || 
-                 request.text?.includes('pg_database') ||
-                 request.text?.trim() === 'BEGIN' ||
-                 request.text?.trim() === 'COMMIT';
+          return (
+            request.text?.includes('pg_stat_activity') ||
+            request.text?.includes('pg_database') ||
+            request.text?.trim() === 'BEGIN' ||
+            request.text?.trim() === 'COMMIT'
+          );
         },
       }),
     ],
@@ -122,14 +124,16 @@ export function initTracing(): void {
 
   // Gracefully shut down the SDK on process exit
   process.on('SIGTERM', () => {
-    sdk.shutdown()
+    sdk
+      .shutdown()
       .then(() => console.log('✅ OpenTelemetry tracing shutdown complete'))
       .catch((error) => console.log('❌ Error shutting down OpenTelemetry tracing:', error))
       .finally(() => process.exit(0));
   });
 
   process.on('SIGINT', () => {
-    sdk.shutdown()
+    sdk
+      .shutdown()
       .then(() => console.log('✅ OpenTelemetry tracing shutdown complete'))
       .catch((error) => console.log('❌ Error shutting down OpenTelemetry tracing:', error))
       .finally(() => process.exit(0));

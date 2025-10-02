@@ -2,7 +2,13 @@
  * Credential entity representing issued credentials.
  */
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('credentials')
 export class Credential {
@@ -42,12 +48,22 @@ export class Credential {
   issuerName: string;
 
   /** Date issued */
-  @ApiProperty({ description: 'Date issued', example: '2025-06-29T12:00:00Z', type: String, format: 'date-time' })
+  @ApiProperty({
+    description: 'Date issued',
+    example: '2025-06-29T12:00:00Z',
+    type: String,
+    format: 'date-time',
+  })
   @CreateDateColumn()
   issuedAt: Date;
 
   /** Date expires (optional) */
-  @ApiPropertyOptional({ description: 'Date expires', example: '2026-06-29T12:00:00Z', type: String, format: 'date-time' })
+  @ApiPropertyOptional({
+    description: 'Date expires',
+    example: '2026-06-29T12:00:00Z',
+    type: String,
+    format: 'date-time',
+  })
   @Column({ nullable: true })
   expiresAt: Date;
 
@@ -77,7 +93,12 @@ export class Credential {
   verificationStatus: boolean;
 
   /** Date last updated */
-  @ApiProperty({ description: 'Date last updated', example: '2025-07-01T12:00:00Z', type: String, format: 'date-time' })
+  @ApiProperty({
+    description: 'Date last updated',
+    example: '2025-07-01T12:00:00Z',
+    type: String,
+    format: 'date-time',
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 }

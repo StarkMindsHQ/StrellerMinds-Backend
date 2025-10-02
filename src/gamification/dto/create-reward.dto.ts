@@ -15,4 +15,4 @@ export class CreateRewardDto {
   @IsInt()
   @Min(0)
   value: number;
-} 
+}

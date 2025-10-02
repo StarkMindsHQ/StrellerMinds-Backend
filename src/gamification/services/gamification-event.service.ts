@@ -22,4 +22,4 @@ export class GamificationEventService {
     }
     return this.eventRepo.find({ relations: ['user'] });
   }
-} 
+}

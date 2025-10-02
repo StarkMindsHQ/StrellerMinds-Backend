@@ -20,8 +20,8 @@ const jest = {
     return mockFn;
   },
   spyOn: () => ({
-    mockImplementation: () => {}
-  })
+    mockImplementation: () => {},
+  }),
 };
 
 import { DatabaseDashboardController } from '../controllers/database-dashboard.controller';
@@ -38,7 +38,7 @@ describe('DatabaseDashboardController', () => {
       getConnectionPoolMetrics: jest.fn().mockResolvedValue({}),
       getCacheStats: jest.fn().mockResolvedValue({}),
       getTopTables: jest.fn().mockResolvedValue([]),
-      getQueryAnalysis: jest.fn().mockResolvedValue({})
+      getQueryAnalysis: jest.fn().mockResolvedValue({}),
     };
 
     // Create controller instance
@@ -52,7 +52,7 @@ describe('DatabaseDashboardController', () => {
   it('should get performance summary', async () => {
     const hours = 24;
     await controller.getPerformanceSummary(hours);
-    
+
     expect(mockDatabaseDashboardService.getPerformanceSummary).toHaveBeenCalledWith(hours);
   });
 
@@ -60,33 +60,33 @@ describe('DatabaseDashboardController', () => {
     const limit = 50;
     const hours = 24;
     await controller.getSlowQueries(limit, hours);
-    
+
     expect(mockDatabaseDashboardService.getSlowQueries).toHaveBeenCalledWith(limit, hours);
   });
 
   it('should get connection pool metrics', async () => {
     await controller.getConnectionPoolMetrics();
-    
+
     expect(mockDatabaseDashboardService.getConnectionPoolMetrics).toHaveBeenCalled();
   });
 
   it('should get cache stats', async () => {
     await controller.getCacheStats();
-    
+
     expect(mockDatabaseDashboardService.getCacheStats).toHaveBeenCalled();
   });
 
   it('should get top tables', async () => {
     const limit = 10;
     await controller.getTopTables(limit);
-    
+
     expect(mockDatabaseDashboardService.getTopTables).toHaveBeenCalledWith(limit);
   });
 
   it('should get query analysis', async () => {
     const queryId = 'test-query-id';
     await controller.getQueryAnalysis(queryId);
-    
+
     expect(mockDatabaseDashboardService.getQueryAnalysis).toHaveBeenCalledWith(queryId);
   });
 });

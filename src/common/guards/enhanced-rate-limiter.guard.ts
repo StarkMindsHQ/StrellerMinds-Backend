@@ -32,12 +32,11 @@ export class EnhancedRateLimitGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
-    
+
     // Get rate limit config from decorator or use defaults
-    const config = this.reflector.get<RateLimitConfig>(
-      RATE_LIMIT_KEY,
-      context.getHandler(),
-    ) || this.getDefaultConfig(req.route?.path);
+    const config =
+      this.reflector.get<RateLimitConfig>(RATE_LIMIT_KEY, context.getHandler()) ||
+      this.getDefaultConfig(req.route?.path);
 
     const rateLimiter = this.getRateLimiter(config);
     const key = this.generateKey(req, config.keyPrefix);
@@ -47,9 +46,9 @@ export class EnhancedRateLimitGuard implements CanActivate {
       return true;
     } catch (rejRes) {
       const remainingTime = Math.round(rejRes.msBeforeNext / 1000);
-      
+
       console.warn(`Rate limit exceeded for ${key}: ${req.ip} on ${req.url}`);
-      
+
       throw new HttpException(
         {
           message: 'Too many requests. Try again later.',
@@ -62,17 +61,20 @@ export class EnhancedRateLimitGuard implements CanActivate {
 
   private getRateLimiter(config: RateLimitConfig): RateLimiterPostgres {
     const key = `${config.keyPrefix || 'default'}_${config.points}_${config.duration}`;
-    
+
     if (!this.rateLimiters.has(key)) {
-      this.rateLimiters.set(key, new RateLimiterPostgres({
-        storeClient: this.dataSource.driver['master'],
-        tableName: 'rate_limiter',
-        keyPrefix: config.keyPrefix || 'default',
-        points: config.points,
-        duration: config.duration,
-      }));
+      this.rateLimiters.set(
+        key,
+        new RateLimiterPostgres({
+          storeClient: this.dataSource.driver['master'],
+          tableName: 'rate_limiter',
+          keyPrefix: config.keyPrefix || 'default',
+          points: config.points,
+          duration: config.duration,
+        }),
+      );
     }
-    
+
     return this.rateLimiters.get(key);
   }
 
@@ -93,7 +95,7 @@ export class EnhancedRateLimitGuard implements CanActivate {
     if (path?.includes('admin')) {
       return { points: 100, duration: 3600, keyPrefix: 'admin' }; // 100 requests per hour
     }
-    
+
     return { points: 100, duration: 900, keyPrefix: 'general' }; // 100 requests per 15 minutes
   }
 }

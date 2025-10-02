@@ -9,7 +9,10 @@ export class EmailTrackingUtil {
 
   constructor(private readonly configService: ConfigService) {
     this.secret = this.configService.get<string>('EMAIL_TRACKING_SECRET');
-    this.baseUrl = this.configService.get<string>('EMAIL_TRACKING_BASE_URL') || this.configService.get<string>('BASE_URL') || '';
+    this.baseUrl =
+      this.configService.get<string>('EMAIL_TRACKING_BASE_URL') ||
+      this.configService.get<string>('BASE_URL') ||
+      '';
 
     if (!this.secret || this.secret.length < 32) {
       throw new BadRequestException('EMAIL_TRACKING_SECRET is not configured or too short');
@@ -82,7 +85,12 @@ export class EmailTrackingUtil {
 export function addTrackingToEmail(html: string, trackingToken: string, baseUrl?: string): string {
   // Allow function-style usage by constructing a minimal util with provided baseUrl
   const fakeConfig = {
-    get: (key: string) => (key === 'EMAIL_TRACKING_SECRET' ? process.env.EMAIL_TRACKING_SECRET : key === 'EMAIL_TRACKING_BASE_URL' ? (baseUrl || process.env.EMAIL_TRACKING_BASE_URL || process.env.BASE_URL) : undefined),
+    get: (key: string) =>
+      key === 'EMAIL_TRACKING_SECRET'
+        ? process.env.EMAIL_TRACKING_SECRET
+        : key === 'EMAIL_TRACKING_BASE_URL'
+          ? baseUrl || process.env.EMAIL_TRACKING_BASE_URL || process.env.BASE_URL
+          : undefined,
   } as unknown as ConfigService;
   const util = new EmailTrackingUtil(fakeConfig);
   return util.addTrackingToEmail(html, trackingToken);
@@ -92,30 +100,29 @@ export function generateEmailId(): string {
   return crypto.randomBytes(16).toString('hex');
 }
 
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from 'uuid';
 
 export function addTrackingToEmail(html: string, emailId: string, baseUrl: string): string {
   // Add tracking pixel for opens
-  const trackingPixel = `<img src="${baseUrl}/email/track/open/${emailId}" width="1" height="1" alt="" style="display:none;">`
+  const trackingPixel = `<img src="${baseUrl}/email/track/open/${emailId}" width="1" height="1" alt="" style="display:none;">`;
 
   // Add tracking to all links
   let modifiedHtml = html.replace(/<a\s+(?:[^>]*?\s+)?href=["']([^"']*)["']/gi, (match, url) => {
     // Don't track unsubscribe links
-    if (url.includes("/unsubscribe") || url.includes("/preferences")) {
-      return match
+    if (url.includes('/unsubscribe') || url.includes('/preferences')) {
+      return match;
     }
 
-    const trackingUrl = `${baseUrl}/email/track/click/${emailId}?url=${encodeURIComponent(url)}`
-    return match.replace(url, trackingUrl)
-  })
+    const trackingUrl = `${baseUrl}/email/track/click/${emailId}?url=${encodeURIComponent(url)}`;
+    return match.replace(url, trackingUrl);
+  });
 
   // Add tracking pixel at the end of the email
-  modifiedHtml = modifiedHtml.replace("</body>", `${trackingPixel}</body>`)
+  modifiedHtml = modifiedHtml.replace('</body>', `${trackingPixel}</body>`);
 
-  return modifiedHtml
+  return modifiedHtml;
 }
 
 export function generateEmailId(): string {
-  return uuidv4()
+  return uuidv4();
 }
-

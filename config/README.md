@@ -65,18 +65,21 @@ Each configuration file follows this structure:
 ## Environment-Specific Settings
 
 ### Development
+
 - Debug logging enabled
 - Relaxed security settings
 - Local CORS origins
 - Higher rate limits
 
 ### Staging
+
 - Info-level logging
 - SSL required for database
 - Production-like security
 - Moderate rate limits
 
 ### Production
+
 - Warning-level logging only
 - Strict security settings
 - Specific CORS origins

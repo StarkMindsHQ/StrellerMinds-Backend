@@ -19,30 +19,30 @@ export class SharedUtilityService {
    */
   validatePasswordStrength(password: string): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
-    
+
     if (password.length < 8) {
       errors.push('Password must be at least 8 characters long');
     }
-    
+
     if (!/[A-Z]/.test(password)) {
       errors.push('Password must contain at least one uppercase letter');
     }
-    
+
     if (!/[a-z]/.test(password)) {
       errors.push('Password must contain at least one lowercase letter');
     }
-    
+
     if (!/\d/.test(password)) {
       errors.push('Password must contain at least one number');
     }
-    
+
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
       errors.push('Password must contain at least one special character');
     }
-    
+
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -64,7 +64,7 @@ export class SharedUtilityService {
    */
   sanitizeInput(input: string): string {
     if (!input) return input;
-    
+
     // Basic XSS protection - remove script tags and dangerous attributes
     return input
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -100,16 +100,16 @@ export class SharedUtilityService {
     if (dateInput instanceof Date) {
       return dateInput;
     }
-    
+
     if (typeof dateInput === 'number') {
       return new Date(dateInput);
     }
-    
+
     const parsed = new Date(dateInput);
     if (isNaN(parsed.getTime())) {
       throw new Error('Invalid date format');
     }
-    
+
     return parsed;
   }
 
@@ -133,15 +133,15 @@ export class SharedUtilityService {
     if (obj === null || typeof obj !== 'object') {
       return obj;
     }
-    
+
     if (obj instanceof Date) {
       return new Date(obj.getTime()) as unknown as T;
     }
-    
+
     if (obj instanceof Array) {
-      return obj.map(item => this.deepClone(item, depth + 1)) as unknown as T;
+      return obj.map((item) => this.deepClone(item, depth + 1)) as unknown as T;
     }
-    
+
     if (typeof obj === 'object') {
       const cloned = {} as T;
       for (const key in obj) {
@@ -151,7 +151,7 @@ export class SharedUtilityService {
       }
       return cloned;
     }
-    
+
     return obj;
   }
 
@@ -166,7 +166,7 @@ export class SharedUtilityService {
     }
 
     const result = this.deepClone(target);
-    
+
     for (const key in source) {
       if (source.hasOwnProperty(key)) {
         if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
@@ -176,7 +176,7 @@ export class SharedUtilityService {
         }
       }
     }
-    
+
     return result;
   }
 
@@ -191,27 +191,32 @@ export class SharedUtilityService {
     }
 
     const camelCaseObj: Record<string, any> = {};
-    
+
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-        
+
         // Recursively transform nested objects
-        if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key]) && !(obj[key] instanceof Date)) {
+        if (
+          obj[key] &&
+          typeof obj[key] === 'object' &&
+          !Array.isArray(obj[key]) &&
+          !(obj[key] instanceof Date)
+        ) {
           camelCaseObj[camelKey] = this.toCamelCase(obj[key], depth + 1);
         } else if (Array.isArray(obj[key])) {
           // Transform array elements if they are objects
-          camelCaseObj[camelKey] = obj[key].map(item => 
-            item && typeof item === 'object' && !(item instanceof Date) 
-              ? this.toCamelCase(item, depth + 1) 
-              : item
+          camelCaseObj[camelKey] = obj[key].map((item) =>
+            item && typeof item === 'object' && !(item instanceof Date)
+              ? this.toCamelCase(item, depth + 1)
+              : item,
           );
         } else {
           camelCaseObj[camelKey] = obj[key];
         }
       }
     }
-    
+
     return camelCaseObj;
   }
 
@@ -226,27 +231,32 @@ export class SharedUtilityService {
     }
 
     const snakeCaseObj: Record<string, any> = {};
-    
+
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
-        const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-        
+        const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+
         // Recursively transform nested objects
-        if (obj[key] && typeof obj[key] === 'object' && !Array.isArray(obj[key]) && !(obj[key] instanceof Date)) {
+        if (
+          obj[key] &&
+          typeof obj[key] === 'object' &&
+          !Array.isArray(obj[key]) &&
+          !(obj[key] instanceof Date)
+        ) {
           snakeCaseObj[snakeKey] = this.toSnakeCase(obj[key], depth + 1);
         } else if (Array.isArray(obj[key])) {
           // Transform array elements if they are objects
-          snakeCaseObj[snakeKey] = obj[key].map(item => 
-            item && typeof item === 'object' && !(item instanceof Date) 
-              ? this.toSnakeCase(item, depth + 1) 
-              : item
+          snakeCaseObj[snakeKey] = obj[key].map((item) =>
+            item && typeof item === 'object' && !(item instanceof Date)
+              ? this.toSnakeCase(item, depth + 1)
+              : item,
           );
         } else {
           snakeCaseObj[snakeKey] = obj[key];
         }
       }
     }
-    
+
     return snakeCaseObj;
   }
 
@@ -266,13 +276,13 @@ export class SharedUtilityService {
    */
   removeEmptyValues<T extends Record<string, any>>(obj: T): Partial<T> {
     const cleaned: Partial<T> = {};
-    
+
     for (const key in obj) {
       if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null) {
         cleaned[key] = obj[key];
       }
     }
-    
+
     return cleaned;
   }
 
@@ -283,14 +293,14 @@ export class SharedUtilityService {
     try {
       const keys = path.split('.');
       let result = obj;
-      
+
       for (const key of keys) {
         if (result === null || result === undefined || typeof result !== 'object') {
           return defaultValue;
         }
         result = result[key];
       }
-      
+
       return result !== undefined ? result : defaultValue;
     } catch (error) {
       this.logger.warn(`Error accessing nested property ${path}: ${error.message}`);
@@ -305,7 +315,7 @@ export class SharedUtilityService {
     try {
       const keys = path.split('.');
       let current = obj;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i];
         if (!(key in current) || typeof current[key] !== 'object' || current[key] === null) {
@@ -313,7 +323,7 @@ export class SharedUtilityService {
         }
         current = current[key];
       }
-      
+
       current[keys[keys.length - 1]] = value;
       return true;
     } catch (error) {
@@ -334,9 +344,9 @@ export class SharedUtilityService {
    * Generate a UUID v4
    */
   generateUUID(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
   }
@@ -346,7 +356,7 @@ export class SharedUtilityService {
    */
   debounce<T extends (...args: any[]) => any>(
     func: T,
-    wait: number
+    wait: number,
   ): (...args: Parameters<T>) => void {
     let timeout: NodeJS.Timeout;
     return (...args: Parameters<T>) => {
@@ -360,14 +370,14 @@ export class SharedUtilityService {
    */
   throttle<T extends (...args: any[]) => any>(
     func: T,
-    limit: number
+    limit: number,
   ): (...args: Parameters<T>) => void {
     let inThrottle: boolean;
     return (...args: Parameters<T>) => {
       if (!inThrottle) {
         func.apply(this, args);
         inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
+        setTimeout(() => (inThrottle = false), limit);
       }
     };
   }

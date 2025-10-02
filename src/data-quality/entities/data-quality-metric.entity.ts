@@ -1,58 +1,58 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
 export enum MetricCategory {
-  COMPLETENESS = "completeness",
-  ACCURACY = "accuracy",
-  CONSISTENCY = "consistency",
-  VALIDITY = "validity",
-  UNIQUENESS = "uniqueness",
-  TIMELINESS = "timeliness",
-  OVERALL = "overall",
+  COMPLETENESS = 'completeness',
+  ACCURACY = 'accuracy',
+  CONSISTENCY = 'consistency',
+  VALIDITY = 'validity',
+  UNIQUENESS = 'uniqueness',
+  TIMELINESS = 'timeliness',
+  OVERALL = 'overall',
 }
 
-@Entity("data_quality_metrics")
-@Index(["entityType", "metricCategory", "timestamp"])
-@Index(["ruleId", "timestamp"])
+@Entity('data_quality_metrics')
+@Index(['entityType', 'metricCategory', 'timestamp'])
+@Index(['ruleId', 'timestamp'])
 export class DataQualityMetric {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ nullable: true })
-  ruleId?: string
+  ruleId?: string;
 
   @Column()
-  entityType: string
+  entityType: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: MetricCategory,
   })
-  metricCategory: MetricCategory
+  metricCategory: MetricCategory;
 
   @Column()
-  metricName: string
+  metricName: string;
 
-  @Column("decimal", { precision: 10, scale: 4 })
-  value: number
+  @Column('decimal', { precision: 10, scale: 4 })
+  value: number;
 
-  @Column("decimal", { precision: 10, scale: 4, nullable: true })
-  threshold?: number
+  @Column('decimal', { precision: 10, scale: 4, nullable: true })
+  threshold?: number;
 
   @Column({ default: true })
-  passed: boolean
+  passed: boolean;
 
-  @Column("jsonb", { nullable: true })
-  details?: Record<string, any>
+  @Column('jsonb', { nullable: true })
+  details?: Record<string, any>;
 
-  @Column("jsonb", { nullable: true })
-  dimensions?: Record<string, string>
+  @Column('jsonb', { nullable: true })
+  dimensions?: Record<string, string>;
 
-  @Column({ type: "timestamp" })
-  timestamp: Date
+  @Column({ type: 'timestamp' })
+  timestamp: Date;
 
-  @Column({ default: "1h" })
-  granularity: string
+  @Column({ default: '1h' })
+  granularity: string;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 }

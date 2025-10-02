@@ -13,7 +13,12 @@ export class BlockchainReferenceDto {
   network: string;
 
   /** Timestamp of the transaction */
-  @ApiProperty({ description: 'Transaction timestamp', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Transaction timestamp',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   timestamp: Date;
 
   /** Block height of the transaction */
@@ -34,10 +39,20 @@ export class CredentialDto {
   @ApiProperty({ description: 'Credential name', example: 'Blockchain Basics Certificate' })
   name: string;
 
-  @ApiProperty({ description: 'Date issued', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date issued',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   issuedAt: Date;
 
-  @ApiPropertyOptional({ description: 'Date expires', type: String, format: 'date-time', example: '2026-06-29T12:00:00Z' })
+  @ApiPropertyOptional({
+    description: 'Date expires',
+    type: String,
+    format: 'date-time',
+    example: '2026-06-29T12:00:00Z',
+  })
   expiresAt?: Date;
 
   @ApiProperty({ description: 'Issuer details' })

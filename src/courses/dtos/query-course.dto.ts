@@ -1,4 +1,3 @@
-
 // src/courses/dto/query-course.dto.ts
 import { IsOptional, IsString, IsNumber, IsBoolean, IsUUID, IsIn, Min } from 'class-validator';
 import { Type } from 'class-transformer';

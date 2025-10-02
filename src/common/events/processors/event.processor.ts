@@ -16,13 +16,13 @@ export class EventProcessor {
   @Process('process-event')
   async handleProcessEvent(job: Job<EventJobData>): Promise<void> {
     this.logger.debug(`Processing event job ${job.id}`);
-    
+
     try {
       const { eventData } = job.data;
-      
+
       // Get subscriptions for this event type
       const subscriptions = this.eventBus.getSubscriptions(eventData.eventType);
-      
+
       if (subscriptions.length === 0) {
         this.logger.debug(`No subscriptions found for event type: ${eventData.eventType}`);
         return;
@@ -30,27 +30,27 @@ export class EventProcessor {
 
       // Process each subscription
       const processingPromises = subscriptions
-        .filter(sub => sub.options?.async !== false) // Only process async handlers here
+        .filter((sub) => sub.options?.async !== false) // Only process async handlers here
         .map(async (subscription) => {
           try {
             // Reconstruct the event object
             const event = this.reconstructEvent(eventData);
             await subscription.handler.handleWithRetry(event);
-            
+
             this.logger.debug(
-              `Successfully processed event ${eventData.eventType} with handler ${subscription.handler.metadata.handlerName}`
+              `Successfully processed event ${eventData.eventType} with handler ${subscription.handler.metadata.handlerName}`,
             );
           } catch (error) {
             this.logger.error(
               `Failed to process event ${eventData.eventType} with handler ${subscription.handler.metadata.handlerName}`,
-              error.stack
+              error.stack,
             );
             throw error;
           }
         });
 
       await Promise.all(processingPromises);
-      
+
       this.logger.debug(`Event job ${job.id} completed successfully`);
     } catch (error) {
       this.logger.error(`Failed to process event job ${job.id}`, error.stack);

@@ -1,29 +1,29 @@
-import { IsNotEmpty, IsUUID, IsBoolean, IsOptional, IsObject } from "class-validator"
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger"
+import { IsNotEmpty, IsUUID, IsBoolean, IsOptional, IsObject } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserLanguageDto {
-  @ApiProperty({ description: "User ID" })
+  @ApiProperty({ description: 'User ID' })
   @IsNotEmpty()
   @IsUUID()
-  userId: string
+  userId: string;
 
-  @ApiProperty({ description: "Language ID" })
+  @ApiProperty({ description: 'Language ID' })
   @IsNotEmpty()
   @IsUUID()
-  languageId: string
+  languageId: string;
 
-  @ApiPropertyOptional({ description: "Whether the language was auto-detected" })
+  @ApiPropertyOptional({ description: 'Whether the language was auto-detected' })
   @IsOptional()
   @IsBoolean()
-  autoDetected?: boolean
+  autoDetected?: boolean;
 
-  @ApiPropertyOptional({ description: "Additional language preferences" })
+  @ApiPropertyOptional({ description: 'Additional language preferences' })
   @IsOptional()
   @IsObject()
-  additionalPreferences?: Record<string, any>
+  additionalPreferences?: Record<string, any>;
 
-  @ApiPropertyOptional({ description: "Additional metadata" })
+  @ApiPropertyOptional({ description: 'Additional metadata' })
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>;
 }

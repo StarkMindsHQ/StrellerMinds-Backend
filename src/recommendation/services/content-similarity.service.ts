@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Course } from '../../courses/entities/course.entity';
 import { UserInteraction, InteractionType } from '../entities/user-interaction.entity';
-import { Recommendation, RecommendationType, RecommendationReason } from '../entities/recommendation.entity';
+import {
+  Recommendation,
+  RecommendationType,
+  RecommendationReason,
+} from '../entities/recommendation.entity';
 import { RecommendationContext } from './recommendation-engine.service';
 
 interface ContentFeatures {
@@ -47,22 +51,24 @@ export class ContentSimilarityService {
 
       // Get user's interaction history to understand preferences
       const userPreferences = await this.extractUserPreferences(context);
-      
+
       // Get candidate courses
       const candidateCourses = await this.getCandidateCourses(context, options.limit * 4);
-      
+
       // Calculate similarity scores
-      const similarityScores = await this.calculateSimilarityScores(candidateCourses, userPreferences);
-      
+      const similarityScores = await this.calculateSimilarityScores(
+        candidateCourses,
+        userPreferences,
+      );
+
       // Filter by minimum confidence and sort
       const filteredScores = similarityScores
-        .filter(score => score.score >= options.minConfidence)
+        .filter((score) => score.score >= options.minConfidence)
         .sort((a, b) => b.score - a.score)
         .slice(0, options.limit);
 
       // Convert to recommendations
-      return filteredScores.map(score => this.createRecommendation(score, context));
-
+      return filteredScores.map((score) => this.createRecommendation(score, context));
     } catch (error) {
       this.logger.error('Error generating content-based recommendations:', error);
       return [];
@@ -84,15 +90,18 @@ export class ContentSimilarityService {
     });
 
     const similarities = allCourses
-      .filter(course => course.id !== courseId)
-      .map(course => ({
+      .filter((course) => course.id !== courseId)
+      .map((course) => ({
         course,
-        similarity: this.calculateCourseSimilarity(targetFeatures, this.extractCourseFeatures(course)),
+        similarity: this.calculateCourseSimilarity(
+          targetFeatures,
+          this.extractCourseFeatures(course),
+        ),
       }))
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, limit);
 
-    return similarities.map(s => s.course);
+    return similarities.map((s) => s.course);
   }
 
   /**
@@ -108,7 +117,7 @@ export class ContentSimilarityService {
     avgRating: number;
   }> {
     const interactions = context.recentInteractions || [];
-    
+
     const preferences = {
       preferredTags: new Map<string, number>(),
       preferredSkills: new Map<string, number>(),
@@ -129,18 +138,21 @@ export class ContentSimilarityService {
       if (!course) continue;
 
       const weight = this.getInteractionWeight(interaction);
-      
+
       // Tags preferences
       if (course.tags) {
-        course.tags.forEach(tag => {
+        course.tags.forEach((tag) => {
           preferences.preferredTags.set(tag, (preferences.preferredTags.get(tag) || 0) + weight);
         });
       }
 
       // Skills preferences
       if (course.skills) {
-        course.skills.forEach(skill => {
-          preferences.preferredSkills.set(skill, (preferences.preferredSkills.get(skill) || 0) + weight);
+        course.skills.forEach((skill) => {
+          preferences.preferredSkills.set(
+            skill,
+            (preferences.preferredSkills.get(skill) || 0) + weight,
+          );
         });
       }
 
@@ -148,7 +160,7 @@ export class ContentSimilarityService {
       if (course.difficulty) {
         preferences.preferredDifficulty.set(
           course.difficulty,
-          (preferences.preferredDifficulty.get(course.difficulty) || 0) + weight
+          (preferences.preferredDifficulty.get(course.difficulty) || 0) + weight,
         );
       }
 
@@ -156,7 +168,7 @@ export class ContentSimilarityService {
       if (course.category) {
         preferences.preferredCategories.set(
           course.category,
-          (preferences.preferredCategories.get(course.category) || 0) + weight
+          (preferences.preferredCategories.get(course.category) || 0) + weight,
         );
       }
 
@@ -164,7 +176,7 @@ export class ContentSimilarityService {
       if (course.instructor) {
         preferences.preferredInstructors.set(
           course.instructor,
-          (preferences.preferredInstructors.get(course.instructor) || 0) + weight
+          (preferences.preferredInstructors.get(course.instructor) || 0) + weight,
         );
       }
 
@@ -210,13 +222,16 @@ export class ContentSimilarityService {
   /**
    * Get candidate courses for recommendation
    */
-  private async getCandidateCourses(context: RecommendationContext, limit: number): Promise<Course[]> {
+  private async getCandidateCourses(
+    context: RecommendationContext,
+    limit: number,
+  ): Promise<Course[]> {
     // Get courses user hasn't interacted with recently
-    const recentCourseIds = context.recentInteractions
-      ?.filter(i => i.courseId)
-      .map(i => i.courseId) || [];
+    const recentCourseIds =
+      context.recentInteractions?.filter((i) => i.courseId).map((i) => i.courseId) || [];
 
-    const queryBuilder = this.courseRepository.createQueryBuilder('course')
+    const queryBuilder = this.courseRepository
+      .createQueryBuilder('course')
       .where('course.isActive = :isActive', { isActive: true });
 
     if (recentCourseIds.length > 0) {
@@ -236,7 +251,7 @@ export class ContentSimilarityService {
     courses: Course[],
     userPreferences: any,
   ): Promise<SimilarityScore[]> {
-    return courses.map(course => {
+    return courses.map((course) => {
       const features = this.extractCourseFeatures(course);
       const score = this.calculateContentSimilarity(features, userPreferences);
       const reasons = this.generateSimilarityReasons(features, userPreferences, score);
@@ -293,8 +308,8 @@ export class ContentSimilarityService {
     totalWeight += 0.3;
 
     // Category similarity (weight: 0.15)
-    const categoryScore = userPreferences.preferredCategories.has(courseFeatures.category) 
-      ? userPreferences.preferredCategories.get(courseFeatures.category) / 10 
+    const categoryScore = userPreferences.preferredCategories.has(courseFeatures.category)
+      ? userPreferences.preferredCategories.get(courseFeatures.category) / 10
       : 0;
     totalScore += Math.min(categoryScore, 1) * 0.15;
     totalWeight += 0.15;
@@ -336,7 +351,7 @@ export class ContentSimilarityService {
     let totalScore = 0;
     let maxPossibleScore = 0;
 
-    courseFeatures.forEach(feature => {
+    courseFeatures.forEach((feature) => {
       const preferenceScore = userPreferences.get(feature) || 0;
       totalScore += Math.min(preferenceScore / 10, 1); // Normalize to [0, 1]
       maxPossibleScore += 1;
@@ -348,17 +363,25 @@ export class ContentSimilarityService {
   /**
    * Calculate duration similarity
    */
-  private calculateDurationSimilarity(courseDuration: number, avgPreferredDuration: number): number {
+  private calculateDurationSimilarity(
+    courseDuration: number,
+    avgPreferredDuration: number,
+  ): number {
     if (avgPreferredDuration === 0) return 0.5; // Neutral if no preference
 
-    const ratio = Math.min(courseDuration, avgPreferredDuration) / Math.max(courseDuration, avgPreferredDuration);
+    const ratio =
+      Math.min(courseDuration, avgPreferredDuration) /
+      Math.max(courseDuration, avgPreferredDuration);
     return ratio;
   }
 
   /**
    * Calculate similarity between two courses
    */
-  private calculateCourseSimilarity(features1: ContentFeatures, features2: ContentFeatures): number {
+  private calculateCourseSimilarity(
+    features1: ContentFeatures,
+    features2: ContentFeatures,
+  ): number {
     let totalScore = 0;
     let weights = 0;
 
@@ -383,7 +406,10 @@ export class ContentSimilarityService {
     weights += 0.1;
 
     // Duration similarity
-    const durationSimilarity = this.calculateDurationSimilarity(features1.duration, features2.duration);
+    const durationSimilarity = this.calculateDurationSimilarity(
+      features1.duration,
+      features2.duration,
+    );
     totalScore += durationSimilarity * 0.1;
     weights += 0.1;
 
@@ -397,10 +423,10 @@ export class ContentSimilarityService {
     if (array1.length === 0 && array2.length === 0) return 1;
     if (array1.length === 0 || array2.length === 0) return 0;
 
-    const set1 = new Set(array1.map(s => s.toLowerCase()));
-    const set2 = new Set(array2.map(s => s.toLowerCase()));
+    const set1 = new Set(array1.map((s) => s.toLowerCase()));
+    const set2 = new Set(array2.map((s) => s.toLowerCase()));
 
-    const intersection = new Set([...set1].filter(x => set2.has(x)));
+    const intersection = new Set([...set1].filter((x) => set2.has(x)));
     const union = new Set([...set1, ...set2]);
 
     return intersection.size / union.size;
@@ -417,16 +443,16 @@ export class ContentSimilarityService {
     const reasons: string[] = [];
 
     // Check for strong tag matches
-    const strongTagMatches = features.tags.filter(tag => 
-      (userPreferences.preferredTags.get(tag) || 0) > 5
+    const strongTagMatches = features.tags.filter(
+      (tag) => (userPreferences.preferredTags.get(tag) || 0) > 5,
     );
     if (strongTagMatches.length > 0) {
       reasons.push(`Matches your interest in ${strongTagMatches.slice(0, 2).join(', ')}`);
     }
 
     // Check for skill matches
-    const skillMatches = features.skills.filter(skill =>
-      (userPreferences.preferredSkills.get(skill) || 0) > 3
+    const skillMatches = features.skills.filter(
+      (skill) => (userPreferences.preferredSkills.get(skill) || 0) > 3,
     );
     if (skillMatches.length > 0) {
       reasons.push(`Builds on your ${skillMatches.slice(0, 2).join(', ')} skills`);
@@ -495,11 +521,11 @@ export class ContentSimilarityService {
    * Determine recommendation reason based on similarity
    */
   private determineRecommendationReason(score: SimilarityScore): RecommendationReason {
-    if (score.reasons.some(reason => reason.includes('skill'))) {
+    if (score.reasons.some((reason) => reason.includes('skill'))) {
       return RecommendationReason.SKILL_BASED;
-    } else if (score.reasons.some(reason => reason.includes('interest'))) {
+    } else if (score.reasons.some((reason) => reason.includes('interest'))) {
       return RecommendationReason.INTEREST_BASED;
-    } else if (score.reasons.some(reason => reason.includes('category'))) {
+    } else if (score.reasons.some((reason) => reason.includes('category'))) {
       return RecommendationReason.SIMILAR_CONTENT;
     } else {
       return RecommendationReason.CONTENT_BASED;

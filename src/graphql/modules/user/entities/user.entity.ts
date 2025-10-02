@@ -1,62 +1,66 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { ObjectType, Field, ID } from "@nestjs/graphql"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 
-import { Post } from "../../post/entities/post.entity"
+import { Post } from '../../post/entities/post.entity';
 
-@Entity("users")
+@Entity('users')
 @ObjectType()
 export class User {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn('uuid')
   @Field(() => ID)
-  id: string
+  id: string;
 
   @Column({ unique: true })
   @Field()
-  email: string
+  email: string;
 
   @Column()
   @Field()
-  firstName: string
+  firstName: string;
 
   @Column()
   @Field()
-  lastName: string
+  lastName: string;
 
   @Column({ nullable: true })
   @Field({ nullable: true })
-  avatar?: string
+  avatar?: string;
 
   @Column({ default: true })
   @Field()
-  isActive: boolean
+  isActive: boolean;
 
-  @Column({ type: "jsonb", nullable: true })
+  @Column({ type: 'jsonb', nullable: true })
   @Field(() => String, { nullable: true })
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>;
 
-  @OneToMany(
-    () => Post,
-    (post) => post.author,
-  )
+  @OneToMany(() => Post, (post) => post.author)
   @Field(() => [Post])
-  posts: Post[]
+  posts: Post[];
 
   @CreateDateColumn()
   @Field()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
   @Field()
-  updatedAt: Date
+  updatedAt: Date;
 
   // Computed fields
   @Field()
   get fullName(): string {
-    return `${this.firstName} ${this.lastName}`
+    return `${this.firstName} ${this.lastName}`;
   }
 
   @Field()
   get postsCount(): number {
-    return this.posts?.length || 0
+    return this.posts?.length || 0;
   }
 }

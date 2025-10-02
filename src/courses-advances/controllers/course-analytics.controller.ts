@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { CourseAnalyticsService } from '../services/course-analytics.service';
 import { AnalyticsQueryDto } from '../dto/course-analytics.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -25,10 +18,7 @@ export class CourseAnalyticsController {
   }
 
   @Get(':courseId')
-  getCourseAnalytics(
-    @Param('courseId') courseId: string,
-    @Query() queryDto: AnalyticsQueryDto,
-  ) {
+  getCourseAnalytics(@Param('courseId') courseId: string, @Query() queryDto: AnalyticsQueryDto) {
     return this.analyticsService.getCourseAnalytics(courseId, queryDto);
   }
 

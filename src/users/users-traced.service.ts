@@ -47,7 +47,7 @@ export class UsersTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           // Create user entity
           const user = this.userRepository.create({
             email: dto.email,
@@ -69,7 +69,7 @@ export class UsersTracedService {
           );
 
           const duration = Date.now() - startTime;
-          
+
           span.setAttributes({
             'user.id': savedUser[0].id,
             'user.created_at': savedUser[0].created_at,
@@ -89,12 +89,12 @@ export class UsersTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error('Failed to create user', {
             error: error.message,
             email: dto.email,
           });
-          
+
           throw error;
         }
       },
@@ -120,7 +120,7 @@ export class UsersTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           const result = await this.tracedDatabaseService.query(
             'SELECT * FROM users WHERE id = $1',
             [id],
@@ -134,7 +134,7 @@ export class UsersTracedService {
 
           const duration = Date.now() - startTime;
           const user = result[0] || null;
-          
+
           span.setAttributes({
             'user.found': !!user,
             'user.operation.duration_ms': duration,
@@ -156,7 +156,7 @@ export class UsersTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           throw error;
         }
       },
@@ -182,7 +182,7 @@ export class UsersTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           const result = await this.tracedDatabaseService.query(
             'SELECT * FROM users WHERE email = $1',
             [email],
@@ -196,7 +196,7 @@ export class UsersTracedService {
 
           const duration = Date.now() - startTime;
           const user = result[0] || null;
-          
+
           span.setAttributes({
             'user.found': !!user,
             'user.operation.duration_ms': duration,
@@ -210,7 +210,7 @@ export class UsersTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           throw error;
         }
       },
@@ -236,7 +236,7 @@ export class UsersTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           // Build dynamic update query
           const updateFields: string[] = [];
           const updateValues: any[] = [];
@@ -270,20 +270,16 @@ export class UsersTracedService {
             RETURNING *
           `;
 
-          const result = await this.tracedDatabaseService.query(
-            query,
-            updateValues,
-            {
-              table: 'users',
-              operation: 'update',
-              includeParams: true,
-              includeResult: true,
-            },
-          );
+          const result = await this.tracedDatabaseService.query(query, updateValues, {
+            table: 'users',
+            operation: 'update',
+            includeParams: true,
+            includeResult: true,
+          });
 
           const duration = Date.now() - startTime;
           const user = result[0] || null;
-          
+
           span.setAttributes({
             'user.updated': !!user,
             'user.operation.duration_ms': duration,
@@ -301,12 +297,12 @@ export class UsersTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error('Failed to update user', {
             error: error.message,
             userId: id,
           });
-          
+
           throw error;
         }
       },
@@ -332,7 +328,7 @@ export class UsersTracedService {
 
         try {
           const startTime = Date.now();
-          
+
           const result = await this.tracedDatabaseService.query(
             'DELETE FROM users WHERE id = $1',
             [id],
@@ -345,7 +341,7 @@ export class UsersTracedService {
 
           const duration = Date.now() - startTime;
           const deleted = result.length > 0;
-          
+
           span.setAttributes({
             'user.deleted': deleted,
             'user.operation.duration_ms': duration,
@@ -363,12 +359,12 @@ export class UsersTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           this.logger.error('Failed to delete user', {
             error: error.message,
             userId: id,
           });
-          
+
           throw error;
         }
       },
@@ -383,7 +379,10 @@ export class UsersTracedService {
    * Get all users with pagination and tracing
    */
   @TraceDatabase('select', 'users')
-  async findAllUsers(page: number = 1, limit: number = 10): Promise<{ users: User[]; total: number }> {
+  async findAllUsers(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ users: User[]; total: number }> {
     return this.tracingService.withSpan(
       'users.findAllUsers',
       async (span) => {
@@ -396,7 +395,7 @@ export class UsersTracedService {
         try {
           const startTime = Date.now();
           const offset = (page - 1) * limit;
-          
+
           // Get total count
           const countResult = await this.tracedDatabaseService.query(
             'SELECT COUNT(*) as total FROM users',
@@ -421,7 +420,7 @@ export class UsersTracedService {
 
           const duration = Date.now() - startTime;
           const total = parseInt(countResult[0].total);
-          
+
           span.setAttributes({
             'user.total_count': total,
             'user.returned_count': usersResult.length,
@@ -439,7 +438,7 @@ export class UsersTracedService {
             'error.name': error.name,
             'error.message': error.message,
           });
-          
+
           throw error;
         }
       },

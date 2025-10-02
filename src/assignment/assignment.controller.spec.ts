@@ -44,7 +44,9 @@ describe('AssignmentController', () => {
         instructions: 'Complete the task',
         dueDate: '2025-12-01',
       };
-      expect(await controller.create(createAssignmentDto)).toBe('This action adds a new assignment');
+      expect(await controller.create(createAssignmentDto)).toBe(
+        'This action adds a new assignment',
+      );
     });
   });
 
@@ -69,7 +71,9 @@ describe('AssignmentController', () => {
         instructions: 'Complete the updated task',
         dueDate: '2025-12-05',
       };
-      expect(await controller.update(assignmentId, updateAssignmentDto)).toBe('This action updates a #1 assignment');
+      expect(await controller.update(assignmentId, updateAssignmentDto)).toBe(
+        'This action updates a #1 assignment',
+      );
     });
   });
 

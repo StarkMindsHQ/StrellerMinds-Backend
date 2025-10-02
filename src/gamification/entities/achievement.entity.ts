@@ -16,4 +16,4 @@ export class Achievement {
 
   @CreateDateColumn()
   createdAt: Date;
-} 
+}

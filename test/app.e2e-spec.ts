@@ -98,10 +98,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+    return request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
   });
 });
 let app: INestApplication;
@@ -134,10 +131,10 @@ describe('Courses (e2e)', () => {
           title: 'Module 1',
           lessons: [
             { title: 'Lesson 1', content: 'Stellar overview' },
-            { title: 'Lesson 2', content: 'Accounts' }
-          ]
-        }
-      ]
+            { title: 'Lesson 2', content: 'Accounts' },
+          ],
+        },
+      ],
     };
 
     const response = await request(app.getHttpServer())

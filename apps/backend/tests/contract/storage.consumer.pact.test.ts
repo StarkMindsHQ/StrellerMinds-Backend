@@ -21,19 +21,19 @@ describe('Cloud Storage Service Consumer Pact', () => {
       // Create service instances
       cloudinaryService = new CloudinaryService();
       awsCloudFrontService = new AwsCloudFrontService({} as any); // configService
-      
+
       // Override the cloudinary uploader for testing
       (cloudinaryService as any).cloudinary = {
         uploader: {
           upload_stream: jest.fn(),
           upload: jest.fn(),
-          destroy: jest.fn()
-        }
+          destroy: jest.fn(),
+        },
       };
-      
+
       // Override the AWS S3 client for testing
       (awsCloudFrontService as any).s3Client = {
-        send: jest.fn()
+        send: jest.fn(),
       };
     });
   });
@@ -47,15 +47,17 @@ describe('Cloud Storage Service Consumer Pact', () => {
       const filePath = '/uploads/course-video-intro.mp4';
       const fileContent = 'Mock file content for testing';
       const expectedResponse = {
-        fileUrl: 'https://res.cloudinary.com/strellerminds/video/upload/v1234567890/course-video-intro.mp4',
+        fileUrl:
+          'https://res.cloudinary.com/strellerminds/video/upload/v1234567890/course-video-intro.mp4',
         publicId: 'course-video-intro',
-        secureUrl: 'https://res.cloudinary.com/strellerminds/video/upload/v1234567890/course-video-intro.mp4',
+        secureUrl:
+          'https://res.cloudinary.com/strellerminds/video/upload/v1234567890/course-video-intro.mp4',
         format: 'mp4',
         resourceType: 'video',
         bytes: 1024000,
         width: 1920,
         height: 1080,
-        duration: 120.5
+        duration: 120.5,
       };
 
       return provider
@@ -67,14 +69,14 @@ describe('Cloud Storage Service Consumer Pact', () => {
             path: filePath,
             headers: {
               'Content-Type': 'video/mp4',
-              'Content-Length': Matchers.string(fileContent.length.toString())
+              'Content-Length': Matchers.string(fileContent.length.toString()),
             },
-            body: Matchers.like(fileContent)
+            body: Matchers.like(fileContent),
           },
           willRespondWith: {
             status: 201,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               fileUrl: Matchers.like(expectedResponse.fileUrl),
@@ -85,20 +87,22 @@ describe('Cloud Storage Service Consumer Pact', () => {
               bytes: Matchers.integer(expectedResponse.bytes),
               width: Matchers.integer(expectedResponse.width),
               height: Matchers.integer(expectedResponse.height),
-              duration: Matchers.decimal(expectedResponse.duration)
-            }
-          }
+              duration: Matchers.decimal(expectedResponse.duration),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the cloudinary upload method
-            (cloudinaryService as any).cloudinary.uploader.upload.mockImplementation((filePath, options, callback) => {
-              callback(null, expectedResponse);
-            });
-            
+            (cloudinaryService as any).cloudinary.uploader.upload.mockImplementation(
+              (filePath, options, callback) => {
+                callback(null, expectedResponse);
+              },
+            );
+
             // Call the actual service method
             const result = await cloudinaryService.uploadVideoFromPath(filePath);
-            
+
             // Assert the result
             expect(result).toBeDefined();
             expect(result.secure_url).toBe(expectedResponse.secureUrl);
@@ -112,14 +116,16 @@ describe('Cloud Storage Service Consumer Pact', () => {
       const imagePath = '/uploads/profile-picture.jpg';
       const imageContent = 'Mock image content for testing';
       const expectedResponse = {
-        fileUrl: 'https://res.cloudinary.com/strellerminds/image/upload/v1234567890/profile-picture.jpg',
+        fileUrl:
+          'https://res.cloudinary.com/strellerminds/image/upload/v1234567890/profile-picture.jpg',
         publicId: 'profile-picture',
-        secureUrl: 'https://res.cloudinary.com/strellerminds/image/upload/v1234567890/profile-picture.jpg',
+        secureUrl:
+          'https://res.cloudinary.com/strellerminds/image/upload/v1234567890/profile-picture.jpg',
         format: 'jpg',
         resourceType: 'image',
         bytes: 512000,
         width: 512,
-        height: 512
+        height: 512,
       };
 
       return provider
@@ -131,14 +137,14 @@ describe('Cloud Storage Service Consumer Pact', () => {
             path: imagePath,
             headers: {
               'Content-Type': 'image/jpeg',
-              'Content-Length': Matchers.string(imageContent.length.toString())
+              'Content-Length': Matchers.string(imageContent.length.toString()),
             },
-            body: Matchers.like(imageContent)
+            body: Matchers.like(imageContent),
           },
           willRespondWith: {
             status: 201,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               fileUrl: Matchers.like(expectedResponse.fileUrl),
@@ -148,28 +154,30 @@ describe('Cloud Storage Service Consumer Pact', () => {
               resourceType: Matchers.like(expectedResponse.resourceType),
               bytes: Matchers.integer(expectedResponse.bytes),
               width: Matchers.integer(expectedResponse.width),
-              height: Matchers.integer(expectedResponse.height)
-            }
-          }
+              height: Matchers.integer(expectedResponse.height),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the cloudinary upload_stream method
-            (cloudinaryService as any).cloudinary.uploader.upload_stream.mockImplementation((options, callback) => {
-              callback(null, expectedResponse);
-              return { end: jest.fn() };
-            });
-            
+            (cloudinaryService as any).cloudinary.uploader.upload_stream.mockImplementation(
+              (options, callback) => {
+                callback(null, expectedResponse);
+                return { end: jest.fn() };
+              },
+            );
+
             // Create a mock file object
             const mockFile = {
               buffer: Buffer.from(imageContent),
               originalname: 'profile-picture.jpg',
-              mimetype: 'image/jpeg'
+              mimetype: 'image/jpeg',
             } as Express.Multer.File;
-            
+
             // Call the actual service method
             const result = await cloudinaryService.uploadImage(mockFile);
-            
+
             // Assert the result
             expect(result).toBeDefined();
             expect(result.secure_url).toBe(expectedResponse.secureUrl);
@@ -183,7 +191,7 @@ describe('Cloud Storage Service Consumer Pact', () => {
       const publicId = 'course-video-intro';
       const expectedResponse = {
         result: 'ok',
-        publicId: publicId
+        publicId: publicId,
       };
 
       return provider
@@ -194,28 +202,30 @@ describe('Cloud Storage Service Consumer Pact', () => {
             method: 'DELETE',
             path: `/delete/${publicId}`,
             headers: {
-              'Accept': 'application/json'
-            }
+              Accept: 'application/json',
+            },
           },
           willRespondWith: {
             status: 200,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               result: Matchers.like(expectedResponse.result),
-              publicId: Matchers.like(expectedResponse.publicId)
-            }
-          }
+              publicId: Matchers.like(expectedResponse.publicId),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the cloudinary destroy method
-            (cloudinaryService as any).cloudinary.uploader.destroy.mockResolvedValue(expectedResponse);
-            
+            (cloudinaryService as any).cloudinary.uploader.destroy.mockResolvedValue(
+              expectedResponse,
+            );
+
             // Call the actual service method
             const result = await cloudinaryService.deleteImage(publicId);
-            
+
             // Assert the result
             expect(result).toBeDefined();
             expect(result.result).toBe(expectedResponse.result);
@@ -230,8 +240,8 @@ describe('Cloud Storage Service Consumer Pact', () => {
       const errorResponse = {
         error: {
           message: 'Invalid file format',
-          http_code: 400
-        }
+          http_code: 400,
+        },
       };
 
       return provider
@@ -243,34 +253,34 @@ describe('Cloud Storage Service Consumer Pact', () => {
             path: filePath,
             headers: {
               'Content-Type': 'video/mp4',
-              'Content-Length': Matchers.string(fileContent.length.toString())
+              'Content-Length': Matchers.string(fileContent.length.toString()),
             },
-            body: Matchers.like(fileContent)
+            body: Matchers.like(fileContent),
           },
           willRespondWith: {
             status: 400,
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             },
             body: {
               error: {
                 message: Matchers.like(errorResponse.error.message),
-                http_code: Matchers.integer(errorResponse.error.http_code)
-              }
-            }
-          }
+                http_code: Matchers.integer(errorResponse.error.http_code),
+              },
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the cloudinary upload method to throw an error
-            (cloudinaryService as any).cloudinary.uploader.upload.mockImplementation((filePath, options, callback) => {
-              callback(errorResponse, null);
-            });
-            
+            (cloudinaryService as any).cloudinary.uploader.upload.mockImplementation(
+              (filePath, options, callback) => {
+                callback(errorResponse, null);
+              },
+            );
+
             // Call the service method and expect it to throw
-            await expect(
-              cloudinaryService.uploadVideoFromPath(filePath)
-            ).rejects.toThrow();
+            await expect(cloudinaryService.uploadVideoFromPath(filePath)).rejects.toThrow();
           });
         });
     });
@@ -283,7 +293,7 @@ describe('Cloud Storage Service Consumer Pact', () => {
         url: `https://strellerminds-bucket.s3.us-east-1.amazonaws.com/${s3Key}`,
         cdnUrl: `https://d1234567890.cloudfront.net/${s3Key}`,
         etag: 'abc123def456',
-        size: fileBuffer.length
+        size: fileBuffer.length,
       };
 
       return provider
@@ -295,39 +305,35 @@ describe('Cloud Storage Service Consumer Pact', () => {
             path: `/${s3Key}`,
             headers: {
               'Content-Type': 'video/mp4',
-              'Content-Length': Matchers.string(fileBuffer.length.toString())
+              'Content-Length': Matchers.string(fileBuffer.length.toString()),
             },
-            body: Matchers.like(fileBuffer.toString())
+            body: Matchers.like(fileBuffer.toString()),
           },
           willRespondWith: {
             status: 201,
             headers: {
               'Content-Type': 'application/json',
-              'ETag': Matchers.like(expectedResponse.etag)
+              ETag: Matchers.like(expectedResponse.etag),
             },
             body: {
               key: Matchers.like(expectedResponse.key),
               url: Matchers.like(expectedResponse.url),
               cdnUrl: Matchers.like(expectedResponse.cdnUrl),
               etag: Matchers.like(expectedResponse.etag),
-              size: Matchers.integer(expectedResponse.size)
-            }
-          }
+              size: Matchers.integer(expectedResponse.size),
+            },
+          },
         })
         .then(() => {
           return provider.executeTest(async () => {
             // Mock the S3 client send method
             (awsCloudFrontService as any).s3Client.send.mockResolvedValue({
-              ETag: `"${expectedResponse.etag}"`
+              ETag: `"${expectedResponse.etag}"`,
             });
-            
+
             // Call the actual service method
-            const result = await awsCloudFrontService.uploadVideo(
-              fileBuffer,
-              s3Key,
-              'video/mp4'
-            );
-            
+            const result = await awsCloudFrontService.uploadVideo(fileBuffer, s3Key, 'video/mp4');
+
             // Assert the result
             expect(result).toBeDefined();
             expect(result.key).toBe(expectedResponse.key);
@@ -340,10 +346,3 @@ describe('Cloud Storage Service Consumer Pact', () => {
     });
   });
 });
-
-
-
-
-
-
-

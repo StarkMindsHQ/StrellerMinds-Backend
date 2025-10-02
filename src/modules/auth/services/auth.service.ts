@@ -11,7 +11,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    
+
     return {
       access_token: this.jwtService.sign({ userId: user.id, email: user.email }),
       user: {
@@ -32,10 +32,7 @@ export class AuthService {
     if (user.mfaEnabled && !loginDto.mfaCode) {
       return {
         requiresMfa: true,
-        temporaryToken: this.jwtService.sign(
-          { userId: user.id, type: 'mfa' },
-          { expiresIn: '5m' }
-        ),
+        temporaryToken: this.jwtService.sign({ userId: user.id, type: 'mfa' }, { expiresIn: '5m' }),
       };
     }
 
@@ -48,12 +45,12 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(
       { userId: user.id, email: user.email, role: user.role },
-      { expiresIn: loginDto.rememberMe ? '30d' : '1h' }
+      { expiresIn: loginDto.rememberMe ? '30d' : '1h' },
     );
 
     const refreshToken = this.jwtService.sign(
       { userId: user.id, type: 'refresh' },
-      { expiresIn: '7d' }
+      { expiresIn: '7d' },
     );
 
     return {

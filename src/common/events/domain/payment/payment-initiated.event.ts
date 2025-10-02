@@ -27,16 +27,11 @@ export class PaymentInitiatedEvent extends DomainEvent {
     private readonly payload: PaymentInitiatedPayload,
     metadata: Partial<DomainEventMetadata> = {},
   ) {
-    super(
-      payload.paymentId,
-      'Payment',
-      1,
-      {
-        ...metadata,
-        userId: payload.userId,
-        correlationId: metadata.correlationId,
-      },
-    );
+    super(payload.paymentId, 'Payment', 1, {
+      ...metadata,
+      userId: payload.userId,
+      correlationId: metadata.correlationId,
+    });
   }
 
   getPayload(): PaymentInitiatedPayload {

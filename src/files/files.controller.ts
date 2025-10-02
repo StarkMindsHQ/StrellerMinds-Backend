@@ -1,18 +1,10 @@
-
 /**
  * FilesController handles endpoints for file management (upload, download, etc.).
  *
  * @module Files
  */
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import {
-  Controller,
-  Post,
-  Body,
-  Req,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Body, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 import { FilesService } from './files.service';
 import { UploadChunkDto } from './dto/upload-chunk.dto';
@@ -34,10 +26,7 @@ export class FilesController {
   async uploadChunk(@Req() req: FastifyRequest, @Body() body: UploadChunkDto) {
     const { uploadId, chunkIndex, totalChunks } = body;
     if (!uploadId || chunkIndex === undefined || !totalChunks) {
-      throw new HttpException(
-        'Missing required fields',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Missing required fields', HttpStatus.BAD_REQUEST);
     }
     const part = await (req as any).file();
     if (!part) {
@@ -57,16 +46,9 @@ export class FilesController {
   async completeUpload(@Body() body: CompleteUploadDto) {
     const { uploadId, fileName, totalChunks } = body;
     if (!uploadId || !fileName || !totalChunks) {
-      throw new HttpException(
-        'Missing required fields',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Missing required fields', HttpStatus.BAD_REQUEST);
     }
-    const cdnUrl = await this.filesService.assembleChunks(
-      uploadId,
-      fileName,
-      totalChunks,
-    );
+    const cdnUrl = await this.filesService.assembleChunks(uploadId, fileName, totalChunks);
     return { message: 'File uploaded and available on CDN', url: cdnUrl };
   }
 
@@ -83,10 +65,7 @@ export class FilesController {
     if (!uploadId) {
       throw new HttpException('Missing uploadId', HttpStatus.BAD_REQUEST);
     }
-    const progress = await this.filesService.getUploadProgress(
-      uploadId,
-      totalChunks,
-    );
+    const progress = await this.filesService.getUploadProgress(uploadId, totalChunks);
     return progress;
   }
 }

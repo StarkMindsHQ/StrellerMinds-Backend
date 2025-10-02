@@ -12,4 +12,4 @@ export class CreateAchievementDto {
   @IsInt()
   @Min(0)
   points: number;
-} 
+}

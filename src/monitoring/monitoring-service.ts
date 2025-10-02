@@ -27,14 +27,14 @@ export class MonitoringService {
   async collectMetrics(): Promise<void> {
     try {
       this.logger.debug('Collecting system metrics');
-      
+
       // Update system metrics
       this.metricsService.updateMemoryMetrics();
       await this.metricsService.updateDatabaseMetrics();
-      
+
       // Collect custom metrics
       await this.metricsCollectorService.collectAll();
-      
+
       this.logger.debug('Metrics collection completed');
     } catch (error) {
       this.logger.error('Failed to collect metrics:', error);
@@ -45,7 +45,7 @@ export class MonitoringService {
   async checkAlertConditions(): Promise<void> {
     try {
       this.logger.debug('Checking alert conditions');
-      
+
       const metrics = await this.metricsService.getMetricsSummary();
       const performance = metrics.performance;
       const custom = metrics.custom;
@@ -100,14 +100,14 @@ export class MonitoringService {
   async cleanupOldData(): Promise<void> {
     try {
       this.logger.debug('Cleaning up old monitoring data');
-      
+
       // Clear resolved alerts older than 24 hours
       const clearedAlerts = this.alertingService.clearResolvedAlerts();
       this.logger.log(`Cleared ${clearedAlerts} resolved alerts`);
-      
+
       // Reset some metrics to prevent memory leaks
       // This is optional and depends on your specific needs
-      
+
       this.logger.debug('Cleanup completed');
     } catch (error) {
       this.logger.error('Failed to cleanup old data:', error);
@@ -140,7 +140,7 @@ export class MonitoringService {
 
   async triggerEmergencyCheck(): Promise<void> {
     this.logger.warn('Emergency monitoring check triggered');
-    
+
     await Promise.allSettled([
       this.performHealthCheck(),
       this.collectMetrics(),
@@ -166,7 +166,7 @@ export class MonitoringService {
     lastCheck: string;
   }> {
     const health = await this.healthService.checkOverallHealth();
-    
+
     return {
       status: health.status,
       uptime: process.uptime(),
@@ -207,7 +207,11 @@ export class MonitoringService {
     }
 
     // Check configuration
-    if (!process.env.SLACK_WEBHOOK_URL && !process.env.DISCORD_WEBHOOK_URL && !process.env.ALERT_WEBHOOK_URL) {
+    if (
+      !process.env.SLACK_WEBHOOK_URL &&
+      !process.env.DISCORD_WEBHOOK_URL &&
+      !process.env.ALERT_WEBHOOK_URL
+    ) {
       recommendations.push('Configure at least one alerting channel (Slack, Discord, or webhook)');
     }
 

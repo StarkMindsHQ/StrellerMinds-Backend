@@ -21,10 +21,12 @@ export class SentryService {
       const sentryId = this.sentryConfig.captureException(error, {
         component: context?.controller || context?.context || 'unknown',
         correlationId: context?.correlationId,
-        user: context?.userId ? {
-          id: context.userId,
-          email: context.userEmail,
-        } : undefined,
+        user: context?.userId
+          ? {
+              id: context.userId,
+              email: context.userEmail,
+            }
+          : undefined,
         request: {
           method: context?.method,
           url: context?.url,
@@ -56,17 +58,23 @@ export class SentryService {
     }
   }
 
-  captureMessage(message: string, level: 'debug' | 'info' | 'warning' | 'error' | 'fatal' = 'info', context?: any): string {
+  captureMessage(
+    message: string,
+    level: 'debug' | 'info' | 'warning' | 'error' | 'fatal' = 'info',
+    context?: any,
+  ): string {
     try {
       const sentryLevel = this.mapLogLevelToSentry(level);
-      
+
       const sentryId = this.sentryConfig.captureMessage(message, sentryLevel, {
         component: context?.component || 'unknown',
         correlationId: context?.correlationId,
-        user: context?.userId ? {
-          id: context.userId,
-          email: context.userEmail,
-        } : undefined,
+        user: context?.userId
+          ? {
+              id: context.userId,
+              email: context.userEmail,
+            }
+          : undefined,
         ...context,
       });
 
@@ -108,7 +116,12 @@ export class SentryService {
     }
   }
 
-  addBreadcrumb(message: string, category: string, level: 'debug' | 'info' | 'warning' | 'error' = 'info', data?: any): void {
+  addBreadcrumb(
+    message: string,
+    category: string,
+    level: 'debug' | 'info' | 'warning' | 'error' = 'info',
+    data?: any,
+  ): void {
     try {
       this.sentryConfig.addBreadcrumb({
         message,

@@ -2,12 +2,7 @@
  * AuditLog entity representing audit log records.
  */
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity('audit_logs')
 export class AuditLog {
@@ -31,7 +26,11 @@ export class AuditLog {
   @Column()
   performedBy: string;
 
-  @ApiProperty({ description: 'Details of the action', type: 'object', example: { reason: 'User request' } })
+  @ApiProperty({
+    description: 'Details of the action',
+    type: 'object',
+    example: { reason: 'User request' },
+  })
   @Column('jsonb', { default: {} })
   details: Record<string, any>;
 

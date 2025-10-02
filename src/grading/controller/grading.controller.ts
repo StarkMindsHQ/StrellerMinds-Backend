@@ -1,16 +1,7 @@
 /**
  * GradingController handles endpoints for grading assignments and updating grades.
  */
-import {
-  Controller,
-  Post,
-  Patch,
-  Get,
-  Param,
-  Body,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Patch, Get, Param, Body, Req, UseGuards } from '@nestjs/common';
 import { GradingService } from '../services/grading.service';
 import { CreateGradeDto } from '../dto/create-grade.dto';
 import { UpdateGradeDto } from '../dto/update-grade.dto';
@@ -53,12 +44,7 @@ export class GradingController {
     @Body() dto: CreateGradeDto,
     @Req() req,
   ) {
-    return this.gradingService.gradeAssignment(
-      req.user,
-      studentId,
-      assignmentId,
-      dto,
-    );
+    return this.gradingService.gradeAssignment(req.user, studentId, assignmentId, dto);
   }
 
   /**
@@ -75,11 +61,7 @@ export class GradingController {
     status: 403,
     description: 'Forbidden. Only mentors can update grades.',
   })
-  async updateGrade(
-    @Param('gradeId') gradeId: number,
-    @Body() dto: UpdateGradeDto,
-    @Req() req,
-  ) {
+  async updateGrade(@Param('gradeId') gradeId: number, @Body() dto: UpdateGradeDto, @Req() req) {
     return this.gradingService.updateGrade(req.user, gradeId, dto);
   }
 

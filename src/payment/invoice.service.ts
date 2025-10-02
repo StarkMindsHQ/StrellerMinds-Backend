@@ -124,7 +124,7 @@ export class InvoiceService {
       const stripeInvoice = await this.stripeService.createInvoice({
         customerId: payment.user?.stripeCustomerId || 'temp_customer',
         description: data.description,
-        lineItems: data.lineItems.map(item => ({
+        lineItems: data.lineItems.map((item) => ({
           price: this.createPriceId(item.unitAmount, payment.currency),
           quantity: item.quantity,
           description: item.description,
@@ -275,7 +275,10 @@ export class InvoiceService {
   /**
    * Update invoice from webhook
    */
-  async updateInvoiceFromWebhook(stripeInvoiceId: string, status: InvoiceStatus): Promise<InvoiceEntity> {
+  async updateInvoiceFromWebhook(
+    stripeInvoiceId: string,
+    status: InvoiceStatus,
+  ): Promise<InvoiceEntity> {
     const invoice = await this.invoiceRepository.findOne({
       where: { stripeInvoiceId },
     });
@@ -404,4 +407,4 @@ export class InvoiceService {
       throw error;
     }
   }
-} 
+}

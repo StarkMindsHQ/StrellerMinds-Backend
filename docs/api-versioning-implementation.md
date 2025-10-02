@@ -76,8 +76,8 @@ export const apiVersionConfig = {
         status: 'current',
         releasedIn: '2024-01-01',
         features: ['Enhanced authentication', 'Improved course management'],
-      }
-    }
+      },
+    },
   },
   backwardCompatibility: {
     enabled: true,
@@ -89,7 +89,7 @@ export const apiVersionConfig = {
     trackUsage: true,
     trackDeprecatedUsage: true,
     retentionDays: 90,
-  }
+  },
 };
 ```
 
@@ -429,4 +429,4 @@ This comprehensive API versioning implementation provides:
 - ✅ **Analytics and monitoring** for usage tracking
 - ✅ **Comprehensive testing** and validation
 
-The implementation ensures smooth API evolution while maintaining compatibility with existing integrations. 
+The implementation ensures smooth API evolution while maintaining compatibility with existing integrations.

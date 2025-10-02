@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { PermissionService } from '../services/permission.service';
 import { AuditLogService } from '../services/audit-log.service';
 import { Permissions } from '../decorators/permissions.decorator';
@@ -25,10 +15,7 @@ export class PermissionController {
   @Post()
   @Permissions('permission:create')
   async create(@Body() body: any, @Req() req: any) {
-    const perm = await this.permissionService.createPermission(
-      body.name,
-      body.description,
-    );
+    const perm = await this.permissionService.createPermission(body.name, body.description);
     await this.auditLogService.log(req.user.id, 'create', 'permission', {
       perm,
     });

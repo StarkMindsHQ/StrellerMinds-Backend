@@ -63,8 +63,9 @@ describe('EmailVerificationService', () => {
     it('should throw NotFoundException for non-existent user', async () => {
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.sendVerificationEmail('test@example.com'))
-        .rejects.toThrow(NotFoundException);
+      await expect(service.sendVerificationEmail('test@example.com')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException for already verified email', async () => {
@@ -73,8 +74,9 @@ describe('EmailVerificationService', () => {
         isEmailVerified: true,
       });
 
-      await expect(service.sendVerificationEmail('test@example.com'))
-        .rejects.toThrow(BadRequestException);
+      await expect(service.sendVerificationEmail('test@example.com')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -98,8 +100,7 @@ describe('EmailVerificationService', () => {
     it('should throw BadRequestException for invalid token', async () => {
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.verifyEmail('invalid-token'))
-        .rejects.toThrow(BadRequestException);
+      await expect(service.verifyEmail('invalid-token')).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException for expired token', async () => {
@@ -111,8 +112,7 @@ describe('EmailVerificationService', () => {
 
       mockUserRepository.findOne.mockResolvedValue(mockUserWithExpiredToken);
 
-      await expect(service.verifyEmail('expired-token'))
-        .rejects.toThrow(BadRequestException);
+      await expect(service.verifyEmail('expired-token')).rejects.toThrow(BadRequestException);
     });
   });
 });

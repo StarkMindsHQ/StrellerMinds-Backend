@@ -34,7 +34,7 @@ export interface Alert {
   resolvedAt?: string;
 }
 
-export type AlertType = 
+export type AlertType =
   | 'HEALTH_CHECK_FAILED'
   | 'SYSTEM_UNHEALTHY'
   | 'SYSTEM_DEGRADED'
@@ -94,10 +94,10 @@ export class AlertingService {
     const alertKey = `${type}_${JSON.stringify(data)}`;
     const now = Date.now();
     const rule = this.alertRules[type];
-    
+
     // Check cooldown period
     const lastAlertTime = this.lastAlertTimes.get(alertKey);
-    if (lastAlertTime && (now - lastAlertTime) < rule.cooldown) {
+    if (lastAlertTime && now - lastAlertTime < rule.cooldown) {
       this.logger.debug(`Alert ${type} is in cooldown period`);
       return;
     }
@@ -157,9 +157,7 @@ export class AlertingService {
         ],
       };
 
-      await firstValueFrom(
-        this.httpService.post(this.alertConfig.slackWebhookUrl, payload),
-      );
+      await firstValueFrom(this.httpService.post(this.alertConfig.slackWebhookUrl, payload));
       this.logger.debug('Slack alert sent successfully');
     } catch (error) {
       this.logger.error('Failed to send Slack alert:', error);
@@ -194,9 +192,7 @@ export class AlertingService {
         ],
       };
 
-      await firstValueFrom(
-        this.httpService.post(this.alertConfig.discordWebhookUrl, payload),
-      );
+      await firstValueFrom(this.httpService.post(this.alertConfig.discordWebhookUrl, payload));
       this.logger.debug('Discord alert sent successfully');
     } catch (error) {
       this.logger.error('Failed to send Discord alert:', error);
@@ -207,9 +203,7 @@ export class AlertingService {
     if (!this.alertConfig.webhookUrl) return;
 
     try {
-      await firstValueFrom(
-        this.httpService.post(this.alertConfig.webhookUrl, alert),
-      );
+      await firstValueFrom(this.httpService.post(this.alertConfig.webhookUrl, alert));
       this.logger.debug('Webhook alert sent successfully');
     } catch (error) {
       this.logger.error('Failed to send webhook alert:', error);
@@ -252,12 +246,16 @@ export class AlertingService {
               <h3>Message:</h3>
               <p>${alert.message}</p>
             </div>
-            ${Object.keys(alert.data).length > 0 ? `
+            ${
+              Object.keys(alert.data).length > 0
+                ? `
             <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
               <h3>Additional Data:</h3>
               <pre style="background-color: #e9ecef; padding: 10px; border-radius: 3px; overflow-x: auto;">${JSON.stringify(alert.data, null, 2)}</pre>
             </div>
-            ` : ''}
+            `
+                : ''
+            }
             <hr style="margin: 30px 0;">
             <p style="font-size: 12px; color: #6c757d;">
               This is an automated alert from your application monitoring system.
@@ -338,7 +336,7 @@ export class AlertingService {
   }
 
   getActiveAlerts(): Alert[] {
-    return Array.from(this.alerts.values()).filter(alert => !alert.resolved);
+    return Array.from(this.alerts.values()).filter((alert) => !alert.resolved);
   }
 
   getAllAlerts(): Alert[] {
@@ -350,8 +348,8 @@ export class AlertingService {
   }
 
   clearResolvedAlerts(): number {
-    const resolved = Array.from(this.alerts.values()).filter(alert => alert.resolved);
-    resolved.forEach(alert => this.alerts.delete(alert.id));
+    const resolved = Array.from(this.alerts.values()).filter((alert) => alert.resolved);
+    resolved.forEach((alert) => this.alerts.delete(alert.id));
     return resolved.length;
   }
 

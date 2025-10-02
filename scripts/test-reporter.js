@@ -9,7 +9,7 @@ class TestReporter {
     this.reportDir = path.join(process.cwd(), 'test-reports');
     this.coverageDir = path.join(process.cwd(), 'coverage');
     this.timestamp = new Date().toISOString();
-    
+
     this.ensureDirectories();
   }
 
@@ -21,7 +21,7 @@ class TestReporter {
 
   async generateComprehensiveReport() {
     console.log('🔍 Generating comprehensive test report...');
-    
+
     const report = {
       timestamp: this.timestamp,
       summary: await this.generateSummary(),
@@ -39,10 +39,10 @@ class TestReporter {
     await this.saveReport(report);
     await this.generateHTMLReport(report);
     await this.generateMarkdownReport(report);
-    
+
     console.log('✅ Test report generated successfully!');
     console.log(`📊 Report available at: ${path.join(this.reportDir, 'index.html')}`);
-    
+
     return report;
   }
 
@@ -70,7 +70,10 @@ class TestReporter {
         summary.passedTests += jestResults.numPassedTests;
         summary.failedTests += jestResults.numFailedTests;
         summary.skippedTests += jestResults.numPendingTests;
-        summary.duration += jestResults.testResults.reduce((acc, result) => acc + result.perfStats.end - result.perfStats.start, 0);
+        summary.duration += jestResults.testResults.reduce(
+          (acc, result) => acc + result.perfStats.end - result.perfStats.start,
+          0,
+        );
       }
 
       // Parse coverage
@@ -81,7 +84,6 @@ class TestReporter {
 
       // Determine overall status
       summary.status = summary.failedTests === 0 ? 'passed' : 'failed';
-      
     } catch (error) {
       console.warn('Warning: Could not parse test results:', error.message);
     }
@@ -91,7 +93,7 @@ class TestReporter {
 
   async parseJestResults() {
     const resultsPath = path.join(this.coverageDir, 'test-results.json');
-    
+
     if (!fs.existsSync(resultsPath)) {
       return null;
     }
@@ -107,7 +109,7 @@ class TestReporter {
 
   async parseCoverageReport() {
     const coveragePath = path.join(this.coverageDir, 'coverage-summary.json');
-    
+
     if (!fs.existsSync(coveragePath)) {
       return null;
     }
@@ -133,13 +135,13 @@ class TestReporter {
     try {
       const jestResults = await this.parseJestResults();
       if (jestResults) {
-        jestResults.testResults.forEach(testFile => {
+        jestResults.testResults.forEach((testFile) => {
           if (testFile.name.includes('/unit/') || testFile.name.includes('.spec.ts')) {
             results.total += testFile.numPassingTests + testFile.numFailingTests;
             results.passed += testFile.numPassingTests;
             results.failed += testFile.numFailingTests;
             results.duration += testFile.perfStats.end - testFile.perfStats.start;
-            
+
             results.suites.push({
               name: path.basename(testFile.name),
               tests: testFile.numPassingTests + testFile.numFailingTests,
@@ -169,13 +171,13 @@ class TestReporter {
     try {
       const jestResults = await this.parseJestResults();
       if (jestResults) {
-        jestResults.testResults.forEach(testFile => {
+        jestResults.testResults.forEach((testFile) => {
           if (testFile.name.includes('/integration/')) {
             results.total += testFile.numPassingTests + testFile.numFailingTests;
             results.passed += testFile.numPassingTests;
             results.failed += testFile.numFailingTests;
             results.duration += testFile.perfStats.end - testFile.perfStats.start;
-            
+
             results.suites.push({
               name: path.basename(testFile.name),
               tests: testFile.numPassingTests + testFile.numFailingTests,
@@ -207,9 +209,9 @@ class TestReporter {
       const cypressResultsPath = path.join(this.reportDir, 'cypress-results.json');
       if (fs.existsSync(cypressResultsPath)) {
         const cypressResults = JSON.parse(fs.readFileSync(cypressResultsPath, 'utf8'));
-        
-        cypressResults.runs.forEach(run => {
-          run.tests.forEach(test => {
+
+        cypressResults.runs.forEach((run) => {
+          run.tests.forEach((test) => {
             results.total++;
             if (test.state === 'passed') {
               results.passed++;
@@ -249,14 +251,15 @@ class TestReporter {
       const artilleryResultsPath = path.join(this.reportDir, 'artillery-results.json');
       if (fs.existsSync(artilleryResultsPath)) {
         const artilleryResults = JSON.parse(fs.readFileSync(artilleryResultsPath, 'utf8'));
-        
+
         if (artilleryResults.aggregate) {
           results.loadTime.average = artilleryResults.aggregate.latency?.mean || 0;
           results.loadTime.p95 = artilleryResults.aggregate.latency?.p95 || 0;
           results.loadTime.max = artilleryResults.aggregate.latency?.max || 0;
           results.throughput.requestsPerSecond = artilleryResults.aggregate.rps?.mean || 0;
           results.errors.total = artilleryResults.aggregate.errors || 0;
-          results.errors.rate = (results.errors.total / (artilleryResults.aggregate.requestsCompleted || 1)) * 100;
+          results.errors.rate =
+            (results.errors.total / (artilleryResults.aggregate.requestsCompleted || 1)) * 100;
         }
       }
     } catch (error) {
@@ -280,12 +283,12 @@ class TestReporter {
       const a11yResultsPath = path.join(this.reportDir, 'accessibility-results.json');
       if (fs.existsSync(a11yResultsPath)) {
         const a11yResults = JSON.parse(fs.readFileSync(a11yResultsPath, 'utf8'));
-        
+
         results.violations = a11yResults.violations?.length || 0;
         results.passes = a11yResults.passes?.length || 0;
         results.incomplete = a11yResults.incomplete?.length || 0;
         results.inapplicable = a11yResults.inapplicable?.length || 0;
-        
+
         // Calculate score (100 - percentage of violations)
         const total = results.violations + results.passes;
         results.score = total > 0 ? Math.round(((total - results.violations) / total) * 100) : 100;
@@ -319,7 +322,7 @@ class TestReporter {
       const coverage = await this.parseCoverageReport();
       if (coverage && coverage.total) {
         metrics.testQuality.coverage = coverage.total.lines.pct;
-        
+
         // Calculate test quality grade
         if (metrics.testQuality.coverage >= 90) {
           metrics.codeQuality.reliability = 'excellent';
@@ -375,7 +378,7 @@ class TestReporter {
       // Add current data point
       const summary = await this.generateSummary();
       const performance = await this.parsePerformanceResults();
-      
+
       const dataPoint = {
         timestamp: this.timestamp,
         coverage: summary.coverage.lines,
@@ -468,7 +471,7 @@ class TestReporter {
   async generateHTMLReport(report) {
     const htmlTemplate = this.getHTMLTemplate();
     const html = htmlTemplate.replace('{{REPORT_DATA}}', JSON.stringify(report, null, 2));
-    
+
     const htmlPath = path.join(this.reportDir, 'index.html');
     fs.writeFileSync(htmlPath, html);
   }
@@ -639,13 +642,17 @@ Generated on: ${new Date(report.timestamp).toLocaleString()}
 
 ## Recommendations
 
-${report.recommendations.map(rec => `
+${report.recommendations
+  .map(
+    (rec) => `
 ### ${rec.title} (${rec.priority} priority)
 
 ${rec.description}
 
 **Action**: ${rec.action}
-`).join('\n')}
+`,
+  )
+  .join('\n')}
 
 ---
 
@@ -657,8 +664,9 @@ ${rec.description}
 // CLI interface
 if (require.main === module) {
   const reporter = new TestReporter();
-  
-  reporter.generateComprehensiveReport()
+
+  reporter
+    .generateComprehensiveReport()
     .then(() => {
       console.log('✅ Test report generation completed successfully!');
       process.exit(0);

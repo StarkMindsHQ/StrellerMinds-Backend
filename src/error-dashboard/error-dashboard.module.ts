@@ -7,11 +7,7 @@ import { AlertingModule } from '../common/alerting/alerting.module';
 import { ErrorLog } from '../common/entities/error-log.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ErrorLog]),
-    LoggingModule,
-    AlertingModule,
-  ],
+  imports: [TypeOrmModule.forFeature([ErrorLog]), LoggingModule, AlertingModule],
   controllers: [ErrorDashboardController],
   providers: [ErrorDashboardService],
   exports: [ErrorDashboardService],

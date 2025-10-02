@@ -16,7 +16,10 @@ export class RolePermissionController {
   @Permissions('role:assign-permission')
   async assign(@Body() body: any, @Req() req: any) {
     const rp = await this.rolePermService.assignPermission(body.roleId, body.permissionId);
-    await this.auditLogService.log(req.user.id, 'assign-permission', 'role', { roleId: body.roleId, permissionId: body.permissionId });
+    await this.auditLogService.log(req.user.id, 'assign-permission', 'role', {
+      roleId: body.roleId,
+      permissionId: body.permissionId,
+    });
     return rp;
   }
 
@@ -24,7 +27,10 @@ export class RolePermissionController {
   @Permissions('role:remove-permission')
   async remove(@Body() body: any, @Req() req: any) {
     await this.rolePermService.removePermission(body.roleId, body.permissionId);
-    await this.auditLogService.log(req.user.id, 'remove-permission', 'role', { roleId: body.roleId, permissionId: body.permissionId });
+    await this.auditLogService.log(req.user.id, 'remove-permission', 'role', {
+      roleId: body.roleId,
+      permissionId: body.permissionId,
+    });
     return { success: true };
   }
 
@@ -33,4 +39,4 @@ export class RolePermissionController {
   async getPermissions(@Param('roleId') roleId: string) {
     return this.rolePermService.getPermissionsForRole(roleId);
   }
-} 
+}

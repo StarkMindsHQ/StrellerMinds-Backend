@@ -41,284 +41,284 @@ import { DifficultyLevel } from '../../courses/enums/difficulty-level.enum';
 @Index('IDX_courses_featured', ['isFeatured'])
 @Index('IDX_courses_search', ['title', 'description'])
 @Index('IDX_courses_instructor_status', ['instructorId', 'status'])
-@Check('CHK_courses_title_length', "LENGTH(title) >= 3")
-@Check('CHK_courses_price_positive', "price >= 0")
-@Check('CHK_courses_rating_range', "averageRating >= 0 AND averageRating <= 5")
-@Check('CHK_courses_duration_positive', "estimatedDuration > 0")
+@Check('CHK_courses_title_length', 'LENGTH(title) >= 3')
+@Check('CHK_courses_price_positive', 'price >= 0')
+@Check('CHK_courses_rating_range', 'averageRating >= 0 AND averageRating <= 5')
+@Check('CHK_courses_duration_positive', 'estimatedDuration > 0')
 export class OptimizedCourse {
-  @ApiProperty({ 
-    description: 'Unique course ID', 
+  @ApiProperty({
+    description: 'Unique course ID',
     example: 'uuid-v4',
-    format: 'uuid'
+    format: 'uuid',
   })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ 
-    description: 'Course title', 
+  @ApiProperty({
+    description: 'Course title',
     example: 'Introduction to Blockchain',
     minLength: 3,
-    maxLength: 200
+    maxLength: 200,
   })
-  @Column({ 
-    type: 'varchar', 
+  @Column({
+    type: 'varchar',
     length: 200,
     nullable: false,
-    comment: 'Course title - must be at least 3 characters'
+    comment: 'Course title - must be at least 3 characters',
   })
   title: string;
 
-  @ApiProperty({ 
-    description: 'Course description', 
+  @ApiProperty({
+    description: 'Course description',
     example: 'Learn the fundamentals of blockchain technology',
-    maxLength: 2000
+    maxLength: 2000,
   })
-  @Column({ 
+  @Column({
     type: 'text',
     nullable: false,
-    comment: 'Detailed course description'
+    comment: 'Detailed course description',
   })
   description: string;
 
-  @ApiPropertyOptional({ 
-    description: 'Course thumbnail URL', 
+  @ApiPropertyOptional({
+    description: 'Course thumbnail URL',
     example: 'https://cdn.com/course-thumb.jpg',
-    maxLength: 500
+    maxLength: 500,
   })
-  @Column({ 
-    type: 'varchar', 
+  @Column({
+    type: 'varchar',
     length: 500,
     nullable: true,
-    comment: 'URL to course thumbnail image'
+    comment: 'URL to course thumbnail image',
   })
   thumbnailUrl: string;
 
-  @ApiProperty({ 
-    description: 'Course price in USD', 
+  @ApiProperty({
+    description: 'Course price in USD',
     example: 99.99,
-    minimum: 0
+    minimum: 0,
   })
-  @Column({ 
-    type: 'decimal', 
-    precision: 10, 
+  @Column({
+    type: 'decimal',
+    precision: 10,
     scale: 2,
     default: 0,
     nullable: false,
-    comment: 'Course price in USD - 0 for free courses'
+    comment: 'Course price in USD - 0 for free courses',
   })
   price: number;
 
-  @ApiProperty({ 
-    description: 'Course status', 
-    enum: CourseStatus, 
-    example: CourseStatus.PUBLISHED 
+  @ApiProperty({
+    description: 'Course status',
+    enum: CourseStatus,
+    example: CourseStatus.PUBLISHED,
   })
-  @Column({ 
-    type: 'enum', 
-    enum: CourseStatus, 
+  @Column({
+    type: 'enum',
+    enum: CourseStatus,
     default: CourseStatus.DRAFT,
     nullable: false,
-    comment: 'Current course status'
+    comment: 'Current course status',
   })
   status: CourseStatus;
 
-  @ApiProperty({ 
-    description: 'Course difficulty level', 
-    enum: DifficultyLevel, 
-    example: DifficultyLevel.BEGINNER 
+  @ApiProperty({
+    description: 'Course difficulty level',
+    enum: DifficultyLevel,
+    example: DifficultyLevel.BEGINNER,
   })
-  @Column({ 
-    type: 'enum', 
-    enum: DifficultyLevel, 
+  @Column({
+    type: 'enum',
+    enum: DifficultyLevel,
     default: DifficultyLevel.BEGINNER,
     nullable: false,
-    comment: 'Course difficulty level'
+    comment: 'Course difficulty level',
   })
   difficulty: DifficultyLevel;
 
-  @ApiProperty({ 
-    description: 'Estimated duration in minutes', 
+  @ApiProperty({
+    description: 'Estimated duration in minutes',
     example: 480,
-    minimum: 1
+    minimum: 1,
   })
-  @Column({ 
+  @Column({
     type: 'integer',
     nullable: false,
-    comment: 'Estimated course duration in minutes'
+    comment: 'Estimated course duration in minutes',
   })
   estimatedDuration: number;
 
-  @ApiProperty({ 
-    description: 'Average course rating', 
+  @ApiProperty({
+    description: 'Average course rating',
     example: 4.5,
     minimum: 0,
-    maximum: 5
+    maximum: 5,
   })
-  @Column({ 
-    type: 'decimal', 
-    precision: 3, 
+  @Column({
+    type: 'decimal',
+    precision: 3,
     scale: 2,
     default: 0,
     nullable: false,
-    comment: 'Average rating from 0 to 5'
+    comment: 'Average rating from 0 to 5',
   })
   averageRating: number;
 
-  @ApiProperty({ 
-    description: 'Total number of ratings', 
+  @ApiProperty({
+    description: 'Total number of ratings',
     example: 150,
-    minimum: 0
+    minimum: 0,
   })
-  @Column({ 
+  @Column({
     type: 'integer',
     default: 0,
     nullable: false,
-    comment: 'Total number of ratings received'
+    comment: 'Total number of ratings received',
   })
   totalRatings: number;
 
-  @ApiProperty({ 
-    description: 'Number of enrolled students', 
+  @ApiProperty({
+    description: 'Number of enrolled students',
     example: 1250,
-    minimum: 0
+    minimum: 0,
   })
-  @Column({ 
+  @Column({
     type: 'integer',
     default: 0,
     nullable: false,
-    comment: 'Total number of enrolled students'
+    comment: 'Total number of enrolled students',
   })
   enrollmentCount: number;
 
-  @ApiProperty({ 
-    description: 'Is course featured', 
-    example: false 
+  @ApiProperty({
+    description: 'Is course featured',
+    example: false,
   })
-  @Column({ 
+  @Column({
     type: 'boolean',
     default: false,
     nullable: false,
-    comment: 'Whether course is featured on homepage'
+    comment: 'Whether course is featured on homepage',
   })
   isFeatured: boolean;
 
-  @ApiPropertyOptional({ 
-    description: 'Course language', 
+  @ApiPropertyOptional({
+    description: 'Course language',
     example: 'en',
-    maxLength: 10
+    maxLength: 10,
   })
-  @Column({ 
-    type: 'varchar', 
+  @Column({
+    type: 'varchar',
     length: 10,
     default: 'en',
     nullable: false,
-    comment: 'Course language code'
+    comment: 'Course language code',
   })
   language: string;
 
-  @ApiPropertyOptional({ 
-    description: 'Course tags for search', 
-    example: ['blockchain', 'cryptocurrency', 'web3']
+  @ApiPropertyOptional({
+    description: 'Course tags for search',
+    example: ['blockchain', 'cryptocurrency', 'web3'],
   })
-  @Column({ 
+  @Column({
     type: 'text',
     array: true,
     nullable: true,
-    comment: 'Array of tags for search and categorization'
+    comment: 'Array of tags for search and categorization',
   })
   tags: string[];
 
-  @ApiPropertyOptional({ 
-    description: 'Course learning objectives', 
-    example: ['Understand blockchain basics', 'Create smart contracts']
+  @ApiPropertyOptional({
+    description: 'Course learning objectives',
+    example: ['Understand blockchain basics', 'Create smart contracts'],
   })
-  @Column({ 
+  @Column({
     type: 'text',
     array: true,
     nullable: true,
-    comment: 'Array of learning objectives'
+    comment: 'Array of learning objectives',
   })
   learningObjectives: string[];
 
-  @ApiPropertyOptional({ 
-    description: 'Course prerequisites', 
-    example: ['Basic programming knowledge', 'Understanding of cryptography']
+  @ApiPropertyOptional({
+    description: 'Course prerequisites',
+    example: ['Basic programming knowledge', 'Understanding of cryptography'],
   })
-  @Column({ 
+  @Column({
     type: 'text',
     array: true,
     nullable: true,
-    comment: 'Array of course prerequisites'
+    comment: 'Array of course prerequisites',
   })
   prerequisites: string[];
 
   // Foreign key columns with proper constraints
-  @ApiProperty({ 
-    description: 'Instructor ID', 
+  @ApiProperty({
+    description: 'Instructor ID',
     example: 'uuid-v4',
-    format: 'uuid'
+    format: 'uuid',
   })
-  @Column({ 
+  @Column({
     type: 'uuid',
     nullable: false,
-    comment: 'ID of the course instructor'
+    comment: 'ID of the course instructor',
   })
   @Index('IDX_courses_instructor_id')
   instructorId: string;
 
-  @ApiPropertyOptional({ 
-    description: 'Category ID', 
+  @ApiPropertyOptional({
+    description: 'Category ID',
     example: 'uuid-v4',
-    format: 'uuid'
+    format: 'uuid',
   })
-  @Column({ 
+  @Column({
     type: 'uuid',
     nullable: true,
-    comment: 'ID of the course category'
+    comment: 'ID of the course category',
   })
   @Index('IDX_courses_category_id')
   categoryId: string;
 
   // Audit fields
-  @ApiPropertyOptional({ 
-    description: 'Date published', 
-    example: '2024-01-01T00:00:00Z' 
+  @ApiPropertyOptional({
+    description: 'Date published',
+    example: '2024-01-01T00:00:00Z',
   })
-  @Column({ 
+  @Column({
     type: 'timestamptz',
     nullable: true,
-    comment: 'When the course was published'
+    comment: 'When the course was published',
   })
   publishedAt: Date;
 
-  @ApiProperty({ 
-    description: 'Date created', 
-    example: '2024-01-01T00:00:00Z' 
+  @ApiProperty({
+    description: 'Date created',
+    example: '2024-01-01T00:00:00Z',
   })
   @CreateDateColumn({
     type: 'timestamptz',
-    comment: 'When the course was created'
+    comment: 'When the course was created',
   })
   createdAt: Date;
 
-  @ApiProperty({ 
-    description: 'Date updated', 
-    example: '2024-01-01T00:00:00Z' 
+  @ApiProperty({
+    description: 'Date updated',
+    example: '2024-01-01T00:00:00Z',
   })
   @UpdateDateColumn({
     type: 'timestamptz',
-    comment: 'When the course was last updated'
+    comment: 'When the course was last updated',
   })
   updatedAt: Date;
 
-  @ApiPropertyOptional({ 
-    description: 'Date deleted', 
-    example: '2024-01-01T00:00:00Z' 
+  @ApiPropertyOptional({
+    description: 'Date deleted',
+    example: '2024-01-01T00:00:00Z',
   })
   @DeleteDateColumn({
     type: 'timestamptz',
     nullable: true,
-    comment: 'When the course was soft deleted'
+    comment: 'When the course was soft deleted',
   })
   deletedAt: Date;
 
@@ -326,63 +326,63 @@ export class OptimizedCourse {
   @ManyToOne(() => OptimizedUser, (user) => user.instructorCourses, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
-    nullable: false
+    nullable: false,
   })
-  @JoinColumn({ 
+  @JoinColumn({
     name: 'instructorId',
-    referencedColumnName: 'id'
+    referencedColumnName: 'id',
   })
   instructor: OptimizedUser;
 
   @ManyToOne(() => Category, (category) => category.courses, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
-    nullable: true
+    nullable: true,
   })
-  @JoinColumn({ 
+  @JoinColumn({
     name: 'categoryId',
-    referencedColumnName: 'id'
+    referencedColumnName: 'id',
   })
   category: Category;
 
   @OneToMany(() => CourseModule, (module) => module.course, {
     cascade: ['insert', 'update', 'remove'],
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
   })
   modules: CourseModule[];
 
   @OneToMany(() => CourseReview, (review) => review.course, {
     cascade: ['remove'],
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
   })
   reviews: CourseReview[];
 
   @OneToMany(() => Certificate, (certificate) => certificate.course, {
     cascade: ['remove'],
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
   })
   certificates: Certificate[];
 
   @OneToMany(() => UserProgress, (progress) => progress.course, {
     cascade: ['remove'],
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
   })
   userProgress: UserProgress[];
 
-  @ManyToMany(() => OptimizedUser, { 
+  @ManyToMany(() => OptimizedUser, {
     cascade: false,
-    onDelete: 'CASCADE'
+    onDelete: 'CASCADE',
   })
   @JoinTable({
     name: 'course_enrollments',
     joinColumn: {
       name: 'courseId',
-      referencedColumnName: 'id'
+      referencedColumnName: 'id',
     },
     inverseJoinColumn: {
       name: 'userId',
-      referencedColumnName: 'id'
-    }
+      referencedColumnName: 'id',
+    },
   })
   enrolledStudents: OptimizedUser[];
 
@@ -393,11 +393,11 @@ export class OptimizedCourse {
     if (this.status === CourseStatus.PUBLISHED && !this.publishedAt) {
       this.publishedAt = new Date();
     }
-    
+
     if (this.price < 0) {
       throw new Error('Course price cannot be negative');
     }
-    
+
     if (this.averageRating < 0 || this.averageRating > 5) {
       throw new Error('Average rating must be between 0 and 5');
     }
@@ -437,11 +437,11 @@ export class OptimizedCourse {
   get formattedDuration(): string {
     const hours = Math.floor(this.estimatedDuration / 60);
     const minutes = this.estimatedDuration % 60;
-    
+
     if (hours === 0) {
       return `${minutes}m`;
     }
-    
+
     return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`;
   }
 }

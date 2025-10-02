@@ -60,9 +60,7 @@ export class BackupVerificationService {
           return false;
         }
 
-        this.logger.log(
-          `Backup verification successful: ${tableCount} tables restored`,
-        );
+        this.logger.log(`Backup verification successful: ${tableCount} tables restored`);
         return true;
       } finally {
         // Clean up test database
@@ -72,16 +70,11 @@ export class BackupVerificationService {
             { env },
           );
         } catch (cleanupError) {
-          this.logger.warn(
-            `Failed to cleanup test database: ${cleanupError.message}`,
-          );
+          this.logger.warn(`Failed to cleanup test database: ${cleanupError.message}`);
         }
       }
     } catch (error) {
-      this.logger.error(
-        `Backup verification failed: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Backup verification failed: ${error.message}`, error.stack);
       return false;
     }
   }
@@ -90,14 +83,10 @@ export class BackupVerificationService {
     try {
       // Check if tar.gz file is valid
       await execAsync(`tar -tzf "${backupPath}" > /dev/null`);
-      this.logger.log(
-        `Application data backup verification successful: ${backupPath}`,
-      );
+      this.logger.log(`Application data backup verification successful: ${backupPath}`);
       return true;
     } catch (error) {
-      this.logger.error(
-        `Application data backup verification failed: ${error.message}`,
-      );
+      this.logger.error(`Application data backup verification failed: ${error.message}`);
       return false;
     }
   }

@@ -1,4 +1,10 @@
-import { Injectable, Logger, Type, BadRequestException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  Type,
+  BadRequestException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 
 /**
@@ -24,7 +30,7 @@ export class DependencyInjectionService {
    */
   async getService<T>(serviceType: Type<T>): Promise<T> {
     const cacheKey = `type:${serviceType.name}`;
-    
+
     // Check cache first
     if (this.cacheEnabled && this.serviceCache.has(cacheKey)) {
       this.logger.debug(`Service ${serviceType.name} found in cache`);
@@ -33,12 +39,12 @@ export class DependencyInjectionService {
 
     try {
       const service = await this.moduleRef.get(serviceType, { strict: false });
-      
+
       // Cache the service if caching is enabled
       if (this.cacheEnabled) {
         this.setCacheEntry(cacheKey, service);
       }
-      
+
       return service;
     } catch (error) {
       const serviceError: ServiceResolutionError = {
@@ -47,7 +53,7 @@ export class DependencyInjectionService {
         serviceName: serviceType.name,
         originalError: error,
       };
-      
+
       this.logger.error(`Failed to resolve service ${serviceType.name}: ${error.message}`);
       throw new ServiceUnavailableException(serviceError.message, { cause: serviceError });
     }
@@ -58,7 +64,7 @@ export class DependencyInjectionService {
    */
   async getServiceByToken<T>(token: string | symbol): Promise<T> {
     const cacheKey = `token:${String(token)}`;
-    
+
     // Check cache first
     if (this.cacheEnabled && this.serviceCache.has(cacheKey)) {
       this.logger.debug(`Service with token ${String(token)} found in cache`);
@@ -67,12 +73,12 @@ export class DependencyInjectionService {
 
     try {
       const service = await this.moduleRef.get(token, { strict: false });
-      
+
       // Cache the service if caching is enabled
       if (this.cacheEnabled) {
         this.setCacheEntry(cacheKey, service);
       }
-      
+
       return service;
     } catch (error) {
       const serviceError: ServiceResolutionError = {
@@ -82,7 +88,7 @@ export class DependencyInjectionService {
         token,
         originalError: error,
       };
-      
+
       this.logger.error(`Failed to resolve service by token ${String(token)}: ${error.message}`);
       throw new ServiceUnavailableException(serviceError.message, { cause: serviceError });
     }
@@ -127,10 +133,7 @@ export class DependencyInjectionService {
   /**
    * Create a service factory that can be used for conditional service creation
    */
-  createServiceFactory<T>(
-    serviceType: Type<T>,
-    condition: () => boolean
-  ): () => Promise<T | null> {
+  createServiceFactory<T>(serviceType: Type<T>, condition: () => boolean): () => Promise<T | null> {
     return async () => {
       if (condition()) {
         return await this.getService(serviceType);
@@ -215,7 +218,7 @@ export class DependencyInjectionService {
    */
   private setCacheEntry(key: string, value: any): void {
     if (!this.cacheEnabled) return;
-    
+
     // Implement LRU-like behavior by removing oldest entries if cache is full
     if (this.serviceCache.size >= this.maxCacheSize) {
       const firstKey = this.serviceCache.keys().next().value;
@@ -223,7 +226,7 @@ export class DependencyInjectionService {
         this.serviceCache.delete(firstKey);
       }
     }
-    
+
     this.serviceCache.set(key, value);
     this.logger.debug(`Service cached: ${key}`);
   }

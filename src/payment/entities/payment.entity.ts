@@ -113,4 +113,4 @@ export class PaymentEntity {
 
   @OneToMany(() => InvoiceEntity, (invoice) => invoice.payment)
   invoices: InvoiceEntity[];
-} 
+}

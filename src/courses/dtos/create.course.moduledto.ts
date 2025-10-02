@@ -1,5 +1,16 @@
-
-import { IsNotEmpty, IsString, IsNumber, IsUUID, IsOptional, IsBoolean, Min, Max, IsArray, ArrayMinSize, IsUrl } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsNumber,
+  IsUUID,
+  IsOptional,
+  IsBoolean,
+  Min,
+  Max,
+  IsArray,
+  ArrayMinSize,
+  IsUrl,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateCourseModuleDto {

@@ -9,7 +9,9 @@ import * as fs from 'fs/promises';
 import * as child_process from 'child_process';
 
 jest.mock('fs/promises');
-jest.mock('child_process', () => ({ exec: jest.fn((cmd, opts, cb) => cb?.(null, { stdout: '' }, null)) }));
+jest.mock('child_process', () => ({
+  exec: jest.fn((cmd, opts, cb) => cb?.(null, { stdout: '' }, null)),
+}));
 
 describe('BackupService', () => {
   let service: BackupService;
@@ -64,8 +66,12 @@ describe('BackupService', () => {
 
   it('should create database backup and verify it', async () => {
     (fs.stat as jest.Mock).mockResolvedValue({ size: 1234 });
-    ((child_process.exec as unknown) as jest.Mock).mockImplementation((cmd, opts, cb) => cb(null, { stdout: '' }, null));
-    const verifySpy = jest.spyOn(verificationService, 'verifyDatabaseBackup').mockResolvedValue(true);
+    (child_process.exec as unknown as jest.Mock).mockImplementation((cmd, opts, cb) =>
+      cb(null, { stdout: '' }, null),
+    );
+    const verifySpy = jest
+      .spyOn(verificationService, 'verifyDatabaseBackup')
+      .mockResolvedValue(true);
     const result = await service.createDatabaseBackup();
     expect(result.success).toBe(true);
     expect(verifySpy).toHaveBeenCalled();
@@ -73,23 +79,33 @@ describe('BackupService', () => {
 
   it('should call sendBackupFailureAlert if verification fails', async () => {
     (fs.stat as jest.Mock).mockResolvedValue({ size: 1234 });
-    ((child_process.exec as unknown) as jest.Mock).mockImplementation((cmd, opts, cb) => cb(null, { stdout: '' }, null));
+    (child_process.exec as unknown as jest.Mock).mockImplementation((cmd, opts, cb) =>
+      cb(null, { stdout: '' }, null),
+    );
     jest.spyOn(verificationService, 'verifyDatabaseBackup').mockResolvedValue(false);
-    const alertSpy = jest.spyOn<any, any>(service, 'sendBackupFailureAlert').mockImplementation(jest.fn());
+    const alertSpy = jest
+      .spyOn<any, any>(service, 'sendBackupFailureAlert')
+      .mockImplementation(jest.fn());
     await service.createDatabaseBackup();
     expect(alertSpy).toHaveBeenCalledWith('Backup verification failed');
   });
 
   it('should call sendBackupFailureAlert if backup throws error', async () => {
-    ((child_process.exec as unknown) as jest.Mock).mockImplementation((cmd, opts, cb) => cb(new Error('fail'), null, null));
-    const alertSpy = jest.spyOn<any, any>(service, 'sendBackupFailureAlert').mockImplementation(jest.fn());
+    (child_process.exec as unknown as jest.Mock).mockImplementation((cmd, opts, cb) =>
+      cb(new Error('fail'), null, null),
+    );
+    const alertSpy = jest
+      .spyOn<any, any>(service, 'sendBackupFailureAlert')
+      .mockImplementation(jest.fn());
     await service.createDatabaseBackup();
     expect(alertSpy).toHaveBeenCalled();
   });
 
   it('should call retention cleanup after scheduled backup', async () => {
     (fs.stat as jest.Mock).mockResolvedValue({ size: 1234 });
-    ((child_process.exec as unknown) as jest.Mock).mockImplementation((cmd, opts, cb) => cb(null, { stdout: '' }, null));
+    (child_process.exec as unknown as jest.Mock).mockImplementation((cmd, opts, cb) =>
+      cb(null, { stdout: '' }, null),
+    );
     jest.spyOn(verificationService, 'verifyDatabaseBackup').mockResolvedValue(true);
     const cleanupSpy = jest.spyOn(retentionService, 'cleanupOldBackups');
     await service.scheduledDatabaseBackup();

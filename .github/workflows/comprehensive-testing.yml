@@ -2,9 +2,9 @@ name: Comprehensive Testing Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
   schedule:
     # Run tests daily at 2 AM UTC
     - cron: '0 2 * * *'
@@ -18,29 +18,29 @@ jobs:
   code-quality:
     name: Code Quality & Linting
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run ESLint
         run: npm run lint
-        
+
       - name: Run Prettier check
         run: npm run format -- --check
-        
+
       - name: Type checking
         run: npx tsc --noEmit
-        
+
       - name: Security audit
         run: npm audit --audit-level moderate
         continue-on-error: true
@@ -50,27 +50,27 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: code-quality
-    
+
     strategy:
       matrix:
         node-version: [16, 18, 20]
-        
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run unit tests
         run: npm run test:coverage:unit
-        
+
       - name: Upload unit test coverage
         uses: codecov/codecov-action@v3
         with:
@@ -83,7 +83,7 @@ jobs:
     name: Integration Tests
     runs-on: ubuntu-latest
     needs: code-quality
-    
+
     services:
       postgres:
         image: postgres:${{ env.POSTGRES_VERSION }}
@@ -98,7 +98,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-          
+
       redis:
         image: redis:7-alpine
         options: >-
@@ -108,20 +108,20 @@ jobs:
           --health-retries 5
         ports:
           - 6379:6379
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Setup test environment
         run: |
           cp .env.test.example .env.test
@@ -132,17 +132,17 @@ jobs:
           echo "DB_DATABASE=strellerminds_test" >> .env.test
           echo "REDIS_HOST=localhost" >> .env.test
           echo "REDIS_PORT=6379" >> .env.test
-          
+
       - name: Run database migrations
         run: npm run db:migrate
         env:
           NODE_ENV: test
-          
+
       - name: Run integration tests
         run: npm run test:coverage:integration
         env:
           NODE_ENV: test
-          
+
       - name: Upload integration test coverage
         uses: codecov/codecov-action@v3
         with:
@@ -155,7 +155,7 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [unit-tests, integration-tests]
-    
+
     services:
       postgres:
         image: postgres:${{ env.POSTGRES_VERSION }}
@@ -170,20 +170,20 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Setup test environment
         run: |
           cp .env.test.example .env.test
@@ -192,15 +192,15 @@ jobs:
           echo "DB_USERNAME=postgres" >> .env.test
           echo "DB_PASSWORD=postgres" >> .env.test
           echo "DB_DATABASE=strellerminds_test" >> .env.test
-          
+
       - name: Build application
         run: npm run build
-        
+
       - name: Run E2E tests (Jest)
         run: npm run test:e2e
         env:
           NODE_ENV: test
-          
+
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6
         with:
@@ -214,14 +214,14 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: test
-          
+
       - name: Upload Cypress screenshots
         uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: cypress-screenshots
           path: test/e2e/screenshots
-          
+
       - name: Upload Cypress videos
         uses: actions/upload-artifact@v3
         if: always()
@@ -234,7 +234,7 @@ jobs:
     name: Performance Tests
     runs-on: ubuntu-latest
     needs: e2e-tests
-    
+
     services:
       postgres:
         image: postgres:${{ env.POSTGRES_VERSION }}
@@ -249,20 +249,20 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Setup test environment
         run: |
           cp .env.test.example .env.test
@@ -271,19 +271,19 @@ jobs:
           echo "DB_USERNAME=postgres" >> .env.test
           echo "DB_PASSWORD=postgres" >> .env.test
           echo "DB_DATABASE=strellerminds_test" >> .env.test
-          
+
       - name: Build and start application
         run: |
           npm run build
           npm run start:prod &
           sleep 30
-          
+
       - name: Run load tests
         run: npm run load:test
-        
+
       - name: Run stress tests
         run: npm run stress:test
-        
+
       - name: Upload performance results
         uses: actions/upload-artifact@v3
         with:
@@ -295,27 +295,27 @@ jobs:
     name: Security Tests
     runs-on: ubuntu-latest
     needs: code-quality
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run Snyk security scan
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
-          
+
       - name: Run OWASP ZAP security scan
         uses: zaproxy/action-baseline@v0.10.0
         with:
@@ -326,23 +326,23 @@ jobs:
     name: Accessibility Tests
     runs-on: ubuntu-latest
     needs: e2e-tests
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run accessibility tests
         run: npm run test:a11y
-        
+
       - name: Upload accessibility results
         uses: actions/upload-artifact@v3
         with:
@@ -355,32 +355,32 @@ jobs:
     runs-on: ubuntu-latest
     needs: [unit-tests, integration-tests, e2e-tests, performance-tests, accessibility-tests]
     if: always()
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Download all artifacts
         uses: actions/download-artifact@v3
-        
+
       - name: Generate comprehensive test report
         run: npm run test:report
-        
+
       - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
           name: test-report
           path: test-reports/
-          
+
       - name: Comment PR with test results
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -388,7 +388,7 @@ jobs:
           script: |
             const fs = require('fs');
             const path = './test-reports/test-report.json';
-            
+
             if (fs.existsSync(path)) {
               const report = JSON.parse(fs.readFileSync(path, 'utf8'));
               
@@ -422,23 +422,23 @@ jobs:
     name: Coverage Gate
     runs-on: ubuntu-latest
     needs: [unit-tests, integration-tests]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Download coverage reports
         uses: actions/download-artifact@v3
-        
+
       - name: Check coverage threshold
         run: |
           # Extract coverage percentage and check against threshold
           COVERAGE=$(grep -o '"lines":{"total":[0-9]*,"covered":[0-9]*,"skipped":[0-9]*,"pct":[0-9.]*' coverage/coverage-summary.json | grep -o 'pct":[0-9.]*' | cut -d':' -f2)
           THRESHOLD=80
-          
+
           echo "Current coverage: ${COVERAGE}%"
           echo "Required threshold: ${THRESHOLD}%"
-          
+
           if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
             echo "❌ Coverage ${COVERAGE}% is below threshold ${THRESHOLD}%"
             exit 1

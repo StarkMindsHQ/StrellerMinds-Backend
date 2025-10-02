@@ -19,12 +19,7 @@ import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { detectLanguageFromHeader } from 'src/common/util/language-detector.util';
 
 @ApiTags('user-profiles')
@@ -88,11 +83,7 @@ export class UserProfilesController {
     @Request() req,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
   ) {
-    return this.userProfilesService.update(
-      id,
-      req.user.id,
-      updateUserProfileDto,
-    );
+    return this.userProfilesService.update(id, req.user.id, updateUserProfileDto);
   }
 
   @Patch(':id')
@@ -110,11 +101,7 @@ export class UserProfilesController {
     @Request() req,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
   ) {
-    return this.userProfilesService.patch(
-      id,
-      req.user.id,
-      updateUserProfileDto,
-    );
+    return this.userProfilesService.patch(id, req.user.id, updateUserProfileDto);
   }
 
   @Delete(':id')
@@ -150,16 +137,16 @@ export class UserProfilesController {
   }
 
   @Get('detect-language')
-@UseGuards(JwtAuthGuard)
-@ApiOperation({ summary: 'Detect and store preferred language' })
-@ApiResponse({ status: 200, description: 'Detected language returned and saved.' })
-@ApiBearerAuth()
-async detectLanguage(@Request() req, @Headers('accept-language') acceptLanguage: string) {
-  const detectedLang = detectLanguageFromHeader(acceptLanguage) || 'en';
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Detect and store preferred language' })
+  @ApiResponse({ status: 200, description: 'Detected language returned and saved.' })
+  @ApiBearerAuth()
+  async detectLanguage(@Request() req, @Headers('accept-language') acceptLanguage: string) {
+    const detectedLang = detectLanguageFromHeader(acceptLanguage) || 'en';
 
-  // Save to user's profile
-  await this.userProfilesService.setPreferredLanguage(req.user.id, detectedLang);
+    // Save to user's profile
+    await this.userProfilesService.setPreferredLanguage(req.user.id, detectedLang);
 
-  return { detectedLanguage: detectedLang };
-}
+    return { detectedLanguage: detectedLang };
+  }
 }

@@ -17,7 +17,14 @@ import {
   createParamDecorator,
   ExecutionContext,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+} from '@nestjs/swagger';
 
 import { CreateUsersDto } from './dtos/create.users.dto';
 import { updateUsersDto } from './dtos/update.users.dto';
@@ -42,10 +49,7 @@ export class UsersController {
   @ApiResponse({ status: 201, description: 'User created successfully.' })
   @UseGuards(RateLimitGuard)
   @Post('create')
-  async createUser(
-    @Req() req: FastifyRequest,
-    @Body() createUsersDto: CreateUsersDto,
-  ) {
+  async createUser(@Req() req: FastifyRequest, @Body() createUsersDto: CreateUsersDto) {
     try {
       const part = await (req as any).file();
       const file = part
@@ -153,16 +157,14 @@ export class UsersController {
 }
 
 // ✅ Custom param decorator
-export const Query = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.query;
-  },
-);
+export const Query = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest();
+  return request.query;
+});
 
 // ✅ Dummy cache decorator placeholder (optional: move to separate file)
 export function CustomCacheKey(
-  keyGenerator: (context: ExecutionContext) => string
+  keyGenerator: (context: ExecutionContext) => string,
 ): MethodDecorator {
   return (target, propertyKey, descriptor) => {
     // Cache logic placeholder

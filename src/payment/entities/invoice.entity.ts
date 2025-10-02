@@ -132,4 +132,4 @@ export class InvoiceEntity {
   @ManyToOne(() => PaymentEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'paymentId' })
   payment: PaymentEntity;
-} 
+}

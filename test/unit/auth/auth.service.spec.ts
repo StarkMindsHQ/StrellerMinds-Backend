@@ -79,9 +79,7 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     usersService = module.get<UsersService>(UsersService);
     jwtService = module.get<JwtService>(JwtService);
-    refreshTokenRepository = module.get<Repository<RefreshToken>>(
-      getRepositoryToken(RefreshToken),
-    );
+    refreshTokenRepository = module.get<Repository<RefreshToken>>(getRepositoryToken(RefreshToken));
     configService = module.get<ConfigService>(ConfigService);
   });
 
@@ -137,10 +135,11 @@ describe('AuthService', () => {
       const accessToken = 'access-token';
       const refreshToken = 'refresh-token';
 
-      jest.spyOn(jwtService, 'sign')
+      jest
+        .spyOn(jwtService, 'sign')
         .mockReturnValueOnce(accessToken)
         .mockReturnValueOnce(refreshToken);
-      
+
       jest.spyOn(refreshTokenRepository, 'create').mockReturnValue(mockRefreshToken as any);
       jest.spyOn(refreshTokenRepository, 'save').mockResolvedValue(mockRefreshToken as any);
 
@@ -193,7 +192,8 @@ describe('AuthService', () => {
 
       jest.spyOn(usersService, 'findByEmail').mockResolvedValue(null);
       jest.spyOn(usersService, 'create').mockResolvedValue(newUser);
-      jest.spyOn(jwtService, 'sign')
+      jest
+        .spyOn(jwtService, 'sign')
         .mockReturnValueOnce(accessToken)
         .mockReturnValueOnce(refreshToken);
       jest.spyOn(refreshTokenRepository, 'create').mockReturnValue(mockRefreshToken as any);
@@ -228,7 +228,7 @@ describe('AuthService', () => {
   describe('refreshToken', () => {
     it('should return new access token for valid refresh token', async () => {
       const newAccessToken = 'new-access-token';
-      
+
       jest.spyOn(jwtService, 'verify').mockReturnValue({ sub: mockUser.id });
       jest.spyOn(refreshTokenRepository, 'findOne').mockResolvedValue(mockRefreshToken as any);
       jest.spyOn(usersService, 'findById').mockResolvedValue(mockUser);

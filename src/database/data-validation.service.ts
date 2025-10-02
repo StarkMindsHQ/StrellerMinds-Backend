@@ -61,7 +61,7 @@ export class DataValidationService {
       this.createDataRangeValidationRule(),
       this.createOrphanedRecordRule(),
       this.createDuplicateDataRule(),
-      this.createDataConsistencyRule()
+      this.createDataConsistencyRule(),
     );
 
     // Performance rules
@@ -69,31 +69,28 @@ export class DataValidationService {
       this.createIndexEfficiencyRule(),
       this.createQueryPerformanceRule(),
       this.createTableSizeRule(),
-      this.createConnectionPoolRule()
+      this.createConnectionPoolRule(),
     );
 
     // Business logic rules
     this.validationRules.push(
       this.createBusinessConstraintRule(),
       this.createDataRetentionRule(),
-      this.createAuditTrailRule()
+      this.createAuditTrailRule(),
     );
   }
 
   /**
    * Run comprehensive validation before migration
    */
-  async validateBeforeMigration(
-    migrationName: string,
-    context?: any
-  ): Promise<ValidationReport> {
+  async validateBeforeMigration(migrationName: string, context?: any): Promise<ValidationReport> {
     this.logger.log(`🔍 Running pre-migration validation for: ${migrationName}`);
 
     const startTime = Date.now();
     const results: ValidationResult[] = [];
 
     const queryRunner = this.dataSource.createQueryRunner();
-    
+
     try {
       await queryRunner.connect();
 
@@ -114,7 +111,6 @@ export class DataValidationService {
           });
         }
       }
-
     } finally {
       await queryRunner.release();
     }
@@ -135,10 +131,7 @@ export class DataValidationService {
   /**
    * Run validation after migration
    */
-  async validateAfterMigration(
-    migrationName: string,
-    context?: any
-  ): Promise<ValidationReport> {
+  async validateAfterMigration(migrationName: string, context?: any): Promise<ValidationReport> {
     this.logger.log(`🔍 Running post-migration validation for: ${migrationName}`);
 
     // Run the same validation rules to ensure data integrity is maintained
@@ -148,22 +141,19 @@ export class DataValidationService {
   /**
    * Validate specific tables or constraints
    */
-  async validateSpecific(
-    targets: string[],
-    ruleTypes?: string[]
-  ): Promise<ValidationReport> {
+  async validateSpecific(targets: string[], ruleTypes?: string[]): Promise<ValidationReport> {
     this.logger.log(`🔍 Running targeted validation for: ${targets.join(', ')}`);
 
     const startTime = Date.now();
     const results: ValidationResult[] = [];
 
     const queryRunner = this.dataSource.createQueryRunner();
-    
+
     try {
       await queryRunner.connect();
 
       // Filter rules based on targets and types
-      const applicableRules = this.validationRules.filter(rule => {
+      const applicableRules = this.validationRules.filter((rule) => {
         if (ruleTypes && !ruleTypes.includes(rule.category)) {
           return false;
         }
@@ -178,7 +168,6 @@ export class DataValidationService {
           this.logger.error(`Validation rule ${rule.name} failed: ${error.message}`);
         }
       }
-
     } finally {
       await queryRunner.release();
     }
@@ -201,7 +190,7 @@ export class DataValidationService {
    */
   getValidationRules(category?: string): ValidationRule[] {
     if (category) {
-      return this.validationRules.filter(rule => rule.category === category);
+      return this.validationRules.filter((rule) => rule.category === category);
     }
     return this.validationRules;
   }
@@ -225,7 +214,7 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const result = await queryRunner.query(`
           SELECT 
             tc.table_name,
@@ -257,7 +246,7 @@ export class DataValidationService {
         }
 
         const executionTime = Date.now() - startTime;
-        
+
         if (violations.length > 0) {
           return {
             ruleId: 'fk_integrity',
@@ -291,7 +280,7 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const result = await queryRunner.query(`
           SELECT 
             table_name,
@@ -315,7 +304,7 @@ export class DataValidationService {
         }
 
         const executionTime = Date.now() - startTime;
-        
+
         if (violations.length > 0) {
           return {
             ruleId: 'not_null_constraints',
@@ -349,7 +338,7 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const result = await queryRunner.query(`
           SELECT 
             tc.table_name,
@@ -376,7 +365,7 @@ export class DataValidationService {
         }
 
         const executionTime = Date.now() - startTime;
-        
+
         if (violations.length > 0) {
           return {
             ruleId: 'unique_constraints',
@@ -410,7 +399,7 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const result = await queryRunner.query(`
           SELECT 
             table_name,
@@ -436,12 +425,14 @@ export class DataValidationService {
             }
           } catch (error) {
             // Skip constraints that can't be easily validated
-            this.logger.warn(`Could not validate check constraint ${constraint.constraint_name}: ${error.message}`);
+            this.logger.warn(
+              `Could not validate check constraint ${constraint.constraint_name}: ${error.message}`,
+            );
           }
         }
 
         const executionTime = Date.now() - startTime;
-        
+
         if (violations.length > 0) {
           return {
             ruleId: 'check_constraints',
@@ -475,10 +466,10 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         // This is a simplified version - in practice, you'd need more sophisticated logic
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'referential_integrity',
           ruleName: 'Referential Integrity',
@@ -500,9 +491,9 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'data_type_validation',
           ruleName: 'Data Type Validation',
@@ -524,9 +515,9 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'data_range_validation',
           ruleName: 'Data Range Validation',
@@ -548,9 +539,9 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'orphaned_records',
           ruleName: 'Orphaned Records',
@@ -572,9 +563,9 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'duplicate_data',
           ruleName: 'Duplicate Data',
@@ -596,9 +587,9 @@ export class DataValidationService {
       category: 'data_integrity',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'data_consistency',
           ruleName: 'Data Consistency',
@@ -620,9 +611,9 @@ export class DataValidationService {
       category: 'performance',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'index_efficiency',
           ruleName: 'Index Efficiency',
@@ -644,9 +635,9 @@ export class DataValidationService {
       category: 'performance',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'query_performance',
           ruleName: 'Query Performance',
@@ -668,9 +659,9 @@ export class DataValidationService {
       category: 'performance',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'table_size',
           ruleName: 'Table Size',
@@ -692,9 +683,9 @@ export class DataValidationService {
       category: 'performance',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'connection_pool',
           ruleName: 'Connection Pool',
@@ -716,9 +707,9 @@ export class DataValidationService {
       category: 'business_logic',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'business_constraints',
           ruleName: 'Business Constraints',
@@ -740,9 +731,9 @@ export class DataValidationService {
       category: 'business_logic',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'data_retention',
           ruleName: 'Data Retention',
@@ -764,9 +755,9 @@ export class DataValidationService {
       category: 'business_logic',
       validate: async (queryRunner: QueryRunner) => {
         const startTime = Date.now();
-        
+
         const executionTime = Date.now() - startTime;
-        
+
         return {
           ruleId: 'audit_trail',
           ruleName: 'Audit Trail',
@@ -783,9 +774,9 @@ export class DataValidationService {
 
   private generateValidationSummary(results: ValidationResult[], executionTime: number) {
     const total = results.length;
-    const passed = results.filter(r => r.status === 'pass').length;
-    const failed = results.filter(r => r.status === 'fail').length;
-    const warnings = results.filter(r => r.status === 'warning').length;
+    const passed = results.filter((r) => r.status === 'pass').length;
+    const failed = results.filter((r) => r.status === 'fail').length;
+    const warnings = results.filter((r) => r.status === 'warning').length;
 
     return {
       total,
@@ -799,12 +790,12 @@ export class DataValidationService {
   private generateRecommendations(results: ValidationResult[]): string[] {
     const recommendations: string[] = [];
 
-    const failedRules = results.filter(r => r.status === 'fail');
+    const failedRules = results.filter((r) => r.status === 'fail');
     if (failedRules.length > 0) {
       recommendations.push('Fix all failed validation rules before proceeding with migration');
     }
 
-    const warningRules = results.filter(r => r.status === 'warning');
+    const warningRules = results.filter((r) => r.status === 'warning');
     if (warningRules.length > 0) {
       recommendations.push('Review and address warnings to ensure data quality');
     }
@@ -818,7 +809,7 @@ export class DataValidationService {
 
   private identifyCriticalIssues(results: ValidationResult[]): string[] {
     return results
-      .filter(r => r.status === 'fail' && r.severity === 'error')
-      .map(r => `${r.ruleName}: ${r.message}`);
+      .filter((r) => r.status === 'fail' && r.severity === 'error')
+      .map((r) => `${r.ruleName}: ${r.message}`);
   }
 }

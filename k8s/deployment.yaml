@@ -21,81 +21,81 @@ spec:
         environment: staging
     spec:
       containers:
-      - name: strellerminds-backend
-        image: ghcr.io/istifanus-n/strellerminds-backend:latest
-        ports:
-        - containerPort: 3000
-          name: http
-        envFrom:
-        - configMapRef:
-            name: strellerminds-backend-config
-        env:
-        - name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-host
-        - name: DB_PORT
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-port
-        - name: DB_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-username
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-password
-        - name: DB_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-name
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: redis-url
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: jwt-secret
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1001
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop:
-            - ALL
+        - name: strellerminds-backend
+          image: ghcr.io/istifanus-n/strellerminds-backend:latest
+          ports:
+            - containerPort: 3000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: strellerminds-backend-config
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-host
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-port
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-password
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-name
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: redis-url
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: jwt-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -120,90 +120,90 @@ spec:
         environment: production
     spec:
       containers:
-      - name: strellerminds-backend
-        image: ghcr.io/istifanus-n/strellerminds-backend:latest
-        ports:
-        - containerPort: 3000
-          name: http
-        envFrom:
-        - configMapRef:
-            name: strellerminds-backend-config
-        env:
-        - name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-host
-        - name: DB_PORT
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-port
-        - name: DB_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-username
-        - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-password
-        - name: DB_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: db-name
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: redis-url
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: strellerminds-backend-secrets
-              key: jwt-secret
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1001
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false
-          capabilities:
-            drop:
-            - ALL
+        - name: strellerminds-backend
+          image: ghcr.io/istifanus-n/strellerminds-backend:latest
+          ports:
+            - containerPort: 3000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: strellerminds-backend-config
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-host
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-port
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-password
+            - name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: db-name
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: redis-url
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: strellerminds-backend-secrets
+                  key: jwt-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '500m'
+            limits:
+              memory: '1Gi'
+              cpu: '1000m'
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - strellerminds-backend
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - strellerminds-backend
+                topologyKey: kubernetes.io/hostname

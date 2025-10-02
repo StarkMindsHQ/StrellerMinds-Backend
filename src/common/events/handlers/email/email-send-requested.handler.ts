@@ -41,7 +41,7 @@ export class EmailSendRequestedHandler extends EventHandler<EmailSendRequestedEv
 
     try {
       // Check if email should be sent immediately or scheduled
-      const delay = payload.scheduledAt 
+      const delay = payload.scheduledAt
         ? Math.max(0, payload.scheduledAt.getTime() - Date.now())
         : 0;
 
@@ -109,7 +109,6 @@ export class EmailSendRequestedHandler extends EventHandler<EmailSendRequestedEv
           },
         ),
       );
-
     } catch (error) {
       this.logger.error('Failed to queue email', {
         emailId: payload.emailId,

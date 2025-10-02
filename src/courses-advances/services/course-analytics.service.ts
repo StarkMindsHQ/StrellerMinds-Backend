@@ -120,9 +120,7 @@ export class CourseAnalyticsService {
 
       switch (groupBy) {
         case 'week':
-          const weekStart = new Date(
-            date.setDate(date.getDate() - date.getDay()),
-          );
+          const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
           key = weekStart.toISOString().split('T')[0];
           break;
         case 'month':

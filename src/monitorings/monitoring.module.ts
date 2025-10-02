@@ -23,9 +23,9 @@ export class MonitoringModule {
         memoryUsage: 85,
         responseTime: 5000,
         errorRate: 5,
-        diskUsage: 90
+        diskUsage: 90,
       },
-      ...config
+      ...config,
     };
 
     return {
@@ -34,24 +34,24 @@ export class MonitoringModule {
       providers: [
         {
           provide: 'MONITORING_CONFIG',
-          useValue: defaultConfig
+          useValue: defaultConfig,
         },
         {
           provide: MonitoringConfig,
-          useValue: defaultConfig
+          useValue: defaultConfig,
         },
         MetricsCollectorService,
         HealthCheckService,
         AlertService,
-        CustomLoggerService
+        CustomLoggerService,
       ],
       exports: [
         MetricsCollectorService,
         HealthCheckService,
         AlertService,
         CustomLoggerService,
-        MonitoringConfig
-      ]
+        MonitoringConfig,
+      ],
     };
   }
 
@@ -66,25 +66,25 @@ export class MonitoringModule {
         {
           provide: 'MONITORING_CONFIG',
           useFactory: options.useFactory,
-          inject: options.inject || []
+          inject: options.inject || [],
         },
         {
           provide: MonitoringConfig,
           useFactory: options.useFactory,
-          inject: options.inject || []
+          inject: options.inject || [],
         },
         MetricsCollectorService,
         HealthCheckService,
         AlertService,
-        CustomLoggerService
+        CustomLoggerService,
       ],
       exports: [
         MetricsCollectorService,
         HealthCheckService,
         AlertService,
         CustomLoggerService,
-        MonitoringConfig
-      ]
+        MonitoringConfig,
+      ],
     };
   }
 }

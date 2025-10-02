@@ -65,10 +65,7 @@ import { Course } from '../course/entities/course.entity';
     PerformanceOptimizationService,
     RecommendationProcessor,
   ],
-  controllers: [
-    RecommendationController,
-    LearningPathController,
-  ],
+  controllers: [RecommendationController, LearningPathController],
   exports: [
     RecommendationEngineService,
     LearningPathService,

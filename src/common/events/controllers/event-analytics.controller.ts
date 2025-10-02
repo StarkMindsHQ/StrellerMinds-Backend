@@ -69,10 +69,7 @@ export class EventAnalyticsController {
   @ApiResponse({ status: 200, description: 'Events by type retrieved successfully' })
   @ApiQuery({ name: 'eventType', required: true, type: String })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getEventsByType(
-    @Query('eventType') eventType: string,
-    @Query('limit') limit?: number,
-  ) {
+  async getEventsByType(@Query('eventType') eventType: string, @Query('limit') limit?: number) {
     return this.eventAnalyticsService.getEventsByType(eventType, limit || 100);
   }
 

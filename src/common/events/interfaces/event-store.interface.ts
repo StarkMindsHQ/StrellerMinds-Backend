@@ -60,10 +60,7 @@ export interface IEventStore {
   /**
    * Get event stream for an aggregate
    */
-  getEventStream(
-    aggregateId: string,
-    aggregateType: string,
-  ): Promise<EventStream>;
+  getEventStream(aggregateId: string, aggregateType: string): Promise<EventStream>;
 
   /**
    * Query events based on criteria

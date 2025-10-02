@@ -23,7 +23,11 @@ import {
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { GetUser } from '../../auth/decorators/get-user.decorator';
 import { User } from '../../users/entities/user.entity';
-import { LearningPathService, LearningGoal, PathGenerationOptions } from '../services/learning-path.service';
+import {
+  LearningPathService,
+  LearningGoal,
+  PathGenerationOptions,
+} from '../services/learning-path.service';
 import {
   CreateLearningPathDto,
   UpdateLearningPathDto,
@@ -70,7 +74,7 @@ export class LearningPathController {
       const totalPages = Math.ceil(result.total / query.limit);
 
       return {
-        paths: result.paths.map(path => this.mapToResponseDto(path)),
+        paths: result.paths.map((path) => this.mapToResponseDto(path)),
         total: result.total,
         pagination: {
           page: Math.floor(query.offset / query.limit) + 1,
@@ -80,10 +84,7 @@ export class LearningPathController {
       };
     } catch (error) {
       this.logger.error(`Error getting learning paths for user ${user.id}:`, error);
-      throw new HttpException(
-        'Failed to get learning paths',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to get learning paths', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -96,7 +97,8 @@ export class LearningPathController {
   })
   async generateLearningPath(
     @GetUser() user: User,
-    @Body() request: {
+    @Body()
+    request: {
       goal: LearningGoal;
       options?: Partial<PathGenerationOptions>;
     },
@@ -132,10 +134,7 @@ export class LearningPathController {
       };
     } catch (error) {
       this.logger.error(`Error generating learning path for user ${user.id}:`, error);
-      throw new HttpException(
-        'Failed to generate learning path',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to generate learning path', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -186,8 +185,8 @@ export class LearningPathController {
         sortOrder: 'DESC',
       });
 
-      const learningPath = result.paths.find(p => p.id === id);
-      
+      const learningPath = result.paths.find((p) => p.id === id);
+
       if (!learningPath) {
         throw new HttpException('Learning path not found', HttpStatus.NOT_FOUND);
       }
@@ -198,10 +197,7 @@ export class LearningPathController {
         throw error;
       }
       this.logger.error(`Error getting learning path ${id}:`, error);
-      throw new HttpException(
-        'Failed to get learning path',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to get learning path', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -222,16 +218,16 @@ export class LearningPathController {
     try {
       // This would require implementing an update method in the service
       // For now, return a placeholder response
-      throw new HttpException('Update functionality not yet implemented', HttpStatus.NOT_IMPLEMENTED);
+      throw new HttpException(
+        'Update functionality not yet implemented',
+        HttpStatus.NOT_IMPLEMENTED,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
       this.logger.error(`Error updating learning path ${id}:`, error);
-      throw new HttpException(
-        'Failed to update learning path',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to update learning path', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -254,17 +250,14 @@ export class LearningPathController {
   }> {
     try {
       const updatedPath = await this.learningPathService.updateProgress(pathId, stepId, true);
-      
+
       return {
         learningPath: this.mapToResponseDto(updatedPath),
         message: 'Step completed successfully',
       };
     } catch (error) {
       this.logger.error(`Error completing step ${stepId} in path ${pathId}:`, error);
-      throw new HttpException(
-        'Failed to complete step',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to complete step', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -287,17 +280,14 @@ export class LearningPathController {
   }> {
     try {
       const updatedPath = await this.learningPathService.updateProgress(pathId, stepId, false);
-      
+
       return {
         learningPath: this.mapToResponseDto(updatedPath),
         message: 'Step marked as not completed',
       };
     } catch (error) {
       this.logger.error(`Error uncompleting step ${stepId} in path ${pathId}:`, error);
-      throw new HttpException(
-        'Failed to uncomplete step',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to uncomplete step', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -322,19 +312,16 @@ export class LearningPathController {
   }> {
     try {
       const adaptedPath = await this.learningPathService.adaptLearningPath(pathId);
-      
+
       const adaptations = adaptedPath.metadata?.adaptations || [];
-      
+
       return {
         learningPath: this.mapToResponseDto(adaptedPath),
         adaptations,
       };
     } catch (error) {
       this.logger.error(`Error adapting learning path ${pathId}:`, error);
-      throw new HttpException(
-        'Failed to adapt learning path',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to adapt learning path', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -377,14 +364,14 @@ export class LearningPathController {
         sortOrder: 'DESC',
       });
 
-      const learningPath = result.paths.find(p => p.id === pathId);
-      
+      const learningPath = result.paths.find((p) => p.id === pathId);
+
       if (!learningPath) {
         throw new HttpException('Learning path not found', HttpStatus.NOT_FOUND);
       }
 
       const completedStepsTime = learningPath.steps
-        .filter(step => step.completed)
+        .filter((step) => step.completed)
         .reduce((sum, step) => sum + step.estimatedDuration, 0);
 
       const totalEstimatedTime = learningPath.estimatedDuration;
@@ -422,7 +409,7 @@ export class LearningPathController {
         completedSteps: learningPath.completedSteps,
         totalSteps: learningPath.totalSteps,
         estimatedTimeRemaining,
-        stepProgress: learningPath.steps.map(step => ({
+        stepProgress: learningPath.steps.map((step) => ({
           stepId: step.id,
           title: step.title,
           completed: step.completed,
@@ -436,10 +423,7 @@ export class LearningPathController {
         throw error;
       }
       this.logger.error(`Error getting progress for learning path ${pathId}:`, error);
-      throw new HttpException(
-        'Failed to get progress',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to get progress', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -455,16 +439,16 @@ export class LearningPathController {
     try {
       // This would require implementing a delete method in the service
       // For now, return a placeholder response
-      throw new HttpException('Delete functionality not yet implemented', HttpStatus.NOT_IMPLEMENTED);
+      throw new HttpException(
+        'Delete functionality not yet implemented',
+        HttpStatus.NOT_IMPLEMENTED,
+      );
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
       }
       this.logger.error(`Error deleting learning path ${pathId}:`, error);
-      throw new HttpException(
-        'Failed to delete learning path',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to delete learning path', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -474,9 +458,7 @@ export class LearningPathController {
     status: 200,
     description: 'Returns learning path analytics overview',
   })
-  async getAnalyticsOverview(
-    @GetUser() user: User,
-  ): Promise<{
+  async getAnalyticsOverview(@GetUser() user: User): Promise<{
     totalPaths: number;
     activePaths: number;
     completedPaths: number;
@@ -496,25 +478,26 @@ export class LearningPathController {
 
       const paths = result.paths;
       const totalPaths = paths.length;
-      const activePaths = paths.filter(p => p.status === LearningPathStatus.IN_PROGRESS).length;
-      const completedPaths = paths.filter(p => p.status === LearningPathStatus.COMPLETED).length;
+      const activePaths = paths.filter((p) => p.status === LearningPathStatus.IN_PROGRESS).length;
+      const completedPaths = paths.filter((p) => p.status === LearningPathStatus.COMPLETED).length;
 
-      const averageCompletionRate = totalPaths > 0
-        ? paths.reduce((sum, path) => sum + path.progressPercentage, 0) / totalPaths
-        : 0;
+      const averageCompletionRate =
+        totalPaths > 0
+          ? paths.reduce((sum, path) => sum + path.progressPercentage, 0) / totalPaths
+          : 0;
 
       const totalTimeSpent = paths.reduce((sum, path) => {
-        const completedSteps = path.steps.filter(step => step.completed);
+        const completedSteps = path.steps.filter((step) => step.completed);
         return sum + completedSteps.reduce((stepSum, step) => stepSum + step.estimatedDuration, 0);
       }, 0);
 
       // Calculate unique skills learned from completed steps
       const skillsLearned = new Set(
-        paths.flatMap(path =>
+        paths.flatMap((path) =>
           path.steps
-            .filter(step => step.completed && step.course?.skills)
-            .flatMap(step => step.course!.skills!)
-        )
+            .filter((step) => step.completed && step.course?.skills)
+            .flatMap((step) => step.course!.skills!),
+        ),
       ).size;
 
       // Calculate streaks (simplified - would need more sophisticated logic)
@@ -533,10 +516,7 @@ export class LearningPathController {
       };
     } catch (error) {
       this.logger.error(`Error getting analytics overview for user ${user.id}:`, error);
-      throw new HttpException(
-        'Failed to get analytics overview',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new HttpException('Failed to get analytics overview', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -559,32 +539,35 @@ export class LearningPathController {
       startedAt: learningPath.startedAt,
       completedAt: learningPath.completedAt,
       metadata: learningPath.metadata,
-      steps: learningPath.steps?.map(step => ({
-        id: step.id,
-        stepType: step.stepType,
-        title: step.title,
-        description: step.description,
-        stepOrder: step.stepOrder,
-        courseId: step.courseId,
-        course: step.course ? {
-          id: step.course.id,
-          title: step.course.title,
-          description: step.course.description,
-          difficulty: step.course.difficulty,
-          duration: step.course.duration,
-          rating: step.course.rating,
-          tags: step.course.tags,
-          skills: step.course.skills,
-          instructor: step.course.instructor,
-          thumbnailUrl: step.course.thumbnailUrl,
-        } : undefined,
-        estimatedDuration: step.estimatedDuration,
-        completed: step.completed,
-        completedAt: step.completedAt,
-        metadata: step.metadata,
-        createdAt: step.createdAt,
-        updatedAt: step.updatedAt,
-      })) || [],
+      steps:
+        learningPath.steps?.map((step) => ({
+          id: step.id,
+          stepType: step.stepType,
+          title: step.title,
+          description: step.description,
+          stepOrder: step.stepOrder,
+          courseId: step.courseId,
+          course: step.course
+            ? {
+                id: step.course.id,
+                title: step.course.title,
+                description: step.course.description,
+                difficulty: step.course.difficulty,
+                duration: step.course.duration,
+                rating: step.course.rating,
+                tags: step.course.tags,
+                skills: step.course.skills,
+                instructor: step.course.instructor,
+                thumbnailUrl: step.course.thumbnailUrl,
+              }
+            : undefined,
+          estimatedDuration: step.estimatedDuration,
+          completed: step.completed,
+          completedAt: step.completedAt,
+          metadata: step.metadata,
+          createdAt: step.createdAt,
+          updatedAt: step.updatedAt,
+        })) || [],
       createdAt: learningPath.createdAt,
       updatedAt: learningPath.updatedAt,
     };

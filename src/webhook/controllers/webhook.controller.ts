@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Patch, Param, Delete, Query, HttpStatus, HttpCode } from "@nestjs/common"
-import type { WebhookService } from "../services/webhook.service"
-import type { WebhookDeliveryService } from "../services/webhook-delivery.service"
-import type { CreateWebhookDto } from "../dto/create-webhook.dto"
-import type { UpdateWebhookDto } from "../dto/update-webhook.dto"
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
+import type { WebhookService } from '../services/webhook.service';
+import type { WebhookDeliveryService } from '../services/webhook-delivery.service';
+import type { CreateWebhookDto } from '../dto/create-webhook.dto';
+import type { UpdateWebhookDto } from '../dto/update-webhook.dto';
 // import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard'; // Uncomment if you have auth
 
-@Controller("webhooks")
+@Controller('webhooks')
 // @UseGuards(JwtAuthGuard) // Uncomment if you have auth
 export class WebhookController {
   constructor(
@@ -15,12 +25,12 @@ export class WebhookController {
 
   @Post()
   async create(createWebhookDto: CreateWebhookDto) {
-    return this.webhookService.create(createWebhookDto)
+    return this.webhookService.create(createWebhookDto);
   }
 
   @Get()
   async findAll() {
-    return this.webhookService.findAll()
+    return this.webhookService.findAll();
   }
 
   @Get(':id')
@@ -28,9 +38,9 @@ export class WebhookController {
     return this.webhookService.findOne(id);
   }
 
-  @Patch(":id")
+  @Patch(':id')
   async update(@Param('id') id: string, updateWebhookDto: UpdateWebhookDto) {
-    return this.webhookService.update(id, updateWebhookDto)
+    return this.webhookService.update(id, updateWebhookDto);
   }
 
   @Delete(':id')
@@ -50,8 +60,8 @@ export class WebhookController {
     return this.webhookService.getWebhookStats(id);
   }
 
-  @Get(":id/deliveries")
+  @Get(':id/deliveries')
   async getDeliveries(@Param('id') id: string, @Query('limit') limit?: number) {
-    return this.webhookDeliveryService.getDeliveries(id, limit)
+    return this.webhookDeliveryService.getDeliveries(id, limit);
   }
 }

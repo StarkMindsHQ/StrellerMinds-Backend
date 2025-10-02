@@ -55,9 +55,11 @@ export { BaseFactory };
 
 // Convenience functions
 export const createUser = (options: any = {}) => userFactory.create(options);
-export const createUsers = (count: number, options: any = {}) => userFactory.createMany(count, options);
+export const createUsers = (count: number, options: any = {}) =>
+  userFactory.createMany(count, options);
 export const createCourse = (options: any = {}) => courseFactory.create(options);
-export const createCourses = (count: number, options: any = {}) => courseFactory.createMany(count, options);
+export const createCourses = (count: number, options: any = {}) =>
+  courseFactory.createMany(count, options);
 
 // Test data presets
 export const testData = {
@@ -68,7 +70,7 @@ export const testData = {
     unverified: () => userFactory.unverified(),
     team: () => userFactory.createTeam(),
   },
-  
+
   courses: {
     published: () => courseFactory.published(),
     draft: () => courseFactory.draft(),
@@ -78,7 +80,7 @@ export const testData = {
     popular: () => courseFactory.popular(),
     catalog: (count: number = 10) => courseFactory.createCatalog(count),
   },
-  
+
   scenarios: {
     // Complete learning platform scenario
     learningPlatform: () => {
@@ -86,7 +88,7 @@ export const testData = {
       const instructors = userFactory.createMany(3, { traits: ['instructor'] });
       const students = userFactory.createMany(10, { traits: ['student'] });
       const courses = courseFactory.createCatalog(15);
-      
+
       return {
         admin,
         instructors,
@@ -94,39 +96,39 @@ export const testData = {
         courses,
       };
     },
-    
+
     // Course enrollment scenario
     courseEnrollment: () => {
       const instructor = userFactory.instructor();
       const course = courseFactory.withInstructor(instructor);
       const students = userFactory.createMany(5, { traits: ['student'] });
-      
+
       return {
         instructor,
         course,
         students,
       };
     },
-    
+
     // Authentication scenario
     authentication: () => {
       const activeUser = userFactory.forAuth('password123');
       const unverifiedUser = userFactory.unverified();
       const inactiveUser = userFactory.inactive();
-      
+
       return {
         activeUser,
         unverifiedUser,
         inactiveUser,
       };
     },
-    
+
     // Payment scenario
     payment: () => {
       const student = userFactory.student();
       const premiumCourse = courseFactory.premium();
       const freeCourse = courseFactory.free();
-      
+
       return {
         student,
         premiumCourse,
@@ -140,22 +142,22 @@ export const testData = {
 export class TestSeeder {
   static async seedUsers(count: number = 10): Promise<any[]> {
     const users = [];
-    
+
     // Create admin
     users.push(userFactory.admin({ overrides: { email: 'admin@test.com' } }));
-    
+
     // Create instructors
     users.push(...userFactory.createMany(2, { traits: ['instructor'] }));
-    
+
     // Create students
     users.push(...userFactory.createMany(count - 3, { traits: ['student'] }));
-    
+
     return users;
   }
-  
+
   static async seedCourses(instructors: any[], count: number = 20): Promise<any[]> {
     const courses = [];
-    
+
     instructors.forEach((instructor, index) => {
       const coursesPerInstructor = Math.ceil(count / instructors.length);
       const instructorCourses = courseFactory.createMany(coursesPerInstructor, {
@@ -163,10 +165,10 @@ export class TestSeeder {
       });
       courses.push(...instructorCourses);
     });
-    
+
     return courses.slice(0, count);
   }
-  
+
   static async seedCompleteDatabase(): Promise<{
     users: any[];
     courses: any[];
@@ -174,21 +176,22 @@ export class TestSeeder {
   }> {
     // Reset seed for consistent data
     BaseFactory.resetSeed(12345);
-    
+
     const users = await this.seedUsers(50);
-    const instructors = users.filter(u => u.role === 'instructor');
+    const instructors = users.filter((u) => u.role === 'instructor');
     const courses = await this.seedCourses(instructors, 100);
-    
+
     // Create enrollments (simplified)
     const enrollments = [];
-    const students = users.filter(u => u.role === 'student');
-    
-    students.forEach(student => {
-      const enrolledCourses = courseFactory.pickRandomMany(courses, 
-        courseFactory.generateNumber(1, 5)
+    const students = users.filter((u) => u.role === 'student');
+
+    students.forEach((student) => {
+      const enrolledCourses = courseFactory.pickRandomMany(
+        courses,
+        courseFactory.generateNumber(1, 5),
       );
-      
-      enrolledCourses.forEach(course => {
+
+      enrolledCourses.forEach((course) => {
         enrollments.push({
           id: courseFactory.generateId(),
           student,
@@ -199,7 +202,7 @@ export class TestSeeder {
         });
       });
     });
-    
+
     return {
       users,
       courses,

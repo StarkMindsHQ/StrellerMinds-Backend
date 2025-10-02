@@ -82,9 +82,7 @@ describe('UserProfilesService', () => {
 
       userRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.create(userId, createDto)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.create(userId, createDto)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException if profile already exists', async () => {
@@ -96,9 +94,7 @@ describe('UserProfilesService', () => {
       userRepository.findOne.mockResolvedValue(user);
       userProfileRepository.findOne.mockResolvedValue(existingProfile);
 
-      await expect(service.create(userId, createDto)).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(service.create(userId, createDto)).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -111,15 +107,7 @@ describe('UserProfilesService', () => {
 
       expect(userProfileRepository.find).toHaveBeenCalledWith({
         where: { isPublic: true },
-        select: [
-          'id',
-          'firstName',
-          'lastName',
-          'bio',
-          'avatarUrl',
-          'createdAt',
-          'updatedAt',
-        ],
+        select: ['id', 'firstName', 'lastName', 'bio', 'avatarUrl', 'createdAt', 'updatedAt'],
       });
       expect(result).toEqual(profiles);
     });

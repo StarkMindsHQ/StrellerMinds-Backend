@@ -14,13 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Lesson,
-      Assignment,
-      CourseModule,
-      UserProgress,
-      ModuleEntity,
-    ]),
+    TypeOrmModule.forFeature([Lesson, Assignment, CourseModule, UserProgress, ModuleEntity]),
   ],
   controllers: [LessonController],
   providers: [LessonService],

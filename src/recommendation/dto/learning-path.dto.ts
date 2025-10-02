@@ -1,4 +1,15 @@
-import { IsEnum, IsOptional, IsString, IsNumber, IsArray, IsUUID, IsBoolean, Min, Max, ValidateNested } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsArray,
+  IsUUID,
+  IsBoolean,
+  Min,
+  Max,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { LearningPathStatus, LearningPathType } from '../entities/learning-path.entity';

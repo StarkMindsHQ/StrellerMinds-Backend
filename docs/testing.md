@@ -48,6 +48,7 @@ test/
 ## Running Tests
 
 ### Basic Commands
+
 - `npm test` - Run all unit tests
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:cov` - Run tests with coverage
@@ -58,6 +59,7 @@ test/
 - `npm run test:all` - Run all test suites
 
 ### Advanced Commands
+
 - `npm run test:cypress:open` - Open Cypress test runner
 - `npm run test:cypress:ci` - Run Cypress tests in CI mode
 - `npm run test:visual` - Run visual regression tests
@@ -218,7 +220,7 @@ const premiumCourse = courseFactory.premium();
 
 // Create with overrides
 const specificUser = userFactory.create({
-  overrides: { email: 'specific@example.com' }
+  overrides: { email: 'specific@example.com' },
 });
 
 // Create multiple instances
@@ -241,21 +243,21 @@ config:
   phases:
     - duration: 60
       arrivalRate: 10
-      name: "Warm up"
+      name: 'Warm up'
     - duration: 120
       arrivalRate: 50
-      name: "Load test"
+      name: 'Load test'
 
 scenarios:
-  - name: "API Load Test"
+  - name: 'API Load Test'
     flow:
       - post:
-          url: "/auth/login"
+          url: '/auth/login'
           json:
-            email: "{{ $randomEmail() }}"
-            password: "password123"
+            email: '{{ $randomEmail() }}'
+            password: 'password123'
       - get:
-          url: "/courses"
+          url: '/courses'
 ```
 
 ### Accessibility Testing
@@ -296,22 +298,26 @@ describe('Visual Tests', () => {
 ```
 
 ### Unit Tests
+
 - Test individual components in isolation
 - Use mocks for dependencies
 - Focus on business logic
 - One test file per component
 
 ### Integration Tests
+
 - Test component interactions
 - Use test database
 - Mock external services
 
 ### E2E Tests
+
 - Test complete flows
 - Use test database
 - Test API endpoints
 
 #### E2E Tests Setup
+
 - Test files: `*.e2e-spec.ts` in `test/e2e/`
 - `.env.test`: defines DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME, JWT_SECRET, STELLAR_NETWORK
 - Global setup/teardown (`jest.global-setup.ts` / `jest.global-teardown.ts`) to reset and teardown test database
@@ -347,15 +353,15 @@ import { UserService } from './user.service';
 
 describe('UserService', () => {
   let service: UserService;
-  
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [UserService],
     }).compile();
-    
+
     service = module.get(UserService);
   });
-  
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
@@ -365,6 +371,7 @@ describe('UserService', () => {
 ## Test Utilities
 
 Common test utilities are available in the `test/utils` directory:
+
 - Mock factories
 - Test data generators
 - Common test setup functions

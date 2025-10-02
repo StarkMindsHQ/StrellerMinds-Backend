@@ -89,6 +89,7 @@ node scripts/run-integration-tests.js user-registration course-enrollment
 ```
 
 The test runner includes:
+
 - Environment validation
 - Database connectivity checks
 - Test database setup
@@ -146,6 +147,7 @@ Integration tests use a specialized Jest configuration (`test/jest-integration.j
 ### With PostgreSQL
 
 If PostgreSQL is available, tests will:
+
 1. Automatically create a test database
 2. Run migrations and setup schemas
 3. Clean up data between tests
@@ -154,6 +156,7 @@ If PostgreSQL is available, tests will:
 ### Without PostgreSQL
 
 Tests can run with mocked database operations:
+
 - Database calls are intercepted and mocked
 - Test data is maintained in memory
 - Full functionality testing without external dependencies
@@ -185,13 +188,13 @@ Test factories provide consistent test data:
 // User factory
 const userData = global.testUtils.generateTestData('user', {
   email: 'custom@example.com',
-  role: 'instructor'
+  role: 'instructor',
 });
 
 // Course factory
 const courseData = global.testUtils.generateTestData('course', {
   price: 199.99,
-  level: 'advanced'
+  level: 'advanced',
 });
 ```
 
@@ -205,24 +208,24 @@ Each test file follows a consistent structure:
 describe('Feature Integration Tests', () => {
   let app: INestApplication;
   let moduleRef: TestingModule;
-  
+
   beforeAll(async () => {
     // Setup test module and application
   });
-  
+
   afterAll(async () => {
     // Cleanup application
   });
-  
+
   beforeEach(async () => {
     // Clean database and setup test data
   });
-  
+
   describe('Specific Flow', () => {
     it('should handle happy path', async () => {
       // Test implementation
     });
-    
+
     it('should handle error cases', async () => {
       // Error case testing
     });
@@ -250,7 +253,7 @@ expect(savedEntity.status).toBe('active');
 // Event verification
 expect(eventEmitter.emit).toHaveBeenCalledWith(
   'user.registered',
-  expect.objectContaining({ userId: expect.any(String) })
+  expect.objectContaining({ userId: expect.any(String) }),
 );
 ```
 
@@ -262,12 +265,12 @@ Integration tests include comprehensive error scenarios:
 it('should handle network failures gracefully', async () => {
   // Simulate network failure
   jest.spyOn(httpService, 'post').mockRejectedValue(new Error('Network error'));
-  
+
   const response = await request(app.getHttpServer())
     .post('/api/endpoint')
     .send(validData)
     .expect(503);
-    
+
   expect(response.body.message).toContain('Service temporarily unavailable');
 });
 ```
@@ -279,16 +282,16 @@ Integration tests include performance benchmarks:
 ```typescript
 it('should handle high-load enrollment', async () => {
   const startTime = Date.now();
-  
+
   const promises = Array.from({ length: 100 }, (_, i) =>
-    enrollInCourse(courseId, `student${i}@example.com`)
+    enrollInCourse(courseId, `student${i}@example.com`),
   );
-  
+
   const results = await Promise.allSettled(promises);
   const duration = Date.now() - startTime;
-  
+
   expect(duration).toBeLessThan(30000); // 30 seconds max
-  expect(results.filter(r => r.status === 'fulfilled')).toHaveLength(100);
+  expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(100);
 });
 ```
 
@@ -299,12 +302,12 @@ Security validations are integrated throughout:
 ```typescript
 it('should prevent SQL injection attacks', async () => {
   const maliciousInput = "'; DROP TABLE users; --";
-  
+
   const response = await request(app.getHttpServer())
     .post('/auth/register')
     .send({ ...validData, firstName: maliciousInput })
     .expect(201);
-    
+
   // Verify database integrity
   const userCount = await userRepository.count();
   expect(userCount).toBeGreaterThan(0); // Table should still exist
@@ -371,16 +374,18 @@ npm run test:integration
 ### Common Issues
 
 1. **Database Connection Errors**
+
    ```bash
    # Check PostgreSQL status
    pg_isready -h localhost -p 5432
-   
+
    # Start PostgreSQL
    brew services start postgresql  # macOS
    sudo service postgresql start  # Linux
    ```
 
 2. **Port Conflicts**
+
    ```bash
    # Check for processes using ports
    lsof -i :5432  # PostgreSQL

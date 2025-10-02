@@ -14,18 +14,9 @@ import { InstructorToolsService } from './services/instructor-tools.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      CoursesAdvance,
-      CourseVersion,
-      CourseAnalytics,
-      CoursePerformance,
-    ]),
+    TypeOrmModule.forFeature([CoursesAdvance, CourseVersion, CourseAnalytics, CoursePerformance]),
   ],
-  controllers: [
-    CoursesAdvancesController,
-    CourseAnalyticsController,
-    CourseVersionsController,
-  ],
+  controllers: [CoursesAdvancesController, CourseAnalyticsController, CourseVersionsController],
   providers: [
     CoursesAdvancesService,
     CourseAnalyticsService,

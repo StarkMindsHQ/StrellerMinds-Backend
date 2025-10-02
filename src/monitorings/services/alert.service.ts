@@ -1,18 +1,24 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { AlertEvent, AlertType, AlertSeverity, AlertThresholds, MonitoringConfig } from '../interfaces/monitoring-config.interface';
+import { Injectable, Inject } from '@nestjs/common';
+import {
+  AlertEvent,
+  AlertType,
+  AlertSeverity,
+  MonitoringConfig,
+} from '../interfaces/monitoring-config.interface';
 import { MetricsCollectorService } from './metrics-collector.service';
 import { HealthCheckService } from './health-check.service';
+import { CustomLoggerService } from './logger.service';
 
 @Injectable()
 export class AlertService {
-  private readonly logger = new Logger(AlertService.name);
   private alerts: AlertEvent[] = [];
   private alertHandlers = new Map<AlertType, (alert: AlertEvent) => Promise<void>>();
 
   constructor(
-    private readonly config: MonitoringConfig,
+    @Inject('MonitoringConfig') private readonly config: MonitoringConfig,
     private readonly metricsCollector: MetricsCollectorService,
-    private readonly healthCheckService: HealthCheckService
+    private readonly healthCheckService: HealthCheckService,
+    @Inject(CustomLoggerService) private readonly logger: CustomLoggerService,
   ) {
     this.setupDefaultAlertHandlers();
   }
@@ -20,19 +26,19 @@ export class AlertService {
   private setupDefaultAlertHandlers(): void {
     // Default console alert handler
     this.alertHandlers.set(AlertType.PERFORMANCE, async (alert) => {
-      this.logger.warn(`Performance Alert: ${alert.message}`, alert.metadata);
+      this.logger.warn(`Performance Alert: ${alert.message} ${JSON.stringify(alert.metadata)}`);
     });
 
     this.alertHandlers.set(AlertType.ERROR, async (alert) => {
-      this.logger.error(`Error Alert: ${alert.message}`, alert.metadata);
+      this.logger.error(`Error Alert: ${alert.message} ${JSON.stringify(alert.metadata)}`);
     });
 
     this.alertHandlers.set(AlertType.AVAILABILITY, async (alert) => {
-      this.logger.error(`Availability Alert: ${alert.message}`, alert.metadata);
+      this.logger.error(`Availability Alert: ${alert.message} ${JSON.stringify(alert.metadata)}`);
     });
 
     this.alertHandlers.set(AlertType.RESOURCE, async (alert) => {
-      this.logger.warn(`Resource Alert: ${alert.message}`, alert.metadata);
+      this.logger.warn(`Resource Alert: ${alert.message} ${JSON.stringify(alert.metadata)}`);
     });
   }
 
@@ -43,19 +49,24 @@ export class AlertService {
       await this.checkPerformanceAlerts();
       await this.checkResourceAlerts();
       await this.checkAvailabilityAlerts();
-    } catch (error) {
-      this.logger.error('Failed to check alert conditions', error.stack);
+    } catch (error: unknown) {
+      this.logger.error(
+        `Failed to check alert conditions: ${error instanceof Error ? error.message : String(error)}`,
+        undefined,
+        AlertService.name,
+      );
     }
   }
 
   private async checkPerformanceAlerts(): Promise<void> {
     const thresholds = this.config.alertThresholds;
-    
+    if (!thresholds) return;
+
     // Check response time
     if (thresholds.responseTime) {
       const responseTimeMetrics = this.metricsCollector.getMetricsByName('response_time_avg');
       const latestMetric = responseTimeMetrics[responseTimeMetrics.length - 1];
-      
+
       if (latestMetric && latestMetric.value > thresholds.responseTime) {
         await this.createAlert({
           type: AlertType.PERFORMANCE,
@@ -64,8 +75,8 @@ export class AlertService {
           metadata: {
             currentValue: latestMetric.value,
             threshold: thresholds.responseTime,
-            metric: 'response_time'
-          }
+            metric: 'response_time',
+          },
         });
       }
     }
@@ -74,7 +85,7 @@ export class AlertService {
     if (thresholds.errorRate) {
       const errorRateMetrics = this.metricsCollector.getMetricsByName('error_rate');
       const latestMetric = errorRateMetrics[errorRateMetrics.length - 1];
-      
+
       if (latestMetric && latestMetric.value > thresholds.errorRate) {
         await this.createAlert({
           type: AlertType.ERROR,
@@ -83,8 +94,8 @@ export class AlertService {
           metadata: {
             currentValue: latestMetric.value,
             threshold: thresholds.errorRate,
-            metric: 'error_rate'
-          }
+            metric: 'error_rate',
+          },
         });
       }
     }
@@ -92,12 +103,13 @@ export class AlertService {
 
   private async checkResourceAlerts(): Promise<void> {
     const thresholds = this.config.alertThresholds;
-    
+    if (!thresholds) return;
+
     // Check CPU usage
     if (thresholds.cpuUsage) {
       const cpuMetrics = this.metricsCollector.getMetricsByName('cpu_usage');
       const latestMetric = cpuMetrics[cpuMetrics.length - 1];
-      
+
       if (latestMetric && latestMetric.value > thresholds.cpuUsage) {
         await this.createAlert({
           type: AlertType.RESOURCE,
@@ -106,8 +118,8 @@ export class AlertService {
           metadata: {
             currentValue: latestMetric.value,
             threshold: thresholds.cpuUsage,
-            metric: 'cpu_usage'
-          }
+            metric: 'cpu_usage',
+          },
         });
       }
     }
@@ -116,7 +128,7 @@ export class AlertService {
     if (thresholds.memoryUsage) {
       const memoryMetrics = this.metricsCollector.getMetricsByName('memory_usage');
       const latestMetric = memoryMetrics[memoryMetrics.length - 1];
-      
+
       if (latestMetric && latestMetric.value > thresholds.memoryUsage) {
         await this.createAlert({
           type: AlertType.RESOURCE,
@@ -125,8 +137,8 @@ export class AlertService {
           metadata: {
             currentValue: latestMetric.value,
             threshold: thresholds.memoryUsage,
-            metric: 'memory_usage'
-          }
+            metric: 'memory_usage',
+          },
         });
       }
     }
@@ -134,37 +146,37 @@ export class AlertService {
 
   private async checkAvailabilityAlerts(): Promise<void> {
     const healthStatus = this.healthCheckService.getOverallHealth();
-    
+
     if (healthStatus.status === 'unhealthy') {
-      const unhealthyServices = healthStatus.services.filter(s => s.status === 'unhealthy');
-      
+      const unhealthyServices = healthStatus.services.filter((s) => s.status === 'unhealthy');
+
       await this.createAlert({
         type: AlertType.AVAILABILITY,
         severity: AlertSeverity.CRITICAL,
-        message: `Services are unhealthy: ${unhealthyServices.map(s => s.service).join(', ')}`,
+        message: `Services are unhealthy: ${unhealthyServices.map((s) => s.service).join(', ')}`,
         metadata: {
-          unhealthyServices: unhealthyServices.map(s => ({
+          unhealthyServices: unhealthyServices.map((s) => ({
             service: s.service,
-            error: s.error
-          }))
-        }
+            error: s.error,
+          })),
+        },
       });
     }
   }
 
-  private async createAlert(alertData: Omit<AlertEvent, 'id' | 'timestamp' | 'resolved'>): Promise<void> {
+  private async createAlert(
+    alertData: Omit<AlertEvent, 'id' | 'timestamp' | 'resolved'>,
+  ): Promise<void> {
     const alert: AlertEvent = {
       id: this.generateAlertId(),
       timestamp: new Date(),
       resolved: false,
-      ...alertData
+      ...alertData,
     };
 
     // Check if similar alert already exists and is not resolved
-    const existingAlert = this.alerts.find(a => 
-      !a.resolved && 
-      a.type === alert.type && 
-      a.message === alert.message
+    const existingAlert = this.alerts.find(
+      (a) => !a.resolved && a.type === alert.type && a.message === alert.message,
     );
 
     if (existingAlert) {
@@ -173,14 +185,14 @@ export class AlertService {
     }
 
     this.alerts.push(alert);
-    
+
     // Execute alert handler
     const handler = this.alertHandlers.get(alert.type);
     if (handler) {
       await handler(alert);
     }
 
-    this.logger.log(`Alert created: ${alert.id} - ${alert.message}`);
+    this.logger.log(`Alert created: ${alert.id} - ${alert.message}`, AlertService.name);
   }
 
   private generateAlertId(): string {
@@ -194,10 +206,10 @@ export class AlertService {
   }
 
   resolveAlert(alertId: string): boolean {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a) => a.id === alertId);
     if (alert && !alert.resolved) {
       alert.resolved = true;
-      this.logger.log(`Alert resolved: ${alertId}`);
+      this.logger.log(`Alert resolved: ${alertId}`, AlertService.name);
       return true;
     }
     return false;
@@ -205,21 +217,21 @@ export class AlertService {
 
   getAlerts(resolved?: boolean): AlertEvent[] {
     if (resolved === undefined) return [...this.alerts];
-    return this.alerts.filter(a => a.resolved === resolved);
+    return this.alerts.filter((a) => a.resolved === resolved);
   }
 
   getAlertsByType(type: AlertType, resolved?: boolean): AlertEvent[] {
-    return this.getAlerts(resolved).filter(a => a.type === type);
+    return this.getAlerts(resolved).filter((a) => a.type === type);
   }
 
   getAlertsBySeverity(severity: AlertSeverity, resolved?: boolean): AlertEvent[] {
-    return this.getAlerts(resolved).filter(a => a.severity === severity);
+    return this.getAlerts(resolved).filter((a) => a.severity === severity);
   }
 
   clearResolvedAlerts(): number {
-    const resolvedCount = this.alerts.filter(a => a.resolved).length;
-    this.alerts = this.alerts.filter(a => !a.resolved);
-    this.logger.log(`Cleared ${resolvedCount} resolved alerts`);
+    const resolvedCount = this.alerts.filter((a) => a.resolved).length;
+    this.alerts = this.alerts.filter((a) => !a.resolved);
+    this.logger.log(`Cleared ${resolvedCount} resolved alerts`, AlertService.name);
     return resolvedCount;
   }
 }

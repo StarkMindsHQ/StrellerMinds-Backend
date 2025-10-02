@@ -1,6 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { HealthCheckResult, HealthStatus, MonitoringConfig } from '../interfaces/monitoring-config.interface';
+import {
+  HealthCheckResult,
+  HealthStatus,
+  MonitoringConfig,
+} from '../interfaces/monitoring-config.interface';
 
 @Injectable()
 export class HealthCheckService {
@@ -8,7 +12,7 @@ export class HealthCheckService {
   private healthChecks = new Map<string, HealthCheckResult>();
   private customHealthChecks = new Map<string, () => Promise<HealthCheckResult>>();
 
-  constructor(private readonly config: MonitoringConfig) {}
+  constructor(@Inject('MonitoringConfig') private readonly config: MonitoringConfig) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
   async performHealthChecks(): Promise<void> {
@@ -25,32 +29,36 @@ export class HealthCheckService {
         try {
           const result = await checkFn();
           this.healthChecks.set(name, result);
-        } catch (error) {
+        } catch (error: unknown) {
           this.healthChecks.set(name, {
             service: name,
             status: HealthStatus.UNHEALTHY,
             timestamp: new Date(),
-            error: error.message
+            error: error instanceof Error ? error.message : String(error),
           });
         }
       }
 
       this.logger.debug('Health checks completed');
     } catch (error) {
-      this.logger.error('Failed to perform health checks', error.stack);
+      if (error instanceof Error) {
+        this.logger.error('Failed to perform health checks', error.stack);
+      } else {
+        this.logger.error('Failed to perform health checks', String(error));
+      }
     }
   }
 
   private async checkDatabaseHealth(): Promise<void> {
     const startTime = Date.now();
-    
+
     try {
       // Simulate database health check
       // In real implementation, you'd check actual database connection
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       const responseTime = Date.now() - startTime;
-      
+
       this.healthChecks.set('database', {
         service: 'database',
         status: HealthStatus.HEALTHY,
@@ -58,15 +66,15 @@ export class HealthCheckService {
         responseTime,
         details: {
           connectionPool: 'active',
-          queryTime: responseTime
-        }
+          queryTime: responseTime,
+        },
       });
-    } catch (error) {
+    } catch (error: unknown) {
       this.healthChecks.set('database', {
         service: 'database',
         status: HealthStatus.UNHEALTHY,
         timestamp: new Date(),
-        error: error.message
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }
@@ -91,8 +99,8 @@ export class HealthCheckService {
       details: {
         heapUsed: `${heapUsedMB.toFixed(2)} MB`,
         heapTotal: `${heapTotalMB.toFixed(2)} MB`,
-        usagePercent: `${memoryUsagePercent.toFixed(2)}%`
-      }
+        usagePercent: `${memoryUsagePercent.toFixed(2)}%`,
+      },
     });
   }
 
@@ -105,8 +113,8 @@ export class HealthCheckService {
       timestamp: new Date(),
       details: {
         usage: '45%',
-        available: '100GB'
-      }
+        available: '100GB',
+      },
     });
   }
 
@@ -124,20 +132,24 @@ export class HealthCheckService {
 
   getHealthStatus(service?: string): HealthCheckResult | HealthCheckResult[] {
     if (service) {
-      return this.healthChecks.get(service);
+      const result = this.healthChecks.get(service);
+      if (!result) {
+        throw new Error(`Health check for service '${service}' not found`);
+      }
+      return result;
     }
     return Array.from(this.healthChecks.values());
   }
 
   getOverallHealth(): { status: HealthStatus; services: HealthCheckResult[] } {
     const services = Array.from(this.healthChecks.values());
-    
+
     if (services.length === 0) {
       return { status: HealthStatus.UNKNOWN, services: [] };
     }
 
-    const hasUnhealthy = services.some(s => s.status === HealthStatus.UNHEALTHY);
-    const hasDegraded = services.some(s => s.status === HealthStatus.DEGRADED);
+    const hasUnhealthy = services.some((s) => s.status === HealthStatus.UNHEALTHY);
+    const hasDegraded = services.some((s) => s.status === HealthStatus.DEGRADED);
 
     let overallStatus = HealthStatus.HEALTHY;
     if (hasUnhealthy) {
@@ -149,15 +161,32 @@ export class HealthCheckService {
     return { status: overallStatus, services };
   }
 
-  async performImmediateHealthCheck(service?: string): Promise<HealthCheckResult | HealthCheckResult[]> {
+  async performImmediateHealthCheck(
+    service?: string,
+  ): Promise<HealthCheckResult | HealthCheckResult[]> {
     if (service) {
       const checkFn = this.customHealthChecks.get(service);
       if (checkFn) {
-        const result = await checkFn();
-        this.healthChecks.set(service, result);
-        return result;
+        try {
+          const result = await checkFn();
+          this.healthChecks.set(service, result);
+          return result;
+        } catch (error: unknown) {
+          const result: HealthCheckResult = {
+            service,
+            status: HealthStatus.UNHEALTHY,
+            timestamp: new Date(),
+            error: error instanceof Error ? error.message : String(error),
+          };
+          this.healthChecks.set(service, result);
+          return result;
+        }
       }
-      return this.healthChecks.get(service);
+      const result = this.healthChecks.get(service);
+      if (!result) {
+        throw new Error(`Health check for service '${service}' not found`);
+      }
+      return result;
     }
 
     await this.performHealthChecks();

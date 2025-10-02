@@ -36,14 +36,8 @@ import { UserSettings } from '../../users/entities/user-settings.entity';
 @Index('IDX_users_instructor_status', ['isInstructor', 'status'])
 @Unique('UQ_users_email', ['email'])
 @Unique('UQ_users_username', ['username'])
-@Check(
-  'CHK_users_email_format',
-  "email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'",
-)
-@Check(
-  'CHK_users_name_length',
-  'LENGTH(firstName) >= 1 AND LENGTH(lastName) >= 1',
-)
+@Check('CHK_users_email_format', "email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'")
+@Check('CHK_users_name_length', 'LENGTH(firstName) >= 1 AND LENGTH(lastName) >= 1')
 export class OptimizedUser {
   @ApiProperty({
     description: 'Unique user ID',

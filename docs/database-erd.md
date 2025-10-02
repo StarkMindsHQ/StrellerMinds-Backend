@@ -1,6 +1,7 @@
 # Database Entity Relationship Diagram
 
 ## Overview
+
 This document provides a visual representation of the database schema using Mermaid diagrams.
 
 ## Core Entities
@@ -31,7 +32,7 @@ erDiagram
 
     EmailTemplate ||--o{ EmailLog : generates
     User ||--o{ EmailPreference : has
-    
+
     User {
         uuid id PK
         string email UK
@@ -114,11 +115,13 @@ erDiagram
 ```
 
 ## Legend
+
 - PK: Primary Key
 - FK: Foreign Key
 - UK: Unique Key
 
 ## Relationship Types
+
 - `||--||` : One to One
 - `||--|{` : One to Many
 - `}|--|{` : Many to Many
@@ -126,6 +129,7 @@ erDiagram
 - `||--o{` : One to Zero or Many
 
 ## Notes
+
 1. All entities use UUID as primary keys
 2. Most entities include timestamps (createdAt, updatedAt)
 3. Foreign key relationships are enforced at the database level

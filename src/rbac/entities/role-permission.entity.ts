@@ -10,4 +10,4 @@ export class RolePermission {
 
   @Column()
   permissionId: string;
-} 
+}

@@ -98,10 +98,7 @@ describe('Auth Integration Tests', () => {
 
     it('should return 409 for duplicate email', async () => {
       // First registration
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(registerDto)
-        .expect(201);
+      await request(app.getHttpServer()).post('/auth/register').send(registerDto).expect(201);
 
       // Second registration with same email
       const response = await request(app.getHttpServer())
@@ -130,15 +127,13 @@ describe('Auth Integration Tests', () => {
     beforeEach(async () => {
       // Create test user
       testUser = userFactory.forAuth('password123');
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: testUser.email,
-          password: 'password123',
-          name: testUser.name,
-          firstName: testUser.firstName,
-          lastName: testUser.lastName,
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: testUser.email,
+        password: 'password123',
+        name: testUser.name,
+        firstName: testUser.firstName,
+        lastName: testUser.lastName,
+      });
     });
 
     it('should login with valid credentials', async () => {
@@ -186,10 +181,7 @@ describe('Auth Integration Tests', () => {
     });
 
     it('should return 400 for missing credentials', async () => {
-      await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({})
-        .expect(400);
+      await request(app.getHttpServer()).post('/auth/login').send({}).expect(400);
     });
   });
 
@@ -198,15 +190,13 @@ describe('Auth Integration Tests', () => {
 
     beforeEach(async () => {
       // Register and login to get refresh token
-      const registerResponse = await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'test@example.com',
-          password: 'password123',
-          name: 'Test User',
-          firstName: 'Test',
-          lastName: 'User',
-        });
+      const registerResponse = await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+      });
 
       refreshToken = registerResponse.body.refresh_token;
     });
@@ -236,10 +226,7 @@ describe('Auth Integration Tests', () => {
     });
 
     it('should return 400 for missing refresh token', async () => {
-      await request(app.getHttpServer())
-        .post('/auth/refresh')
-        .send({})
-        .expect(400);
+      await request(app.getHttpServer()).post('/auth/refresh').send({}).expect(400);
     });
   });
 
@@ -247,15 +234,13 @@ describe('Auth Integration Tests', () => {
     let refreshToken: string;
 
     beforeEach(async () => {
-      const registerResponse = await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'test@example.com',
-          password: 'password123',
-          name: 'Test User',
-          firstName: 'Test',
-          lastName: 'User',
-        });
+      const registerResponse = await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+      });
 
       refreshToken = registerResponse.body.refresh_token;
     });
@@ -283,15 +268,13 @@ describe('Auth Integration Tests', () => {
 
     beforeEach(async () => {
       testUser = userFactory.forAuth();
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: testUser.email,
-          password: 'password123',
-          name: testUser.name,
-          firstName: testUser.firstName,
-          lastName: testUser.lastName,
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: testUser.email,
+        password: 'password123',
+        name: testUser.name,
+        firstName: testUser.firstName,
+        lastName: testUser.lastName,
+      });
     });
 
     it('should send password reset email for existing user', async () => {
@@ -328,15 +311,13 @@ describe('Auth Integration Tests', () => {
 
     beforeEach(async () => {
       testUser = userFactory.forAuth();
-      const registerResponse = await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: testUser.email,
-          password: 'password123',
-          name: testUser.name,
-          firstName: testUser.firstName,
-          lastName: testUser.lastName,
-        });
+      const registerResponse = await request(app.getHttpServer()).post('/auth/register').send({
+        email: testUser.email,
+        password: 'password123',
+        name: testUser.name,
+        firstName: testUser.firstName,
+        lastName: testUser.lastName,
+      });
 
       accessToken = registerResponse.body.access_token;
     });
@@ -355,9 +336,7 @@ describe('Auth Integration Tests', () => {
     });
 
     it('should return 401 for missing token', async () => {
-      await request(app.getHttpServer())
-        .get('/auth/profile')
-        .expect(401);
+      await request(app.getHttpServer()).get('/auth/profile').expect(401);
     });
 
     it('should return 401 for invalid token', async () => {

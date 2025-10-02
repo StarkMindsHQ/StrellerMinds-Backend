@@ -22,11 +22,7 @@ export class EmailService {
    * @param htmlBody Email HTML body
    * @throws Error if sending fails
    */
-  async sendEmail(
-    to: string,
-    subject: string,
-    htmlBody: string,
-  ): Promise<void> {
+  async sendEmail(to: string, subject: string, htmlBody: string): Promise<void> {
     try {
       // In a production environment, you would integrate with a real email
       // service provider like SendGrid, Mailgun, AWS SES, etc.

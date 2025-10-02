@@ -30,7 +30,9 @@ export class MentorshipService {
     const mentee = await this.userRepo.findOne({ where: { id: menteeId } });
     if (!mentee) return [];
 
-    const skills: string[] = (criteria?.skills || criteria?.interests || []).map((s: string) => s.toLowerCase());
+    const skills: string[] = (criteria?.skills || criteria?.interests || []).map((s: string) =>
+      s.toLowerCase(),
+    );
     const availability: string | undefined = criteria?.availability;
 
     // Basic heuristic:
@@ -47,7 +49,8 @@ export class MentorshipService {
         if (typeof mentor.reputation === 'number') score += mentor.reputation;
 
         // Simple textual signals using bio and username for provided skills/interests (fallback due to missing explicit fields)
-        const haystack = `${mentor.firstName} ${mentor.lastName} ${mentor.bio || ''} ${mentor.username}`.toLowerCase();
+        const haystack =
+          `${mentor.firstName} ${mentor.lastName} ${mentor.bio || ''} ${mentor.username}`.toLowerCase();
         for (const s of skills) {
           if (s && haystack.includes(s)) score += 10;
         }
@@ -85,7 +88,10 @@ export class MentorshipService {
    * @returns The mentorship entity with related sessions, mentor, and mentee.
    */
   async trackMentorship(mentorshipId: string) {
-    return this.mentorshipRepo.findOne({ where: { id: mentorshipId }, relations: ['sessions', 'mentor', 'mentee'] });
+    return this.mentorshipRepo.findOne({
+      where: { id: mentorshipId },
+      relations: ['sessions', 'mentor', 'mentee'],
+    });
   }
 
   /**
@@ -96,7 +102,12 @@ export class MentorshipService {
    * @param notes - Any notes for the session.
    * @returns The created session entity.
    */
-  async createSession(mentorshipId: string, scheduledAt: Date, durationMinutes = 60, notes?: string) {
+  async createSession(
+    mentorshipId: string,
+    scheduledAt: Date,
+    durationMinutes = 60,
+    notes?: string,
+  ) {
     const mentorship = await this.mentorshipRepo.findOne({ where: { id: mentorshipId } });
     if (!mentorship) throw new Error('Mentorship not found');
     const session = this.sessionRepo.create({ mentorship, scheduledAt, durationMinutes, notes });

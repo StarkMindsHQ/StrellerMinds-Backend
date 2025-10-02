@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -28,10 +23,10 @@ export class PermissionsGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
-      PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;
     }
@@ -56,18 +51,14 @@ export class PermissionsGuard implements CanActivate {
 
     // Get all permissions from roles (including inherited roles)
     const allRoleIds = await this.getAllInheritedRoleIds(roleIds);
-    const rolePerms = await this.rolePermRepo.findByIds(
-      allRoleIds.map((roleId) => ({ roleId })),
-    );
+    const rolePerms = await this.rolePermRepo.findByIds(allRoleIds.map((roleId) => ({ roleId })));
     const rolePermSet = new Set(rolePerms.map((rp) => rp.permissionId));
 
     // Combine user and role permissions
     const effectivePerms = new Set([...userPermSet, ...rolePermSet]);
 
     // Check if user has all required permissions
-    const hasAll = requiredPermissions.every((perm) =>
-      effectivePerms.has(perm),
-    );
+    const hasAll = requiredPermissions.every((perm) => effectivePerms.has(perm));
     if (!hasAll) {
       throw new ForbiddenException('Insufficient permissions');
     }
@@ -86,10 +77,7 @@ export class PermissionsGuard implements CanActivate {
       const role = await this.roleRepo.findOne({ where: { id: roleId } });
       if (role && role.parentRoleId) {
         allIds.add(role.parentRoleId);
-        const parentIds = await this.getAllInheritedRoleIds(
-          [role.parentRoleId],
-          visited,
-        );
+        const parentIds = await this.getAllInheritedRoleIds([role.parentRoleId], visited);
         parentIds.forEach((id) => allIds.add(id));
       }
     }

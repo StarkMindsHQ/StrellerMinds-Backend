@@ -60,9 +60,9 @@ describe('Blockchain Interaction Integration Tests', () => {
       })
       .expect(201);
 
-    testStudent = await userRepository.findOne({
+    testStudent = (await userRepository.findOne({
       where: { email: 'student@example.com' },
-    }) as User;
+    })) as User;
     studentToken = studentResponse.body.access_token;
   }
 

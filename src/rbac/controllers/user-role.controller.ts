@@ -16,7 +16,10 @@ export class UserRoleController {
   @Permissions('user:assign-role')
   async assign(@Body() body: any, @Req() req: any) {
     const ur = await this.userRoleService.assignRole(body.userId, body.roleId);
-    await this.auditLogService.log(req.user.id, 'assign-role', 'user', { userId: body.userId, roleId: body.roleId });
+    await this.auditLogService.log(req.user.id, 'assign-role', 'user', {
+      userId: body.userId,
+      roleId: body.roleId,
+    });
     return ur;
   }
 
@@ -24,7 +27,10 @@ export class UserRoleController {
   @Permissions('user:remove-role')
   async remove(@Body() body: any, @Req() req: any) {
     await this.userRoleService.removeRole(body.userId, body.roleId);
-    await this.auditLogService.log(req.user.id, 'remove-role', 'user', { userId: body.userId, roleId: body.roleId });
+    await this.auditLogService.log(req.user.id, 'remove-role', 'user', {
+      userId: body.userId,
+      roleId: body.roleId,
+    });
     return { success: true };
   }
 
@@ -33,4 +39,4 @@ export class UserRoleController {
   async getRoles(@Param('userId') userId: string) {
     return this.userRoleService.getRolesForUser(userId);
   }
-} 
+}

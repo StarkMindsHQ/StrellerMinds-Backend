@@ -43,14 +43,17 @@ npm run start:prod
 ## Disaster Recovery Plan
 
 ### Purpose
+
 Restore platform operations in the event of catastrophic data loss or system failure.
 
 ### Roles & Responsibilities
+
 - **Backup Admin:** Monitors backups, receives alerts, and initiates recovery.
 - **DevOps:** Assists with server/database restoration.
 - **Support:** Communicates with stakeholders.
 
 ### Steps
+
 1. Assess the incident and determine recovery point.
 2. Notify stakeholders.
 3. Stop all application services.
@@ -60,6 +63,7 @@ Restore platform operations in the event of catastrophic data loss or system fai
 7. Resume services and monitor.
 
 ### Contacts
+
 - Backup Admin: [admin@example.com]
 - DevOps: [devops@example.com]
 

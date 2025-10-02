@@ -12,11 +12,7 @@ import { TracedDatabaseService } from './traced-database.service';
 
 @Global()
 @Module({
-  imports: [
-    ConfigModule,
-    HttpModule,
-    TypeOrmModule,
-  ],
+  imports: [ConfigModule, HttpModule, TypeOrmModule],
   providers: [
     TracingConfigService,
     TracingService,
@@ -45,17 +41,19 @@ export class TracingModule implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit() {
     const config = this.tracingConfigService.getConfig();
-    
+
     if (this.tracingConfigService.isEnabled()) {
       console.log('🔍 Initializing OpenTelemetry tracing...');
-      
+
       this.sdk = createTracingSDK(config);
       await this.sdk.start();
-      
+
       console.log('✅ OpenTelemetry tracing initialized successfully');
       console.log(`📊 Service: ${config.serviceName} v${config.serviceVersion}`);
       console.log(`🌍 Environment: ${config.environment}`);
-      console.log(`📈 Sampling enabled: ${config.sampling.enabled} (ratio: ${config.sampling.ratio})`);
+      console.log(
+        `📈 Sampling enabled: ${config.sampling.enabled} (ratio: ${config.sampling.ratio})`,
+      );
     } else {
       console.log('⚠️ OpenTelemetry tracing is disabled');
     }

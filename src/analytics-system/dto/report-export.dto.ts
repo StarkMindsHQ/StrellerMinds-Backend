@@ -1,21 +1,21 @@
-import { IsArray, IsEnum, IsObject, IsOptional, IsString } from "class-validator"
-import { ReportFormat } from "../interfaces/analytics.interface"
+import { IsArray, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
+import { ReportFormat } from '../interfaces/analytics.interface';
 
 export class ReportExportDto {
   @IsArray()
-  data: any[] // The data to be exported
+  data: any[]; // The data to be exported
 
   @IsEnum(ReportFormat)
-  format: ReportFormat
+  format: ReportFormat;
 
   @IsString()
-  reportName: string
+  reportName: string;
 
   @IsOptional()
   @IsString()
-  reportTitle?: string
+  reportTitle?: string;
 
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, any>
+  metadata?: Record<string, any>;
 }

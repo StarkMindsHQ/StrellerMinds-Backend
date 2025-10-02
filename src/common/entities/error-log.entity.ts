@@ -40,18 +40,18 @@ export class ErrorLog {
   @Column({ type: 'jsonb', nullable: true })
   context: Record<string, any>;
 
-  @Column({ 
-    type: 'enum', 
+  @Column({
+    type: 'enum',
     enum: ['low', 'medium', 'high', 'critical'],
-    default: 'medium'
+    default: 'medium',
   })
   @Index()
   severity: string;
 
-  @Column({ 
-    type: 'enum', 
+  @Column({
+    type: 'enum',
     enum: ['AUTHENTICATION', 'RESOURCE', 'VALIDATION', 'BUSINESS_LOGIC', 'SYSTEM', 'UNKNOWN'],
-    default: 'UNKNOWN'
+    default: 'UNKNOWN',
   })
   @Index()
   category: string;

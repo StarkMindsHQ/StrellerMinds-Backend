@@ -11,13 +11,15 @@ export class EnhancedLoggingMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction): void {
     const startTime = Date.now();
     const correlationId = (req as any).correlationId || req.headers['x-correlation-id'];
-    
+
     // Extract user context if available
     const user = (req as any).user;
-    const userContext = user ? {
-      userId: user.id,
-      userEmail: user.email,
-    } : {};
+    const userContext = user
+      ? {
+          userId: user.id,
+          userEmail: user.email,
+        }
+      : {};
 
     // Build base context
     const baseContext: LogContext = {
@@ -40,7 +42,7 @@ export class EnhancedLoggingMiddleware implements NestMiddleware {
 
     // Override res.end to capture response
     const originalEnd = res.end;
-    res.end = function(chunk?: any, encoding?: any, cb?: any) {
+    res.end = function (chunk?: any, encoding?: any, cb?: any) {
       const duration = Date.now() - startTime;
       const statusCode = res.statusCode;
 
@@ -75,16 +77,11 @@ export class EnhancedLoggingMiddleware implements NestMiddleware {
 
   private sanitizeHeaders(headers: any): any {
     const sanitized = { ...headers };
-    
-    // Remove sensitive headers
-    const sensitiveHeaders = [
-      'authorization',
-      'cookie',
-      'x-api-key',
-      'x-auth-token',
-    ];
 
-    sensitiveHeaders.forEach(header => {
+    // Remove sensitive headers
+    const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key', 'x-auth-token'];
+
+    sensitiveHeaders.forEach((header) => {
       if (sanitized[header]) {
         sanitized[header] = '***';
       }

@@ -25,7 +25,7 @@ import { VideoAnalytics } from '../../src/video-streaming/entities/video-analyti
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const isTestEnv = process.env.NODE_ENV === 'test';
-        
+
         if (!isTestEnv) {
           throw new Error('DatabaseTestModule should only be used in test environment');
         }
@@ -75,16 +75,16 @@ export class DatabaseTestModule {
     global.testUtils.cleanupDatabase = async () => {
       if (this.dataSource.isInitialized) {
         const entities = this.dataSource.entityMetadatas;
-        
+
         // Disable foreign key checks
         await this.dataSource.query('SET FOREIGN_KEY_CHECKS = 0;');
-        
+
         // Clear all tables
         for (const entity of entities) {
           const repository = this.dataSource.getRepository(entity.name);
           await repository.clear();
         }
-        
+
         // Re-enable foreign key checks
         await this.dataSource.query('SET FOREIGN_KEY_CHECKS = 1;');
       }
@@ -111,7 +111,7 @@ export class DatabaseTestModule {
           }
 
           // Seed other entities...
-          
+
           await queryRunner.commitTransaction();
         } catch (error) {
           await queryRunner.rollbackTransaction();

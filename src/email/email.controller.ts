@@ -1,7 +1,19 @@
 /**
  * EmailController handles endpoints for managing email preferences, analytics, and tracking.
  */
-import { Controller, Get, Post, Body, Param, Query, Res, Req, ForbiddenException, Logger, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  Res,
+  Req,
+  ForbiddenException,
+  Logger,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { EmailService } from './email.service';
 import { EmailPreference } from './entities/email-preference.entity';
@@ -39,15 +51,15 @@ export class EmailController {
 
       const pixel = Buffer.from(
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-        'base64'
+        'base64',
       );
 
       res.writeHead(200, {
         'Content-Type': 'image/png',
         'Content-Length': pixel.length,
         'Cache-Control': 'no-store, no-cache, must-revalidate, private',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        Pragma: 'no-cache',
+        Expires: '0',
         'X-Content-Type-Options': 'nosniff',
         'X-Frame-Options': 'DENY',
         'Referrer-Policy': 'no-referrer',
@@ -57,7 +69,7 @@ export class EmailController {
       this.logger.error(`Error tracking email open: ${error.message}`);
       const pixel = Buffer.from(
         'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
-        'base64'
+        'base64',
       );
       res.writeHead(200, {
         'Content-Type': 'image/png',
@@ -115,8 +127,8 @@ export class EmailController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get email tracking analytics' })
   @ApiParam({ name: 'emailId', description: 'Email log ID' })
-  async getAnalytics(@Param('emailId') emailId: string) {
-    return this.emailService.getEmailAnalytics(emailId);
+  async getEmailLogAnalytics(@Param('emailId') emailId: string) {
+    return this.emailService.getEmailLogAnalytics(emailId);
   }
 
   private getClientIp(req: Request): string {
@@ -133,17 +145,24 @@ export class EmailController {
    * @returns The updated EmailPreference entity
    */
   @Post('preferences')
-  @ApiOperation({ summary: 'Update email preference', description: 'Update a user\'s email preference for a specific email type.' })
-  @ApiBody({ schema: { properties: { email: { type: 'string' }, emailType: { type: 'string' }, optOut: { type: 'boolean' } } } })
+  @ApiOperation({
+    summary: 'Update email preference',
+    description: "Update a user's email preference for a specific email type.",
+  })
+  @ApiBody({
+    schema: {
+      properties: {
+        email: { type: 'string' },
+        emailType: { type: 'string' },
+        optOut: { type: 'boolean' },
+      },
+    },
+  })
   @ApiResponse({ status: 200, description: 'Email preference updated', type: EmailPreference })
   async updatePreference(
     @Body() body: { email: string; emailType: string; optOut: boolean },
   ): Promise<EmailPreference> {
-    return this.emailService.updateEmailPreference(
-      body.email,
-      body.emailType,
-      body.optOut,
-    );
+    return this.emailService.updateEmailPreference(body.email, body.emailType, body.optOut);
   }
 
   /**
@@ -154,12 +173,15 @@ export class EmailController {
    * @returns Analytics data
    */
   @Get('analytics')
-  @ApiOperation({ summary: 'Get email analytics', description: 'Get email analytics for a date range and optional template name.' })
+  @ApiOperation({
+    summary: 'Get email analytics',
+    description: 'Get email analytics for a date range and optional template name.',
+  })
   @ApiQuery({ name: 'startDate', required: true, description: 'Start date (ISO8601)' })
   @ApiQuery({ name: 'endDate', required: true, description: 'End date (ISO8601)' })
   @ApiQuery({ name: 'templateName', required: false, description: 'Template name' })
   @ApiResponse({ status: 200, description: 'Email analytics data' })
-  async getAnalytics(
+  async getAnalyticsByRange(
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
     @Query('templateName') templateName?: string,
@@ -177,7 +199,10 @@ export class EmailController {
    * @param res - Response object
    */
   @Get('track/open/:id')
-  @ApiOperation({ summary: 'Track email open', description: 'Track email open event (returns a 1x1 transparent pixel).' })
+  @ApiOperation({
+    summary: 'Track email open',
+    description: 'Track email open event (returns a 1x1 transparent pixel).',
+  })
   @ApiParam({ name: 'id', description: 'Email log ID' })
   @ApiResponse({ status: 200, description: '1x1 transparent pixel returned' })
   async trackOpen(@Param('id') id: string, @Res() res) {
@@ -192,10 +217,7 @@ export class EmailController {
       );
 
       res.set('Content-Type', 'image/gif');
-      res.set(
-        'Cache-Control',
-        'no-store, no-cache, must-revalidate, proxy-revalidate',
-      );
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       res.set('Pragma', 'no-cache');
       res.set('Expires', '0');
       return res.send(buffer);
@@ -213,11 +235,7 @@ export class EmailController {
 
   // This endpoint would be used for tracking email clicks
   @Get('track/click/:id')
-  async trackClick(
-    @Param('id') id: string,
-    @Query('url') url: string,
-    @Res() res,
-  ) {
+  async trackClick(@Param('id') id: string, @Query('url') url: string, @Res() res) {
     try {
       // Update the email log to mark as clicked
       await this.emailService.markEmailAsClicked(id, url);

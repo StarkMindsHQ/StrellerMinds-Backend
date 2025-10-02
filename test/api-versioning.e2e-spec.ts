@@ -147,9 +147,7 @@ describe('API Versioning (e2e)', () => {
     });
 
     it('should return 404 for non-existent version', () => {
-      return request(app.getHttpServer())
-        .get('/documentation/v3')
-        .expect(404);
+      return request(app.getHttpServer()).get('/documentation/v3').expect(404);
     });
   });
 
@@ -233,9 +231,7 @@ describe('API Versioning (e2e)', () => {
     });
 
     it('should return 404 for non-existent migration guide', () => {
-      return request(app.getHttpServer())
-        .get('/documentation/migration/v2/v3')
-        .expect(404);
+      return request(app.getHttpServer()).get('/documentation/migration/v2/v3').expect(404);
     });
   });
 
@@ -277,9 +273,7 @@ describe('API Versioning (e2e)', () => {
     });
 
     it('should return 404 for non-existent version comparison', () => {
-      return request(app.getHttpServer())
-        .get('/documentation/compare/v1/v3')
-        .expect(404);
+      return request(app.getHttpServer()).get('/documentation/compare/v1/v3').expect(404);
     });
   });
 
@@ -366,28 +360,24 @@ describe('API Versioning (e2e)', () => {
     });
 
     it('should return 404 for non-existent documentation version', () => {
-      return request(app.getHttpServer())
-        .get('/documentation/v3')
-        .expect(404);
+      return request(app.getHttpServer()).get('/documentation/v3').expect(404);
     });
 
     it('should return 404 for non-existent migration guide', () => {
-      return request(app.getHttpServer())
-        .get('/documentation/migration/v2/v3')
-        .expect(404);
+      return request(app.getHttpServer()).get('/documentation/migration/v2/v3').expect(404);
     });
   });
 
   describe('Performance Tests', () => {
     it('should handle multiple concurrent version requests', async () => {
-      const requests = Array.from({ length: 10 }, (_, i) => 
+      const requests = Array.from({ length: 10 }, (_, i) =>
         request(app.getHttpServer())
           .get('/version/info')
-          .set('api-version', i % 2 === 0 ? 'v1' : 'v2')
+          .set('api-version', i % 2 === 0 ? 'v1' : 'v2'),
       );
 
       const responses = await Promise.all(requests);
-      
+
       responses.forEach((response) => {
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('current');
@@ -397,7 +387,7 @@ describe('API Versioning (e2e)', () => {
 
     it('should handle version analytics with different time periods', async () => {
       const periods = [1, 7, 30, 90];
-      
+
       for (const days of periods) {
         await request(app.getHttpServer())
           .get(`/version/analytics?days=${days}`)
@@ -409,4 +399,4 @@ describe('API Versioning (e2e)', () => {
       }
     });
   });
-}); 
+});

@@ -62,7 +62,7 @@ export class UsersService {
         relations,
         select: ['id', 'firstName', 'lastName', 'email', 'role', 'status', 'createdAt'],
       });
-      
+
       if (!user) {
         throw new NotFoundException(`User with ID ${id} not found`);
       }
@@ -73,10 +73,7 @@ export class UsersService {
     }
   }
 
-  public async update(
-    id: string,
-    updateUserDto: updateUsersDto,
-  ): Promise<User> {
+  public async update(id: string, updateUserDto: updateUsersDto): Promise<User> {
     try {
       await this.findOne(id);
       await this.userRepository.update(id, updateUserDto);
@@ -128,7 +125,7 @@ export class UsersService {
       throw new InternalServerErrorException('Error finding user by ID');
     }
   }
- 
+
   async updatePassword(userId: string, hashedPassword: string): Promise<void> {
     try {
       await this.userRepository.update(userId, { password: hashedPassword });

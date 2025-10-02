@@ -6,14 +6,7 @@
  * All fields are documented for OpenAPI/Swagger UI.
  */
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { UserRole } from '../enums/userRole.enum';
 import { AccountStatus } from '../enums/accountStatus.enum';
 
@@ -23,7 +16,11 @@ export class CreateUsersDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: 'StrongPassword123', minLength: 8, description: 'User password (min 8 chars)' })
+  @ApiProperty({
+    example: 'StrongPassword123',
+    minLength: 8,
+    description: 'User password (min 8 chars)',
+  })
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @IsNotEmpty()
@@ -39,7 +36,10 @@ export class CreateUsersDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiPropertyOptional({ example: 'https://cdn.com/profile.jpg', description: 'Profile image URL (optional)' })
+  @ApiPropertyOptional({
+    example: 'https://cdn.com/profile.jpg',
+    description: 'Profile image URL (optional)',
+  })
   @IsOptional()
   @IsString()
   profileImageUrl?: string;

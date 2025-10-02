@@ -67,9 +67,9 @@ describe('Payment Processing Integration Tests', () => {
       })
       .expect(201);
 
-    testStudent = await userRepository.findOne({
+    testStudent = (await userRepository.findOne({
       where: { email: 'student@example.com' },
-    }) as User;
+    })) as User;
     studentToken = studentResponse.body.access_token;
 
     // Create instructor
@@ -84,9 +84,9 @@ describe('Payment Processing Integration Tests', () => {
       })
       .expect(201);
 
-    testInstructor = await userRepository.findOne({
+    testInstructor = (await userRepository.findOne({
       where: { email: 'instructor@example.com' },
-    }) as User;
+    })) as User;
     instructorToken = instructorResponse.body.access_token;
   }
 
@@ -198,7 +198,7 @@ describe('Payment Processing Integration Tests', () => {
     it('should handle payment with discount coupon', async () => {
       const course = await createTestCourse({
         title: 'Discounted Course',
-        price: 200.00,
+        price: 200.0,
       });
 
       const originalAmount = 20000; // $200 in cents
@@ -322,7 +322,7 @@ describe('Payment Processing Integration Tests', () => {
       // Create a course first
       const course = await createTestCourse({
         title: 'Analytics Course',
-        price: 100.00,
+        price: 100.0,
       });
 
       // Create a payment

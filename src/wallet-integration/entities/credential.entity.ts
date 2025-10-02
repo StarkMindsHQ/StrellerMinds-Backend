@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Wallet } from './wallet.entity';
 
 export enum CredentialType {
@@ -6,14 +14,14 @@ export enum CredentialType {
   EMPLOYMENT = 'employment',
   CERTIFICATION = 'certification',
   IDENTITY = 'identity',
-  ACHIEVEMENT = 'achievement'
+  ACHIEVEMENT = 'achievement',
 }
 
 export enum CredentialStatus {
   ACTIVE = 'active',
   REVOKED = 'revoked',
   EXPIRED = 'expired',
-  PENDING = 'pending'
+  PENDING = 'pending',
 }
 
 @Entity('credentials')
@@ -33,7 +41,7 @@ export class Credential {
   @Column({
     type: 'enum',
     enum: CredentialStatus,
-    default: CredentialStatus.PENDING
+    default: CredentialStatus.PENDING,
   })
   status: CredentialStatus;
 
@@ -61,7 +69,7 @@ export class Credential {
   @Column({ nullable: true })
   transactionHash?: string;
 
-  @ManyToOne(() => Wallet, wallet => wallet.credentials)
+  @ManyToOne(() => Wallet, (wallet) => wallet.credentials)
   @JoinColumn({ name: 'walletId' })
   wallet: Wallet;
 

@@ -17,12 +17,7 @@ import { ForumAnalyticsService } from './forum-analytics';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([Topic, Thread, Reply, User])],
-  providers: [
-    ModerationService,
-    ReputationService,
-    ForumGateway,
-    ForumAnalyticsService,
-  ],
+  providers: [ModerationService, ReputationService, ForumGateway, ForumAnalyticsService],
   controllers: [],
 })
 export class ForumModule {}

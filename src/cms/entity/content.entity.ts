@@ -28,7 +28,7 @@ export class Content {
   @ManyToOne(() => User)
   author!: User;
 
-  @OneToMany(() => ContentVersion, version => version.content)
+  @OneToMany(() => ContentVersion, (version) => version.content)
   versions!: ContentVersion[];
 
   @Column('simple-array', { nullable: true })

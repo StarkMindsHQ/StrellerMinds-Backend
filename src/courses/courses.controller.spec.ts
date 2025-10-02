@@ -9,16 +9,18 @@ describe('CourseController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CourseController],
-      providers: [{
-        provide: CourseService,
-        useValue: {
-          findAll: jest.fn().mockResolvedValue([]),
-          findOne: jest.fn().mockResolvedValue({}),
-          create: jest.fn().mockResolvedValue({}),
-          update: jest.fn().mockResolvedValue({}),
-          remove: jest.fn().mockResolvedValue({}),
-        }
-      }],
+      providers: [
+        {
+          provide: CourseService,
+          useValue: {
+            findAll: jest.fn().mockResolvedValue([]),
+            findOne: jest.fn().mockResolvedValue({}),
+            create: jest.fn().mockResolvedValue({}),
+            update: jest.fn().mockResolvedValue({}),
+            remove: jest.fn().mockResolvedValue({}),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<CourseController>(CourseController);

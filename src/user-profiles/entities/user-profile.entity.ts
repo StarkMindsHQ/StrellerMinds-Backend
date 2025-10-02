@@ -6,63 +6,60 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
-} from "typeorm"
-import { User } from "../../users/entities/user.entity"
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
-@Entity("user_profiles")
+@Entity('user_profiles')
 export class UserProfile {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ nullable: true })
-  firstName: string
+  firstName: string;
 
   @Column({ nullable: true })
-  lastName: string
+  lastName: string;
 
   @Column({ nullable: true })
-  bio: string
+  bio: string;
 
   @Column({ nullable: true })
-  avatarUrl: string
+  avatarUrl: string;
 
   @Column({ nullable: true })
-  phoneNumber: string
+  phoneNumber: string;
 
   @Column({ nullable: true })
-  address: string
+  address: string;
 
   @Column({ nullable: true })
-  city: string
+  city: string;
 
   @Column({ nullable: true })
-  country: string
+  country: string;
 
   @Column({ nullable: true })
-  postalCode: string
+  postalCode: string;
 
   @Column({ nullable: true })
-  dateOfBirth: Date
+  dateOfBirth: Date;
 
   @Column({ default: false })
-  isPublic: boolean
+  isPublic: boolean;
 
   @Column({ nullable: true })
   preferredLanguage: string; // e.g., 'en', 'fr', 'pt-BR'
-  
-  @OneToOne(
-    () => User,
-    (user) => user.profile,
-  )
+
+  @OneToOne(() => User, (user) => user.profile)
   @JoinColumn()
-  user: User
+  user: User;
 
   @Column()
-  userId: string
+  userId: string;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

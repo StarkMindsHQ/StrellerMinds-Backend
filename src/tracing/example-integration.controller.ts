@@ -267,7 +267,7 @@ export class ExampleIntegrationController {
         });
 
         // Simulate validation
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 50));
 
         span.setAttributes({
           'validation.success': true,
@@ -376,7 +376,7 @@ export class ExampleIntegrationController {
         });
 
         // Simulate notification sending
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         span.setAttributes({
           'notification.sent': true,
@@ -401,7 +401,7 @@ export class ExampleIntegrationController {
         });
 
         // Simulate blockchain transaction
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
 
         const transactionHash = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 

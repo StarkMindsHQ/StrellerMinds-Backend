@@ -16,10 +16,7 @@ export class EmailProcessor {
       await this.emailService.sendImmediate(job.data);
       this.logger.debug(`Email job ${job.id} completed successfully`);
     } catch (error) {
-      this.logger.error(
-        `Failed to process email job ${job.id}: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Failed to process email job ${job.id}: ${error.message}`, error.stack);
       throw error; // Rethrow to trigger Bull's retry mechanism
     }
   }

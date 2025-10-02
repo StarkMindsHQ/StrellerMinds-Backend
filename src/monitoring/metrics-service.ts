@@ -111,7 +111,7 @@ export class MetricsService {
 
   async getPerformanceMetrics(): Promise<Record<string, any>> {
     const startTime = Date.now();
-    
+
     // Database response time
     let dbResponseTime = 0;
     try {
@@ -137,12 +137,10 @@ export class MetricsService {
   async getBusinessMetrics(): Promise<Record<string, any>> {
     try {
       // Example business metrics - customize based on your application
-      const userCount = await this.connection.query(
-        'SELECT COUNT(*) as count FROM users',
-      );
-      
+      const userCount = await this.connection.query('SELECT COUNT(*) as count FROM users');
+
       const orderCount = await this.connection.query(
-        'SELECT COUNT(*) as count FROM orders WHERE created_at >= NOW() - INTERVAL \'24 hours\'',
+        "SELECT COUNT(*) as count FROM orders WHERE created_at >= NOW() - INTERVAL '24 hours'",
       );
 
       return {

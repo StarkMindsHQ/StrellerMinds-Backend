@@ -12,8 +12,8 @@ class IntegrationTestRunner {
       'certificate-generation': ['test/integration/certificate-generation.integration.spec.ts'],
       'payment-processing': ['test/integration/payment-processing.integration.spec.ts'],
       'blockchain-interaction': ['test/integration/blockchain-interaction.integration.spec.ts'],
-      'auth': ['test/integration/auth/auth.integration.spec.ts'],
-      'all': ['test/integration/**/*.spec.ts']
+      auth: ['test/integration/auth/auth.integration.spec.ts'],
+      all: ['test/integration/**/*.spec.ts'],
     };
   }
 
@@ -25,7 +25,7 @@ class IntegrationTestRunner {
 
   async checkEnvironment() {
     this.log('=== Environment Check ===');
-    
+
     // Check if .env.test exists
     const envTestPath = path.join(process.cwd(), '.env.test');
     if (fs.existsSync(envTestPath)) {
@@ -49,7 +49,7 @@ class IntegrationTestRunner {
     }
 
     return true;
-    }
+  }
 
   createTestEnvFile() {
     const envContent = `# Test Environment Configuration
@@ -105,7 +105,7 @@ RATE_LIMIT_LIMIT=1000
 
   async checkDatabaseConnectivity() {
     this.log('=== Database Connectivity Check ===');
-    
+
     try {
       // Try to connect using node pg client instead of pg_isready
       const { Client } = require('pg');
@@ -135,18 +135,21 @@ RATE_LIMIT_LIMIT=1000
       this.log('   - Windows: net start postgresql-x64-13', 'info');
       this.log('', 'info');
       this.log('2. Use Docker:', 'info');
-      this.log('   docker run --name postgres-test -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres:13', 'info');
+      this.log(
+        '   docker run --name postgres-test -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres:13',
+        'info',
+      );
       this.log('', 'info');
       this.log('3. Use in-memory database (SQLite) for testing:', 'info');
       this.log('   Set DB_TYPE=sqlite in .env.test', 'info');
-      
+
       return false;
     }
   }
 
   async setupTestDatabase() {
     this.log('=== Test Database Setup ===');
-    
+
     try {
       // Check if test database exists, create if not
       const { Client } = require('pg');
@@ -162,10 +165,7 @@ RATE_LIMIT_LIMIT=1000
 
       // Check if test database exists
       const dbName = process.env.DB_DATABASE || 'strellerminds_test';
-      const result = await client.query(
-        'SELECT 1 FROM pg_database WHERE datname = $1',
-        [dbName]
-      );
+      const result = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [dbName]);
 
       if (result.rows.length === 0) {
         this.log(`Creating test database: ${dbName}`, 'info');
@@ -185,11 +185,11 @@ RATE_LIMIT_LIMIT=1000
 
   async runTests(suiteNames = ['all']) {
     this.log('=== Running Integration Tests ===');
-    
+
     try {
       // Set NODE_ENV to test
       process.env.NODE_ENV = 'test';
-      
+
       // Determine which tests to run
       let testFiles = [];
       for (const suiteName of suiteNames) {
@@ -204,12 +204,13 @@ RATE_LIMIT_LIMIT=1000
 
       // Remove duplicates
       testFiles = [...new Set(testFiles)];
-      
+
       this.log(`Running tests: ${testFiles.join(', ')}`, 'info');
 
       // Build Jest command
       const jestArgs = [
-        '--config', 'test/jest-integration.json',
+        '--config',
+        'test/jest-integration.json',
         '--testPathPattern=' + testFiles.join('|').replace(/\//g, '\\/'),
         '--runInBand', // Run tests serially for integration tests
         '--forceExit', // Exit after tests complete
@@ -225,7 +226,7 @@ RATE_LIMIT_LIMIT=1000
       // Run tests
       const jestProcess = spawn('npx', ['jest', ...jestArgs], {
         stdio: 'inherit',
-        env: { ...process.env, NODE_ENV: 'test' }
+        env: { ...process.env, NODE_ENV: 'test' },
       });
 
       return new Promise((resolve) => {
@@ -239,7 +240,6 @@ RATE_LIMIT_LIMIT=1000
           }
         });
       });
-
     } catch (error) {
       this.log('Failed to run tests: ' + error.message, 'error');
       return false;
@@ -276,7 +276,7 @@ RATE_LIMIT_LIMIT=1000
 
       // Run tests
       const testsOk = await this.runTests(suiteNames);
-      
+
       if (testsOk) {
         this.log('Integration test run completed successfully', 'success');
         process.exit(0);
@@ -284,7 +284,6 @@ RATE_LIMIT_LIMIT=1000
         this.log('Integration test run completed with failures', 'error');
         process.exit(1);
       }
-
     } catch (error) {
       this.log(`Test execution failed: ${error.message}`, 'error');
       process.exit(1);

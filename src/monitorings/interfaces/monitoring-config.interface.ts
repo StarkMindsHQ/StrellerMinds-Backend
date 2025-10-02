@@ -48,7 +48,7 @@ export enum HealthStatus {
   HEALTHY = 'healthy',
   UNHEALTHY = 'unhealthy',
   DEGRADED = 'degraded',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
 }
 
 export enum LogLevel {
@@ -56,19 +56,19 @@ export enum LogLevel {
   WARN = 'warn',
   INFO = 'info',
   DEBUG = 'debug',
-  VERBOSE = 'verbose'
+  VERBOSE = 'verbose',
 }
 
 export enum AlertType {
   PERFORMANCE = 'performance',
   ERROR = 'error',
   AVAILABILITY = 'availability',
-  RESOURCE = 'resource'
+  RESOURCE = 'resource',
 }
 
 export enum AlertSeverity {
   CRITICAL = 'critical',
   HIGH = 'high',
   MEDIUM = 'medium',
-  LOW = 'low'
+  LOW = 'low',
 }

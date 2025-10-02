@@ -18,10 +18,7 @@ export class TranslationController {
   }
 
   @Get('batch')
-  async getBatch(
-    @Query('keys') keys: string[],
-    @Query('lang') lang: Language
-  ) {
+  async getBatch(@Query('keys') keys: string[], @Query('lang') lang: Language) {
     return await this.service.translateBatch(keys, lang);
   }
 }

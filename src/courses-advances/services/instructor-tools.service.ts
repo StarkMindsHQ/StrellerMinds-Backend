@@ -21,14 +21,7 @@ export class InstructorToolsService {
 
     return {
       courses,
-      availableActions: [
-        'publish',
-        'unpublish',
-        'archive',
-        'duplicate',
-        'export',
-        'updatePricing',
-      ],
+      availableActions: ['publish', 'unpublish', 'archive', 'duplicate', 'export', 'updatePricing'],
     };
   }
 
@@ -55,16 +48,10 @@ export class InstructorToolsService {
         );
         break;
       case 'unpublish':
-        await this.courseRepository.update(
-          { id: { $in: validCourseIds } },
-          { status: 'draft' },
-        );
+        await this.courseRepository.update({ id: { $in: validCourseIds } }, { status: 'draft' });
         break;
       case 'archive':
-        await this.courseRepository.update(
-          { id: { $in: validCourseIds } },
-          { status: 'archived' },
-        );
+        await this.courseRepository.update({ id: { $in: validCourseIds } }, { status: 'archived' });
         break;
       case 'updatePricing':
         if (actionData?.price) {
@@ -98,17 +85,12 @@ export class InstructorToolsService {
       enrollment: {
         trend: this.calculateTrend(analytics, 'enrollments'),
         total: course.enrollmentCount,
-        recentIncrease: analytics
-          .slice(0, 7)
-          .reduce((sum, a) => sum + a.enrollments, 0),
+        recentIncrease: analytics.slice(0, 7).reduce((sum, a) => sum + a.enrollments, 0),
       },
       engagement: {
         averageWatchTime:
-          analytics.reduce((sum, a) => sum + a.averageWatchTime, 0) /
-          analytics.length,
-        completionRate:
-          analytics.reduce((sum, a) => sum + a.completionRate, 0) /
-          analytics.length,
+          analytics.reduce((sum, a) => sum + a.averageWatchTime, 0) / analytics.length,
+        completionRate: analytics.reduce((sum, a) => sum + a.completionRate, 0) / analytics.length,
         dropOffPoints: this.identifyDropOffPoints(analytics),
       },
       performance: {
@@ -127,12 +109,8 @@ export class InstructorToolsService {
     return {
       titleOptimization: 'Consider adding specific skill levels to your title',
       descriptionImprovement: 'Add more specific learning outcomes',
-      pricingRecommendation:
-        'Based on similar courses, consider pricing between $49-$79',
-      contentGaps: [
-        'Missing practice exercises',
-        'Could use more real-world examples',
-      ],
+      pricingRecommendation: 'Based on similar courses, consider pricing between $49-$79',
+      contentGaps: ['Missing practice exercises', 'Could use more real-world examples'],
       seoImprovement: ['Add trending keywords', 'Optimize course tags'],
     };
   }
@@ -143,12 +121,8 @@ export class InstructorToolsService {
   ): 'up' | 'down' | 'stable' {
     if (analytics.length < 2) return 'stable';
 
-    const recent = analytics
-      .slice(0, 7)
-      .reduce((sum, a) => sum + (a[field] as number), 0);
-    const previous = analytics
-      .slice(7, 14)
-      .reduce((sum, a) => sum + (a[field] as number), 0);
+    const recent = analytics.slice(0, 7).reduce((sum, a) => sum + (a[field] as number), 0);
+    const previous = analytics.slice(7, 14).reduce((sum, a) => sum + (a[field] as number), 0);
 
     if (recent > previous * 1.1) return 'up';
     if (recent < previous * 0.9) return 'down';
@@ -172,14 +146,11 @@ export class InstructorToolsService {
     const suggestions = [];
 
     if (course.averageRating < 4.0) {
-      suggestions.push(
-        'Consider updating course content based on student feedback',
-      );
+      suggestions.push('Consider updating course content based on student feedback');
     }
 
     const avgCompletion =
-      analytics.reduce((sum, a) => sum + a.completionRate, 0) /
-      analytics.length;
+      analytics.reduce((sum, a) => sum + a.completionRate, 0) / analytics.length;
     if (avgCompletion < 60) {
       suggestions.push(
         'Course completion rate is low - consider breaking content into smaller sections',

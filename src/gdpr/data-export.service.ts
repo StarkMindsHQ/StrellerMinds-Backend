@@ -2,10 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  DataProcessingLog,
-  ProcessingActivity,
-} from './entities/data-processing-log.entity';
+import { DataProcessingLog, ProcessingActivity } from './entities/data-processing-log.entity';
 import { DataExportRequestDto, ExportFormat } from './dto/data-export.dto';
 
 @Injectable()
@@ -50,10 +47,7 @@ export class DataExportService {
     };
   }
 
-  private async collectUserData(
-    userId: string,
-    dataTypes?: string[],
-  ): Promise<any> {
+  private async collectUserData(userId: string, dataTypes?: string[]): Promise<any> {
     const userData: any = {
       userId,
       exportDate: new Date().toISOString(),
@@ -86,10 +80,7 @@ export class DataExportService {
     return userData;
   }
 
-  private async formatExportData(
-    data: any,
-    format: ExportFormat,
-  ): Promise<string | any> {
+  private async formatExportData(data: any, format: ExportFormat): Promise<string | any> {
     switch (format) {
       case ExportFormat.JSON:
         return JSON.stringify(data, null, 2);

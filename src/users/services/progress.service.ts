@@ -62,7 +62,7 @@ export class ProgressService {
     progress.isCompleted = progressPercentage >= 100;
     progress.metadata = metadata;
     progress.lastAccessedAt = new Date();
-    
+
     if (progress.isCompleted && !progress.completedAt) {
       progress.completedAt = new Date();
     }
@@ -92,7 +92,7 @@ export class ProgressService {
     });
 
     const totalLessons = module.lessons.length;
-    const completedLessons = progress.filter(p => p.isCompleted).length;
+    const completedLessons = progress.filter((p) => p.isCompleted).length;
     const moduleProgress = (completedLessons / totalLessons) * 100;
 
     // Create or update module-level progress
@@ -124,7 +124,10 @@ export class ProgressService {
     await this.progressRepository.save(moduleProgressRecord);
   }
 
-  async getCourseProgress(userId: string, courseId: string): Promise<{
+  async getCourseProgress(
+    userId: string,
+    courseId: string,
+  ): Promise<{
     overallProgress: number;
     completedLessons: number;
     totalLessons: number;
@@ -163,14 +166,10 @@ export class ProgressService {
         });
 
         const completedLessons = progress.filter(
-          (p) =>
-            p.isCompleted &&
-            moduleLessons.some((l) => l.id === p.lesson?.id),
+          (p) => p.isCompleted && moduleLessons.some((l) => l.id === p.lesson?.id),
         ).length;
 
-        const moduleProgressRecord = progress.find(
-          (p) => p.module?.id === module.id && !p.lesson,
-        );
+        const moduleProgressRecord = progress.find((p) => p.module?.id === module.id && !p.lesson);
 
         return {
           moduleId: module.id,
@@ -183,10 +182,7 @@ export class ProgressService {
       }),
     );
 
-    const totalLessons = moduleProgress.reduce(
-      (sum, module) => sum + module.totalLessons,
-      0,
-    );
+    const totalLessons = moduleProgress.reduce((sum, module) => sum + module.totalLessons, 0);
     const completedLessons = moduleProgress.reduce(
       (sum, module) => sum + module.completedLessons,
       0,
@@ -200,30 +196,35 @@ export class ProgressService {
     };
   }
 
-  async getUserProgress(userId: string): Promise<Array<{
-    courseId: string;
-    courseTitle: string;
-    progress: number;
-    lastAccessed: Date;
-    completedModules: number;
-    totalModules: number;
-  }>> {
+  async getUserProgress(userId: string): Promise<
+    Array<{
+      courseId: string;
+      courseTitle: string;
+      progress: number;
+      lastAccessed: Date;
+      completedModules: number;
+      totalModules: number;
+    }>
+  > {
     const progress = await this.progressRepository.find({
       where: { user: { id: userId } },
       relations: ['course', 'module'],
       order: { lastAccessedAt: 'DESC' },
     });
 
-    const courseProgressMap = new Map<string, {
-      courseTitle: string;
-      progress: number;
-      lastAccessed: Date;
-      completedModules: number;
-      totalModules: number;
-    }>();
+    const courseProgressMap = new Map<
+      string,
+      {
+        courseTitle: string;
+        progress: number;
+        lastAccessed: Date;
+        completedModules: number;
+        totalModules: number;
+      }
+    >();
 
     // Preload all courses with their modules
-    const courseIds = Array.from(new Set(progress.map(p => p.course?.id).filter(Boolean)));
+    const courseIds = Array.from(new Set(progress.map((p) => p.course?.id).filter(Boolean)));
 
     const coursesWithModules = await this.courseRepository.find({
       where: { id: In(courseIds) },
@@ -241,11 +242,7 @@ export class ProgressService {
       const existing = courseProgressMap.get(p.course.id);
       if (!existing || p.lastAccessedAt > existing.lastAccessed) {
         const moduleProgress = progress.filter(
-          (mp) =>
-            mp.course?.id === p.course.id &&
-            mp.module &&
-            !mp.lesson &&
-            mp.isCompleted,
+          (mp) => mp.course?.id === p.course.id && mp.module && !mp.lesson && mp.isCompleted,
         );
 
         courseProgressMap.set(p.course.id, {
@@ -289,23 +286,23 @@ export class ProgressService {
       where: { user: { id: userId }, course: { id: courseId } },
       relations: ['lesson'],
     });
-    const completed = progress.filter(p => p.isCompleted);
+    const completed = progress.filter((p) => p.isCompleted);
     const avgScore = completed.length
       ? completed.reduce((sum, p) => sum + (p.metadata?.score || 0), 0) / completed.length
       : 0;
     const strengths = completed
-      .filter(p => (p.metadata?.score || 0) >= 80)
-      .map(p => p.lesson?.title || p.lesson?.id);
+      .filter((p) => (p.metadata?.score || 0) >= 80)
+      .map((p) => p.lesson?.title || p.lesson?.id);
     const weaknesses = completed
-      .filter(p => (p.metadata?.score || 0) < 50)
-      .map(p => p.lesson?.title || p.lesson?.id);
+      .filter((p) => (p.metadata?.score || 0) < 50)
+      .map((p) => p.lesson?.title || p.lesson?.id);
     return {
       totalLessons: progress.length,
       completedLessons: completed.length,
       avgScore,
       strengths,
       weaknesses,
-      progressOverTime: progress.map(p => ({
+      progressOverTime: progress.map((p) => ({
         lesson: p.lesson?.title || p.lesson?.id,
         completedAt: p.completedAt,
         score: p.metadata?.score || null,
@@ -323,22 +320,26 @@ export class ProgressService {
     });
     if (!course) throw new NotFoundException('Course not found');
     const modules = await course.modules;
-    const allLessons = modules.flatMap(m => m.lessons);
+    const allLessons = modules.flatMap((m) => m.lessons);
     const progress = await this.progressRepository.find({
       where: { user: { id: userId }, course: { id: courseId } },
       relations: ['lesson'],
     });
-    const completedLessonIds = new Set(progress.filter(p => p.isCompleted).map(p => p.lesson?.id));
+    const completedLessonIds = new Set(
+      progress.filter((p) => p.isCompleted).map((p) => p.lesson?.id),
+    );
     // Recommend next uncompleted lessons, prioritizing those after weak lessons
-    const weakLessons = progress.filter(p => (p.metadata?.score || 0) < 50).map(p => p.lesson?.id);
-    const nextLessons = allLessons.filter(l => !completedLessonIds.has(l.id));
+    const weakLessons = progress
+      .filter((p) => (p.metadata?.score || 0) < 50)
+      .map((p) => p.lesson?.id);
+    const nextLessons = allLessons.filter((l) => !completedLessonIds.has(l.id));
     // Prioritize lessons in the same module as weak lessons
     const prioritized = nextLessons.sort((a, b) => {
       if (weakLessons.includes(a.id)) return -1;
       if (weakLessons.includes(b.id)) return 1;
       return 0;
     });
-    return prioritized.slice(0, 3).map(l => ({ id: l.id, title: l.title }));
+    return prioritized.slice(0, 3).map((l) => ({ id: l.id, title: l.title }));
   }
 
   /**
@@ -349,7 +350,7 @@ export class ProgressService {
       where: { user: { id: userId }, course: { id: courseId } },
       order: { completedAt: 'ASC' },
     });
-    return progress.map(p => ({
+    return progress.map((p) => ({
       lessonId: p.lesson?.id,
       completedAt: p.completedAt,
       progress: p.progressPercentage,
@@ -364,11 +365,14 @@ export class ProgressService {
     const progress = await this.progressRepository.find({
       where: { user: { id: userId }, course: { id: courseId } },
     });
-    const completed = progress.filter(p => p.isCompleted);
-    const mastery = completed.filter(p => (p.metadata?.score || 0) >= 80).length / (progress.length || 1);
-    const improvement = completed.length > 1
-      ? (completed[completed.length - 1].metadata?.score || 0) - (completed[0].metadata?.score || 0)
-      : 0;
+    const completed = progress.filter((p) => p.isCompleted);
+    const mastery =
+      completed.filter((p) => (p.metadata?.score || 0) >= 80).length / (progress.length || 1);
+    const improvement =
+      completed.length > 1
+        ? (completed[completed.length - 1].metadata?.score || 0) -
+          (completed[0].metadata?.score || 0)
+        : 0;
     const engagement = progress.length;
     return { mastery, improvement, engagement };
   }

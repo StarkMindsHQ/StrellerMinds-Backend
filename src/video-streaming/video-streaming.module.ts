@@ -30,11 +30,7 @@ import { UsersModule } from '../users/users.module';
   imports: [
     ConfigModule,
     ScheduleModule.forRoot(),
-    TypeOrmModule.forFeature([
-      Video,
-      VideoQuality,
-      VideoAnalytics,
-    ]),
+    TypeOrmModule.forFeature([Video, VideoQuality, VideoAnalytics]),
     BullModule.registerQueue({
       name: 'video-processing',
       defaultJobOptions: {
@@ -49,10 +45,7 @@ import { UsersModule } from '../users/users.module';
     }),
     UsersModule,
   ],
-  controllers: [
-    VideoStreamingController,
-    VideoAnalyticsController,
-  ],
+  controllers: [VideoStreamingController, VideoAnalyticsController],
   providers: [
     VideoStreamingService,
     AwsCloudFrontService,
@@ -61,10 +54,6 @@ import { UsersModule } from '../users/users.module';
     VideoAnalyticsService,
     VideoProcessingProcessor,
   ],
-  exports: [
-    VideoStreamingService,
-    VideoAnalyticsService,
-    VideoSecurityService,
-  ],
+  exports: [VideoStreamingService, VideoAnalyticsService, VideoSecurityService],
 })
 export class VideoStreamingModule {}

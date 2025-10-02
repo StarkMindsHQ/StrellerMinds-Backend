@@ -12,11 +12,11 @@ export class Reward {
   description: string;
 
   @Column()
-  type: string; 
+  type: string;
 
   @Column('int')
   value: number;
 
   @CreateDateColumn()
   createdAt: Date;
-} 
+}

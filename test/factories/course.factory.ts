@@ -9,7 +9,7 @@ export class CourseFactory extends BaseFactory<Course> {
 
   protected definition(): Partial<Course> {
     const title = this.generateText(1).replace('.', '');
-    
+
     return {
       id: this.generateId(),
       title,
@@ -39,21 +39,20 @@ export class CourseFactory extends BaseFactory<Course> {
         'Health',
         'Lifestyle',
       ]),
-      tags: this.pickRandomMany([
-        'beginner',
-        'intermediate',
-        'advanced',
-        'practical',
-        'theory',
-        'hands-on',
-        'certification',
-        'popular',
-      ], this.generateNumber(2, 5)),
-      requirements: [
-        'Basic computer skills',
-        'Internet connection',
-        'Willingness to learn',
-      ],
+      tags: this.pickRandomMany(
+        [
+          'beginner',
+          'intermediate',
+          'advanced',
+          'practical',
+          'theory',
+          'hands-on',
+          'certification',
+          'popular',
+        ],
+        this.generateNumber(2, 5),
+      ),
+      requirements: ['Basic computer skills', 'Internet connection', 'Willingness to learn'],
       whatYouWillLearn: [
         'Master the fundamentals',
         'Build real-world projects',
@@ -152,7 +151,7 @@ export class CourseFactory extends BaseFactory<Course> {
       const originalPrice = this.generatePrice(100, 500);
       const discountPercent = this.generateNumber(10, 50);
       const price = originalPrice * (1 - discountPercent / 100);
-      
+
       return {
         originalPrice,
         price: parseFloat(price.toFixed(2)),
@@ -170,11 +169,7 @@ export class CourseFactory extends BaseFactory<Course> {
     programming: (): Partial<Course> => ({
       category: 'Programming',
       tags: ['programming', 'coding', 'development', 'software'],
-      requirements: [
-        'Basic computer skills',
-        'Text editor or IDE',
-        'Programming language basics',
-      ],
+      requirements: ['Basic computer skills', 'Text editor or IDE', 'Programming language basics'],
     }),
 
     design: (): Partial<Course> => ({
@@ -249,13 +244,13 @@ export class CourseFactory extends BaseFactory<Course> {
    */
   createCatalog(count: number = 10): Course[] {
     const courses = [];
-    
+
     // Mix of different types
     courses.push(...this.createMany(3, { traits: ['popular'] }));
     courses.push(...this.createMany(2, { traits: ['featured'] }));
     courses.push(...this.createMany(2, { traits: ['free'] }));
     courses.push(...this.createMany(3, { traits: ['premium'] }));
-    
+
     return courses.slice(0, count);
   }
 }

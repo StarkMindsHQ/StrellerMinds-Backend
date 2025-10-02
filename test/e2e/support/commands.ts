@@ -14,7 +14,7 @@ Cypress.Commands.add('loginViaAPI', (email?: string, password?: string) => {
   }).then((response) => {
     expect(response.status).to.eq(200);
     expect(response.body).to.have.property('access_token');
-    
+
     // Store tokens in local storage
     window.localStorage.setItem('access_token', response.body.access_token);
     window.localStorage.setItem('refresh_token', response.body.refresh_token);
@@ -32,7 +32,7 @@ Cypress.Commands.add('loginViaUI', (email?: string, password?: string) => {
   cy.get('[data-cy=email-input]').type(credentials.email);
   cy.get('[data-cy=password-input]').type(credentials.password);
   cy.get('[data-cy=login-button]').click();
-  
+
   // Wait for successful login
   cy.url().should('not.include', '/login');
   cy.get('[data-cy=user-menu]').should('be.visible');
@@ -56,7 +56,7 @@ Cypress.Commands.add('registerViaAPI', (userData?: any) => {
   }).then((response) => {
     expect(response.status).to.eq(201);
     expect(response.body).to.have.property('access_token');
-    
+
     // Store tokens in local storage
     window.localStorage.setItem('access_token', response.body.access_token);
     window.localStorage.setItem('refresh_token', response.body.refresh_token);
@@ -82,7 +82,7 @@ Cypress.Commands.add('registerViaUI', (userData?: any) => {
   cy.get('[data-cy=first-name-input]').type(user.firstName);
   cy.get('[data-cy=last-name-input]').type(user.lastName);
   cy.get('[data-cy=register-button]').click();
-  
+
   // Wait for successful registration
   cy.url().should('not.include', '/register');
   cy.get('[data-cy=user-menu]').should('be.visible');
@@ -91,14 +91,14 @@ Cypress.Commands.add('registerViaUI', (userData?: any) => {
 Cypress.Commands.add('logout', () => {
   // Clear local storage
   cy.clearLocalStorage();
-  
+
   // If on a page with logout button, click it
   cy.get('body').then(($body) => {
     if ($body.find('[data-cy=logout-button]').length > 0) {
       cy.get('[data-cy=logout-button]').click();
     }
   });
-  
+
   // Verify logout
   cy.visit('/');
   cy.get('[data-cy=login-button]').should('be.visible');
@@ -152,16 +152,19 @@ Cypress.Commands.add('waitForAPI', (alias: string, timeout?: number) => {
   cy.wait(`@${alias}`, { timeout: timeout || 10000 });
 });
 
-Cypress.Commands.add('checkToast', (message: string, type?: 'success' | 'error' | 'warning' | 'info') => {
-  cy.get('[data-cy=toast]').should('be.visible').and('contain.text', message);
-  
-  if (type) {
-    cy.get('[data-cy=toast]').should('have.class', `toast-${type}`);
-  }
-  
-  // Wait for toast to disappear
-  cy.get('[data-cy=toast]').should('not.exist', { timeout: 10000 });
-});
+Cypress.Commands.add(
+  'checkToast',
+  (message: string, type?: 'success' | 'error' | 'warning' | 'info') => {
+    cy.get('[data-cy=toast]').should('be.visible').and('contain.text', message);
+
+    if (type) {
+      cy.get('[data-cy=toast]').should('have.class', `toast-${type}`);
+    }
+
+    // Wait for toast to disappear
+    cy.get('[data-cy=toast]').should('not.exist', { timeout: 10000 });
+  },
+);
 
 Cypress.Commands.add('checkLoading', (shouldBeLoading?: boolean) => {
   if (shouldBeLoading !== false) {
@@ -201,20 +204,20 @@ Cypress.Commands.add('checkResponsive', (breakpoints?: string[]) => {
     const [width, height] = viewports[breakpoint];
     cy.viewport(width, height);
     cy.wait(500); // Allow time for responsive changes
-    
+
     // Take screenshot for visual comparison
     cy.screenshot(`responsive-${breakpoint}`);
   });
-  
+
   // Reset to default viewport
   cy.viewport(1280, 720);
 });
 
 Cypress.Commands.add('mockAPI', (method: string, url: string, response: any, alias?: string) => {
   const interceptAlias = alias || `mock${method}${url.replace(/[^a-zA-Z0-9]/g, '')}`;
-  
+
   cy.intercept(method, url, response).as(interceptAlias);
-  
+
   return cy.wrap(interceptAlias);
 });
 
@@ -228,13 +231,13 @@ Cypress.Commands.add('checkEmail', (emailType: string) => {
 
 Cypress.Commands.add('waitForStable', (selector: string) => {
   let previousPosition: any;
-  
+
   cy.get(selector).then(($el) => {
     previousPosition = $el.offset();
   });
-  
+
   cy.wait(100);
-  
+
   cy.get(selector).should(($el) => {
     const currentPosition = $el.offset();
     expect(currentPosition.top).to.equal(previousPosition.top);
@@ -248,20 +251,20 @@ Cypress.Commands.add('checkPerformance', (thresholds?: any) => {
     firstContentfulPaint: 2000,
     largestContentfulPaint: 4000,
   };
-  
+
   const performanceThresholds = { ...defaultThresholds, ...thresholds };
-  
+
   cy.window().then((win) => {
     const performance = win.performance;
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    
+
     const loadTime = navigation.loadEventEnd - navigation.navigationStart;
     expect(loadTime).to.be.lessThan(performanceThresholds.loadTime);
-    
+
     // Check other performance metrics if available
     const paintEntries = performance.getEntriesByType('paint');
-    const fcp = paintEntries.find(entry => entry.name === 'first-contentful-paint');
-    
+    const fcp = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
+
     if (fcp) {
       expect(fcp.startTime).to.be.lessThan(performanceThresholds.firstContentfulPaint);
     }

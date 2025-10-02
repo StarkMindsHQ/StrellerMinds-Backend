@@ -9,18 +9,12 @@ import {
   HttpStatus,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/role/roles.decorator';
 import { RolesGuard } from 'src/role/roles.guard';
 import { Role } from 'src/role/roles.enum';
 import { UserDeletionService } from './services/users.deletion.service';
-
 
 /**
  * Controller for handling user account deletion operations
@@ -90,8 +84,7 @@ export class UserDeletionController {
 
     await this.userDeletionService.requestAccountDeletion(userId, req.user.id);
     return {
-      message:
-        'Account deletion requested. Please check your email for confirmation instructions.',
+      message: 'Account deletion requested. Please check your email for confirmation instructions.',
     };
   }
 
@@ -114,10 +107,7 @@ export class UserDeletionController {
     @Param('id', ParseUUIDPipe) userId: string,
     @Body() confirmDeletionDto: ConfirmDeletionDto,
   ): Promise<{ message: string }> {
-    await this.userDeletionService.confirmAccountDeletion(
-      userId,
-      confirmDeletionDto.token,
-    );
+    await this.userDeletionService.confirmAccountDeletion(userId, confirmDeletionDto.token);
     return { message: 'Account has been permanently deleted' };
   }
 

@@ -16,10 +16,7 @@ export class CourseVersionsService {
     createVersionDto: CreateCourseVersionDto,
   ): Promise<CourseVersion> {
     // Deactivate previous active version
-    await this.versionRepository.update(
-      { courseId, isActive: true },
-      { isActive: false },
-    );
+    await this.versionRepository.update({ courseId, isActive: true }, { isActive: false });
 
     const version = this.versionRepository.create({
       ...createVersionDto,
@@ -79,10 +76,7 @@ export class CourseVersionsService {
         content: version2.content,
         createdAt: version2.createdAt,
       },
-      differences: this.calculateDifferences(
-        version1.content,
-        version2.content,
-      ),
+      differences: this.calculateDifferences(version1.content, version2.content),
     };
   }
 
@@ -100,11 +94,7 @@ export class CourseVersionsService {
           field: key,
           oldValue: content1[key],
           newValue: content2[key],
-          changeType: !content1[key]
-            ? 'added'
-            : !content2[key]
-              ? 'removed'
-              : 'modified',
+          changeType: !content1[key] ? 'added' : !content2[key] ? 'removed' : 'modified',
         });
       }
     });

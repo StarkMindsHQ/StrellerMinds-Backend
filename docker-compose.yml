@@ -5,14 +5,14 @@ services:
     image: jaegertracing/all-in-one:latest
     container_name: strellerminds-jaeger
     ports:
-      - "16686:16686"  # Jaeger UI
-      - "4318:4318"    # OTLP HTTP receiver
+      - '16686:16686' # Jaeger UI
+      - '4318:4318' # OTLP HTTP receiver
     environment:
       - COLLECTOR_OTLP_ENABLED=true
     networks:
       - strellerminds-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:14269/"]
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:14269/']
       interval: 30s
       timeout: 10s
       retries: 3

@@ -49,7 +49,7 @@ export class AddEmailTrackingFields1706800000000 implements MigrationInterface {
         name: 'updatedAt',
         type: 'timestamp',
         isNullable: false,
-        default: 'now()'
+        default: 'now()',
       }),
     ]);
 
@@ -88,5 +88,3 @@ export class AddEmailTrackingFields1706800000000 implements MigrationInterface {
     await queryRunner.dropColumn('email_logs', 'firstOpenedAt');
   }
 }
-
-

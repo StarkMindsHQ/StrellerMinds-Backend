@@ -7,46 +7,42 @@ import {
   OneToOne,
   JoinColumn,
   Index,
-} from "typeorm"
-import { User } from "../../users/entities/user.entity"
-import type { NotificationChannel, NotificationType } from "./notification.entity"
+} from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import type { NotificationChannel, NotificationType } from './notification.entity';
 
-@Entity("user_notification_preferences")
-@Index(["userId"], { unique: true })
+@Entity('user_notification_preferences')
+@Index(['userId'], { unique: true })
 export class UserNotificationPreference {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column({ type: "uuid", unique: true })
-  userId: string
+  @Column({ type: 'uuid', unique: true })
+  userId: string;
 
-  @Column({ type: "boolean", default: true })
-  emailEnabled: boolean
+  @Column({ type: 'boolean', default: true })
+  emailEnabled: boolean;
 
-  @Column({ type: "boolean", default: false })
-  smsEnabled: boolean
+  @Column({ type: 'boolean', default: false })
+  smsEnabled: boolean;
 
-  @Column({ type: "boolean", default: true })
-  inAppEnabled: boolean
+  @Column({ type: 'boolean', default: true })
+  inAppEnabled: boolean;
 
-  @Column({ type: "boolean", default: false })
-  pushEnabled: boolean
+  @Column({ type: 'boolean', default: false })
+  pushEnabled: boolean;
 
   // Stores preferences per notification type, e.g., { "COURSE_UPDATE": ["EMAIL", "IN_APP"] }
-  @Column({ type: "jsonb", nullable: true })
-  typePreferences: { [key in NotificationType]?: NotificationChannel[] } | null
+  @Column({ type: 'jsonb', nullable: true })
+  typePreferences: { [key in NotificationType]?: NotificationChannel[] } | null;
 
-  @CreateDateColumn({ type: "timestamp" })
-  createdAt: Date
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 
-  @UpdateDateColumn({ type: "timestamp" })
-  updatedAt: Date
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date;
 
-  @OneToOne(
-    () => User,
-    (user) => user.notificationPreferences,
-    { onDelete: "CASCADE" },
-  )
-  @JoinColumn({ name: "userId" })
-  user: User
+  @OneToOne(() => User, (user) => user.notificationPreferences, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }

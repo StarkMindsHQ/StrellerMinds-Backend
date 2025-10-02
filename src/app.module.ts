@@ -84,9 +84,7 @@ console.log('ENV:', ENV);
         extra: {
           max: configService.get<number>('database.maxPoolSize'),
           min: configService.get<number>('database.minPoolSize'),
-          idleTimeoutMillis: configService.get<number>(
-            'database.poolIdleTimeout',
-          ),
+          idleTimeoutMillis: configService.get<number>('database.poolIdleTimeout'),
         },
         // Retry Mechanism
         retryAttempts: configService.get<number>('database.retryAttempts'),

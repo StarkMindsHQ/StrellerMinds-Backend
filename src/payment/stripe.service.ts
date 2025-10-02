@@ -476,7 +476,7 @@ export class StripeService {
           quantity: params.quantity,
           timestamp: params.timestamp ?? Math.floor(Date.now() / 1000),
           action: params.action ?? 'increment',
-        }
+        },
       );
       this.logger.log(`Reported usage on ${params.subscriptionItemId}: +${params.quantity}`);
       return usage;
@@ -503,4 +503,3 @@ export class StripeService {
     }
   }
 }
- 

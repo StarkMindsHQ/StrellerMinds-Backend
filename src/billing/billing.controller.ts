@@ -1,4 +1,13 @@
-import { Controller, Post, Body, Param, ParseUUIDPipe, Get, Req, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  ParseUUIDPipe,
+  Get,
+  Req,
+  BadRequestException,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { BillingService } from './billing.service';
 import { BillingCycle, SubscriptionPlan } from '../payment/entities/subscription.entity';
@@ -11,7 +20,17 @@ export class BillingController {
 
   @ApiOperation({ summary: 'Start a subscription for the current user' })
   @Post('subscriptions/start')
-  async start(@Req() req: any, @Body() body: { plan: SubscriptionPlan | string; billingCycle: BillingCycle; seats?: number; trialDays?: number; priceIdOverride?: string }) {
+  async start(
+    @Req() req: any,
+    @Body()
+    body: {
+      plan: SubscriptionPlan | string;
+      billingCycle: BillingCycle;
+      seats?: number;
+      trialDays?: number;
+      priceIdOverride?: string;
+    },
+  ) {
     const userId = req?.user?.id || body['userId'];
     if (!userId) throw new BadRequestException('Missing user context');
     return this.billingService.startSubscription({

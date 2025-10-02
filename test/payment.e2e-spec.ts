@@ -397,9 +397,7 @@ describe('Payment System (e2e)', () => {
     });
 
     it('should handle non-existent payment', () => {
-      return request(app.getHttpServer())
-        .get('/payments/non-existent-id')
-        .expect(404);
+      return request(app.getHttpServer()).get('/payments/non-existent-id').expect(404);
     });
 
     it('should handle invalid subscription data', () => {
@@ -467,4 +465,4 @@ describe('Payment System (e2e)', () => {
         });
     });
   });
-}); 
+});

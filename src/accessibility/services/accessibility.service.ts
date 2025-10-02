@@ -1,69 +1,73 @@
-import { Injectable, Logger } from "@nestjs/common"
-import type { Repository } from "typeorm"
+import { Injectable, Logger } from '@nestjs/common';
+import type { Repository } from 'typeorm';
 
-import { type AccessibilityMetadata, ContentType, type AriaRole } from "../entities/accessibility-metadata.entity"
-import type { ContentLabel } from "../entities/content-label.entity"
-import type { AccessibilityLoggingService } from "./accessibility-logging.service"
+import {
+  type AccessibilityMetadata,
+  ContentType,
+  type AriaRole,
+} from '../entities/accessibility-metadata.entity';
+import type { ContentLabel } from '../entities/content-label.entity';
+import type { AccessibilityLoggingService } from './accessibility-logging.service';
 
 export interface AccessibilityData {
-  contentId: string
-  contentType: ContentType
-  altText?: string
-  ariaLabel?: string
-  ariaRole?: AriaRole
-  title?: string
-  description?: string
-  languageCode?: string
-  isDecorative?: boolean
-  customAttributes?: Record<string, any>
+  contentId: string;
+  contentType: ContentType;
+  altText?: string;
+  ariaLabel?: string;
+  ariaRole?: AriaRole;
+  title?: string;
+  description?: string;
+  languageCode?: string;
+  isDecorative?: boolean;
+  customAttributes?: Record<string, any>;
 }
 
 export interface AccessibilityResponse {
-  data: any
+  data: any;
   accessibility: {
-    metadata?: AccessibilityMetadata
-    labels?: ContentLabel[]
+    metadata?: AccessibilityMetadata;
+    labels?: ContentLabel[];
     structure?: {
-      headings?: Array<{ level: number; text: string; id?: string }>
-      landmarks?: Array<{ role: string; label?: string }>
-      skipLinks?: Array<{ href: string; text: string }>
-    }
+      headings?: Array<{ level: number; text: string; id?: string }>;
+      landmarks?: Array<{ role: string; label?: string }>;
+      skipLinks?: Array<{ href: string; text: string }>;
+    };
     navigation?: {
-      breadcrumbs?: Array<{ text: string; href?: string; current?: boolean }>
+      breadcrumbs?: Array<{ text: string; href?: string; current?: boolean }>;
       pagination?: {
-        current: number
-        total: number
-        hasNext: boolean
-        hasPrevious: boolean
-      }
-    }
+        current: number;
+        total: number;
+        hasNext: boolean;
+        hasPrevious: boolean;
+      };
+    };
     forms?: {
       fields?: Array<{
-        id: string
-        label: string
-        type: string
-        required: boolean
-        errors?: string[]
-        helpText?: string
-      }>
+        id: string;
+        label: string;
+        type: string;
+        required: boolean;
+        errors?: string[];
+        helpText?: string;
+      }>;
       validation?: {
-        hasErrors: boolean
-        errorSummary?: string[]
-      }
-    }
+        hasErrors: boolean;
+        errorSummary?: string[];
+      };
+    };
     media?: {
-      hasAudio: boolean
-      hasVideo: boolean
-      hasTranscript: boolean
-      hasCaptions: boolean
-      hasAudioDescription: boolean
-    }
-  }
+      hasAudio: boolean;
+      hasVideo: boolean;
+      hasTranscript: boolean;
+      hasCaptions: boolean;
+      hasAudioDescription: boolean;
+    };
+  };
 }
 
 @Injectable()
 export class AccessibilityService {
-  private readonly logger = new Logger(AccessibilityService.name)
+  private readonly logger = new Logger(AccessibilityService.name);
 
   constructor(
     private readonly metadataRepository: Repository<AccessibilityMetadata>,
@@ -75,18 +79,18 @@ export class AccessibilityService {
     try {
       const metadata = this.metadataRepository.create({
         ...data,
-        languageCode: data.languageCode || "en",
+        languageCode: data.languageCode || 'en',
         isDecorative: data.isDecorative || false,
-        validationStatus: "pending",
-      })
+        validationStatus: 'pending',
+      });
 
-      const saved = await this.metadataRepository.save(metadata)
+      const saved = await this.metadataRepository.save(metadata);
 
-      this.logger.log(`Created accessibility metadata for content: ${data.contentId}`)
-      return saved
+      this.logger.log(`Created accessibility metadata for content: ${data.contentId}`);
+      return saved;
     } catch (error) {
-      this.logger.error(`Failed to create accessibility metadata: ${error.message}`, error.stack)
-      throw error
+      this.logger.error(`Failed to create accessibility metadata: ${error.message}`, error.stack);
+      throw error;
     }
   }
 
@@ -97,22 +101,22 @@ export class AccessibilityService {
     try {
       const existing = await this.metadataRepository.findOne({
         where: { contentId },
-      })
+      });
 
       if (!existing) {
-        throw new Error(`Accessibility metadata not found for content: ${contentId}`)
+        throw new Error(`Accessibility metadata not found for content: ${contentId}`);
       }
 
-      Object.assign(existing, updates)
-      existing.validationStatus = "pending"
+      Object.assign(existing, updates);
+      existing.validationStatus = 'pending';
 
-      const updated = await this.metadataRepository.save(existing)
+      const updated = await this.metadataRepository.save(existing);
 
-      this.logger.log(`Updated accessibility metadata for content: ${contentId}`)
-      return updated
+      this.logger.log(`Updated accessibility metadata for content: ${contentId}`);
+      return updated;
     } catch (error) {
-      this.logger.error(`Failed to update accessibility metadata: ${error.message}`, error.stack)
-      throw error
+      this.logger.error(`Failed to update accessibility metadata: ${error.message}`, error.stack);
+      throw error;
     }
   }
 
@@ -120,14 +124,18 @@ export class AccessibilityService {
     try {
       return await this.metadataRepository.findOne({
         where: { contentId },
-      })
+      });
     } catch (error) {
-      this.logger.error(`Failed to get accessibility metadata: ${error.message}`, error.stack)
-      return null
+      this.logger.error(`Failed to get accessibility metadata: ${error.message}`, error.stack);
+      return null;
     }
   }
 
-  async getContentLabels(contentId: string, contentType: string, languageCode = "en"): Promise<ContentLabel[]> {
+  async getContentLabels(
+    contentId: string,
+    contentType: string,
+    languageCode = 'en',
+  ): Promise<ContentLabel[]> {
     try {
       return await this.labelRepository.find({
         where: {
@@ -135,25 +143,25 @@ export class AccessibilityService {
           contentType,
           languageCode,
         },
-        order: { createdAt: "DESC" },
-      })
+        order: { createdAt: 'DESC' },
+      });
     } catch (error) {
-      this.logger.error(`Failed to get content labels: ${error.message}`, error.stack)
-      return []
+      this.logger.error(`Failed to get content labels: ${error.message}`, error.stack);
+      return [];
     }
   }
 
   async createContentLabel(
     contentId: string,
     contentType: string,
-    labelType: ContentLabel["labelType"],
+    labelType: ContentLabel['labelType'],
     labelText: string,
     options: {
-      languageCode?: string
-      context?: string
-      isAutoGenerated?: boolean
-      confidenceScore?: number
-      source?: ContentLabel["source"]
+      languageCode?: string;
+      context?: string;
+      isAutoGenerated?: boolean;
+      confidenceScore?: number;
+      source?: ContentLabel['source'];
     } = {},
   ): Promise<ContentLabel> {
     try {
@@ -162,205 +170,215 @@ export class AccessibilityService {
         contentType,
         labelType,
         labelText,
-        languageCode: options.languageCode || "en",
+        languageCode: options.languageCode || 'en',
         context: options.context,
         isAutoGenerated: options.isAutoGenerated || false,
         confidenceScore: options.confidenceScore,
-        source: options.source || "manual",
-      })
+        source: options.source || 'manual',
+      });
 
-      const saved = await this.labelRepository.save(label)
+      const saved = await this.labelRepository.save(label);
 
-      this.logger.log(`Created content label for ${contentType}:${contentId}`)
-      return saved
+      this.logger.log(`Created content label for ${contentType}:${contentId}`);
+      return saved;
     } catch (error) {
-      this.logger.error(`Failed to create content label: ${error.message}`, error.stack)
-      throw error
+      this.logger.error(`Failed to create content label: ${error.message}`, error.stack);
+      throw error;
     }
   }
 
   async enhanceResponseWithAccessibility(
     data: any,
     options: {
-      includeMetadata?: boolean
-      includeLabels?: boolean
-      includeStructure?: boolean
-      includeNavigation?: boolean
-      includeForms?: boolean
-      includeMedia?: boolean
-      languageCode?: string
+      includeMetadata?: boolean;
+      includeLabels?: boolean;
+      includeStructure?: boolean;
+      includeNavigation?: boolean;
+      includeForms?: boolean;
+      includeMedia?: boolean;
+      languageCode?: string;
     } = {},
   ): Promise<AccessibilityResponse> {
-    const accessibility: AccessibilityResponse["accessibility"] = {}
+    const accessibility: AccessibilityResponse['accessibility'] = {};
 
     try {
       // Extract content IDs from response data
-      const contentIds = this.extractContentIds(data)
+      const contentIds = this.extractContentIds(data);
 
       if (options.includeMetadata && contentIds.length > 0) {
         const metadata = await this.metadataRepository.find({
           where: contentIds.map((id) => ({ contentId: id })),
-        })
-        accessibility.metadata = metadata[0] // For simplicity, return first match
+        });
+        accessibility.metadata = metadata[0]; // For simplicity, return first match
       }
 
       if (options.includeLabels && contentIds.length > 0) {
         const labels = await this.labelRepository.find({
           where: contentIds.map((id) => ({
             contentId: id,
-            languageCode: options.languageCode || "en",
+            languageCode: options.languageCode || 'en',
           })),
-        })
-        accessibility.labels = labels
+        });
+        accessibility.labels = labels;
       }
 
       if (options.includeStructure) {
-        accessibility.structure = this.generateStructureInfo(data)
+        accessibility.structure = this.generateStructureInfo(data);
       }
 
       if (options.includeNavigation) {
-        accessibility.navigation = this.generateNavigationInfo(data)
+        accessibility.navigation = this.generateNavigationInfo(data);
       }
 
       if (options.includeForms) {
-        accessibility.forms = this.generateFormsInfo(data)
+        accessibility.forms = this.generateFormsInfo(data);
       }
 
       if (options.includeMedia) {
-        accessibility.media = this.generateMediaInfo(data)
+        accessibility.media = this.generateMediaInfo(data);
       }
 
-      return { data, accessibility }
+      return { data, accessibility };
     } catch (error) {
-      this.logger.error(`Failed to enhance response with accessibility: ${error.message}`, error.stack)
-      return { data, accessibility }
+      this.logger.error(
+        `Failed to enhance response with accessibility: ${error.message}`,
+        error.stack,
+      );
+      return { data, accessibility };
     }
   }
 
   async validateAccessibilityCompliance(contentId: string): Promise<{
-    isCompliant: boolean
-    level: "A" | "AA" | "AAA"
+    isCompliant: boolean;
+    level: 'A' | 'AA' | 'AAA';
     violations: Array<{
-      rule: string
-      severity: "low" | "medium" | "high" | "critical"
-      description: string
-      suggestion: string
-    }>
-    warnings: string[]
+      rule: string;
+      severity: 'low' | 'medium' | 'high' | 'critical';
+      description: string;
+      suggestion: string;
+    }>;
+    warnings: string[];
   }> {
     try {
-      const metadata = await this.getAccessibilityMetadata(contentId)
+      const metadata = await this.getAccessibilityMetadata(contentId);
 
       if (!metadata) {
         return {
           isCompliant: false,
-          level: "A",
+          level: 'A',
           violations: [
             {
-              rule: "missing-metadata",
-              severity: "high",
-              description: "No accessibility metadata found",
-              suggestion: "Add accessibility metadata for this content",
+              rule: 'missing-metadata',
+              severity: 'high',
+              description: 'No accessibility metadata found',
+              suggestion: 'Add accessibility metadata for this content',
             },
           ],
           warnings: [],
-        }
+        };
       }
 
-      const violations = []
-      const warnings = []
+      const violations = [];
+      const warnings = [];
 
       // Check for alt text on images
-      if (metadata.contentType === ContentType.IMAGE && !metadata.isDecorative && !metadata.altText) {
+      if (
+        metadata.contentType === ContentType.IMAGE &&
+        !metadata.isDecorative &&
+        !metadata.altText
+      ) {
         violations.push({
-          rule: "img-alt",
-          severity: "high" as const,
-          description: "Image missing alternative text",
-          suggestion: "Add descriptive alt text for the image",
-        })
+          rule: 'img-alt',
+          severity: 'high' as const,
+          description: 'Image missing alternative text',
+          suggestion: 'Add descriptive alt text for the image',
+        });
       }
 
       // Check for proper heading structure
       if (metadata.contentType === ContentType.HEADING && !metadata.headingLevel) {
         violations.push({
-          rule: "heading-level",
-          severity: "medium" as const,
-          description: "Heading missing level information",
-          suggestion: "Specify the heading level (h1-h6)",
-        })
+          rule: 'heading-level',
+          severity: 'medium' as const,
+          description: 'Heading missing level information',
+          suggestion: 'Specify the heading level (h1-h6)',
+        });
       }
 
       // Check for form labels
       if (metadata.contentType === ContentType.FORM && !metadata.formLabels) {
         violations.push({
-          rule: "form-labels",
-          severity: "high" as const,
-          description: "Form elements missing labels",
-          suggestion: "Add proper labels for all form elements",
-        })
+          rule: 'form-labels',
+          severity: 'high' as const,
+          description: 'Form elements missing labels',
+          suggestion: 'Add proper labels for all form elements',
+        });
       }
 
       // Check color contrast
       if (metadata.colorContrast && metadata.colorContrast.ratio < 4.5) {
         violations.push({
-          rule: "color-contrast",
-          severity: "medium" as const,
-          description: "Insufficient color contrast ratio",
-          suggestion: "Increase color contrast to meet WCAG AA standards (4.5:1)",
-        })
+          rule: 'color-contrast',
+          severity: 'medium' as const,
+          description: 'Insufficient color contrast ratio',
+          suggestion: 'Increase color contrast to meet WCAG AA standards (4.5:1)',
+        });
       }
 
       // Determine compliance level
-      const criticalViolations = violations.filter((v) => v.severity === "critical")
-      const highViolations = violations.filter((v) => v.severity === "high")
-      const mediumViolations = violations.filter((v) => v.severity === "medium")
+      const criticalViolations = violations.filter((v) => v.severity === 'critical');
+      const highViolations = violations.filter((v) => v.severity === 'high');
+      const mediumViolations = violations.filter((v) => v.severity === 'medium');
 
-      let level: "A" | "AA" | "AAA" = "AAA"
-      let isCompliant = true
+      let level: 'A' | 'AA' | 'AAA' = 'AAA';
+      let isCompliant = true;
 
       if (criticalViolations.length > 0 || highViolations.length > 0) {
-        level = "A"
-        isCompliant = false
+        level = 'A';
+        isCompliant = false;
       } else if (mediumViolations.length > 0) {
-        level = "AA"
+        level = 'AA';
       }
 
       // Update metadata with validation results
-      metadata.validationStatus = isCompliant ? "valid" : "invalid"
-      metadata.validationErrors = violations.map((v) => v.description)
-      metadata.validationWarnings = warnings
-      metadata.complianceLevel = level
+      metadata.validationStatus = isCompliant ? 'valid' : 'invalid';
+      metadata.validationErrors = violations.map((v) => v.description);
+      metadata.validationWarnings = warnings;
+      metadata.complianceLevel = level;
 
-      await this.metadataRepository.save(metadata)
+      await this.metadataRepository.save(metadata);
 
-      return { isCompliant, level, violations, warnings }
+      return { isCompliant, level, violations, warnings };
     } catch (error) {
-      this.logger.error(`Failed to validate accessibility compliance: ${error.message}`, error.stack)
-      throw error
+      this.logger.error(
+        `Failed to validate accessibility compliance: ${error.message}`,
+        error.stack,
+      );
+      throw error;
     }
   }
 
   private extractContentIds(data: any): string[] {
-    const ids: string[] = []
+    const ids: string[] = [];
 
-    if (typeof data === "object" && data !== null) {
-      if (data.id) ids.push(data.id)
-      if (data.contentId) ids.push(data.contentId)
+    if (typeof data === 'object' && data !== null) {
+      if (data.id) ids.push(data.id);
+      if (data.contentId) ids.push(data.contentId);
 
       if (Array.isArray(data)) {
         data.forEach((item) => {
-          ids.push(...this.extractContentIds(item))
-        })
+          ids.push(...this.extractContentIds(item));
+        });
       } else {
         Object.values(data).forEach((value) => {
-          if (typeof value === "object") {
-            ids.push(...this.extractContentIds(value))
+          if (typeof value === 'object') {
+            ids.push(...this.extractContentIds(value));
           }
-        })
+        });
       }
     }
 
-    return [...new Set(ids)] // Remove duplicates
+    return [...new Set(ids)]; // Remove duplicates
   }
 
   private generateStructureInfo(data: any) {
@@ -368,21 +386,21 @@ export class AccessibilityService {
       headings: this.extractHeadings(data),
       landmarks: this.extractLandmarks(data),
       skipLinks: this.generateSkipLinks(data),
-    }
+    };
   }
 
   private generateNavigationInfo(data: any) {
     return {
       breadcrumbs: this.extractBreadcrumbs(data),
       pagination: this.extractPagination(data),
-    }
+    };
   }
 
   private generateFormsInfo(data: any) {
     return {
       fields: this.extractFormFields(data),
       validation: this.extractValidationInfo(data),
-    }
+    };
   }
 
   private generateMediaInfo(data: any) {
@@ -392,30 +410,30 @@ export class AccessibilityService {
       hasTranscript: this.hasTranscript(data),
       hasCaptions: this.hasCaptions(data),
       hasAudioDescription: this.hasAudioDescription(data),
-    }
+    };
   }
 
   private extractHeadings(data: any): Array<{ level: number; text: string; id?: string }> {
     // Implementation would extract heading information from data
-    return []
+    return [];
   }
 
   private extractLandmarks(data: any): Array<{ role: string; label?: string }> {
     // Implementation would extract landmark information from data
-    return []
+    return [];
   }
 
   private generateSkipLinks(data: any): Array<{ href: string; text: string }> {
     // Implementation would generate appropriate skip links
     return [
-      { href: "#main-content", text: "Skip to main content" },
-      { href: "#navigation", text: "Skip to navigation" },
-    ]
+      { href: '#main-content', text: 'Skip to main content' },
+      { href: '#navigation', text: 'Skip to navigation' },
+    ];
   }
 
   private extractBreadcrumbs(data: any): Array<{ text: string; href?: string; current?: boolean }> {
     // Implementation would extract breadcrumb information
-    return []
+    return [];
   }
 
   private extractPagination(data: any) {
@@ -426,14 +444,14 @@ export class AccessibilityService {
         total: data.pagination.totalPages || 1,
         hasNext: data.pagination.hasNext || false,
         hasPrevious: data.pagination.hasPrevious || false,
-      }
+      };
     }
-    return null
+    return null;
   }
 
   private extractFormFields(data: any) {
     // Implementation would extract form field information
-    return []
+    return [];
   }
 
   private extractValidationInfo(data: any) {
@@ -441,31 +459,31 @@ export class AccessibilityService {
     return {
       hasErrors: false,
       errorSummary: [],
-    }
+    };
   }
 
   private hasAudioContent(data: any): boolean {
     // Implementation would check for audio content
-    return false
+    return false;
   }
 
   private hasVideoContent(data: any): boolean {
     // Implementation would check for video content
-    return false
+    return false;
   }
 
   private hasTranscript(data: any): boolean {
     // Implementation would check for transcript availability
-    return false
+    return false;
   }
 
   private hasCaptions(data: any): boolean {
     // Implementation would check for captions availability
-    return false
+    return false;
   }
 
   private hasAudioDescription(data: any): boolean {
     // Implementation would check for audio description availability
-    return false
+    return false;
   }
 }

@@ -76,10 +76,11 @@ export class ErrorDashboardService {
     const startDate = new Date(endDate.getTime() - timeRangeHours * 60 * 60 * 1000);
 
     // Build query
-    let query = this.errorLogRepository.createQueryBuilder('error')
+    let query = this.errorLogRepository
+      .createQueryBuilder('error')
       .where('error.timestamp >= :startDate AND error.timestamp <= :endDate', {
         startDate,
-        endDate
+        endDate,
       });
 
     if (errorCode) {
@@ -91,10 +92,10 @@ export class ErrorDashboardService {
 
     // Calculate statistics
     const totalErrors = filteredLogs.length;
-    const criticalErrors = filteredLogs.filter((log: ErrorLog) => 
-      log.severity === 'high' || log.severity === 'critical'
+    const criticalErrors = filteredLogs.filter(
+      (log: ErrorLog) => log.severity === 'high' || log.severity === 'critical',
     ).length;
-    
+
     // Calculate error rate (errors per hour)
     const errorRate = totalErrors / timeRangeHours;
 
@@ -105,12 +106,12 @@ export class ErrorDashboardService {
     });
 
     const topErrorTypes = Object.entries(errorTypeCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([errorCode, count]) => ({
         errorCode,
         count,
-        percentage: totalErrors > 0 ? (count / totalErrors) * 100 : 0
+        percentage: totalErrors > 0 ? (count / totalErrors) * 100 : 0,
       }));
 
     return {
@@ -120,59 +121,59 @@ export class ErrorDashboardService {
       topErrorTypes,
       timeRange: {
         start: startDate,
-        end: endDate
-      }
+        end: endDate,
+      },
     };
   }
 
   async getErrorTrends(timeRangeHours = 168, intervalHours = 1): Promise<ErrorTrend[]> {
     const endDate = new Date();
     const startDate = new Date(endDate.getTime() - timeRangeHours * 60 * 60 * 1000);
-    
+
     const trends: ErrorTrend[] = [];
-    
+
     // Create time intervals
     const intervals = Math.ceil(timeRangeHours / intervalHours);
     for (let i = 0; i < intervals; i++) {
       const intervalStart = new Date(startDate.getTime() + i * intervalHours * 60 * 60 * 1000);
       const intervalEnd = new Date(intervalStart.getTime() + intervalHours * 60 * 60 * 1000);
-      
+
       // Get counts for this interval
       const totalCount = await this.errorLogRepository
         .createQueryBuilder('error')
         .where('error.timestamp >= :intervalStart AND error.timestamp < :intervalEnd', {
           intervalStart,
-          intervalEnd
+          intervalEnd,
         })
         .getCount();
-      
+
       const criticalCount = await this.errorLogRepository
         .createQueryBuilder('error')
         .where('error.timestamp >= :intervalStart AND error.timestamp < :intervalEnd', {
           intervalStart,
-          intervalEnd
+          intervalEnd,
         })
         .andWhere('error.severity IN (:...severities)', { severities: ['high', 'critical'] })
         .getCount();
-      
+
       // Calculate error rate for this interval (errors per hour)
       const errorRate = totalCount / intervalHours;
-      
+
       trends.push({
         timestamp: intervalStart,
         totalCount,
         criticalCount,
-        errorRate
+        errorRate,
       });
     }
-    
+
     return trends;
   }
 
   async getTopErrors(limit = 10, timeRangeHours = 24): Promise<TopError[]> {
     const endDate = new Date();
     const startDate = new Date(endDate.getTime() - timeRangeHours * 60 * 60 * 1000);
-    
+
     // Get errors grouped by error code with aggregation information
     const results = await this.errorLogRepository
       .createQueryBuilder('error')
@@ -184,7 +185,7 @@ export class ErrorDashboardService {
       .addSelect('ARRAY_AGG(DISTINCT error.endpoint)', 'affectedEndpoints')
       .where('error.timestamp >= :startDate AND error.timestamp <= :endDate', {
         startDate,
-        endDate
+        endDate,
       })
       .groupBy('error.errorCode, error.errorMessage')
       .orderBy('count', 'DESC')
@@ -197,7 +198,7 @@ export class ErrorDashboardService {
       count: parseInt(result.count, 10),
       firstOccurrence: new Date(result.firstOccurrence),
       lastOccurrence: new Date(result.lastOccurrence),
-      affectedEndpoints: result.affectedEndpoints ? result.affectedEndpoints.filter(Boolean) : []
+      affectedEndpoints: result.affectedEndpoints ? result.affectedEndpoints.filter(Boolean) : [],
     }));
   }
 
@@ -206,11 +207,11 @@ export class ErrorDashboardService {
       .createQueryBuilder('error')
       .where('error.correlationId = :correlationId', { correlationId })
       .getOne();
-    
+
     if (!log) {
       return null;
     }
-    
+
     return {
       correlationId: log.correlationId,
       errorCode: log.errorCode,
@@ -223,7 +224,7 @@ export class ErrorDashboardService {
       userAgent: log.userAgent,
       ip: log.ip,
       stackTrace: log.stackTrace,
-      context: log.context || {}
+      context: log.context || {},
     };
   }
 
@@ -250,14 +251,14 @@ export class ErrorDashboardService {
         context: errorLogData.context || {},
         severity: errorLogData.severity || 'medium',
         category: errorLogData.category || 'UNKNOWN',
-        timestamp: new Date(errorLogData.timestamp)
+        timestamp: new Date(errorLogData.timestamp),
       });
-      
+
       await this.errorLogRepository.save(errorLog);
     } catch (error: any) {
       this.loggerService.error('Failed to save error log to database', {
         error: error.message,
-        correlationId: errorLogData.correlationId
+        correlationId: errorLogData.correlationId,
       });
     }
   }
@@ -268,7 +269,7 @@ export class ErrorDashboardService {
     this.loggerService.info('Alert history item received', {
       alertId: alert.id,
       type: alert.type,
-      severity: alert.severity
+      severity: alert.severity,
     });
   }
 }

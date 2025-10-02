@@ -257,11 +257,11 @@ export class Video {
 
   get formattedDuration(): string {
     if (!this.duration) return '0:00';
-    
+
     const hours = Math.floor(this.duration / 3600);
     const minutes = Math.floor((this.duration % 3600) / 60);
     const seconds = this.duration % 60;
-    
+
     if (hours > 0) {
       return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
@@ -270,16 +270,16 @@ export class Video {
 
   get formattedFileSize(): string {
     if (!this.fileSize) return '0 B';
-    
+
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     let size = Number(this.fileSize);
     let unitIndex = 0;
-    
+
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
       unitIndex++;
     }
-    
+
     return `${size.toFixed(1)} ${units[unitIndex]}`;
   }
 }

@@ -26,16 +26,11 @@ export class CourseEnrollmentCompletedEvent extends DomainEvent {
     private readonly payload: CourseEnrollmentCompletedPayload,
     metadata: Partial<DomainEventMetadata> = {},
   ) {
-    super(
-      payload.enrollmentId,
-      'CourseEnrollment',
-      1,
-      {
-        ...metadata,
-        userId: payload.userId,
-        correlationId: metadata.correlationId,
-      },
-    );
+    super(payload.enrollmentId, 'CourseEnrollment', 1, {
+      ...metadata,
+      userId: payload.userId,
+      correlationId: metadata.correlationId,
+    });
   }
 
   getPayload(): CourseEnrollmentCompletedPayload {

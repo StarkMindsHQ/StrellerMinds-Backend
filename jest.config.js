@@ -18,11 +18,7 @@ module.exports = {
   ],
 
   // Ignore patterns
-  testPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/dist/',
-    '<rootDir>/test/e2e/',
-  ],
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/test/e2e/'],
 
   // Module name mapping for path aliases
   moduleNameMapper: {
@@ -32,9 +28,7 @@ module.exports = {
   },
 
   // Setup files
-  setupFilesAfterEnv: [
-    '<rootDir>/test/setup/jest.setup.ts',
-  ],
+  setupFilesAfterEnv: ['<rootDir>/test/setup/jest.setup.ts'],
 
   // Transform configuration
   transform: {
@@ -66,15 +60,7 @@ module.exports = {
   ],
 
   coverageDirectory: '<rootDir>/coverage',
-  coverageReporters: [
-    'text',
-    'text-summary',
-    'html',
-    'lcov',
-    'json',
-    'json-summary',
-    'cobertura',
-  ],
+  coverageReporters: ['text', 'text-summary', 'html', 'lcov', 'json', 'json-summary', 'cobertura'],
 
   // Coverage thresholds
   coverageThreshold: {
@@ -145,9 +131,5 @@ module.exports = {
   ],
 
   // Watch mode configuration
-  watchPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/dist/',
-    '<rootDir>/coverage/',
-  ],
+  watchPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/coverage/'],
 };

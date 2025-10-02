@@ -11,7 +11,7 @@ export function initializeTracing() {
   const serviceName = process.env.TRACING_SERVICE_NAME || 'strellerminds-backend';
   const serviceVersion = process.env.TRACING_SERVICE_VERSION || '1.0.0';
   const environment = process.env.NODE_ENV || 'development';
-  
+
   const resource = new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
     [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion,
@@ -20,7 +20,7 @@ export function initializeTracing() {
 
   // Determine which exporter to use
   let traceExporter;
-  
+
   if (process.env.TRACING_JAEGER_ENABLED === 'true') {
     traceExporter = new JaegerExporter({
       endpoint: process.env.TRACING_JAEGER_ENDPOINT || 'http://localhost:14268/api/traces',
@@ -60,10 +60,11 @@ export function initializeTracing() {
   console.log('✅ OpenTelemetry tracing initialized successfully');
   console.log(`📊 Service: ${serviceName} v${serviceVersion}`);
   console.log(`🌍 Environment: ${environment}`);
-  
+
   // Gracefully shut down the SDK on process exit
   process.on('SIGTERM', () => {
-    sdk.shutdown()
+    sdk
+      .shutdown()
       .then(() => console.log('✅ OpenTelemetry tracing shutdown complete'))
       .catch((error) => console.log('❌ Error shutting down OpenTelemetry tracing', error))
       .finally(() => process.exit(0));

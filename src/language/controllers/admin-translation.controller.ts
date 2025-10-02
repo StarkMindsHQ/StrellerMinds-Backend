@@ -1,33 +1,33 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common"
-import type { AdminTranslationService } from "../services/admin-translation.service"
-import { CreateLanguageDto } from "../dto/create-language.dto"
-import { UpdateLanguageDto } from "../dto/update-language.dto"
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import type { AdminTranslationService } from '../services/admin-translation.service';
+import { CreateLanguageDto } from '../dto/create-language.dto';
+import { UpdateLanguageDto } from '../dto/update-language.dto';
 // import { LanguageGuard } from "../guards/language.guard"
-import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from "@nestjs/swagger"
+import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags("Admin Translation Management")
-@Controller("admin/translations")
+@ApiTags('Admin Translation Management')
+@Controller('admin/translations')
 export class AdminTranslationController {
   constructor(private readonly adminTranslationService: AdminTranslationService) {}
 
-  @ApiOperation({ summary: "Get all languages" })
+  @ApiOperation({ summary: 'Get all languages' })
   @ApiResponse({
     status: 200,
-    description: "Returns all available languages",
+    description: 'Returns all available languages',
   })
-  @Get("languages")
+  @Get('languages')
   async getAllLanguages() {
-    const languages = await this.adminTranslationService.getAllLanguages()
+    const languages = await this.adminTranslationService.getAllLanguages();
     return {
       success: true,
       data: languages,
-    }
+    };
   }
 
   @ApiOperation({ summary: 'Get language by ID' })
   @ApiParam({ name: 'id', description: 'Language ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns the language with the specified ID',
   })
   @Get('languages/:id')
@@ -41,8 +41,8 @@ export class AdminTranslationController {
 
   @ApiOperation({ summary: 'Get language by code' })
   @ApiParam({ name: 'code', description: 'Language code (e.g., en, es, fr)' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns the language with the specified code',
   })
   @Get('languages/code/:code')
@@ -56,8 +56,8 @@ export class AdminTranslationController {
 
   @ApiOperation({ summary: 'Create a new language' })
   @ApiBody({ type: CreateLanguageDto })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Creates a new language',
   })
   @Post('languages')
@@ -69,26 +69,26 @@ export class AdminTranslationController {
     };
   }
 
-  @ApiOperation({ summary: "Update a language" })
-  @ApiParam({ name: "id", description: "Language ID" })
+  @ApiOperation({ summary: 'Update a language' })
+  @ApiParam({ name: 'id', description: 'Language ID' })
   @ApiBody({ type: UpdateLanguageDto })
   @ApiResponse({
     status: 200,
-    description: "Updates an existing language",
+    description: 'Updates an existing language',
   })
-  @Patch("languages/:id")
+  @Patch('languages/:id')
   async updateLanguage(@Param('id') id: string, @Body() updateDto: UpdateLanguageDto) {
-    const language = await this.adminTranslationService.updateLanguage(id, updateDto)
+    const language = await this.adminTranslationService.updateLanguage(id, updateDto);
     return {
       success: true,
       data: language,
-    }
+    };
   }
 
   @ApiOperation({ summary: 'Delete a language' })
   @ApiParam({ name: 'id', description: 'Language ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Deletes a language',
   })
   @Delete('languages/:id')
@@ -102,8 +102,8 @@ export class AdminTranslationController {
 
   @ApiOperation({ summary: 'Set a language as default' })
   @ApiParam({ name: 'id', description: 'Language ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Sets the specified language as the default language',
   })
   @Patch('languages/:id/default')
@@ -115,17 +115,17 @@ export class AdminTranslationController {
     };
   }
 
-  @ApiOperation({ summary: "Get translation statistics" })
+  @ApiOperation({ summary: 'Get translation statistics' })
   @ApiResponse({
     status: 200,
-    description: "Returns statistics about translations for all languages",
+    description: 'Returns statistics about translations for all languages',
   })
-  @Get("stats")
+  @Get('stats')
   async getTranslationStats() {
-    const stats = await this.adminTranslationService.getTranslationStats()
+    const stats = await this.adminTranslationService.getTranslationStats();
     return {
       success: true,
       data: stats,
-    }
+    };
   }
 }

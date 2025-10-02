@@ -1,56 +1,64 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, Unique } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+  Unique,
+} from 'typeorm';
 
 export enum LocaleSource {
-  USER_PREFERENCE = "user_preference",
-  BROWSER_DETECTION = "browser_detection",
-  GEO_LOCATION = "geo_location",
-  DEFAULT = "default",
+  USER_PREFERENCE = 'user_preference',
+  BROWSER_DETECTION = 'browser_detection',
+  GEO_LOCATION = 'geo_location',
+  DEFAULT = 'default',
 }
 
-@Entity("user_locales")
-@Unique(["userId"])
-@Index(["locale"])
-@Index(["source"])
+@Entity('user_locales')
+@Unique(['userId'])
+@Index(['locale'])
+@Index(['source'])
 export class UserLocale {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   @Index()
-  userId: string
+  userId: string;
 
   @Column()
-  locale: string
+  locale: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: LocaleSource,
     default: LocaleSource.USER_PREFERENCE,
   })
-  source: LocaleSource
+  source: LocaleSource;
 
-  @Column("simple-array", { nullable: true })
-  fallbackLocales?: string[]
+  @Column('simple-array', { nullable: true })
+  fallbackLocales?: string[];
 
-  @Column("jsonb", { nullable: true })
+  @Column('jsonb', { nullable: true })
   preferences?: {
-    dateFormat?: string
-    timeFormat?: string
-    numberFormat?: string
-    currency?: string
-    timezone?: string
-    rtl?: boolean
-  }
+    dateFormat?: string;
+    timeFormat?: string;
+    numberFormat?: string;
+    currency?: string;
+    timezone?: string;
+    rtl?: boolean;
+  };
 
   @Column({ default: true })
-  isActive: boolean
+  isActive: boolean;
 
-  @Column({ type: "timestamp", nullable: true })
-  lastUsedAt?: Date
+  @Column({ type: 'timestamp', nullable: true })
+  lastUsedAt?: Date;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

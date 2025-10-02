@@ -55,12 +55,7 @@ import { CommonModule } from '../common/common.module';
     CommonModule, // Import CommonModule for shared services
   ],
   controllers: [UsersController, ProgressController, AdminUsersController],
-  providers: [
-    UsersService,
-    AccountDeletionConfirmationService,
-    ProgressService,
-    CloudinaryService,
-  ],
+  providers: [UsersService, AccountDeletionConfirmationService, ProgressService, CloudinaryService],
   exports: [UsersService, AccountDeletionConfirmationService],
 })
 export class UsersModule {}

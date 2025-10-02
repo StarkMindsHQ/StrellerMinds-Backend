@@ -1,8 +1,4 @@
-import {
-  createParamDecorator,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { createParamDecorator, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Request } from 'express';
 
 // Extend the Request interface to include the 'user' property
@@ -13,10 +9,7 @@ declare module 'express' {
 }
 
 export const CurrentUser = createParamDecorator(
-  (
-    data: { required?: boolean } = { required: true },
-    ctx: ExecutionContext,
-  ) => {
+  (data: { required?: boolean } = { required: true }, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<Request>();
 
     // Get user from request - the exact property may vary based on your auth implementation
@@ -31,9 +24,7 @@ export const CurrentUser = createParamDecorator(
   },
 );
 
-export const OptionalUser = createParamDecorator(
-  (data: any, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest<Request>();
-    return request.user;
-  },
-);
+export const OptionalUser = createParamDecorator((data: any, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest<Request>();
+  return request.user;
+});

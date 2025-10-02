@@ -64,9 +64,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should return performance metrics', async () => {
-      mockReportingService.getCoursePerformanceMetrics.mockResolvedValue(
-        'course-metrics',
-      );
+      mockReportingService.getCoursePerformanceMetrics.mockResolvedValue('course-metrics');
       const result = await service.getCoursePerformance({ courseId: '123' });
       expect(result).toBe('course-metrics');
     });
@@ -80,9 +78,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should return user engagement metrics', async () => {
-      mockReportingService.getUserEngagementMetrics.mockResolvedValue(
-        'user-metrics',
-      );
+      mockReportingService.getUserEngagementMetrics.mockResolvedValue('user-metrics');
       const result = await service.getUserEngagement({ userId: '456' });
       expect(result).toBe('user-metrics');
     });
@@ -96,9 +92,7 @@ describe('AnalyticsService', () => {
     });
 
     it('should return instructor performance metrics', async () => {
-      mockReportingService.getInstructorPerformanceMetrics.mockResolvedValue(
-        'instructor-metrics',
-      );
+      mockReportingService.getInstructorPerformanceMetrics.mockResolvedValue('instructor-metrics');
       const result = await service.getInstructorPerformance({
         instructorId: '789',
       });
@@ -108,9 +102,7 @@ describe('AnalyticsService', () => {
 
   describe('getPlatformOverview', () => {
     it('should return overview metrics', async () => {
-      mockReportingService.getPlatformOverviewMetrics.mockResolvedValue(
-        'overview',
-      );
+      mockReportingService.getPlatformOverviewMetrics.mockResolvedValue('overview');
       const result = await service.getPlatformOverview({});
       expect(result).toBe('overview');
     });
@@ -118,9 +110,7 @@ describe('AnalyticsService', () => {
 
   describe('getRealtimeData', () => {
     it('should return realtime dashboard data', async () => {
-      mockRealtimeAnalyticsService.getRealtimeDashboardData.mockResolvedValue(
-        'dashboard',
-      );
+      mockRealtimeAnalyticsService.getRealtimeDashboardData.mockResolvedValue('dashboard');
       const result = await service.getRealtimeData();
       expect(result).toBe('dashboard');
     });
@@ -128,9 +118,7 @@ describe('AnalyticsService', () => {
 
   describe('predictCompletion', () => {
     it('should return prediction result', async () => {
-      mockPredictiveAnalyticsService.predictCourseCompletion.mockResolvedValue(
-        'prediction',
-      );
+      mockPredictiveAnalyticsService.predictCourseCompletion.mockResolvedValue('prediction');
       const result = await service.predictCompletion({} as any);
       expect(result).toBe('prediction');
     });
@@ -138,9 +126,7 @@ describe('AnalyticsService', () => {
 
   describe('getUserPredictions', () => {
     it('should return user predictions', async () => {
-      mockPredictiveAnalyticsService.getUserCompletionPredictions.mockResolvedValue(
-        ['pred1'],
-      );
+      mockPredictiveAnalyticsService.getUserCompletionPredictions.mockResolvedValue(['pred1']);
       const result = await service.getUserPredictions('user123');
       expect(result).toEqual(['pred1']);
     });
@@ -148,9 +134,7 @@ describe('AnalyticsService', () => {
 
   describe('getCoursePredictions', () => {
     it('should return course predictions', async () => {
-      mockPredictiveAnalyticsService.getCourseCompletionPredictions.mockResolvedValue(
-        ['pred2'],
-      );
+      mockPredictiveAnalyticsService.getCourseCompletionPredictions.mockResolvedValue(['pred2']);
       const result = await service.getCoursePredictions('course123');
       expect(result).toEqual(['pred2']);
     });
@@ -179,9 +163,7 @@ describe('AnalyticsService', () => {
 
   describe('getPredictiveSummary', () => {
     it('should return summary', async () => {
-      mockReportingService.getPredictiveSummary.mockResolvedValue([
-        { summary: 'data' },
-      ]);
+      mockReportingService.getPredictiveSummary.mockResolvedValue([{ summary: 'data' }]);
       const result = await service.getPredictiveSummary({});
       expect(result).toEqual({ summary: 'data' });
     });

@@ -16,4 +16,4 @@ export class UserAchievement {
 
   @CreateDateColumn()
   dateUnlocked: Date;
-} 
+}

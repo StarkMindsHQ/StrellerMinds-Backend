@@ -3,10 +3,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/apps/backend/tests/contract'],
-  testMatch: [
-    '**/*.pact.test.ts',
-    '**/*.contract.test.ts'
-  ],
+  testMatch: ['**/*.pact.test.ts', '**/*.contract.test.ts'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
@@ -31,19 +28,19 @@ module.exports = {
   moduleNameMapping: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@test/(.*)$': '<rootDir>/test/$1',
-    '^@contract/(.*)$': '<rootDir>/apps/backend/tests/contract/$1'
+    '^@contract/(.*)$': '<rootDir>/apps/backend/tests/contract/$1',
   },
   globals: {
     'ts-jest': {
-      tsconfig: 'tsconfig.json'
-    }
+      tsconfig: 'tsconfig.json',
+    },
   },
   // Pact-specific configuration
   testEnvironmentOptions: {
     // Ensure Pact tests have enough time to complete
-    timeout: 30000
+    timeout: 30000,
   },
   // Ensure Pact files are generated in the correct directory
   globalSetup: '<rootDir>/apps/backend/tests/contract/global-setup.ts',
-  globalTeardown: '<rootDir>/apps/backend/tests/contract/global-teardown.ts'
+  globalTeardown: '<rootDir>/apps/backend/tests/contract/global-teardown.ts',
 };

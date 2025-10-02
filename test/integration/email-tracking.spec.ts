@@ -36,7 +36,9 @@ describe('Email Tracking (Integration)', () => {
   });
 
   it('GET /email/track/open/:token.png returns pixel', async () => {
-    const res = await request(app.getHttpServer()).get('/email/track/open/testtoken.png').expect(200);
+    const res = await request(app.getHttpServer())
+      .get('/email/track/open/testtoken.png')
+      .expect(200);
     expect(res.headers['content-type']).toContain('image/png');
   });
 
@@ -50,5 +52,3 @@ describe('Email Tracking (Integration)', () => {
     expect(res.headers.location).toBe(url);
   });
 });
-
-

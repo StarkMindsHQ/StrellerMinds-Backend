@@ -99,8 +99,12 @@ export class VideoStreamingService {
       const savedVideo = await this.videoRepository.save(video);
 
       // Generate S3 upload URL for direct upload
-      const uploadKey = this.cloudFrontService.generateVideoKey(savedVideo.id, undefined, 'original');
-      
+      const uploadKey = this.cloudFrontService.generateVideoKey(
+        savedVideo.id,
+        undefined,
+        'original',
+      );
+
       // Update video with S3 information
       await this.videoRepository.update(savedVideo.id, {
         s3Key: uploadKey,
@@ -125,7 +129,7 @@ export class VideoStreamingService {
       this.logger.debug(`Uploading video file for video: ${videoId}`);
 
       const video = await this.findVideoById(videoId);
-      
+
       if (video.status !== VideoStatus.UPLOADING) {
         throw new BadRequestException('Video is not in uploading state');
       }
@@ -164,7 +168,7 @@ export class VideoStreamingService {
       this.logger.debug(`Video file uploaded successfully: ${videoId}`);
     } catch (error) {
       this.logger.error(`Failed to upload video file: ${videoId}`, error.stack);
-      
+
       // Update video status to failed
       await this.videoRepository.update(videoId, {
         status: VideoStatus.FAILED,
@@ -172,7 +176,7 @@ export class VideoStreamingService {
           processingErrors: [error.message],
         },
       });
-      
+
       throw error;
     }
   }
@@ -206,8 +210,8 @@ export class VideoStreamingService {
 
       // Get quality variants
       const qualities = video.qualityVariants
-        .filter(q => q.status === 'completed')
-        .map(q => ({
+        .filter((q) => q.status === 'completed')
+        .map((q) => ({
           quality: q.quality,
           url: q.url,
           width: q.width,
@@ -287,16 +291,16 @@ export class VideoStreamingService {
       whereClause.uploadedBy = { id: filters.uploadedBy };
     }
 
-    const queryBuilder = this.videoRepository.createQueryBuilder('video')
+    const queryBuilder = this.videoRepository
+      .createQueryBuilder('video')
       .leftJoinAndSelect('video.uploadedBy', 'uploadedBy')
       .leftJoinAndSelect('video.qualityVariants', 'qualityVariants')
       .where(whereClause);
 
     if (filters.search) {
-      queryBuilder.andWhere(
-        '(video.title ILIKE :search OR video.description ILIKE :search)',
-        { search: `%${filters.search}%` },
-      );
+      queryBuilder.andWhere('(video.title ILIKE :search OR video.description ILIKE :search)', {
+        search: `%${filters.search}%`,
+      });
     }
 
     const [videos, total] = await queryBuilder
@@ -308,11 +312,7 @@ export class VideoStreamingService {
     return { videos, total };
   }
 
-  async updateVideo(
-    videoId: string,
-    updateData: Partial<Video>,
-    userId: string,
-  ): Promise<Video> {
+  async updateVideo(videoId: string, updateData: Partial<Video>, userId: string): Promise<Video> {
     const video = await this.findVideoById(videoId);
 
     // Check if user has permission to update

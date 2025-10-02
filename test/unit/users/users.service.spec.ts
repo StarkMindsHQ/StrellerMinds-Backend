@@ -204,16 +204,14 @@ describe('UsersService', () => {
 
     it('should update user successfully', async () => {
       const updatedUser = { ...mockUser, ...updateData };
-      
+
       jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser);
       jest.spyOn(repository, 'save').mockResolvedValue(updatedUser);
 
       const result = await service.update(mockUser.id, updateData);
 
       expect(result).toEqual(updatedUser);
-      expect(repository.save).toHaveBeenCalledWith(
-        expect.objectContaining(updateData),
-      );
+      expect(repository.save).toHaveBeenCalledWith(expect.objectContaining(updateData));
     });
 
     it('should throw NotFoundException when user not found', async () => {
@@ -226,7 +224,7 @@ describe('UsersService', () => {
 
     it('should hash password when updating password', async () => {
       const passwordUpdate = { password: 'newpassword123' };
-      
+
       jest.spyOn(repository, 'findOne').mockResolvedValue(mockUser);
       jest.spyOn(repository, 'save').mockResolvedValue(mockUser);
 
@@ -282,9 +280,10 @@ describe('UsersService', () => {
         ]),
       };
 
-      jest.spyOn(repository, 'count')
+      jest
+        .spyOn(repository, 'count')
         .mockResolvedValueOnce(100) // total users
-        .mockResolvedValueOnce(80)  // active users
+        .mockResolvedValueOnce(80) // active users
         .mockResolvedValueOnce(15); // new users this month
 
       jest.spyOn(repository, 'createQueryBuilder').mockReturnValue(mockQueryBuilder as any);

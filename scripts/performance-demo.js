@@ -26,19 +26,19 @@ class PerformanceDemoRunner {
       const step = this.steps[i];
       console.log(`\n📋 Step ${i + 1}/${this.steps.length}: ${step.name}`);
       console.log('─'.repeat(50));
-      
+
       try {
         await step.action();
         console.log(`✅ ${step.name} completed successfully`);
       } catch (error) {
         console.error(`❌ ${step.name} failed:`, error.message);
-        
+
         // Continue with demo even if some steps fail
         if (step.name === 'Health Check') {
           console.log('⚠️  Application may not be running. Some steps may fail.');
         }
       }
-      
+
       // Brief pause between steps
       await this.sleep(2000);
     }
@@ -49,12 +49,12 @@ class PerformanceDemoRunner {
 
   async healthCheck() {
     console.log('🔍 Checking application health...');
-    
+
     try {
       const response = await axios.get(`${this.baseUrl}/health`, { timeout: 5000 });
       console.log(`   Status: ${response.status}`);
       console.log(`   Response: ${JSON.stringify(response.data, null, 2)}`);
-      
+
       if (response.status === 200) {
         console.log('   ✅ Application is healthy and ready for testing');
       }
@@ -68,11 +68,11 @@ class PerformanceDemoRunner {
 
   async createBaseline() {
     console.log('📋 Creating performance baseline...');
-    
+
     return new Promise((resolve, reject) => {
       const baseline = spawn('node', ['scripts/performance-baseline.js'], {
         stdio: 'inherit',
-        env: { ...process.env, API_BASE_URL: this.baseUrl }
+        env: { ...process.env, API_BASE_URL: this.baseUrl },
       });
 
       baseline.on('close', (code) => {
@@ -92,16 +92,15 @@ class PerformanceDemoRunner {
 
   async runQuickLoadTest() {
     console.log('🔥 Running quick load test...');
-    
+
     return new Promise((resolve, reject) => {
-      const loadTest = spawn('npx', [
-        'artillery', 'quick',
-        '--count', '20',
-        '--num', '5',
-        `${this.baseUrl}/health`
-      ], {
-        stdio: 'inherit'
-      });
+      const loadTest = spawn(
+        'npx',
+        ['artillery', 'quick', '--count', '20', '--num', '5', `${this.baseUrl}/health`],
+        {
+          stdio: 'inherit',
+        },
+      );
 
       loadTest.on('close', (code) => {
         if (code === 0) {
@@ -122,11 +121,11 @@ class PerformanceDemoRunner {
 
   async startMonitoring() {
     console.log('📊 Starting performance monitoring (30 seconds)...');
-    
+
     return new Promise((resolve, reject) => {
       const monitor = spawn('timeout', ['30', 'node', 'scripts/performance-monitor.js'], {
         stdio: 'inherit',
-        env: { ...process.env, API_BASE_URL: this.baseUrl, MONITORING_INTERVAL: '5000' }
+        env: { ...process.env, API_BASE_URL: this.baseUrl, MONITORING_INTERVAL: '5000' },
       });
 
       monitor.on('close', (code) => {
@@ -143,16 +142,15 @@ class PerformanceDemoRunner {
 
   async runStressTest() {
     console.log('💪 Running stress test...');
-    
+
     return new Promise((resolve, reject) => {
-      const stressTest = spawn('npx', [
-        'autocannon',
-        '-c', '50',
-        '-d', '15',
-        `${this.baseUrl}/health`
-      ], {
-        stdio: 'inherit'
-      });
+      const stressTest = spawn(
+        'npx',
+        ['autocannon', '-c', '50', '-d', '15', `${this.baseUrl}/health`],
+        {
+          stdio: 'inherit',
+        },
+      );
 
       stressTest.on('close', (code) => {
         if (code === 0) {
@@ -172,11 +170,11 @@ class PerformanceDemoRunner {
 
   async generateReport() {
     console.log('📊 Generating performance report...');
-    
+
     return new Promise((resolve, reject) => {
       const report = spawn('node', ['scripts/performance-report.js'], {
         stdio: 'inherit',
-        env: { ...process.env, API_BASE_URL: this.baseUrl }
+        env: { ...process.env, API_BASE_URL: this.baseUrl },
       });
 
       report.on('close', (code) => {
@@ -257,7 +255,7 @@ class PerformanceDemoRunner {
   }
 
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

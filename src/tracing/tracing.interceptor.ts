@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
@@ -21,7 +15,7 @@ export class TracingInterceptor implements NestInterceptor {
     const response = context.switchToHttp().getResponse();
     const handler = context.getHandler();
     const controller = context.getClass();
-    
+
     const spanName = `${controller.name}.${handler.name}`;
     const method = request.method;
     const url = request.url;
@@ -47,7 +41,7 @@ export class TracingInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap((data) => {
         const duration = Date.now() - startTime;
-        
+
         span.setAttributes({
           'http.status_code': response.statusCode,
           'http.response.size': JSON.stringify(data).length,
@@ -83,7 +77,7 @@ export class TracingInterceptor implements NestInterceptor {
       }),
       catchError((error) => {
         const duration = Date.now() - startTime;
-        
+
         span.setAttributes({
           'http.status_code': response.statusCode || 500,
           'error.name': error.name,
@@ -97,7 +91,7 @@ export class TracingInterceptor implements NestInterceptor {
           code: SpanStatusCode.ERROR,
           message: error.message,
         });
-        
+
         span.recordException(error);
         span.end();
 

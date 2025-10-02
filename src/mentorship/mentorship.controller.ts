@@ -14,8 +14,13 @@ export class MentorshipController {
    * Match a mentee to potential mentors based on criteria.
    */
   @Post('match')
-  @ApiOperation({ summary: 'Match mentee to mentors', description: 'Finds mentors for a mentee based on criteria.' })
-  @ApiBody({ schema: { properties: { menteeId: { type: 'string' }, criteria: { type: 'object' } } } })
+  @ApiOperation({
+    summary: 'Match mentee to mentors',
+    description: 'Finds mentors for a mentee based on criteria.',
+  })
+  @ApiBody({
+    schema: { properties: { menteeId: { type: 'string' }, criteria: { type: 'object' } } },
+  })
   @ApiResponse({ status: 200, description: 'List of matched mentors.' })
   async matchMentor(@Body() body: { menteeId: string; criteria: any }) {
     return this.mentorshipService.matchMentorMentee(body.menteeId, body.criteria);
@@ -25,8 +30,19 @@ export class MentorshipController {
    * Create a new mentorship relationship.
    */
   @Post()
-  @ApiOperation({ summary: 'Create mentorship', description: 'Creates a new mentorship between mentor and mentee.' })
-  @ApiBody({ schema: { properties: { mentorId: { type: 'string' }, menteeId: { type: 'string' }, goals: { type: 'string', required: false } } } })
+  @ApiOperation({
+    summary: 'Create mentorship',
+    description: 'Creates a new mentorship between mentor and mentee.',
+  })
+  @ApiBody({
+    schema: {
+      properties: {
+        mentorId: { type: 'string' },
+        menteeId: { type: 'string' },
+        goals: { type: 'string', required: false },
+      },
+    },
+  })
   @ApiResponse({ status: 201, description: 'Mentorship created.' })
   async createMentorship(@Body() body: { mentorId: string; menteeId: string; goals?: string }) {
     return this.mentorshipService.createMentorship(body.mentorId, body.menteeId, body.goals);
@@ -47,19 +63,41 @@ export class MentorshipController {
    * Create a session for a mentorship.
    */
   @Post(':id/session')
-  @ApiOperation({ summary: 'Create mentorship session', description: 'Schedules a new session for a mentorship.' })
+  @ApiOperation({
+    summary: 'Create mentorship session',
+    description: 'Schedules a new session for a mentorship.',
+  })
   @ApiParam({ name: 'id', description: 'Mentorship ID' })
-  @ApiBody({ schema: { properties: { scheduledAt: { type: 'string', format: 'date-time' }, durationMinutes: { type: 'number', required: false }, notes: { type: 'string', required: false } } } })
+  @ApiBody({
+    schema: {
+      properties: {
+        scheduledAt: { type: 'string', format: 'date-time' },
+        durationMinutes: { type: 'number', required: false },
+        notes: { type: 'string', required: false },
+      },
+    },
+  })
   @ApiResponse({ status: 201, description: 'Session created.' })
-  async createSession(@Param('id') mentorshipId: string, @Body() body: { scheduledAt: Date; durationMinutes?: number; notes?: string }) {
-    return this.mentorshipService.createSession(mentorshipId, body.scheduledAt, body.durationMinutes, body.notes);
+  async createSession(
+    @Param('id') mentorshipId: string,
+    @Body() body: { scheduledAt: Date; durationMinutes?: number; notes?: string },
+  ) {
+    return this.mentorshipService.createSession(
+      mentorshipId,
+      body.scheduledAt,
+      body.durationMinutes,
+      body.notes,
+    );
   }
 
   /**
    * Get mentorship analytics summary.
    */
   @Get('analytics/summary')
-  @ApiOperation({ summary: 'Get mentorship analytics', description: 'Returns analytics summary for mentorships.' })
+  @ApiOperation({
+    summary: 'Get mentorship analytics',
+    description: 'Returns analytics summary for mentorships.',
+  })
   @ApiResponse({ status: 200, description: 'Analytics summary.' })
   async getAnalytics() {
     return this.mentorshipService.getMentorshipAnalytics();

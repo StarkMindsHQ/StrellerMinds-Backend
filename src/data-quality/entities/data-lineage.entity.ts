@@ -1,55 +1,62 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+} from 'typeorm';
 
 export enum LineageType {
-  SOURCE = "source",
-  TRANSFORMATION = "transformation",
-  DESTINATION = "destination",
-  DEPENDENCY = "dependency",
+  SOURCE = 'source',
+  TRANSFORMATION = 'transformation',
+  DESTINATION = 'destination',
+  DEPENDENCY = 'dependency',
 }
 
-@Entity("data_lineage")
-@Index(["sourceEntity", "targetEntity"])
-@Index(["lineageType", "createdAt"])
+@Entity('data_lineage')
+@Index(['sourceEntity', 'targetEntity'])
+@Index(['lineageType', 'createdAt'])
 export class DataLineage {
-  @PrimaryGeneratedColumn("uuid")
-  id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  sourceEntity: string
+  sourceEntity: string;
 
   @Column({ nullable: true })
-  sourceField?: string
+  sourceField?: string;
 
   @Column()
-  targetEntity: string
+  targetEntity: string;
 
   @Column({ nullable: true })
-  targetField?: string
+  targetField?: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: LineageType,
   })
-  lineageType: LineageType
+  lineageType: LineageType;
 
-  @Column("text", { nullable: true })
-  transformationLogic?: string
+  @Column('text', { nullable: true })
+  transformationLogic?: string;
 
-  @Column("jsonb", { nullable: true })
-  metadata?: Record<string, any>
-
-  @Column({ nullable: true })
-  processName?: string
+  @Column('jsonb', { nullable: true })
+  metadata?: Record<string, any>;
 
   @Column({ nullable: true })
-  processVersion?: string
+  processName?: string;
+
+  @Column({ nullable: true })
+  processVersion?: string;
 
   @Column({ default: true })
-  isActive: boolean
+  isActive: boolean;
 
   @CreateDateColumn()
-  createdAt: Date
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date
+  updatedAt: Date;
 }

@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -37,10 +29,7 @@ export class VideoAnalyticsController {
   @Post('events')
   @ApiOperation({ summary: 'Record analytics event' })
   @ApiResponse({ status: 201, description: 'Analytics event recorded successfully' })
-  async recordEvent(
-    @Body() eventData: CreateVideoAnalyticsDto,
-    @GetUser() user?: User,
-  ) {
+  async recordEvent(@Body() eventData: CreateVideoAnalyticsDto, @GetUser() user?: User) {
     // Add user ID if authenticated
     if (user && !eventData.userId) {
       eventData.userId = user.id;
@@ -228,10 +217,7 @@ export class VideoAnalyticsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Generate analytics report' })
   @ApiResponse({ status: 200, description: 'Report generated successfully' })
-  async generateReport(
-    @Body() reportDto: VideoAnalyticsReportDto,
-    @GetUser() user?: User,
-  ) {
+  async generateReport(@Body() reportDto: VideoAnalyticsReportDto, @GetUser() user?: User) {
     // Verify user has access to requested videos
     if (reportDto.videoIds) {
       for (const videoId of reportDto.videoIds) {
@@ -241,7 +227,7 @@ export class VideoAnalyticsController {
 
     // Implementation for report generation would go here
     // This could generate PDF reports, CSV exports, etc.
-    
+
     return {
       message: 'Report generation started',
       reportId: `report_${Date.now()}`,
@@ -267,8 +253,8 @@ export class VideoAnalyticsController {
       { limit: 1000 }, // Get all videos
     );
 
-    const videoIds = videos.map(v => v.id);
-    
+    const videoIds = videos.map((v) => v.id);
+
     if (videoIds.length === 0) {
       return {
         totalVideos: 0,
@@ -297,13 +283,14 @@ export class VideoAnalyticsController {
 
     const totalViews = allMetrics.reduce((sum, m) => sum + m.views, 0);
     const totalWatchTime = allMetrics.reduce((sum, m) => sum + m.watchTime, 0);
-    const averageEngagement = allMetrics.reduce((sum, m) => sum + m.engagement, 0) / allMetrics.length;
+    const averageEngagement =
+      allMetrics.reduce((sum, m) => sum + m.engagement, 0) / allMetrics.length;
 
     const topVideos = allMetrics
       .sort((a, b) => b.views - a.views)
       .slice(0, 10)
-      .map(m => {
-        const video = videos.find(v => v.id === m.videoId);
+      .map((m) => {
+        const video = videos.find((v) => v.id === m.videoId);
         return {
           id: video?.id,
           title: video?.title,
@@ -324,7 +311,7 @@ export class VideoAnalyticsController {
 
   private async verifyVideoAccess(videoId: string, userId?: string): Promise<void> {
     const video = await this.videoStreamingService.findVideoById(videoId);
-    
+
     if (video.uploadedBy.id !== userId) {
       throw new Error('You do not have permission to view analytics for this video');
     }
@@ -333,7 +320,7 @@ export class VideoAnalyticsController {
   private getPrimaryDevice(deviceTypes: Record<string, number>): string {
     const entries = Object.entries(deviceTypes);
     if (entries.length === 0) return 'Unknown';
-    
+
     return entries.sort(([, a], [, b]) => b - a)[0][0];
   }
 }

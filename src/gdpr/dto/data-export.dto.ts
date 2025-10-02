@@ -22,7 +22,11 @@ export class DataExportRequestDto {
   dataTypes?: string[];
 
   /** Export format (optional) */
-  @ApiPropertyOptional({ enum: ExportFormat, description: 'Export format', default: ExportFormat.JSON })
+  @ApiPropertyOptional({
+    enum: ExportFormat,
+    description: 'Export format',
+    default: ExportFormat.JSON,
+  })
   @IsOptional()
   @IsEnum(ExportFormat)
   format?: ExportFormat = ExportFormat.JSON;

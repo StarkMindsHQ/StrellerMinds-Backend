@@ -27,4 +27,4 @@ import { GamificationController } from './controllers/gamification.controller';
   controllers: [GamificationController],
   exports: [AchievementService, RewardService, LeaderboardService, GamificationEventService],
 })
-export class GamificationModule {} 
+export class GamificationModule {}

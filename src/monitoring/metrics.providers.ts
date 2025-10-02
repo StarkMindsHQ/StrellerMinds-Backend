@@ -1,5 +1,9 @@
 // src/monitoring/metrics.providers.ts
-import { makeCounterProvider, makeHistogramProvider, makeGaugeProvider } from '@willsoto/nestjs-prometheus';
+import {
+  makeCounterProvider,
+  makeHistogramProvider,
+  makeGaugeProvider,
+} from '@willsoto/nestjs-prometheus';
 
 export const MetricsProviders = [
   makeCounterProvider({

@@ -12,20 +12,20 @@ export class EnhancedValidationPipe implements PipeTransform<any> {
 
     // Sanitize before validation
     const sanitizedValue = this.sanitizeInput(value);
-    
+
     const object = plainToClass(metatype, sanitizedValue);
     const errors = await validate(object, {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-      validateCustomDecorators: true
+      validateCustomDecorators: true,
     });
 
     if (errors.length > 0) {
-      const errorMessages = errors.map(error => 
-        Object.values(error.constraints || {}).join(', ')
-      ).join('; ');
-      
+      const errorMessages = errors
+        .map((error) => Object.values(error.constraints || {}).join(', '))
+        .join('; ');
+
       throw new BadRequestException(`Validation failed: ${errorMessages}`);
     }
 
@@ -41,7 +41,7 @@ export class EnhancedValidationPipe implements PipeTransform<any> {
     if (typeof value === 'string') {
       return xss(value.trim());
     }
-    
+
     if (typeof value === 'object' && value !== null) {
       const sanitized = Array.isArray(value) ? [] : {};
       for (const key in value) {
@@ -49,7 +49,7 @@ export class EnhancedValidationPipe implements PipeTransform<any> {
       }
       return sanitized;
     }
-    
+
     return value;
   }
 }

@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from "@nestjs/common"
-import type { Repository } from "typeorm"
-import { type Certificate, CertificateStatus } from "../entities/certificate.entity"
-import type { CertificationType } from "../entities/certification-type.entity"
-import type { CreateCertificateDto } from "../dto/create-certificate.dto"
-import type { CertificateGeneratorService } from "./certificate-generator.service"
-import type { CertificateVerificationService } from "./certificate-verification.service"
-import * as crypto from "crypto"
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import type { Repository } from 'typeorm';
+import { type Certificate, CertificateStatus } from '../entities/certificate.entity';
+import type { CertificationType } from '../entities/certification-type.entity';
+import type { CreateCertificateDto } from '../dto/create-certificate.dto';
+import type { CertificateGeneratorService } from './certificate-generator.service';
+import type { CertificateVerificationService } from './certificate-verification.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class CertificateService {
-  private readonly logger = new Logger(CertificateService.name)
+  private readonly logger = new Logger(CertificateService.name);
 
   constructor(
     private certificateRepository: Repository<Certificate>,
@@ -22,17 +22,17 @@ export class CertificateService {
     // Validate certification type
     const certificationType = await this.certificationTypeRepository.findOne({
       where: { id: createDto.certificationTypeId },
-    })
+    });
 
     if (!certificationType) {
-      throw new NotFoundException("Certification type not found")
+      throw new NotFoundException('Certification type not found');
     }
 
     // Check requirements
-    await this.validateRequirements(createDto, certificationType)
+    await this.validateRequirements(createDto, certificationType);
 
     // Generate certificate number
-    const certificateNumber = await this.generateCertificateNumber()
+    const certificateNumber = await this.generateCertificateNumber();
 
     // Create certificate
     const certificate = this.certificateRepository.create({
@@ -40,97 +40,97 @@ export class CertificateService {
       certificateNumber,
       status: CertificateStatus.PENDING,
       verificationHash: this.generateVerificationHash(certificateNumber),
-    })
+    });
 
-    const saved = await this.certificateRepository.save(certificate)
-    this.logger.log(`Certificate created: ${saved.id}`)
+    const saved = await this.certificateRepository.save(certificate);
+    this.logger.log(`Certificate created: ${saved.id}`);
 
     // Generate certificate document
-    await this.generateCertificateDocument(saved)
+    await this.generateCertificateDocument(saved);
 
-    return saved
+    return saved;
   }
 
   async findAll(userId?: string): Promise<Certificate[]> {
-    const where = userId ? { userId } : {}
+    const where = userId ? { userId } : {};
 
     return this.certificateRepository.find({
       where,
-      relations: ["certificationType"],
-      order: { createdAt: "DESC" },
-    })
+      relations: ['certificationType'],
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: string): Promise<Certificate> {
     const certificate = await this.certificateRepository.findOne({
       where: { id },
-      relations: ["certificationType", "verifications"],
-    })
+      relations: ['certificationType', 'verifications'],
+    });
 
     if (!certificate) {
-      throw new NotFoundException(`Certificate with ID ${id} not found`)
+      throw new NotFoundException(`Certificate with ID ${id} not found`);
     }
 
-    return certificate
+    return certificate;
   }
 
   async findByCertificateNumber(certificateNumber: string): Promise<Certificate> {
     const certificate = await this.certificateRepository.findOne({
       where: { certificateNumber },
-      relations: ["certificationType"],
-    })
+      relations: ['certificationType'],
+    });
 
     if (!certificate) {
-      throw new NotFoundException(`Certificate with number ${certificateNumber} not found`)
+      throw new NotFoundException(`Certificate with number ${certificateNumber} not found`);
     }
 
-    return certificate
+    return certificate;
   }
 
   async issueCertificate(id: string, issuedBy: string): Promise<Certificate> {
-    const certificate = await this.findOne(id)
+    const certificate = await this.findOne(id);
 
     if (certificate.status !== CertificateStatus.PENDING) {
-      throw new BadRequestException("Certificate is not in pending status")
+      throw new BadRequestException('Certificate is not in pending status');
     }
 
-    certificate.status = CertificateStatus.ISSUED
-    certificate.issuedAt = new Date()
-    certificate.issuedBy = issuedBy
+    certificate.status = CertificateStatus.ISSUED;
+    certificate.issuedAt = new Date();
+    certificate.issuedBy = issuedBy;
 
     // Set expiration date if applicable
     if (certificate.certificationType.validityDays > 0) {
-      const expirationDate = new Date()
-      expirationDate.setDate(expirationDate.getDate() + certificate.certificationType.validityDays)
-      certificate.expiresAt = expirationDate
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + certificate.certificationType.validityDays);
+      certificate.expiresAt = expirationDate;
     }
 
-    const updated = await this.certificateRepository.save(certificate)
-    this.logger.log(`Certificate issued: ${updated.id}`)
+    const updated = await this.certificateRepository.save(certificate);
+    this.logger.log(`Certificate issued: ${updated.id}`);
 
-    return updated
+    return updated;
   }
 
   async revokeCertificate(id: string, reason: string): Promise<Certificate> {
-    const certificate = await this.findOne(id)
+    const certificate = await this.findOne(id);
 
-    certificate.status = CertificateStatus.REVOKED
-    certificate.revocationReason = reason
+    certificate.status = CertificateStatus.REVOKED;
+    certificate.revocationReason = reason;
 
-    const updated = await this.certificateRepository.save(certificate)
-    this.logger.log(`Certificate revoked: ${updated.id}`)
+    const updated = await this.certificateRepository.save(certificate);
+    this.logger.log(`Certificate revoked: ${updated.id}`);
 
-    return updated
+    return updated;
   }
 
   async verifyCertificate(certificateNumber: string, verifierInfo: any): Promise<any> {
-    const certificate = await this.findByCertificateNumber(certificateNumber)
+    const certificate = await this.findByCertificateNumber(certificateNumber);
 
     // Record verification attempt
-    await this.verificationService.recordVerification(certificate.id, verifierInfo)
+    await this.verificationService.recordVerification(certificate.id, verifierInfo);
 
     // Check certificate validity
-    const isValid = this.isCertificateValid(certificate)
+    const isValid = this.isCertificateValid(certificate);
 
     return {
       certificate: {
@@ -144,31 +144,43 @@ export class CertificateService {
       },
       isValid,
       verificationTimestamp: new Date(),
-    }
+    };
   }
 
   async getUserCertificates(userId: string): Promise<Certificate[]> {
     return this.certificateRepository.find({
       where: { userId, status: CertificateStatus.ISSUED },
-      relations: ["certificationType"],
-      order: { issuedAt: "DESC" },
-    })
+      relations: ['certificationType'],
+      order: { issuedAt: 'DESC' },
+    });
   }
 
   async getCertificateStats(userId?: string) {
-    const baseQuery = this.certificateRepository.createQueryBuilder("c")
+    const baseQuery = this.certificateRepository.createQueryBuilder('c');
 
     if (userId) {
-      baseQuery.where("c.userId = :userId", { userId })
+      baseQuery.where('c.userId = :userId', { userId });
     }
 
     const [total, issued, pending, revoked, expired] = await Promise.all([
       baseQuery.getCount(),
-      baseQuery.clone().andWhere("c.status = :status", { status: CertificateStatus.ISSUED }).getCount(),
-      baseQuery.clone().andWhere("c.status = :status", { status: CertificateStatus.PENDING }).getCount(),
-      baseQuery.clone().andWhere("c.status = :status", { status: CertificateStatus.REVOKED }).getCount(),
-      baseQuery.clone().andWhere("c.status = :status", { status: CertificateStatus.EXPIRED }).getCount(),
-    ])
+      baseQuery
+        .clone()
+        .andWhere('c.status = :status', { status: CertificateStatus.ISSUED })
+        .getCount(),
+      baseQuery
+        .clone()
+        .andWhere('c.status = :status', { status: CertificateStatus.PENDING })
+        .getCount(),
+      baseQuery
+        .clone()
+        .andWhere('c.status = :status', { status: CertificateStatus.REVOKED })
+        .getCount(),
+      baseQuery
+        .clone()
+        .andWhere('c.status = :status', { status: CertificateStatus.EXPIRED })
+        .getCount(),
+    ]);
 
     return {
       total,
@@ -176,20 +188,20 @@ export class CertificateService {
       pending,
       revoked,
       expired,
-    }
+    };
   }
 
   private async validateRequirements(
     createDto: CreateCertificateDto,
     certificationType: CertificationType,
   ): Promise<void> {
-    const requirements = certificationType.requirements
+    const requirements = certificationType.requirements;
 
-    if (!requirements) return
+    if (!requirements) return;
 
     // Check minimum score
     if (requirements.minScore && createDto.score && createDto.score < requirements.minScore) {
-      throw new BadRequestException(`Minimum score of ${requirements.minScore} required`)
+      throw new BadRequestException(`Minimum score of ${requirements.minScore} required`);
     }
 
     // Check required courses (implement based on your course system)
@@ -204,39 +216,40 @@ export class CertificateService {
   }
 
   private async generateCertificateNumber(): Promise<string> {
-    const prefix = "CERT"
-    const timestamp = Date.now().toString(36).toUpperCase()
-    const random = crypto.randomBytes(4).toString("hex").toUpperCase()
+    const prefix = 'CERT';
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = crypto.randomBytes(4).toString('hex').toUpperCase();
 
-    return `${prefix}-${timestamp}-${random}`
+    return `${prefix}-${timestamp}-${random}`;
   }
 
   private generateVerificationHash(certificateNumber: string): string {
     return crypto
-      .createHash("sha256")
+      .createHash('sha256')
       .update(certificateNumber + Date.now())
-      .digest("hex")
+      .digest('hex');
   }
 
   private async generateCertificateDocument(certificate: Certificate): Promise<void> {
     try {
-      const certificateUrl = await this.certificateGeneratorService.generateCertificate(certificate)
-      certificate.certificateUrl = certificateUrl
-      await this.certificateRepository.save(certificate)
+      const certificateUrl =
+        await this.certificateGeneratorService.generateCertificate(certificate);
+      certificate.certificateUrl = certificateUrl;
+      await this.certificateRepository.save(certificate);
     } catch (error) {
-      this.logger.error(`Failed to generate certificate document for ${certificate.id}:`, error)
+      this.logger.error(`Failed to generate certificate document for ${certificate.id}:`, error);
     }
   }
 
   private isCertificateValid(certificate: Certificate): boolean {
     if (certificate.status !== CertificateStatus.ISSUED) {
-      return false
+      return false;
     }
 
     if (certificate.expiresAt && certificate.expiresAt < new Date()) {
-      return false
+      return false;
     }
 
-    return true
+    return true;
   }
 }

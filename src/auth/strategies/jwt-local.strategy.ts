@@ -168,10 +168,7 @@ export class JwtLocalStrategy implements IAuthStrategy {
 
   async revokeUserRefreshTokens(userId: string): Promise<void> {
     try {
-      await this.refreshTokenRepository.update(
-        { userId, isRevoked: false },
-        { isRevoked: true },
-      );
+      await this.refreshTokenRepository.update({ userId, isRevoked: false }, { isRevoked: true });
     } catch (error) {
       throw new InternalServerErrorException('Error revoking refresh tokens');
     }
@@ -255,13 +252,16 @@ export class JwtLocalStrategy implements IAuthStrategy {
     return { message: 'Password successfully reset' };
   }
 
-
   async requestPasswordReset(email: string): Promise<any> {
     // Implement your password reset logic here, e.g., generate token, send email, etc.
     // For now, just return a placeholder response.
     return { message: `Password reset link sent to ${email}` };
   }
-  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<boolean> {
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<boolean> {
     const user = await this.usersService.findOne(userId);
     if (!user) throw new UnauthorizedException('User not found');
 
@@ -280,4 +280,3 @@ export class JwtLocalStrategy implements IAuthStrategy {
 function addMinutes(date: Date, minutes: number): Date {
   return new Date(date.getTime() + minutes * 60000);
 }
-

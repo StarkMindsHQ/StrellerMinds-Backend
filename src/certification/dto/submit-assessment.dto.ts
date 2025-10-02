@@ -1,21 +1,21 @@
-import { IsUUID, IsArray, IsObject } from "class-validator"
+import { IsUUID, IsArray, IsObject } from 'class-validator';
 
 export class SubmitAssessmentDto {
   @IsUUID()
-  attemptId: string
+  attemptId: string;
 
   @IsArray()
   answers: {
-    questionId: string
-    answer: string | string[]
-    timeSpent: number
-  }[]
+    questionId: string;
+    answer: string | string[];
+    timeSpent: number;
+  }[];
 
   @IsObject()
   proctoring?: {
-    violations?: string[]
-    screenshots?: string[]
-    webcamRecording?: string
-    screenRecording?: string
-  }
+    violations?: string[];
+    screenshots?: string[];
+    webcamRecording?: string;
+    screenRecording?: string;
+  };
 }

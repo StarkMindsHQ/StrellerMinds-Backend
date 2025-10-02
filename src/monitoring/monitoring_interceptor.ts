@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { MetricsService } from './metrics-service';
@@ -23,7 +17,7 @@ export class MonitoringInterceptor implements NestInterceptor {
     const startTime = Date.now();
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
-    
+
     const method = request.method;
     const url = request.url;
     const handler = context.getHandler().name;
@@ -37,13 +31,10 @@ export class MonitoringInterceptor implements NestInterceptor {
         const statusCode = response.statusCode;
 
         // Record successful operation metrics
-        this.metricsService.incrementBusinessOperation(
-          `${controller}.${handler}`,
-          true
-        );
+        this.metricsService.incrementBusinessOperation(`${controller}.${handler}`, true);
 
         this.logger.debug(
-          `Completed ${controller}.${handler} - ${method} ${url} - ${statusCode} - ${duration}ms`
+          `Completed ${controller}.${handler} - ${method} ${url} - ${statusCode} - ${duration}ms`,
         );
 
         // Check for slow operations
@@ -53,43 +44,39 @@ export class MonitoringInterceptor implements NestInterceptor {
       }),
       catchError((error) => {
         const duration = Date.now() - startTime;
-        
+
         // Record failed operation metrics
-        this.metricsService.incrementBusinessOperation(
-          `${controller}.${handler}`,
-          false
-        );
+        this.metricsService.incrementBusinessOperation(`${controller}.${handler}`, false);
 
         // Log error details
-        this.logger.error(
-          `Error in ${controller}.${handler} - ${method} ${url} - ${duration}ms`,
-          {
-            error: error.message,
-            stack: error.stack,
-            duration,
-            controller,
-            handler,
-            method,
-            url,
-          }
-        );
+        this.logger.error(`Error in ${controller}.${handler} - ${method} ${url} - ${duration}ms`, {
+          error: error.message,
+          stack: error.stack,
+          duration,
+          controller,
+          handler,
+          method,
+          url,
+        });
 
         // Send alert for critical errors
         if (this.isCriticalError(error)) {
-          this.alertingService.sendAlert('HIGH_ERROR_RATE', {
-            controller,
-            handler,
-            error: error.message,
-            method,
-            url,
-            duration,
-          }).catch(alertError => {
-            this.logger.error('Failed to send error alert:', alertError);
-          });
+          this.alertingService
+            .sendAlert('HIGH_ERROR_RATE', {
+              controller,
+              handler,
+              error: error.message,
+              method,
+              url,
+              duration,
+            })
+            .catch((alertError) => {
+              this.logger.error('Failed to send error alert:', alertError);
+            });
         }
 
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -103,9 +90,9 @@ export class MonitoringInterceptor implements NestInterceptor {
     ];
 
     const criticalStatusCodes = [500, 502, 503, 504];
-    
+
     return (
-      criticalErrorTypes.some(type => error.constructor.name.includes(type)) ||
+      criticalErrorTypes.some((type) => error.constructor.name.includes(type)) ||
       criticalStatusCodes.includes(error.status) ||
       error.message?.toLowerCase().includes('database') ||
       error.message?.toLowerCase().includes('connection')
@@ -117,9 +104,9 @@ export class MonitoringInterceptor implements NestInterceptor {
 export class PerformanceInterceptor implements NestInterceptor {
   private readonly logger = new Logger(PerformanceInterceptor.name);
   private readonly performanceThresholds = {
-    fast: 100,      // < 100ms
-    medium: 500,    // 100ms - 500ms
-    slow: 1000,     // 500ms - 1s
+    fast: 100, // < 100ms
+    medium: 500, // 100ms - 500ms
+    slow: 1000, // 500ms - 1s
     verySlow: 5000, // > 1s
   };
 
@@ -135,14 +122,18 @@ export class PerformanceInterceptor implements NestInterceptor {
 
         // Categorize performance
         const performanceCategory = this.categorizePerformance(duration);
-        
-        this.logger.debug(`${controller}.${handler} performance: ${duration.toFixed(2)}ms (${performanceCategory})`);
+
+        this.logger.debug(
+          `${controller}.${handler} performance: ${duration.toFixed(2)}ms (${performanceCategory})`,
+        );
 
         // Log slow operations with more detail
         if (performanceCategory === 'slow' || performanceCategory === 'very_slow') {
-          this.logger.warn(`${performanceCategory.toUpperCase()} operation: ${controller}.${handler} - ${duration.toFixed(2)}ms`);
+          this.logger.warn(
+            `${performanceCategory.toUpperCase()} operation: ${controller}.${handler} - ${duration.toFixed(2)}ms`,
+          );
         }
-      })
+      }),
     );
   }
 
@@ -172,23 +163,17 @@ export class BusinessMetricsInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap((result) => {
         // Record successful business operation
-        this.metricsService.incrementBusinessOperation(
-          `${operationType}_${resourceType}`,
-          true
-        );
+        this.metricsService.incrementBusinessOperation(`${operationType}_${resourceType}`, true);
 
         // Record specific business metrics based on the operation
         this.recordSpecificBusinessMetrics(operationType, resourceType, result);
       }),
       catchError((error) => {
         // Record failed business operation
-        this.metricsService.incrementBusinessOperation(
-          `${operationType}_${resourceType}`,
-          false
-        );
+        this.metricsService.incrementBusinessOperation(`${operationType}_${resourceType}`, false);
 
         throw error;
-      })
+      }),
     );
   }
 
@@ -208,17 +193,13 @@ export class BusinessMetricsInterceptor implements NestInterceptor {
     return controller.replace('Controller', '').toLowerCase();
   }
 
-  private recordSpecificBusinessMetrics(
-    operation: string,
-    resource: string,
-    result: any
-  ): void {
+  private recordSpecificBusinessMetrics(operation: string, resource: string, result: any): void {
     try {
       // Record specific metrics based on the operation and resource
       if (operation === 'create' && resource === 'user') {
         this.metricsService.incrementBusinessOperation('user_registration', true);
       }
-      
+
       if (operation === 'create' && resource === 'order') {
         this.metricsService.incrementBusinessOperation('order_placement', true);
       }

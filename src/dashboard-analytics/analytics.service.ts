@@ -1,15 +1,20 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
-import type { Repository } from "typeorm";
-import type { UserEngagement, EngagementType } from "./entities/user-engagement.entity";
-import { type CourseCompletion, CompletionStatus } from "./entities/course-completion.entity";
-import type { User } from "../users/entities/user.entity";
-import type { Course } from "../courses/entities/course.entity";
-import { type AnalyticsQueryDto, type ExportQueryDto, TimeRange, ExportFormat } from "./dto/analytics-query.dto";
+import { Injectable, BadRequestException } from '@nestjs/common';
+import type { Repository } from 'typeorm';
+import type { UserEngagement, EngagementType } from './entities/user-engagement.entity';
+import { type CourseCompletion, CompletionStatus } from './entities/course-completion.entity';
+import type { User } from '../users/entities/user.entity';
+import type { Course } from '../courses/entities/course.entity';
+import {
+  type AnalyticsQueryDto,
+  type ExportQueryDto,
+  TimeRange,
+  ExportFormat,
+} from './dto/analytics-query.dto';
 import type {
   AnalyticsDashboardResponse,
   UserEngagementMetrics,
   CourseCompletionMetrics,
-} from "./dto/analytics-response.dto";
+} from './dto/analytics-response.dto';
 
 /**
  * AnalyticsService provides logic for analytics dashboard, export, and engagement tracking.
@@ -69,14 +74,14 @@ export class AnalyticsService {
     courseFilter: string[],
   ): Promise<UserEngagementMetrics> {
     const baseQuery = this.userEngagementRepository
-      .createQueryBuilder("engagement")
-      .where("engagement.createdAt BETWEEN :startDate AND :endDate", {
+      .createQueryBuilder('engagement')
+      .where('engagement.createdAt BETWEEN :startDate AND :endDate', {
         startDate,
         endDate,
       });
 
     if (courseFilter.length > 0) {
-      baseQuery.andWhere("engagement.courseId IN (:...courseIds)", {
+      baseQuery.andWhere('engagement.courseId IN (:...courseIds)', {
         courseIds: courseFilter,
       });
     }
@@ -85,15 +90,15 @@ export class AnalyticsService {
     const [totalUsers, activeUsers] = await Promise.all([
       this.userRepository.count(),
       baseQuery
-        .select("COUNT(DISTINCT engagement.userId)", "count")
+        .select('COUNT(DISTINCT engagement.userId)', 'count')
         .getRawOne()
         .then((result) => Number.parseInt(result.count)),
     ]);
 
     // New users in period
     const newUsers = await this.userRepository
-      .createQueryBuilder("user")
-      .where("user.createdAt BETWEEN :startDate AND :endDate", {
+      .createQueryBuilder('user')
+      .where('user.createdAt BETWEEN :startDate AND :endDate', {
         startDate,
         endDate,
       })
@@ -101,13 +106,13 @@ export class AnalyticsService {
 
     // Session metrics
     const sessionMetrics = await baseQuery
-      .select(["COUNT(*) as totalSessions", "AVG(engagement.duration) as avgDuration"])
+      .select(['COUNT(*) as totalSessions', 'AVG(engagement.duration) as avgDuration'])
       .getRawOne();
 
     // Engagement by type
     const engagementByType = await baseQuery
-      .select(["engagement.engagementType as type", "COUNT(*) as count"])
-      .groupBy("engagement.engagementType")
+      .select(['engagement.engagementType as type', 'COUNT(*) as count'])
+      .groupBy('engagement.engagementType')
       .getRawMany();
 
     const engagementTypeMap = engagementByType.reduce((acc, item) => {
@@ -120,7 +125,7 @@ export class AnalyticsService {
       activeUsers,
       newUsers,
       averageSessionDuration: Math.round(sessionMetrics.avgDuration || 0),
-      totalSessions: Number.parseInt(sessionMetrics.totalSessions || "0"),
+      totalSessions: Number.parseInt(sessionMetrics.totalSessions || '0'),
       engagementByType: engagementTypeMap,
     };
   }
@@ -138,15 +143,15 @@ export class AnalyticsService {
     courseFilter: string[],
   ): Promise<CourseCompletionMetrics> {
     const baseQuery = this.courseCompletionRepository
-      .createQueryBuilder("completion")
-      .leftJoin("completion.course", "course")
-      .where("completion.createdAt BETWEEN :startDate AND :endDate", {
+      .createQueryBuilder('completion')
+      .leftJoin('completion.course', 'course')
+      .where('completion.createdAt BETWEEN :startDate AND :endDate', {
         startDate,
         endDate,
       });
 
     if (courseFilter.length > 0) {
-      baseQuery.andWhere("completion.courseId IN (:...courseIds)", {
+      baseQuery.andWhere('completion.courseId IN (:...courseIds)', {
         courseIds: courseFilter,
       });
     }
@@ -154,20 +159,20 @@ export class AnalyticsService {
     // Overall completion metrics
     const completionStats = await baseQuery
       .select([
-        "COUNT(*) as totalEnrollments",
+        'COUNT(*) as totalEnrollments',
         `SUM(CASE WHEN completion.status = '${CompletionStatus.COMPLETED}' THEN 1 ELSE 0 END) as completedCourses`,
         `SUM(CASE WHEN completion.status = '${CompletionStatus.IN_PROGRESS}' THEN 1 ELSE 0 END) as inProgressCourses`,
         `SUM(CASE WHEN completion.status = '${CompletionStatus.DROPPED}' THEN 1 ELSE 0 END) as droppedCourses`,
-        "AVG(completion.progressPercentage) as avgCompletionRate",
+        'AVG(completion.progressPercentage) as avgCompletionRate',
       ])
       .getRawOne();
 
     // Average time to complete
     const avgTimeToComplete = await this.courseCompletionRepository
-      .createQueryBuilder("completion")
-      .select("AVG(completion.timeSpent) as avgTime")
-      .where("completion.status = :status", { status: CompletionStatus.COMPLETED })
-      .andWhere("completion.completedAt BETWEEN :startDate AND :endDate", {
+      .createQueryBuilder('completion')
+      .select('AVG(completion.timeSpent) as avgTime')
+      .where('completion.status = :status', { status: CompletionStatus.COMPLETED })
+      .andWhere('completion.completedAt BETWEEN :startDate AND :endDate', {
         startDate,
         endDate,
       })
@@ -176,23 +181,23 @@ export class AnalyticsService {
     // Course-specific completion rates
     const courseCompletionRates = await baseQuery
       .select([
-        "completion.courseId as courseId",
-        "course.title as courseName",
-        "COUNT(*) as totalEnrollments",
+        'completion.courseId as courseId',
+        'course.title as courseName',
+        'COUNT(*) as totalEnrollments',
         `SUM(CASE WHEN completion.status = '${CompletionStatus.COMPLETED}' THEN 1 ELSE 0 END) as completed`,
         `ROUND((SUM(CASE WHEN completion.status = '${CompletionStatus.COMPLETED}' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) as completionRate`,
       ])
-      .groupBy("completion.courseId, course.title")
-      .orderBy("completionRate", "DESC")
+      .groupBy('completion.courseId, course.title')
+      .orderBy('completionRate', 'DESC')
       .limit(10)
       .getRawMany();
 
     return {
-      totalEnrollments: Number.parseInt(completionStats.totalEnrollments || "0"),
-      completedCourses: Number.parseInt(completionStats.completedCourses || "0"),
-      inProgressCourses: Number.parseInt(completionStats.inProgressCourses || "0"),
-      droppedCourses: Number.parseInt(completionStats.droppedCourses || "0"),
-      averageCompletionRate: Number.parseFloat(completionStats.avgCompletionRate || "0"),
+      totalEnrollments: Number.parseInt(completionStats.totalEnrollments || '0'),
+      completedCourses: Number.parseInt(completionStats.completedCourses || '0'),
+      inProgressCourses: Number.parseInt(completionStats.inProgressCourses || '0'),
+      droppedCourses: Number.parseInt(completionStats.droppedCourses || '0'),
+      averageCompletionRate: Number.parseFloat(completionStats.avgCompletionRate || '0'),
       averageTimeToComplete: Math.round(avgTimeToComplete?.avgTime || 0),
       courseCompletionRates: courseCompletionRates.map((item) => ({
         courseId: item.courseId,
@@ -307,7 +312,7 @@ export class AnalyticsService {
 
     if (query.timeRange === TimeRange.CUSTOM) {
       if (!query.startDate || !query.endDate) {
-        throw new BadRequestException("Start date and end date are required for custom time range");
+        throw new BadRequestException('Start date and end date are required for custom time range');
       }
       startDate = new Date(query.startDate);
       endDate = new Date(query.endDate);
@@ -340,23 +345,27 @@ export class AnalyticsService {
    * @param userId - ID of the requesting user (optional)
    * @returns Array of course IDs that the user has access to
    */
-  private async buildCourseFilter(query: AnalyticsQueryDto, userRole: string, userId?: string): Promise<string[]> {
+  private async buildCourseFilter(
+    query: AnalyticsQueryDto,
+    userRole: string,
+    userId?: string,
+  ): Promise<string[]> {
     let courseIds: string[] = [];
 
     if (query.courseId) {
       courseIds = [query.courseId];
-    } else if (userRole === "instructor" && userId) {
+    } else if (userRole === 'instructor' && userId) {
       // Instructors can only see their own courses
       const instructorCourses = await this.courseRepository.find({
         where: { instructor: { id: userId } },
-        select: ["id"],
+        select: ['id'],
       });
       courseIds = instructorCourses.map((course) => course.id);
     } else if (query.instructorId) {
       // Admin can filter by instructor
       const instructorCourses = await this.courseRepository.find({
         where: { instructor: { id: query.instructorId } },
-        select: ["id"],
+        select: ['id'],
       });
       courseIds = instructorCourses.map((course) => course.id);
     }
@@ -373,25 +382,25 @@ export class AnalyticsService {
     const csvRows: string[] = [];
 
     // User Engagement CSV
-    csvRows.push("User Engagement Metrics");
-    csvRows.push("Metric,Value");
+    csvRows.push('User Engagement Metrics');
+    csvRows.push('Metric,Value');
     csvRows.push(`Total Users,${data.userEngagement.totalUsers}`);
     csvRows.push(`Active Users,${data.userEngagement.activeUsers}`);
     csvRows.push(`New Users,${data.userEngagement.newUsers}`);
     csvRows.push(`Average Session Duration,${data.userEngagement.averageSessionDuration}`);
     csvRows.push(`Total Sessions,${data.userEngagement.totalSessions}`);
-    csvRows.push("");
+    csvRows.push('');
 
     // Course Completion CSV
-    csvRows.push("Course Completion Metrics");
-    csvRows.push("Metric,Value");
+    csvRows.push('Course Completion Metrics');
+    csvRows.push('Metric,Value');
     csvRows.push(`Total Enrollments,${data.courseCompletion.totalEnrollments}`);
     csvRows.push(`Completed Courses,${data.courseCompletion.completedCourses}`);
     csvRows.push(`In Progress Courses,${data.courseCompletion.inProgressCourses}`);
     csvRows.push(`Dropped Courses,${data.courseCompletion.droppedCourses}`);
     csvRows.push(`Average Completion Rate,${data.courseCompletion.averageCompletionRate}%`);
 
-    return csvRows.join("\n");
+    return csvRows.join('\n');
   }
 
   /**
@@ -405,25 +414,25 @@ export class AnalyticsService {
     return {
       worksheets: [
         {
-          name: "User Engagement",
+          name: 'User Engagement',
           data: [
-            ["Metric", "Value"],
-            ["Total Users", data.userEngagement.totalUsers],
-            ["Active Users", data.userEngagement.activeUsers],
-            ["New Users", data.userEngagement.newUsers],
-            ["Average Session Duration", data.userEngagement.averageSessionDuration],
-            ["Total Sessions", data.userEngagement.totalSessions],
+            ['Metric', 'Value'],
+            ['Total Users', data.userEngagement.totalUsers],
+            ['Active Users', data.userEngagement.activeUsers],
+            ['New Users', data.userEngagement.newUsers],
+            ['Average Session Duration', data.userEngagement.averageSessionDuration],
+            ['Total Sessions', data.userEngagement.totalSessions],
           ],
         },
         {
-          name: "Course Completion",
+          name: 'Course Completion',
           data: [
-            ["Metric", "Value"],
-            ["Total Enrollments", data.courseCompletion.totalEnrollments],
-            ["Completed Courses", data.courseCompletion.completedCourses],
-            ["In Progress Courses", data.courseCompletion.inProgressCourses],
-            ["Dropped Courses", data.courseCompletion.droppedCourses],
-            ["Average Completion Rate", `${data.courseCompletion.averageCompletionRate}%`],
+            ['Metric', 'Value'],
+            ['Total Enrollments', data.courseCompletion.totalEnrollments],
+            ['Completed Courses', data.courseCompletion.completedCourses],
+            ['In Progress Courses', data.courseCompletion.inProgressCourses],
+            ['Dropped Courses', data.courseCompletion.droppedCourses],
+            ['Average Completion Rate', `${data.courseCompletion.averageCompletionRate}%`],
           ],
         },
       ],

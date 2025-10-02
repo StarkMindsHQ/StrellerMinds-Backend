@@ -1,19 +1,19 @@
-import { Controller, Get, Patch, Param, Body, Delete, Post, UseGuards } from "@nestjs/common"
-import type { UserLanguageService } from "../services/user-language.service"
-import { CreateUserLanguageDto } from "../dto/create-user-language.dto"
-import { UpdateUserLanguageDto } from "../dto/update-user-language.dto"
+import { Controller, Get, Patch, Param, Body, Delete, Post, UseGuards } from '@nestjs/common';
+import type { UserLanguageService } from '../services/user-language.service';
+import { CreateUserLanguageDto } from '../dto/create-user-language.dto';
+import { UpdateUserLanguageDto } from '../dto/update-user-language.dto';
 // import { LanguageGuard } from "../guards/language.guard"
-import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from "@nestjs/swagger"
+import { ApiTags, ApiOperation, ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags("User Language Preferences")
-@Controller("language")
+@ApiTags('User Language Preferences')
+@Controller('language')
 export class UserLanguageController {
   constructor(private readonly userLanguageService: UserLanguageService) {}
 
   @ApiOperation({ summary: 'Get user language preference' })
   @ApiParam({ name: 'userId', description: 'User ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns the user language preference',
   })
   @Get(':userId')
@@ -27,8 +27,8 @@ export class UserLanguageController {
 
   @ApiOperation({ summary: 'Create user language preference' })
   @ApiBody({ type: CreateUserLanguageDto })
-  @ApiResponse({ 
-    status: 201, 
+  @ApiResponse({
+    status: 201,
     description: 'Creates a new user language preference',
   })
   @Post()
@@ -40,26 +40,29 @@ export class UserLanguageController {
     };
   }
 
-  @ApiOperation({ summary: "Update user language preference" })
-  @ApiParam({ name: "userId", description: "User ID" })
+  @ApiOperation({ summary: 'Update user language preference' })
+  @ApiParam({ name: 'userId', description: 'User ID' })
   @ApiBody({ type: UpdateUserLanguageDto })
   @ApiResponse({
     status: 200,
-    description: "Updates the user language preference",
+    description: 'Updates the user language preference',
   })
-  @Patch("update/:userId")
-  async updateUserLanguage(@Param('userId') userId: string, @Body() updateDto: UpdateUserLanguageDto) {
-    const preference = await this.userLanguageService.updateUserLanguage(userId, updateDto)
+  @Patch('update/:userId')
+  async updateUserLanguage(
+    @Param('userId') userId: string,
+    @Body() updateDto: UpdateUserLanguageDto,
+  ) {
+    const preference = await this.userLanguageService.updateUserLanguage(userId, updateDto);
     return {
       success: true,
       data: preference,
-    }
+    };
   }
 
   @ApiOperation({ summary: 'Delete user language preference' })
   @ApiParam({ name: 'userId', description: 'User ID' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Deletes the user language preference',
   })
   @Delete(':userId')

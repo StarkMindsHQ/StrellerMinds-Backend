@@ -8,7 +8,7 @@ async function testAuthentication() {
     console.log('Test 1: Login with valid credentials');
     const loginResponse = await axios.post(`${API_URL}/auth/login`, {
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
     });
     console.log('Login Response:', loginResponse.data);
     const { access_token, refresh_token, user } = loginResponse.data;
@@ -18,8 +18,8 @@ async function testAuthentication() {
     try {
       const protectedResponse = await axios.get(`${API_URL}/users/profile`, {
         headers: {
-          Authorization: `Bearer ${access_token}`
-        }
+          Authorization: `Bearer ${access_token}`,
+        },
       });
       console.log('Protected Route Response:', protectedResponse.data);
     } catch (error) {
@@ -31,7 +31,7 @@ async function testAuthentication() {
     try {
       const refreshResponse = await axios.post(`${API_URL}/auth/refresh`, {
         userId: user.id,
-        refreshToken: refresh_token
+        refreshToken: refresh_token,
       });
       console.log('Refresh Token Response:', refreshResponse.data);
     } catch (error) {
@@ -43,8 +43,8 @@ async function testAuthentication() {
     try {
       await axios.get(`${API_URL}/users/profile`, {
         headers: {
-          Authorization: 'Bearer invalid_token'
-        }
+          Authorization: 'Bearer invalid_token',
+        },
       });
     } catch (error) {
       console.log('Expected Error (Invalid Token):', error.response?.data || error.message);
@@ -55,16 +55,16 @@ async function testAuthentication() {
     try {
       await axios.get(`${API_URL}/users/profile`, {
         headers: {
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyMzkwMjJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-        }
+          Authorization:
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyMzkwMjJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+        },
       });
     } catch (error) {
       console.log('Expected Error (Expired Token):', error.response?.data || error.message);
     }
-
   } catch (error) {
     console.error('Test Error:', error.response?.data || error.message);
   }
 }
 
-testAuthentication(); 
+testAuthentication();

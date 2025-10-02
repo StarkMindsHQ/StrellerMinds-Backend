@@ -30,7 +30,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
     const authHeader = request?.headers?.authorization;
     const token = authHeader?.split(' ')[1];
-    if (token && await this.redisService.isTokenBlacklisted(token)) {
+    if (token && (await this.redisService.isTokenBlacklisted(token))) {
       throw new UnauthorizedException('Token is blacklisted');
     }
 

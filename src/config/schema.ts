@@ -4,9 +4,7 @@ export const configSchema = Joi.object({
   app: Joi.object({
     name: Joi.string().required(),
     version: Joi.string().required(),
-    environment: Joi.string()
-      .valid('development', 'staging', 'production')
-      .required(),
+    environment: Joi.string().valid('development', 'staging', 'production').required(),
   }).required(),
 
   server: Joi.object({

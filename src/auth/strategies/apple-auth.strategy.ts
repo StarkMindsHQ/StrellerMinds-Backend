@@ -3,10 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import AppleStrategy from 'passport-apple';
 
 @Injectable()
-export class AppleOAuthPassportStrategy extends PassportStrategy(
-  AppleStrategy,
-  'apple',
-) {
+export class AppleOAuthPassportStrategy extends PassportStrategy(AppleStrategy, 'apple') {
   constructor() {
     super({
       clientID: process.env.APPLE_CLIENT_ID,

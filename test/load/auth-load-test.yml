@@ -3,97 +3,97 @@ config:
   phases:
     - duration: 60
       arrivalRate: 10
-      name: "Authentication Load Test"
+      name: 'Authentication Load Test'
     - duration: 120
       arrivalRate: 10
       rampTo: 30
-      name: "Auth Ramp-up"
+      name: 'Auth Ramp-up'
     - duration: 180
       arrivalRate: 30
-      name: "Auth Sustained"
-  
+      name: 'Auth Sustained'
+
   ensure:
     maxErrorRate: 2
     maxResponseTime: 1500
-  
+
   variables:
     users:
-      - email: "user1@test.com"
-        password: "TestPass123!"
-      - email: "user2@test.com"
-        password: "TestPass123!"
-      - email: "user3@test.com"
-        password: "TestPass123!"
+      - email: 'user1@test.com'
+        password: 'TestPass123!'
+      - email: 'user2@test.com'
+        password: 'TestPass123!'
+      - email: 'user3@test.com'
+        password: 'TestPass123!'
 
 scenarios:
-  - name: "Login Flow"
+  - name: 'Login Flow'
     weight: 60
     flow:
       - post:
-          url: "/auth/login"
+          url: '/auth/login'
           json:
-            email: "{{ users.email }}"
-            password: "{{ users.password }}"
+            email: '{{ users.email }}'
+            password: '{{ users.password }}'
           capture:
-            - json: "$.access_token"
-              as: "token"
-            - json: "$.refresh_token"
-              as: "refreshToken"
+            - json: '$.access_token'
+              as: 'token'
+            - json: '$.refresh_token'
+              as: 'refreshToken'
           expect:
             - statusCode: 200
-            - hasProperty: "access_token"
-      
+            - hasProperty: 'access_token'
+
       - think: 2
-      
+
       - get:
-          url: "/auth/profile"
+          url: '/auth/profile'
           headers:
-            Authorization: "Bearer {{ token }}"
+            Authorization: 'Bearer {{ token }}'
           expect:
             - statusCode: 200
 
-  - name: "Token Refresh"
+  - name: 'Token Refresh'
     weight: 20
     flow:
       - post:
-          url: "/auth/login"
+          url: '/auth/login'
           json:
-            email: "{{ users.email }}"
-            password: "{{ users.password }}"
+            email: '{{ users.email }}'
+            password: '{{ users.password }}'
           capture:
-            - json: "$.refresh_token"
-              as: "refreshToken"
-      
+            - json: '$.refresh_token'
+              as: 'refreshToken'
+
       - think: 1
-      
+
       - post:
-          url: "/auth/refresh"
+          url: '/auth/refresh'
           json:
-            refresh_token: "{{ refreshToken }}"
+            refresh_token: '{{ refreshToken }}'
           expect:
             - statusCode: 200
-            - hasProperty: "access_token"
+            - hasProperty: 'access_token'
 
-  - name: "Registration Flow"
+  - name: 'Registration Flow'
     weight: 20
     flow:
       - post:
-          url: "/auth/register"
+          url: '/auth/register'
           json:
-            firstName: "Test"
-            lastName: "User"
-            email: "test{{ $randomString() }}@example.com"
-            username: "testuser{{ $randomString() }}"
-            password: "TestPassword123!"
+            firstName: 'Test'
+            lastName: 'User'
+            email: 'test{{ $randomString() }}@example.com'
+            username: 'testuser{{ $randomString() }}'
+            password: 'TestPassword123!'
           expect:
             - statusCode: 201
-      
+
       - think: 1
-      
+
       - post:
-          url: "/auth/login"
+          url: '/auth/login'
           json:
-            email: "test{{ $randomString() }}@example.com"
-            password: "TestPassword123!"
+            email: 'test{{ $randomString() }}@example.com'
+            password: 'TestPassword123!'
           expect:
             - statusCode: 200

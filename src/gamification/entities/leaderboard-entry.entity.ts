@@ -17,5 +17,5 @@ export class LeaderboardEntry {
   rank: number;
 
   @Column()
-  period: string; 
-} 
+  period: string;
+}

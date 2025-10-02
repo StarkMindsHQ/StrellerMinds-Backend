@@ -31,9 +31,7 @@ export class RecommendationCacheService {
     collaborativeData: { ttl: 1800, maxSize: 500 }, // 30 minutes
   };
 
-  constructor(
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   /**
    * Cache user recommendations
@@ -57,7 +55,7 @@ export class RecommendationCacheService {
       await this.cacheManager.set(
         cacheKey,
         recommendations,
-        this.cacheConfigs.recommendations.ttl * 1000
+        this.cacheConfigs.recommendations.ttl * 1000,
       );
 
       this.logger.debug(`Cached ${recommendations.length} recommendations for user ${userId}`);
@@ -85,7 +83,7 @@ export class RecommendationCacheService {
       });
 
       const cached = await this.cacheManager.get<Recommendation[]>(cacheKey);
-      
+
       if (cached) {
         this.logger.debug(`Retrieved ${cached.length} cached recommendations for user ${userId}`);
       }
@@ -107,11 +105,7 @@ export class RecommendationCacheService {
         userId,
       });
 
-      await this.cacheManager.set(
-        cacheKey,
-        profile,
-        this.cacheConfigs.userProfile.ttl * 1000
-      );
+      await this.cacheManager.set(cacheKey, profile, this.cacheConfigs.userProfile.ttl * 1000);
 
       this.logger.debug(`Cached user profile for user ${userId}`);
     } catch (error) {
@@ -129,7 +123,7 @@ export class RecommendationCacheService {
         userId,
       });
 
-      return await this.cacheManager.get(cacheKey) || null;
+      return (await this.cacheManager.get(cacheKey)) || null;
     } catch (error) {
       this.logger.error('Error retrieving cached user profile:', error);
       return null;
@@ -150,7 +144,7 @@ export class RecommendationCacheService {
       await this.cacheManager.set(
         cacheKey,
         similarity,
-        this.cacheConfigs.similarityScores.ttl * 1000
+        this.cacheConfigs.similarityScores.ttl * 1000,
       );
     } catch (error) {
       this.logger.error('Error caching similarity scores:', error);
@@ -160,13 +154,10 @@ export class RecommendationCacheService {
   /**
    * Get cached similarity scores
    */
-  async getCachedSimilarityScores(
-    courseId1: string,
-    courseId2: string,
-  ): Promise<number | null> {
+  async getCachedSimilarityScores(courseId1: string, courseId2: string): Promise<number | null> {
     try {
       const cacheKey = this.buildSimilarityCacheKey(courseId1, courseId2);
-      return await this.cacheManager.get<number>(cacheKey) || null;
+      return (await this.cacheManager.get<number>(cacheKey)) || null;
     } catch (error) {
       this.logger.error('Error retrieving cached similarity scores:', error);
       return null;
@@ -187,7 +178,7 @@ export class RecommendationCacheService {
       await this.cacheManager.set(
         cacheKey,
         learningPath,
-        this.cacheConfigs.learningPaths.ttl * 1000
+        this.cacheConfigs.learningPaths.ttl * 1000,
       );
 
       this.logger.debug(`Cached learning path ${learningPath.id} for user ${userId}`);
@@ -207,7 +198,7 @@ export class RecommendationCacheService {
         params: { pathId },
       });
 
-      return await this.cacheManager.get<LearningPath>(cacheKey) || null;
+      return (await this.cacheManager.get<LearningPath>(cacheKey)) || null;
     } catch (error) {
       this.logger.error('Error retrieving cached learning path:', error);
       return null;
@@ -224,11 +215,7 @@ export class RecommendationCacheService {
         userId,
       });
 
-      await this.cacheManager.set(
-        cacheKey,
-        features,
-        this.cacheConfigs.mlFeatures.ttl * 1000
-      );
+      await this.cacheManager.set(cacheKey, features, this.cacheConfigs.mlFeatures.ttl * 1000);
 
       this.logger.debug(`Cached ML features for user ${userId}`);
     } catch (error) {
@@ -246,7 +233,7 @@ export class RecommendationCacheService {
         userId,
       });
 
-      return await this.cacheManager.get(cacheKey) || null;
+      return (await this.cacheManager.get(cacheKey)) || null;
     } catch (error) {
       this.logger.error('Error retrieving cached ML features:', error);
       return null;
@@ -268,11 +255,7 @@ export class RecommendationCacheService {
         params: { dataType },
       });
 
-      await this.cacheManager.set(
-        cacheKey,
-        data,
-        this.cacheConfigs.collaborativeData.ttl * 1000
-      );
+      await this.cacheManager.set(cacheKey, data, this.cacheConfigs.collaborativeData.ttl * 1000);
 
       this.logger.debug(`Cached collaborative ${dataType} for user ${userId}`);
     } catch (error) {
@@ -294,7 +277,7 @@ export class RecommendationCacheService {
         params: { dataType },
       });
 
-      return await this.cacheManager.get(cacheKey) || null;
+      return (await this.cacheManager.get(cacheKey)) || null;
     } catch (error) {
       this.logger.error('Error retrieving cached collaborative data:', error);
       return null;
@@ -338,7 +321,7 @@ export class RecommendationCacheService {
         params: { analyticsType },
       });
 
-      return await this.cacheManager.get(cacheKey) || null;
+      return (await this.cacheManager.get(cacheKey)) || null;
     } catch (error) {
       this.logger.error('Error retrieving cached analytics:', error);
       return null;
@@ -386,10 +369,8 @@ export class RecommendationCacheService {
    */
   async invalidateLearningPathCache(userId: string, pathId?: string): Promise<void> {
     try {
-      const pattern = pathId 
-        ? `learningPaths:${userId}:${pathId}`
-        : `learningPaths:${userId}:*`;
-      
+      const pattern = pathId ? `learningPaths:${userId}:${pathId}` : `learningPaths:${userId}:*`;
+
       await this.invalidateByPattern(pattern);
       this.logger.debug(`Invalidated learning path cache for user ${userId}`);
     } catch (error) {
@@ -403,14 +384,13 @@ export class RecommendationCacheService {
   async warmUpCache(userId: string): Promise<void> {
     try {
       this.logger.log(`Warming up cache for user ${userId}`);
-      
+
       // This would typically pre-load frequently accessed data
       // Implementation depends on your specific use case
-      
+
       // Example: Pre-load user profile, recent recommendations, etc.
       // await this.preloadUserProfile(userId);
       // await this.preloadRecentRecommendations(userId);
-      
     } catch (error) {
       this.logger.error('Error warming up cache:', error);
     }
@@ -455,18 +435,18 @@ export class RecommendationCacheService {
    */
   private buildCacheKey(key: CacheKey): string {
     let cacheKey = `${key.prefix}:${key.userId}`;
-    
+
     if (key.params) {
       const paramString = Object.entries(key.params)
         .sort(([a], [b]) => a.localeCompare(b)) // Sort for consistent keys
         .map(([k, v]) => `${k}:${v}`)
         .join(':');
-      
+
       if (paramString) {
         cacheKey += `:${paramString}`;
       }
     }
-    
+
     return cacheKey;
   }
 
@@ -486,7 +466,7 @@ export class RecommendationCacheService {
       // Note: This implementation depends on your cache manager
       // For Redis, you might use SCAN with pattern matching
       // For in-memory cache, you might need to track keys manually
-      
+
       // Simple implementation for demonstration
       // In production, you'd want more sophisticated pattern matching
       await this.cacheManager.del(pattern);

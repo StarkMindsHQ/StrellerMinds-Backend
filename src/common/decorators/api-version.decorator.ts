@@ -6,16 +6,13 @@ export const DEPRECATION_INFO_KEY = 'deprecationInfo';
 
 export const ApiVersion = (version: string) => SetMetadata(API_VERSION_KEY, version);
 
-export const Deprecated = (
-  deprecatedIn: string,
-  removedIn: string,
-  migrationGuide?: string,
-) => SetMetadata(DEPRECATED_KEY, {
-  deprecatedIn,
-  removedIn,
-  migrationGuide,
-  message: `This endpoint is deprecated since ${deprecatedIn} and will be removed in ${removedIn}`,
-});
+export const Deprecated = (deprecatedIn: string, removedIn: string, migrationGuide?: string) =>
+  SetMetadata(DEPRECATED_KEY, {
+    deprecatedIn,
+    removedIn,
+    migrationGuide,
+    message: `This endpoint is deprecated since ${deprecatedIn} and will be removed in ${removedIn}`,
+  });
 
 export const DeprecationInfo = (info: {
   deprecatedIn: string;
@@ -24,4 +21,3 @@ export const DeprecationInfo = (info: {
   alternative?: string;
   reason?: string;
 }) => SetMetadata(DEPRECATION_INFO_KEY, info);
-

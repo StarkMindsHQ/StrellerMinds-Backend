@@ -4,7 +4,12 @@ import { Repository } from 'typeorm';
 import { LearningPathService, LearningGoal } from '../services/learning-path.service';
 import { RecommendationAnalyticsService } from '../services/recommendation-analytics.service';
 import { ContentSimilarityService } from '../services/content-similarity.service';
-import { LearningPath, LearningPathStep, LearningPathStatus, StepType } from '../entities/learning-path.entity';
+import {
+  LearningPath,
+  LearningPathStep,
+  LearningPathStatus,
+  StepType,
+} from '../entities/learning-path.entity';
 import { UserInteraction, InteractionType } from '../entities/user-interaction.entity';
 import { User } from '../../users/entities/user.entity';
 import { Course } from '../../courses/entities/course.entity';
@@ -159,7 +164,9 @@ describe('LearningPathService', () => {
     stepRepository = module.get<Repository<LearningPathStep>>(getRepositoryToken(LearningPathStep));
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
     courseRepository = module.get<Repository<Course>>(getRepositoryToken(Course));
-    interactionRepository = module.get<Repository<UserInteraction>>(getRepositoryToken(UserInteraction));
+    interactionRepository = module.get<Repository<UserInteraction>>(
+      getRepositoryToken(UserInteraction),
+    );
     analyticsService = module.get<RecommendationAnalyticsService>(RecommendationAnalyticsService);
     similarityService = module.get<ContentSimilarityService>(ContentSimilarityService);
   });
@@ -188,7 +195,9 @@ describe('LearningPathService', () => {
         orderBy: jest.fn().mockReturnThis(),
         getMany: jest.fn().mockResolvedValue([mockCourse]),
       } as any);
-      jest.spyOn(learningPathRepository, 'save').mockResolvedValue({ ...mockLearningPath, id: 'generated-path-id' });
+      jest
+        .spyOn(learningPathRepository, 'save')
+        .mockResolvedValue({ ...mockLearningPath, id: 'generated-path-id' });
       jest.spyOn(stepRepository, 'save').mockResolvedValue([mockStep]);
       jest.spyOn(analyticsService, 'trackRecommendationGeneration').mockResolvedValue();
 
@@ -285,7 +294,9 @@ describe('LearningPathService', () => {
         getMany: jest.fn().mockResolvedValue([mockLearningPath]),
       };
 
-      jest.spyOn(learningPathRepository, 'createQueryBuilder').mockReturnValue(mockQueryBuilder as any);
+      jest
+        .spyOn(learningPathRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
 
       // Act
       const result = await service.getUserLearningPaths(userId, query);
@@ -295,7 +306,9 @@ describe('LearningPathService', () => {
       expect(result.paths).toHaveLength(1);
       expect(result.total).toBe(1);
       expect(mockQueryBuilder.where).toHaveBeenCalledWith('path.userId = :userId', { userId });
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('path.status = :status', { status: query.status });
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('path.status = :status', {
+        status: query.status,
+      });
     });
 
     it('should filter by skill area when provided', async () => {
@@ -320,13 +333,17 @@ describe('LearningPathService', () => {
         getMany: jest.fn().mockResolvedValue([mockLearningPath]),
       };
 
-      jest.spyOn(learningPathRepository, 'createQueryBuilder').mockReturnValue(mockQueryBuilder as any);
+      jest
+        .spyOn(learningPathRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
 
       // Act
       const result = await service.getUserLearningPaths(userId, query);
 
       // Assert
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('path.targetSkills @> :skillArea', { skillArea: ['React'] });
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('path.targetSkills @> :skillArea', {
+        skillArea: ['React'],
+      });
     });
   });
 
@@ -367,13 +384,15 @@ describe('LearningPathService', () => {
         ...mockLearningPath,
         steps: [
           { ...mockStep, completed: true },
-          { ...mockStep, id: 'step-2', completed: false }
+          { ...mockStep, id: 'step-2', completed: false },
         ],
         totalSteps: 2,
       };
 
       jest.spyOn(learningPathRepository, 'findOne').mockResolvedValue(pathWithSteps);
-      jest.spyOn(stepRepository, 'save').mockResolvedValue({ ...mockStep, id: 'step-2', completed: true });
+      jest
+        .spyOn(stepRepository, 'save')
+        .mockResolvedValue({ ...mockStep, id: 'step-2', completed: true });
       jest.spyOn(learningPathRepository, 'save').mockImplementation((path: any) => {
         expect(path.progressPercentage).toBe(100);
         expect(path.status).toBe(LearningPathStatus.COMPLETED);
@@ -397,7 +416,7 @@ describe('LearningPathService', () => {
 
       // Act & Assert
       await expect(service.updateProgress(pathId, stepId, true)).rejects.toThrow(
-        `Learning path ${pathId} not found`
+        `Learning path ${pathId} not found`,
       );
     });
 
@@ -414,7 +433,7 @@ describe('LearningPathService', () => {
 
       // Act & Assert
       await expect(service.updateProgress(pathId, stepId, true)).rejects.toThrow(
-        `Step ${stepId} not found in learning path`
+        `Step ${stepId} not found in learning path`,
       );
     });
   });
@@ -451,7 +470,7 @@ describe('LearningPathService', () => {
 
       // Act & Assert
       await expect(service.adaptLearningPath(pathId)).rejects.toThrow(
-        `Learning path ${pathId} not found`
+        `Learning path ${pathId} not found`,
       );
     });
   });
@@ -483,7 +502,7 @@ describe('LearningPathService', () => {
 
       // Act & Assert
       await expect(service.getPathRecommendations(userId)).rejects.toThrow(
-        `User ${userId} not found`
+        `User ${userId} not found`,
       );
     });
   });
@@ -576,7 +595,9 @@ describe('LearningPathService', () => {
       // Arrange
       const userId = 'user-1';
 
-      jest.spyOn(userRepository, 'findOne').mockRejectedValue(new Error('Database connection failed'));
+      jest
+        .spyOn(userRepository, 'findOne')
+        .mockRejectedValue(new Error('Database connection failed'));
 
       // Act & Assert
       await expect(service.generateLearningPath(userId, mockLearningGoal)).rejects.toThrow();
@@ -648,7 +669,7 @@ describe('LearningPathService', () => {
       // Assert
       const endTime = Date.now();
       const executionTime = endTime - startTime;
-      
+
       expect(result).toBeDefined();
       expect(executionTime).toBeLessThan(3000); // Should complete within 3 seconds
     });

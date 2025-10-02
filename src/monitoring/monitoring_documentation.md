@@ -70,15 +70,15 @@ The monitoring module is configured in `monitoring.config.ts` with the following
 
 ### Application Metrics
 
-| Metric Name | Type | Description |
-|-------------|------|-------------|
-| `http_requests_total` | Counter | Total HTTP requests |
-| `http_request_duration_seconds` | Histogram | HTTP request duration |
-| `http_errors_total` | Counter | Total HTTP errors |
-| `database_connections_active` | Gauge | Active database connections |
-| `database_queries_total` | Counter | Total database queries |
-| `memory_usage_bytes` | Gauge | Memory usage in bytes |
-| `cpu_usage_percent` | Gauge | CPU usage percentage |
+| Metric Name                     | Type      | Description                 |
+| ------------------------------- | --------- | --------------------------- |
+| `http_requests_total`           | Counter   | Total HTTP requests         |
+| `http_request_duration_seconds` | Histogram | HTTP request duration       |
+| `http_errors_total`             | Counter   | Total HTTP errors           |
+| `database_connections_active`   | Gauge     | Active database connections |
+| `database_queries_total`        | Counter   | Total database queries      |
+| `memory_usage_bytes`            | Gauge     | Memory usage in bytes       |
+| `cpu_usage_percent`             | Gauge     | CPU usage percentage        |
 
 ### System Metrics
 

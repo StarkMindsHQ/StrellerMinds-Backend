@@ -27,14 +27,12 @@ import { UserRole } from '../users/enums/userRole.enum';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class PerformanceController {
-  constructor(
-    private readonly performanceMonitoringService: PerformanceMonitoringService,
-  ) {}
+  constructor(private readonly performanceMonitoringService: PerformanceMonitoringService) {}
 
   @Get('system/summary')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get system performance summary',
-    description: 'Returns overall system performance metrics and statistics'
+    description: 'Returns overall system performance metrics and statistics',
   })
   @ApiQuery({
     name: 'timeWindow',
@@ -72,17 +70,15 @@ export class PerformanceController {
     },
   })
   @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
-  getSystemPerformanceSummary(
-    @Query('timeWindow') timeWindow: string = '3600',
-  ) {
+  getSystemPerformanceSummary(@Query('timeWindow') timeWindow: string = '3600') {
     const timeWindowMs = parseInt(timeWindow) * 1000;
     return this.performanceMonitoringService.getSystemPerformanceSummary(timeWindowMs);
   }
 
   @Get('endpoint/:endpoint')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get endpoint-specific performance statistics',
-    description: 'Returns detailed performance metrics for a specific endpoint'
+    description: 'Returns detailed performance metrics for a specific endpoint',
   })
   @ApiQuery({
     name: 'timeWindow',
@@ -118,16 +114,13 @@ export class PerformanceController {
     @Query('timeWindow') timeWindow: string = '3600',
   ) {
     const timeWindowMs = parseInt(timeWindow) * 1000;
-    return this.performanceMonitoringService.getEndpointPerformanceStats(
-      endpoint,
-      timeWindowMs,
-    );
+    return this.performanceMonitoringService.getEndpointPerformanceStats(endpoint, timeWindowMs);
   }
 
   @Get('metrics/real-time')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get real-time performance metrics',
-    description: 'Returns current system performance metrics in real-time'
+    description: 'Returns current system performance metrics in real-time',
   })
   @ApiResponse({
     status: 200,
@@ -161,7 +154,7 @@ export class PerformanceController {
     // Get last minute performance data
     const oneMinute = 60 * 1000;
     const summary = this.performanceMonitoringService.getSystemPerformanceSummary(oneMinute);
-    
+
     return {
       timestamp: new Date().toISOString(),
       currentLoad: {
@@ -179,9 +172,9 @@ export class PerformanceController {
   }
 
   @Get('health/performance')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get performance health status',
-    description: 'Returns current performance health status and alerts'
+    description: 'Returns current performance health status and alerts',
   })
   @ApiResponse({
     status: 200,
@@ -214,7 +207,7 @@ export class PerformanceController {
   @HttpCode(HttpStatus.OK)
   getPerformanceHealth() {
     const summary = this.performanceMonitoringService.getSystemPerformanceSummary();
-    
+
     if (!summary.overallPerformance) {
       return {
         status: 'unknown',
@@ -302,9 +295,9 @@ export class PerformanceController {
   }
 
   @Post('baseline/create')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create performance baseline',
-    description: 'Creates a new performance baseline for comparison'
+    description: 'Creates a new performance baseline for comparison',
   })
   @ApiBody({
     schema: {
@@ -327,7 +320,7 @@ export class PerformanceController {
   ) {
     const timeWindow = (createBaselineDto.timeWindow || 3600) * 1000;
     const summary = this.performanceMonitoringService.getSystemPerformanceSummary(timeWindow);
-    
+
     // In a real implementation, you would save this to a database
     const baseline = {
       id: Date.now().toString(),

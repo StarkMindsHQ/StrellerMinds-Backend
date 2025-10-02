@@ -14,9 +14,7 @@ export class CloudinaryService {
   }
 
   //FN TO UPLOAD PROFILE IMG
-  public async uploadImage(
-    file: UploadedFileLike,
-  ): Promise<UploadApiResponse> {
+  public async uploadImage(file: UploadedFileLike): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
@@ -48,9 +46,7 @@ export class CloudinaryService {
    * @param filePath The path to the file on disk
    * @returns The Cloudinary upload response
    */
-  public async uploadVideoFromPath(
-    filePath: string,
-  ): Promise<UploadApiResponse> {
+  public async uploadVideoFromPath(filePath: string): Promise<UploadApiResponse> {
     return new Promise((resolve, reject) => {
       cloudinary.uploader.upload(
         filePath,

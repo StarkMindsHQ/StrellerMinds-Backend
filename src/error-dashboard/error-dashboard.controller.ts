@@ -10,7 +10,11 @@ export class ErrorDashboardController {
   @Get('summary')
   @ApiOperation({ summary: 'Get error summary dashboard' })
   @ApiResponse({ status: 200, description: 'Error summary retrieved successfully' })
-  @ApiQuery({ name: 'timeRange', required: false, description: 'Time range in hours (default: 24)' })
+  @ApiQuery({
+    name: 'timeRange',
+    required: false,
+    description: 'Time range in hours (default: 24)',
+  })
   @ApiQuery({ name: 'errorCode', required: false, description: 'Filter by specific error code' })
   async getErrorSummary(
     @Query('timeRange') timeRange?: number,
@@ -22,8 +26,16 @@ export class ErrorDashboardController {
   @Get('trends')
   @ApiOperation({ summary: 'Get error trends dashboard' })
   @ApiResponse({ status: 200, description: 'Error trends retrieved successfully' })
-  @ApiQuery({ name: 'timeRange', required: false, description: 'Time range in hours (default: 168 - 1 week)' })
-  @ApiQuery({ name: 'interval', required: false, description: 'Grouping interval in hours (default: 1)' })
+  @ApiQuery({
+    name: 'timeRange',
+    required: false,
+    description: 'Time range in hours (default: 168 - 1 week)',
+  })
+  @ApiQuery({
+    name: 'interval',
+    required: false,
+    description: 'Grouping interval in hours (default: 1)',
+  })
   async getErrorTrends(
     @Query('timeRange') timeRange?: number,
     @Query('interval') interval?: number,
@@ -34,12 +46,17 @@ export class ErrorDashboardController {
   @Get('top-errors')
   @ApiOperation({ summary: 'Get top errors dashboard' })
   @ApiResponse({ status: 200, description: 'Top errors retrieved successfully' })
-  @ApiQuery({ name: 'limit', required: false, description: 'Number of top errors to return (default: 10)' })
-  @ApiQuery({ name: 'timeRange', required: false, description: 'Time range in hours (default: 24)' })
-  async getTopErrors(
-    @Query('limit') limit?: number,
-    @Query('timeRange') timeRange?: number,
-  ) {
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Number of top errors to return (default: 10)',
+  })
+  @ApiQuery({
+    name: 'timeRange',
+    required: false,
+    description: 'Time range in hours (default: 24)',
+  })
+  async getTopErrors(@Query('limit') limit?: number, @Query('timeRange') timeRange?: number) {
     return this.errorDashboardService.getTopErrors(limit, timeRange);
   }
 
@@ -54,8 +71,16 @@ export class ErrorDashboardController {
   @Get('alert-history')
   @ApiOperation({ summary: 'Get error alert history' })
   @ApiResponse({ status: 200, description: 'Alert history retrieved successfully' })
-  @ApiQuery({ name: 'timeRange', required: false, description: 'Time range in hours (default: 168 - 1 week)' })
-  @ApiQuery({ name: 'severity', required: false, description: 'Filter by severity (low, medium, high, critical)' })
+  @ApiQuery({
+    name: 'timeRange',
+    required: false,
+    description: 'Time range in hours (default: 168 - 1 week)',
+  })
+  @ApiQuery({
+    name: 'severity',
+    required: false,
+    description: 'Filter by severity (low, medium, high, critical)',
+  })
   async getAlertHistory(
     @Query('timeRange') timeRange?: number,
     @Query('severity') severity?: string,

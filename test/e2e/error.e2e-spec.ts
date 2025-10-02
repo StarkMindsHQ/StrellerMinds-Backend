@@ -23,7 +23,7 @@ describe('Error Handling (e2e)', () => {
     return request(app.getHttpServer())
       .get('/test-error/validation')
       .expect(400)
-      .then(response => {
+      .then((response) => {
         expect(response.body).toEqual({
           statusCode: 400,
           message: 'Validation failed',
@@ -34,12 +34,10 @@ describe('Error Handling (e2e)', () => {
   });
 
   it('/test-error/unauthorized (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/test-error/unauthorized')
-      .expect(401, {
-        statusCode: 401,
-        message: 'Authentication required',
-        error: 'Unauthorized',
-      });
+    return request(app.getHttpServer()).get('/test-error/unauthorized').expect(401, {
+      statusCode: 401,
+      message: 'Authentication required',
+      error: 'Unauthorized',
+    });
   });
 });

@@ -14,7 +14,7 @@ export class DatabaseHealthIndicator extends HealthIndicator {
 
   async isHealthy(key: string): Promise<HealthIndicatorResult> {
     const startTime = Date.now();
-    
+
     try {
       // Test basic connectivity
       const isConnected = this.connection.isConnected;
@@ -93,21 +93,21 @@ export class DatabaseHealthIndicator extends HealthIndicator {
 
   async checkDatabaseSize(): Promise<HealthIndicatorResult> {
     const key = 'database_size';
-    
+
     try {
       const sizeQuery = `
         SELECT 
           pg_size_pretty(pg_database_size(current_database())) as size,
           pg_database_size(current_database()) as size_bytes
       `;
-      
+
       const result = await this.connection.query(sizeQuery);
       const sizeBytes = parseInt(result[0]?.size_bytes || '0');
       const sizeGB = sizeBytes / (1024 * 1024 * 1024);
 
       // Check if database size is reasonable (customize threshold as needed)
       const isHealthy = sizeGB < 10; // 10GB threshold
-      
+
       return this.getStatus(key, isHealthy, {
         size: result[0]?.size,
         sizeBytes,
@@ -116,15 +116,16 @@ export class DatabaseHealthIndicator extends HealthIndicator {
         status: isHealthy ? 'ok' : 'warning',
       });
     } catch (error) {
-      throw new HealthCheckError('Database size check failed', 
-        this.getStatus(key, false, { error: error.message })
+      throw new HealthCheckError(
+        'Database size check failed',
+        this.getStatus(key, false, { error: error.message }),
       );
     }
   }
 
   async checkTableStats(): Promise<HealthIndicatorResult> {
     const key = 'database_tables';
-    
+
     try {
       const tablesQuery = `
         SELECT 
@@ -139,33 +140,34 @@ export class DatabaseHealthIndicator extends HealthIndicator {
         ORDER BY n_live_tup DESC
         LIMIT 10
       `;
-      
+
       const tables = await this.connection.query(tablesQuery);
-      
+
       // Check for tables with high dead tuple ratio
-      const problematicTables = tables.filter(table => {
+      const problematicTables = tables.filter((table) => {
         const deadRatio = table.dead_tuples / (table.live_tuples + table.dead_tuples || 1);
         return deadRatio > 0.1; // 10% dead tuples threshold
       });
 
       const isHealthy = problematicTables.length === 0;
-      
+
       return this.getStatus(key, isHealthy, {
         totalTables: tables.length,
         problematicTables: problematicTables.length,
         tables: tables.slice(0, 5), // Return top 5 tables
-        needsVacuum: problematicTables.map(t => t.tablename),
+        needsVacuum: problematicTables.map((t) => t.tablename),
       });
     } catch (error) {
-      throw new HealthCheckError('Database table stats check failed',
-        this.getStatus(key, false, { error: error.message })
+      throw new HealthCheckError(
+        'Database table stats check failed',
+        this.getStatus(key, false, { error: error.message }),
       );
     }
   }
 
   async checkLockStatus(): Promise<HealthIndicatorResult> {
     const key = 'database_locks';
-    
+
     try {
       const locksQuery = `
         SELECT 
@@ -176,13 +178,13 @@ export class DatabaseHealthIndicator extends HealthIndicator {
         GROUP BY mode
         ORDER BY count DESC
       `;
-      
+
       const locks = await this.connection.query(locksQuery);
       const totalLocks = locks.reduce((sum, lock) => sum + parseInt(lock.count), 0);
-      
+
       // Check for excessive locks (customize threshold as needed)
       const isHealthy = totalLocks < 100;
-      
+
       return this.getStatus(key, isHealthy, {
         totalLocks,
         lockTypes: locks,
@@ -190,8 +192,9 @@ export class DatabaseHealthIndicator extends HealthIndicator {
         status: isHealthy ? 'ok' : 'warning',
       });
     } catch (error) {
-      throw new HealthCheckError('Database locks check failed',
-        this.getStatus(key, false, { error: error.message })
+      throw new HealthCheckError(
+        'Database locks check failed',
+        this.getStatus(key, false, { error: error.message }),
       );
     }
   }
@@ -210,14 +213,22 @@ export class DatabaseHealthIndicator extends HealthIndicator {
     ]);
 
     return {
-      connectivity: connectivity.status === 'fulfilled' ? connectivity.value : 
-        this.getStatus('database_connectivity', false, { error: 'Check failed' }),
-      size: size.status === 'fulfilled' ? size.value :
-        this.getStatus('database_size', false, { error: 'Check failed' }),
-      tables: tables.status === 'fulfilled' ? tables.value :
-        this.getStatus('database_tables', false, { error: 'Check failed' }),
-      locks: locks.status === 'fulfilled' ? locks.value :
-        this.getStatus('database_locks', false, { error: 'Check failed' }),
+      connectivity:
+        connectivity.status === 'fulfilled'
+          ? connectivity.value
+          : this.getStatus('database_connectivity', false, { error: 'Check failed' }),
+      size:
+        size.status === 'fulfilled'
+          ? size.value
+          : this.getStatus('database_size', false, { error: 'Check failed' }),
+      tables:
+        tables.status === 'fulfilled'
+          ? tables.value
+          : this.getStatus('database_tables', false, { error: 'Check failed' }),
+      locks:
+        locks.status === 'fulfilled'
+          ? locks.value
+          : this.getStatus('database_locks', false, { error: 'Check failed' }),
     };
   }
 }

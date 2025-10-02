@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { trace, SpanStatusCode } from '@opentelemetry/api';
 import { TRACE_OPTIONS_KEY, TraceOptions } from './tracing.decorators';
@@ -19,10 +14,7 @@ export class TracingGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const traceOptions = this.reflector.get<TraceOptions>(
-      TRACE_OPTIONS_KEY,
-      context.getHandler(),
-    );
+    const traceOptions = this.reflector.get<TraceOptions>(TRACE_OPTIONS_KEY, context.getHandler());
 
     if (!traceOptions) {
       return true; // No tracing needed
@@ -85,7 +77,7 @@ export class TracingGuard implements CanActivate {
         span.recordException(error);
       } else {
         span.setStatus({ code: SpanStatusCode.OK });
-        
+
         // Add result to span if it's small enough
         if (result && JSON.stringify(result).length < 1000) {
           span.setAttributes({

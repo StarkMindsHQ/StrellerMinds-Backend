@@ -15,16 +15,11 @@ export class UserEmailVerifiedEvent extends DomainEvent {
     private readonly payload: UserEmailVerifiedPayload,
     metadata: Partial<DomainEventMetadata> = {},
   ) {
-    super(
-      payload.userId,
-      'User',
-      1,
-      {
-        ...metadata,
-        userId: payload.userId,
-        correlationId: metadata.correlationId,
-      },
-    );
+    super(payload.userId, 'User', 1, {
+      ...metadata,
+      userId: payload.userId,
+      correlationId: metadata.correlationId,
+    });
   }
 
   getPayload(): UserEmailVerifiedPayload {

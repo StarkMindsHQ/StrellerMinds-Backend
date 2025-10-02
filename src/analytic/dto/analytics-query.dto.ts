@@ -1,45 +1,45 @@
-import { IsArray, IsOptional, IsObject, IsDateString, IsString, IsNumber } from "class-validator"
-import { ApiProperty } from "@nestjs/swagger"
-import { Type } from "class-transformer"
+import { IsArray, IsOptional, IsObject, IsDateString, IsString, IsNumber } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 class TimeRangeDto {
-  @ApiProperty({ description: "Start date for the query" })
+  @ApiProperty({ description: 'Start date for the query' })
   @IsDateString()
-  start: string
+  start: string;
 
-  @ApiProperty({ description: "End date for the query" })
+  @ApiProperty({ description: 'End date for the query' })
   @IsDateString()
-  end: string
+  end: string;
 }
 
 export class AnalyticsQueryDto {
-  @ApiProperty({ description: "List of metrics to query", type: [String] })
+  @ApiProperty({ description: 'List of metrics to query', type: [String] })
   @IsArray()
   @IsString({ each: true })
-  metrics: string[]
+  metrics: string[];
 
-  @ApiProperty({ description: "Dimensions to group by", type: [String], required: false })
+  @ApiProperty({ description: 'Dimensions to group by', type: [String], required: false })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  dimensions?: string[]
+  dimensions?: string[];
 
-  @ApiProperty({ description: "Filters to apply", type: "object", required: false })
+  @ApiProperty({ description: 'Filters to apply', type: 'object', required: false })
   @IsOptional()
   @IsObject()
-  filters?: Record<string, any>
+  filters?: Record<string, any>;
 
-  @ApiProperty({ description: "Time range for the query", type: TimeRangeDto })
+  @ApiProperty({ description: 'Time range for the query', type: TimeRangeDto })
   @Type(() => TimeRangeDto)
-  timeRange: TimeRangeDto
+  timeRange: TimeRangeDto;
 
-  @ApiProperty({ description: "Granularity for aggregation", required: false })
+  @ApiProperty({ description: 'Granularity for aggregation', required: false })
   @IsOptional()
   @IsString()
-  granularity?: string
+  granularity?: string;
 
-  @ApiProperty({ description: "Limit number of results", required: false })
+  @ApiProperty({ description: 'Limit number of results', required: false })
   @IsOptional()
   @IsNumber()
-  limit?: number
+  limit?: number;
 }

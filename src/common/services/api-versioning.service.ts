@@ -44,7 +44,7 @@ export class ApiVersioningService {
     documentation: any;
   } {
     const config = this.configService.get('api');
-    
+
     return {
       current: config.defaultVersion,
       supported: config.supportedVersions,
@@ -115,7 +115,7 @@ export class ApiVersioningService {
       .select([
         'log.version',
         'COUNT(*) as usage_count',
-        'COUNT(CASE WHEN log.deprecated = true THEN 1 END) as deprecated_usage_count'
+        'COUNT(CASE WHEN log.deprecated = true THEN 1 END) as deprecated_usage_count',
       ])
       .where('log.timestamp >= :startDate', { startDate })
       .groupBy('log.version')
@@ -136,11 +136,7 @@ export class ApiVersioningService {
   async getDeprecatedEndpointUsage(): Promise<any> {
     return this.apiUsageRepository
       .createQueryBuilder('log')
-      .select([
-        'log.endpoint',
-        'log.version',
-        'COUNT(*) as usage_count'
-      ])
+      .select(['log.endpoint', 'log.version', 'COUNT(*) as usage_count'])
       .where('log.deprecated = :deprecated', { deprecated: true })
       .groupBy('log.endpoint, log.version')
       .orderBy('usage_count', 'DESC')
@@ -171,7 +167,10 @@ export class ApiVersioningService {
   /**
    * Validate backward compatibility
    */
-  validateBackwardCompatibility(oldVersion: string, newVersion: string): {
+  validateBackwardCompatibility(
+    oldVersion: string,
+    newVersion: string,
+  ): {
     compatible: boolean;
     breakingChanges: string[];
     recommendations: string[];
@@ -258,4 +257,4 @@ export class ApiVersioningService {
       },
     ];
   }
-} 
+}

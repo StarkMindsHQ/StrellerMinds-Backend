@@ -46,12 +46,22 @@ export class Grade {
   feedback: string;
 
   /** Date/time when the grade was created */
-  @ApiProperty({ description: 'Date/time when the grade was created', type: String, format: 'date-time', example: '2025-06-29T12:00:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the grade was created',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:00:00Z',
+  })
   @CreateDateColumn()
   createdAt: Date;
 
   /** Date/time when the grade was last updated */
-  @ApiProperty({ description: 'Date/time when the grade was last updated', type: String, format: 'date-time', example: '2025-06-29T12:10:00Z' })
+  @ApiProperty({
+    description: 'Date/time when the grade was last updated',
+    type: String,
+    format: 'date-time',
+    example: '2025-06-29T12:10:00Z',
+  })
   @UpdateDateColumn()
   updatedAt: Date;
 }

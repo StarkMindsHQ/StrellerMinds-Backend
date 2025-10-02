@@ -36,12 +36,14 @@ export class BackwardCompatibilityService {
    */
   transformRequest(version: string, endpoint: string, method: string, data: any): any {
     const rule = this.findCompatibilityRule(version, endpoint, method);
-    
+
     if (rule && rule.transformation) {
-      this.logger.debug(`Applying backward compatibility transformation for ${version} ${method} ${endpoint}`);
+      this.logger.debug(
+        `Applying backward compatibility transformation for ${version} ${method} ${endpoint}`,
+      );
       return rule.transformation(data);
     }
-    
+
     return data;
   }
 
@@ -50,12 +52,12 @@ export class BackwardCompatibilityService {
    */
   transformResponse(version: string, endpoint: string, method: string, data: any): any {
     const rule = this.findCompatibilityRule(version, endpoint, method);
-    
+
     if (rule && rule.reverseTransformation) {
       this.logger.debug(`Applying reverse transformation for ${version} ${method} ${endpoint}`);
       return rule.reverseTransformation(data);
     }
-    
+
     return data;
   }
 
@@ -64,9 +66,8 @@ export class BackwardCompatibilityService {
    */
   hasBreakingChanges(version: string, endpoint: string, method: string): boolean {
     return this.breakingChanges.some(
-      change => change.version === version && 
-                change.endpoint === endpoint && 
-                change.method === method
+      (change) =>
+        change.version === version && change.endpoint === endpoint && change.method === method,
     );
   }
 
@@ -74,23 +75,26 @@ export class BackwardCompatibilityService {
    * Get breaking changes for a version
    */
   getBreakingChanges(version: string): BreakingChange[] {
-    return this.breakingChanges.filter(change => change.version === version);
+    return this.breakingChanges.filter((change) => change.version === version);
   }
 
   /**
    * Get migration recommendations for a version
    */
-  getMigrationRecommendations(fromVersion: string, toVersion: string): {
+  getMigrationRecommendations(
+    fromVersion: string,
+    toVersion: string,
+  ): {
     breakingChanges: BreakingChange[];
     compatibilityRules: CompatibilityRule[];
     recommendations: string[];
   } {
     const relevantBreakingChanges = this.breakingChanges.filter(
-      change => change.version === toVersion
+      (change) => change.version === toVersion,
     );
 
     const relevantRules = this.compatibilityRules.filter(
-      rule => rule.fromVersion === fromVersion && rule.toVersion === toVersion
+      (rule) => rule.fromVersion === fromVersion && rule.toVersion === toVersion,
     );
 
     const recommendations = this.generateRecommendations(relevantBreakingChanges, relevantRules);
@@ -105,7 +109,10 @@ export class BackwardCompatibilityService {
   /**
    * Validate API contract compatibility
    */
-  validateApiContract(oldContract: any, newContract: any): {
+  validateApiContract(
+    oldContract: any,
+    newContract: any,
+  ): {
     compatible: boolean;
     issues: string[];
     suggestions: string[];
@@ -154,9 +161,9 @@ export class BackwardCompatibilityService {
       toVersion,
       summary: {
         totalBreakingChanges: breakingChanges.length,
-        highImpactChanges: breakingChanges.filter(c => c.impact === 'high').length,
-        mediumImpactChanges: breakingChanges.filter(c => c.impact === 'medium').length,
-        lowImpactChanges: breakingChanges.filter(c => c.impact === 'low').length,
+        highImpactChanges: breakingChanges.filter((c) => c.impact === 'high').length,
+        mediumImpactChanges: breakingChanges.filter((c) => c.impact === 'medium').length,
+        lowImpactChanges: breakingChanges.filter((c) => c.impact === 'low').length,
         compatibilityScore: this.calculateCompatibilityScore(breakingChanges),
       },
       breakingChanges,
@@ -166,11 +173,14 @@ export class BackwardCompatibilityService {
     };
   }
 
-  private findCompatibilityRule(version: string, endpoint: string, method: string): CompatibilityRule | undefined {
+  private findCompatibilityRule(
+    version: string,
+    endpoint: string,
+    method: string,
+  ): CompatibilityRule | undefined {
     return this.compatibilityRules.find(
-      rule => rule.fromVersion === version && 
-              rule.endpoint === endpoint && 
-              rule.method === method
+      (rule) =>
+        rule.fromVersion === version && rule.endpoint === endpoint && rule.method === method,
     );
   }
 
@@ -197,10 +207,12 @@ export class BackwardCompatibilityService {
           // Transform v2 login response to v1 format
           return {
             ...data,
-            user: data.user ? {
-              ...data.user,
-              username: data.user.email,
-            } : undefined,
+            user: data.user
+              ? {
+                  ...data.user,
+                  username: data.user.email,
+                }
+              : undefined,
           };
         },
       },
@@ -266,7 +278,10 @@ export class BackwardCompatibilityService {
     ];
   }
 
-  private generateRecommendations(breakingChanges: BreakingChange[], compatibilityRules: CompatibilityRule[]): string[] {
+  private generateRecommendations(
+    breakingChanges: BreakingChange[],
+    compatibilityRules: CompatibilityRule[],
+  ): string[] {
     const recommendations: string[] = [];
 
     if (breakingChanges.length > 0) {
@@ -278,7 +293,7 @@ export class BackwardCompatibilityService {
       recommendations.push('Backward compatibility rules are available for smooth transition');
     }
 
-    if (breakingChanges.filter(c => c.impact === 'high').length > 0) {
+    if (breakingChanges.filter((c) => c.impact === 'high').length > 0) {
       recommendations.push('High-impact changes detected - plan migration carefully');
     }
 
@@ -328,8 +343,8 @@ export class BackwardCompatibilityService {
   private generateCompatibilityRecommendations(breakingChanges: BreakingChange[]): string[] {
     const recommendations: string[] = [];
 
-    const highImpactChanges = breakingChanges.filter(c => c.impact === 'high');
-    const mediumImpactChanges = breakingChanges.filter(c => c.impact === 'medium');
+    const highImpactChanges = breakingChanges.filter((c) => c.impact === 'high');
+    const mediumImpactChanges = breakingChanges.filter((c) => c.impact === 'medium');
 
     if (highImpactChanges.length > 0) {
       recommendations.push('Schedule downtime for high-impact changes');
@@ -348,4 +363,4 @@ export class BackwardCompatibilityService {
 
     return recommendations;
   }
-} 
+}

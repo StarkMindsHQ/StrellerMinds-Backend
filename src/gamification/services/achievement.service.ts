@@ -38,6 +38,9 @@ export class AchievementService {
   }
 
   async getUserAchievements(user: User): Promise<UserAchievement[]> {
-    return this.userAchievementRepo.find({ where: { user: { id: user.id } }, relations: ['achievement'] });
+    return this.userAchievementRepo.find({
+      where: { user: { id: user.id } },
+      relations: ['achievement'],
+    });
   }
-} 
+}

@@ -7,7 +7,11 @@ export class VerifyCredentialDto {
   @IsString()
   credentialHash: string;
 
-  @ApiProperty({ example: 'eth_signature', enum: ['eth_signature', 'jwt', 'ipfs_proof'], description: 'Verification method to use' })
+  @ApiProperty({
+    example: 'eth_signature',
+    enum: ['eth_signature', 'jwt', 'ipfs_proof'],
+    description: 'Verification method to use',
+  })
   @IsString()
   @IsIn(['eth_signature', 'jwt', 'ipfs_proof'])
   method: string;

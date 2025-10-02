@@ -45,7 +45,7 @@ export class EmailVerificationService {
   async sendVerificationEmail(email: string): Promise<{ message: string }> {
     try {
       const user = await this.userRepository.findOne({ where: { email } });
-      
+
       if (!user) {
         throw new NotFoundException('User not found');
       }
@@ -65,11 +65,7 @@ export class EmailVerificationService {
       });
 
       // Send verification email
-      await this.emailService.sendVerificationEmail(
-        email,
-        verificationToken,
-        user.id
-      );
+      await this.emailService.sendVerificationEmail(email, verificationToken, user.id);
 
       this.logger.log(`Verification email sent to ${email}`);
 
@@ -147,8 +143,10 @@ export class EmailVerificationService {
       }
 
       // Check if we can resend (rate limiting)
-      if (user.emailVerificationTokenExpiry && 
-          new Date() < new Date(user.emailVerificationTokenExpiry.getTime() - (23 * 60 * 60 * 1000))) {
+      if (
+        user.emailVerificationTokenExpiry &&
+        new Date() < new Date(user.emailVerificationTokenExpiry.getTime() - 23 * 60 * 60 * 1000)
+      ) {
         throw new BadRequestException('Please wait before requesting another verification email');
       }
 
@@ -163,11 +161,11 @@ export class EmailVerificationService {
    * Check if user email is verified
    */
   async isEmailVerified(userId: string): Promise<boolean> {
-    const user = await this.userRepository.findOne({ 
+    const user = await this.userRepository.findOne({
       where: { id: userId },
-      select: ['isEmailVerified']
+      select: ['isEmailVerified'],
     });
-    
+
     return user?.isEmailVerified || false;
   }
 
@@ -184,7 +182,7 @@ export class EmailVerificationService {
         {
           emailVerificationToken: null,
           emailVerificationTokenExpiry: null,
-        }
+        },
       );
 
       this.logger.log(`Cleaned up ${result.affected} expired verification tokens`);
