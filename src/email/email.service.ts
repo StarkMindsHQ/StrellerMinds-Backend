@@ -231,7 +231,7 @@ export class EmailService {
    * @param templateName - Optional template name
    * @returns Analytics data
    */
-  async getEmailAnalytics(startDate: Date, endDate: Date, templateName?: string): Promise<any> {
+  async getEmailAnalyticsByRange(startDate: Date, endDate: Date, templateName?: string): Promise<any> {
     const query = this.emailLogRepository
       .createQueryBuilder('log')
       .select('log.templateName', 'templateName')
@@ -423,7 +423,7 @@ export class EmailService {
   /**
    * Get analytics for a specific email log
    */
-  async getEmailAnalytics(emailId: string): Promise<any> {
+  async getEmailLogAnalytics(emailId: string): Promise<any> {
     const emailLog = await this.emailLogRepository.findOne({ where: { id: emailId } });
     if (!emailLog) {
       throw new NotFoundException('Email not found');
