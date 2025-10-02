@@ -83,7 +83,7 @@ describe('EmailService (tracking)', () => {
     });
   });
 
-  describe('getEmailAnalytics', () => {
+  describe('getEmailLogAnalytics', () => {
     it('returns safe analytics shape', async () => {
       const log: Partial<EmailLog> = {
         id: '1',
@@ -97,7 +97,7 @@ describe('EmailService (tracking)', () => {
         clickEvents: [{ clickedAt: new Date().toISOString(), url: 'https://x.com' }],
       } as any;
       emailLogRepo.findOne.mockResolvedValue(log as EmailLog);
-      const result = await service.getEmailAnalytics('1');
+      const result = await service.getEmailLogAnalytics('1');
       expect(result).toMatchObject({ id: '1', clicked: true, clickCount: 2 });
       expect(result).not.toHaveProperty('trackingToken');
     });
@@ -256,6 +256,54 @@ describe('EmailService', () => {
       mockEmailTemplateRepo.findOne.mockResolvedValue({ content: '<p>Hello</p>' });
       const template = await service.getTemplate('email-verification');
       expect(template).toBe('<p>Hello</p>');
+    });
+  });
+
+  describe('getEmailAnalyticsByRange', () => {
+    it('should return aggregated analytics for a date range', async () => {
+      const mockQueryBuilder = {
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        addGroupBy: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getRawMany: jest.fn().mockResolvedValue([
+          { templateName: 'email-verification', count: 10, status: 'sent' },
+        ]),
+      };
+      mockEmailLogRepo.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-01-31');
+      const result = await service.getEmailAnalyticsByRange(startDate, endDate);
+
+      expect(mockEmailLogRepo.createQueryBuilder).toHaveBeenCalled();
+      expect(mockQueryBuilder.select).toHaveBeenCalledWith('log.templateName', 'templateName');
+      expect(mockQueryBuilder.addSelect).toHaveBeenCalledWith('COUNT(*)', 'count');
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith('log.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate });
+      expect(mockQueryBuilder.groupBy).toHaveBeenCalledWith('log.templateName');
+      expect(mockQueryBuilder.addGroupBy).toHaveBeenCalledWith('log.status');
+      expect(result).toEqual([{ templateName: 'email-verification', count: 10, status: 'sent' }]);
+    });
+
+    it('should filter by template name if provided', async () => {
+      const mockQueryBuilder = {
+        select: jest.fn().mockReturnThis(),
+        addSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        addGroupBy: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getRawMany: jest.fn().mockResolvedValue([]),
+      };
+      mockEmailLogRepo.createQueryBuilder = jest.fn().mockReturnValue(mockQueryBuilder);
+
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-01-31');
+      await service.getEmailAnalyticsByRange(startDate, endDate, 'email-verification');
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('log.templateName = :templateName', { templateName: 'email-verification' });
     });
   });
 });
