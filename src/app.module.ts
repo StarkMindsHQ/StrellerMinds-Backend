@@ -50,6 +50,8 @@ import { CorrelationIdMiddleware } from './common/middleware/correlation-id.midd
 import { DatabaseOptimizationModule } from './database-optimization/database-optimization.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { I18nApiModule } from './i18n/i18n.module';
+import { BullModule } from '@nestjs/bull';
+import { BullBoardConfigModule } from './email/bull-board.module';
 
 const ENV = process.env.NODE_ENV;
 console.log('NODE_ENV:', process.env.NODE_ENV);
@@ -105,6 +107,19 @@ const databaseImports = isOpenApiEnv
       load: [databaseConfig, () => ({ api: apiVersionConfig })],
     }),
 
+    // Bull Queue
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        redis: {
+          host: configService.get<string>('REDIS_HOST', 'localhost'),
+          port: configService.get<number>('REDIS_PORT', 6379),
+          password: configService.get<string>('REDIS_PASSWORD'),
+        },
+      }),
+    }),
+
     // Database
     // Replace direct DB import with a conditional to avoid connecting during OpenAPI generation
     ...databaseImports,
@@ -139,6 +154,7 @@ const databaseImports = isOpenApiEnv
     ErrorDashboardModule,
     DatabaseOptimizationModule.forRoot(),
     NotificationsModule,
+    ...(process.env.NODE_ENV !== 'production' ? [BullBoardConfigModule] : []),
   ],
   controllers: [AppController],
   providers: [

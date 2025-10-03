@@ -10,6 +10,7 @@ import {
 } from '@nestjs/terminus';
 import { DatabaseHealthIndicator } from './database-health-indicator';
 import { CustomHealthIndicator } from './custom_health_indicator';
+import { EmailQueueHealthIndicator } from '../email/email-queue.health';
 
 @ApiTags('Health')
 @Controller('health')
@@ -22,6 +23,7 @@ export class HealthController {
     private disk: DiskHealthIndicator,
     private databaseHealth: DatabaseHealthIndicator,
     private customHealth: CustomHealthIndicator,
+    private emailQueueHealth: EmailQueueHealthIndicator,
   ) {}
 
   @Get()
@@ -91,6 +93,15 @@ export class HealthController {
   checkLiveness() {
     return this.health.check([
       () => this.customHealth.isHealthy('liveness'),
+    ]);
+  }
+
+  @Get('queues')
+  @ApiOperation({ summary: 'Check email queue workers health status' })
+  @HealthCheck()
+  checkQueues() {
+    return this.health.check([
+      () => this.emailQueueHealth.isHealthy('email-queue'),
     ]);
   }
 }
