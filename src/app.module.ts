@@ -17,6 +17,7 @@ import { CredentialModule } from './credential/credential.module';
 import { TranslationModule } from './translation/translation.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { MediaModule } from './media/media.module';
 // import { FeedbackModule } from './feedback/feedback.module';
 import { MentorshipModule } from './mentorship/mentorship.module';
 import { ArchiveModule } from './archive/archive.module';
@@ -121,6 +122,7 @@ const databaseImports = isOpenApiEnv
     UserProfilesModule,
     CredentialModule,
     ArchiveModule,
+    MediaModule,
     // FeedbackModule,
     I18nApiModule,
     MentorshipModule,
