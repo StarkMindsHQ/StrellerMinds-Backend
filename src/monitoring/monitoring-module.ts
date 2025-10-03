@@ -18,11 +18,13 @@ import { PerformanceInterceptor } from './performance.interceptor';
 import { BaselineService } from './baseline.service';
 import { Registry } from 'prom-client';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     TerminusModule,
     HttpModule,
+    EmailModule,
     PrometheusModule.register({
       defaultMetrics: {
         enabled: true,

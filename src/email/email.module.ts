@@ -21,6 +21,7 @@ import { EmailTestService } from './utils/test.util';
 import { EmailPreviewController } from './admin/preview.controller';
 import { MockEmailService } from './mock-email.service';
 import { EmailTrackingUtil } from './utils/tracking.util';
+import { EmailQueueHealthIndicator } from './email-queue.health';
 
 @Module({
   imports: [
@@ -28,6 +29,18 @@ import { EmailTrackingUtil } from './utils/tracking.util';
     TypeOrmModule.forFeature([EmailTemplate, EmailLog, EmailPreference]),
     BullModule.registerQueue({
       name: 'email',
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+    }),
+    BullModule.registerQueue({
+      name: 'email-dlq',
     }),
   ],
   controllers: [
@@ -62,7 +75,8 @@ import { EmailTrackingUtil } from './utils/tracking.util';
     EmailTemplateService,
     EmailTestService,
     EmailTrackingUtil,
+    EmailQueueHealthIndicator,
   ],
-  exports: [EmailService],
+  exports: [EmailService, EmailQueueHealthIndicator],
 })
 export class EmailModule {}
