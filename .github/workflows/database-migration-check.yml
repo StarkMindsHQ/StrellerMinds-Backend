@@ -1,0 +1,62 @@
+name: Database Migration Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+      - staging
+
+jobs:
+  validate-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Set up PostgreSQL
+        uses: Harmonize-Health/postgresql-action@v1
+        with:
+          postgresql-version: '13'
+          postgresql-db: 'test-db'
+          postgresql-user: 'test-user'
+          postgresql-password: 'test-password'
+
+      - name: Run Migrations
+        run: npm run db:migrate
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: test-user
+          DB_PASSWORD: test-password
+          DB_DATABASE: test-db
+
+      - name: Validate Migrations
+        id: validate_migrations
+        run: |
+          npm run db:validate > migration-validation.log
+          npm run db:status > migration-status.log
+          if grep -q "pending migrations" migration-status.log; then
+            echo "::error::There are pending migrations. Please run migrations and commit the changes."
+            exit 1
+          fi
+          if grep -q "failed" migration-validation.log; then
+            echo "::error::Schema validation failed."
+            exit 1
+          fi
+
+      - name: Upload migration logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: migration-logs
+          path: |
+            migration-validation.log
+            migration-status.log

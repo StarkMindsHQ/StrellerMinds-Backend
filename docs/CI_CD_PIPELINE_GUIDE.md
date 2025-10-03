@@ -45,6 +45,7 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 - `rollback`: Manual rollback capability
 - `post-deployment-monitoring`: Extended health checks and monitoring
 - `cleanup`: Resource cleanup and metrics update
+- `validate-migrations`: Database migration validation
 
 ### 2. Comprehensive Testing Pipeline (`.github/workflows/comprehensive-testing.yml`)
 
@@ -57,6 +58,19 @@ This document describes the enhanced CI/CD pipeline for the StrellerMinds Backen
 - Security tests with Snyk and OWASP ZAP
 - Accessibility tests
 - Coverage gates (80% threshold)
+
+### 3. Database Migration Gate (`.github/workflows/database-migration-check.yml`)
+
+**Triggers:**
+- Pull requests to `main`, `develop`, `staging`
+
+**Jobs:**
+- `validate-migrations`: Validates database migrations against a seeded PostgreSQL instance.
+  - Sets up Node.js and PostgreSQL.
+  - Installs dependencies and runs migrations.
+  - Runs `db:validate` and `db:status` to check for pending migrations or mismatches.
+  - Fails the job if any issues are found.
+  - Uploads migration logs as a CI artifact.
 
 ## Deployment Scripts
 
