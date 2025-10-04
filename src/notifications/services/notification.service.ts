@@ -5,7 +5,7 @@ import { Notification, NotificationChannel, NotificationStatus } from "../entiti
 import { User } from "../../users/entities/user.entity"
 import type { CreateNotificationDto } from "../dto/create-notification.dto"
 import type { NotificationQueryDto } from "../dto/notification-query.dto"
-import type { EmailService } from "./email.service"
+import { EmailService } from "../../email/email.service"
 import type { SmsService } from "./sms.service"
 import type { PushNotificationService } from "./push-notification.service"
 import type { NotificationPreferenceService } from "./notification-preference.service"
@@ -92,11 +92,18 @@ export class NotificationService {
         switch (channel) {
           case NotificationChannel.EMAIL:
             if (user.email) {
-              channelSuccess = await this.emailService.sendEmail(
-                user.email,
-                notification.title || "Notification",
-                notification.message,
-              )
+              channelSuccess = await this.emailService.sendImmediate({
+                to: user.email,
+                subject: notification.title || "Notification",
+                templateName: "notification",
+                context: {
+                  title: notification.title,
+                  message: notification.message,
+                  user: user.name || user.email,
+                  year: new Date().getFullYear(),
+                },
+                skipTracking: true,
+              })
             } else {
               this.logger.warn(`User ${user.id} has no email for email notification.`)
             }
