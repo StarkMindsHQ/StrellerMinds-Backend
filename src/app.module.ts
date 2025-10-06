@@ -42,6 +42,7 @@ import { AuthControllerV2 } from './modules/auth/controllers/auth.controller.v2'
 import { VersionController } from './modules/version/version.controller';
 import { apiVersionConfig } from './config/api-version.config';
 import { VersionHeaderMiddleware } from './common/middleware/version-header.middleware';
+import { SimplifiedDeprecationService } from './common/services/simplified-deprecation.service';
 import { PaymentModule } from './payment/payment.module';
 import { CmsModule } from './cms/cms.module';
 import { BillingModule } from './billing/billing.module';
@@ -162,6 +163,7 @@ const databaseImports = isOpenApiEnv
   providers: [
     AppService,
     VersionAnalyticsService,
+    SimplifiedDeprecationService,
     {
       provide: APP_INTERCEPTOR,
       useClass: VersionTrackingInterceptor,

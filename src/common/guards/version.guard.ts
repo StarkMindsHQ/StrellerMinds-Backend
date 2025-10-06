@@ -1,7 +1,8 @@
-import { Injectable, CanActivate, ExecutionContext, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, BadRequestException, Logger, GoneException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { API_VERSION_KEY, DEPRECATED_KEY } from '../decorators/api-version.decorator';
+import { SimplifiedDeprecationService } from '../services/simplified-deprecation.service';
 
 @Injectable()
 export class VersionGuard implements CanActivate {
@@ -10,6 +11,7 @@ export class VersionGuard implements CanActivate {
   constructor(
     private configService: ConfigService,
     private reflector: Reflector,
+    private deprecationService: SimplifiedDeprecationService,
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
@@ -20,7 +22,6 @@ export class VersionGuard implements CanActivate {
     // Get version from multiple sources
     const version = this.getRequestVersion(request);
     const supportedVersions = this.configService.get<string[]>('api.supportedVersions', []);
-    const deprecatedVersions = this.configService.get<string[]>('api.deprecatedVersions', []);
 
     // Check if version is supported
     if (!supportedVersions.includes(version)) {
@@ -32,15 +33,21 @@ export class VersionGuard implements CanActivate {
       });
     }
 
-    // Check for deprecation
-    const isDeprecated = deprecatedVersions.includes(version);
-    if (isDeprecated) {
+    // Check for deprecation and sunset
+    const isDeprecated = this.deprecationService.isDeprecated(version);
+    const isPastSunset = this.deprecationService.isPastSunset(version);
+    const sunsetEnforcement = this.configService.get('api.sunsetEnforcement', { enabled: true });
+
+    if (isPastSunset && sunsetEnforcement.enabled) {
+      this.handleSunsetViolation(request, version);
+    } else if (isDeprecated) {
       this.handleDeprecatedVersion(request, version);
     }
 
     // Set version info in request for later use
     request.apiVersion = version;
     request.isDeprecated = isDeprecated;
+    request.isPastSunset = isPastSunset;
 
     return true;
   }
@@ -57,31 +64,54 @@ export class VersionGuard implements CanActivate {
   }
 
   private handleDeprecatedVersion(request: any, version: string): void {
-    const deprecatedConfig = this.configService.get('api.deprecatedVersions', [])
-      .find((v: any) => v.version === version);
+    const deprecationInfo = this.deprecationService.getDeprecationInfo(version);
+    if (!deprecationInfo) return;
 
-    if (deprecatedConfig) {
-      const warning = {
-        message: `API version ${version} is deprecated`,
-        deprecatedIn: deprecatedConfig.deprecatedIn,
-        removedIn: deprecatedConfig.removedIn,
-        migrationGuide: deprecatedConfig.migrationGuide,
-        alternative: deprecatedConfig.alternative,
-      };
+    const warning = this.deprecationService.generateWarning(version);
+    const daysUntilSunset = this.deprecationService.getDaysUntilSunset(version);
 
-      // Log deprecation usage
-      this.logger.warn(`Deprecated API version used: ${version}`, {
-        endpoint: request.url,
-        userAgent: request.headers['user-agent'],
-        ip: request.ip,
-        warning,
+    // Log deprecation usage
+    this.deprecationService.logDeprecationUsage(
+      version,
+      `${request.method} ${request.route?.path || request.url}`,
+      request.headers['user-agent']
+    );
+
+    // Add deprecation headers
+    if (request.res) {
+      request.res.setHeader('Deprecation', 'true');
+      request.res.setHeader('Sunset', deprecationInfo.sunsetDate);
+      request.res.setHeader('Link', `<${deprecationInfo.migrationGuide}>; rel="deprecation"`);
+      
+      if (warning) {
+        request.res.setHeader('Warning', `299 - "${warning.message}"`);
+      }
+    }
+  }
+
+  private handleSunsetViolation(request: any, version: string): void {
+    const deprecationInfo = this.deprecationService.getDeprecationInfo(version);
+    if (!deprecationInfo) return;
+
+    const sunsetEnforcement = this.configService.get('api.sunsetEnforcement', {});
+    const responseType = sunsetEnforcement.responseAfterSunset || 'gone';
+
+    // Log sunset violation
+    this.logger.error(`Sunset violation: API version ${version} accessed after sunset date`, {
+      version,
+      sunsetDate: deprecationInfo.sunsetDate,
+      endpoint: request.url,
+      userAgent: request.headers['user-agent'],
+      ip: request.ip,
+    });
+
+    if (responseType === 'gone') {
+      throw new GoneException({
+        message: `API version ${version} has been removed as of ${deprecationInfo.sunsetDate}`,
+        sunsetDate: deprecationInfo.sunsetDate,
+        migrationGuide: deprecationInfo.migrationGuide,
+        alternative: deprecationInfo.alternative,
       });
-
-      // Add deprecation headers
-      request.res?.setHeader('Deprecation', 'true');
-      request.res?.setHeader('Sunset', deprecatedConfig.removedIn);
-      request.res?.setHeader('Link', `<${deprecatedConfig.migrationGuide}>; rel="deprecation"`);
-      request.res?.setHeader('Warning', `299 - "API version ${version} is deprecated. Will be removed in ${deprecatedConfig.removedIn}"`);
     }
   }
 }
