@@ -1,398 +1,298 @@
-**StrellerMinds-Backend**
+# StrellerMinds Backend
 
-StrellerMinds-Backend is the NestJS-based API server powering StarkMinds, a pioneering blockchain education platform built on Stellar. This repository provides secure, scalable endpoints for user authentication, course management, data persistence, and integration with Stellar smart contracts.
+StrellerMinds Backend is a modern NestJS-based API server that powers a blockchain education platform built on the Stellar network. This backend provides a robust foundation for educational platforms focused on blockchain technology, offering secure user management, course delivery, and seamless Stellar blockchain integration for on-chain learning verification and credentialing.
 
-**Features**
-• Secure JWT-based authentication and authorization
-• RESTful APIs for managing courses and user data
-• Integration with Stellar smart contracts for on-chain interactions
-• Modular architecture with environment-based configuration
-• Comprehensive logging, error handling, and testing (Jest)
-• Auto-generated API docs with Swagger
-• CI/CD pipeline integration for continuous delivery
+The platform is designed for educational institutions, online learning platforms, and blockchain training providers who want to offer verifiable, on-chain certificates and credentials while maintaining a traditional learning management system experience.
 
-**Getting Started**
+## 🚀 Features
 
-_Prerequisites:_
-• Node.js v14 or higher
-• npm
-• Docker and Docker Compose (for local development services)
-• PostgreSQL (if not using Docker)
+- **Modern Architecture**: Built with NestJS for scalable, maintainable code
+- **Stellar Integration**: Seamless blockchain interactions for credential verification
+- **RESTful APIs**: Clean, well-documented endpoints for all platform features
+- **TypeScript**: Full type safety and enhanced developer experience
+- **Modular Design**: Clean separation of concerns with NestJS modules
+- **Auto-generated Documentation**: Interactive Swagger/OpenAPI documentation
+- **Comprehensive Testing**: Unit and integration tests with Jest
+- **Environment Configuration**: Flexible configuration management
 
-## Local Development with Docker Compose
+## 🛠️ Tech Stack
 
-The easiest way to set up local development is using Docker Compose, which provides all necessary services:
+- **Framework**: NestJS (Node.js)
+- **Language**: TypeScript
+- **Database**: PostgreSQL with TypeORM
+- **Blockchain**: Stellar Network
+- **Authentication**: JWT-based auth
+- **Documentation**: Swagger/OpenAPI
+- **Testing**: Jest
+- **Code Quality**: ESLint + Prettier
 
-### Quick Start
+## 📋 Prerequisites
 
-1. Clone the repository:
-   `git clone https://github.com/your-username/strellerminds-backend.git`
-2. Change to the project directory:
-   `cd strellerminds-backend`
-3. Copy the development environment file:
-   `cp development.env.example .env.development`
-4. Start all services:
-   `docker-compose up -d`
-5. Install dependencies:
-   `npm install`
-6. Start the development server:
-   `npm run start:dev`
+- **Node.js** v18 or higher
+- **npm** or **yarn** package manager
+- **PostgreSQL** database (v12 or higher)
+- **Git** for version control
 
-### Services Included
+## 🚀 Quick Start
 
-The Docker Compose setup includes:
-
-- **PostgreSQL** (port 5432): Database with persistent storage
-- **Redis** (port 6379): Cache and queue management with password protection
-- **Mailhog** (ports 1025/8025): Email testing with web UI at http://localhost:8025
-- **LocalStack** (port 4566): AWS S3 emulation for file storage
-
-### Service URLs
-
-- **Application**: http://localhost:3000
-- **API Documentation**: http://localhost:3000/api
-- **Mailhog Web UI**: http://localhost:8025
-- **LocalStack S3**: http://localhost:4566
-
-### Docker Compose Commands
+### 1. Clone the Repository
 
 ```bash
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
-
-# Stop and remove volumes (WARNING: This will delete all data)
-docker-compose down -v
-
-# Restart a specific service
-docker-compose restart postgres
-
-# Check service health
-docker-compose ps
+git clone https://github.com/https://github.com/StarkMindsHQ/strellerminds-backend.git
+cd strellerminds-backend
 ```
 
-### Manual Installation (without Docker)
+### 2. Install Dependencies
 
-1. Clone the repository:
-   `git clone https://github.com/your-username/strellerminds-backend.git`
-2. Change to the project directory:
-   `cd strellerminds-backend`
-3. Install dependencies:
-   `npm install`
-4. Set up PostgreSQL database and Redis
-5. Create a `.env` file based on the provided `.env.example`
-6. Start the development server:
-   `npm run start:dev`
-
-_Contribution Guidelines:_
-• Fork the repository and create a feature branch.
-• Follow the established ESLint/Prettier configurations.
-• Write tests for new features and ensure all existing tests pass.
-• Submit a detailed pull request describing your changes.
-
-
-• NB: `package-lock.json` is the recommended file for tracking package versions and ensuring consistent installations across environments.
-
-**Contact**
-For questions or feedback, please open an issue or contact the maintainers.
-
-# User Data Retention Policy
-
-## Overview
-
-This document outlines the data retention policies for user accounts within our platform, focusing on how user data is handled during account deactivation and deletion processes. These policies have been designed to comply with privacy regulations while maintaining the integrity of blockchain credentials where necessary.
-
-## Account States
-
-User accounts may exist in one of the following states:
-
-1. **Active** - Normal operational state
-2. **Deactivated** - Temporarily suspended but recoverable
-3. **Pending Deletion** - Awaiting confirmation for permanent deletion
-4. **Deleted** - Permanently removed (soft-deleted with data scrubbing)
-
-## Data Categories
-
-User data is categorized as follows:
-
-### Personal Identifiable Information (PII)
-
-- Full name
-- Email address
-- Profile picture
-- Biography
-- Other personal details
-
-### Account Data
-
-- User ID
-- Account credentials (password hash)
-- Role information
-- Account creation and activity timestamps
-
-### Blockchain Credentials
-
-- Wallet address
-- Chain ID
-- Wallet type
-- Associated blockchain credentials
-
-### Activity Data
-
-- Learning progress
-- Course completion records
-- Transaction history (if applicable)
-
-## Retention Periods
-
-| Data Category          | Active Account | Deactivated Account | Post-Deletion                               |
-| ---------------------- | -------------- | ------------------- | ------------------------------------------- |
-| PII                    | Retained       | Retained            | Scrubbed immediately                        |
-| Account Data           | Retained       | Retained            | Soft-deleted for 30 days, then hard-deleted |
-| Blockchain Credentials | Retained       | Retained            | Preserved indefinitely for compliance\*     |
-| Activity Data          | Retained       | Retained            | Soft-deleted for 30 days, then hard-deleted |
-
-\* _Retention of blockchain credentials is necessary for compliance with financial regulations and to maintain the integrity of blockchain transactions. These credentials are dissociated from personal information upon account deletion._
-
-## Data Handling Procedures
-
-### Account Deactivation
-
-When an account is deactivated:
-
-- All data is preserved
-- Access to the account is suspended
-- User can reactivate the account at any time
-- Deactivation is logged for audit purposes
-
-### Account Deletion Request
-
-When a user requests account deletion:
-
-1. User must confirm deletion via a secure link sent to their email
-2. Account is marked as "Pending Deletion"
-3. User has 24 hours to cancel the deletion request
-4. Request is logged for audit purposes
-
-### Account Deletion Process
-
-When account deletion is confirmed:
-
-1. Personal identifiable information is immediately scrubbed:
-   - Name fields are replaced with "[REDACTED]"
-   - Email is anonymized
-   - Profile picture and bio are removed
-2. Account is soft-deleted and marked as "Deleted"
-3. Blockchain credentials are preserved but dissociated from personal information
-4. Learning progress data is soft-deleted
-5. Deletion is logged for audit purposes
-6. Complete data purge is scheduled after the retention period
-
-### Final Data Purge
-
-After the 30-day retention period:
-
-1. All remaining user data is permanently deleted from the system
-2. Blockchain credentials are reviewed and retained only if necessary for legal compliance
-3. Purge is logged for audit purposes
-
-## Compliance Considerations
-
-This data retention policy is designed to comply with:
-
-- General Data Protection Regulation (GDPR)
-- California Consumer Privacy Act (CCPA)
-- Other applicable privacy regulations
-
-The policy provides users with the "right to be forgotten" while maintaining necessary data for legal and operational requirements.
-
-## Audit Trail
-
-All account state changes and data handling operations are logged with:
-
-- Action type
-- Timestamp
-- User ID (or system identifier for automated processes)
-- Details of the action performed
-
-Audit logs are retained for a minimum of 2 years for compliance purposes.
-
-## Special Considerations for Blockchain Data
-
-Due to the immutable nature of blockchain technology:
-
-- Transactions recorded on the blockchain cannot be removed
-- Wallet addresses and public keys remain on the blockchain
-- Our system preserves the minimum necessary information to maintain blockchain integrity
-- All preserved blockchain data is dissociated from personal information
-
-## Policy Review
-
-This data retention policy is reviewed annually and updated as necessary to comply with evolving regulations and platform requirements.
-
-# OAuth Strategy Integration Guide
-
-## Supported Providers
-
-- Google
-- Facebook
-- Apple Sign-In
-
-## Design Pattern
-
-- All OAuth strategies implement `IAuthStrategy`
-- Each is wrapped in an Adapter to conform to internal structure
-- Dynamic injection via 'AUTH_STRATEGIES' token
-- Strategy selection based on `provider` string
-
-## Flow
-
-1. User hits `/auth/{provider}` → redirects to provider login
-2. Callback `/auth/{provider}/callback` is handled
-3. User profile is validated, token issued via `AuthService.login`
-4. Optionally, credentials can be used to `register` or `link` accounts
-
-## Adding a New Provider
-
-1. Implement provider’s Passport strategy
-2. Create Adapter implementing `IAuthStrategy`
-3. Register Adapter and Strategy in AuthModule
-4. Add new route in AuthController
-
-# API Documentation
-
-The backend provides interactive OpenAPI (Swagger) documentation and supports SDK generation for client integration.
-
-### Swagger UI
-- Access the interactive API docs at: `/api` (e.g., http://localhost:3000/api)
-- All endpoints, request/response models, and modules are grouped and described for clarity.
-
-### SDK Generation
-
-You can generate client SDKs in various languages using the OpenAPI spec:
-
-#### Generate OpenAPI Spec
-
-```
-npm run generate:openapi
-```
-
-#### Generate SDK (example using openapi-generator-cli)
-
-```
-npx openapi-generator-cli generate -i http://localhost:3000/api-json -g typescript-axios -o ./sdk/typescript
-```
-
-Replace `typescript-axios` and output path as needed for your target language.
-
-### Scripts
-
-- `generate:openapi`: Exports the OpenAPI spec to `openapi.json` for SDK generation.
-
-### Automated SDK Release
-
-When you push a version tag in the format `vX.Y.Z`, an automated workflow will:
-- Build the backend and generate the OpenAPI spec (`openapi.json`) aligned to your `package.json` version.
-- Generate a TypeScript Axios SDK with fully typed models and API clients.
-- Publish artifacts to GitHub Releases, and optionally publish the SDK to npm if `NPM_TOKEN` is configured in repository secrets.
-
-Artifacts published in the GitHub Release:
-- `openapi.json` (the exact OpenAPI spec used for generation)
-- `typescript-sdk-<version>.zip` (generated SDK package)
-
-To consume the SDK from npm:
-- Install: `npm install @starkmindshq/strellerminds-sdk@<version>`
-- Import and use in your TypeScript/JavaScript project:
-
-```ts
-import { Configuration, DefaultApi } from '@starkmindshq/strellerminds-sdk';
-
-const config = new Configuration({ basePath: 'https://api.strellerminds.io', accessToken: 'YOUR_TOKEN' });
-const api = new DefaultApi(config);
-// Example call
-// const result = await api.usersControllerFindAll();
-```
-
-Release traceability:
-- Each Release includes a direct link to the matching `openapi.json` used for SDK generation.
-- The SDK package version matches the backend `package.json` version used for the tag.
-
-## Contributing
-
-Please follow the contribution guidelines outlined in the **Getting Started** section. Additionally, ensure your code changes do not break the API contract and are reflected in the OpenAPI documentation.
-
-# OAuth Strategy Integration Guide
-
-## Supported Providers
-
-- Google
-- Facebook
-- Apple Sign-In
-
-## Design Pattern
-
-- All OAuth strategies implement `IAuthStrategy`
-- Each is wrapped in an Adapter to conform to internal structure
-- Dynamic injection via 'AUTH_STRATEGIES' token
-- Strategy selection based on `provider` string
-
-## Flow
-
-1. User hits `/auth/{provider}` → redirects to provider login
-2. Callback `/auth/{provider}/callback` is handled
-3. User profile is validated, token issued via `AuthService.login`
-4. Optionally, credentials can be used to `register` or `link` accounts
-
-## Adding a New Provider
-
-1. Implement provider’s Passport strategy
-2. Create Adapter implementing `IAuthStrategy`
-3. Register Adapter and Strategy in AuthModule
-4. Add new route in AuthController
-
-# API Documentation
-
-The backend provides interactive OpenAPI (Swagger) documentation and supports SDK generation for client integration.
-
-### Swagger UI
-- Access the interactive API docs at: `/api` (e.g., http://localhost:3000/api)
-- All endpoints, request/response models, and modules are grouped and described for clarity.
-
-### SDK Generation
-
-You can generate client SDKs in various languages using the OpenAPI spec:
-
-#### Generate OpenAPI Spec
-
-```
-npm run generate:openapi
-```
-
-#### Generate SDK (example using openapi-generator-cli)
-
-```
-npx openapi-generator-cli generate -i http://localhost:3000/api-json -g typescript-axios -o ./sdk/typescript
-```
-
-Replace `typescript-axios` and output path as needed for your target language.
-
-## Contributing
-
-Please follow the contribution guidelines outlined in the **Getting Started** section. Additionally, ensure your code changes do not break the API contract and are reflected in the OpenAPI documentation.
-
-
-# Contract Testing with Pact
-
-We use Pact for consumer-driven contract tests against external integrations:
-- Stellar Horizon API
-- SMTP Provider
-- S3 (LocalStack)
-
-## Running locally
 ```bash
-yarn test:contract
+npm install
+```
+
+### 3. Environment Setup
+
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env with your configuration
+# Required: Database connection, JWT secret, Stellar network settings
+```
+
+### 4. Database Setup
+
+Ensure PostgreSQL is running and create the database:
+
+```sql
+CREATE DATABASE strellerminds;
+```
+
+### 5. Start the Application
+
+```bash
+# Development mode with hot reload
+npm run start:dev
+
+# Production mode
+npm run build
+npm run start:prod
+```
+
+The API will be available at `http://localhost:3000`
+
+### 6. Verify Installation
+
+```bash
+# Check if server is running
+curl http://localhost:3000
+
+# Should return: {"message": "Hello World!"}
+```
+
+## 📚 Available Scripts
+
+```bash
+# Development
+npm run start:dev          # Start in development mode with hot reload
+npm run start:debug        # Start in debug mode
+npm run start              # Start in production mode
+
+# Building
+npm run build              # Build the application
+npm run build:prod         # Build for production
+
+# Testing
+npm run test               # Run unit tests
+npm run test:cov           # Run tests with coverage report
+npm run test:e2e           # Run end-to-end tests
+npm run test:watch         # Run tests in watch mode
+
+# Code Quality
+npm run lint               # Lint the codebase
+npm run lint:fix           # Fix linting issues automatically
+npm run format             # Format code with Prettier
+```
+
+## 🔧 Environment Configuration
+
+Create a `.env` file from `.env.example` and configure these essential variables:
+
+```env
+# Database Configuration
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USER=postgres
+DATABASE_PASSWORD=your_password
+DATABASE_NAME=strellerminds
+
+# JWT Authentication
+JWT_SECRET=your_super_secret_jwt_key_here
+JWT_EXPIRES_IN=24h
+
+# Stellar Blockchain
+STELLAR_NETWORK=TESTNET
+SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+
+# Application
+PORT=3000
+NODE_ENV=development
+```
+
+For a complete list of all available environment variables, refer to `.env.example`.
+
+## 🏗️ Project Structure
+
+```
+src/
+├── app.controller.ts          # Main application controller
+├── app.module.ts            # Root application module
+├── app.service.ts           # Core application service
+├── main.ts                 # Application entry point
+├── common/                 # Shared utilities and decorators
+│   ├── decorators/
+│   └── errors/
+├── config/                 # Configuration files
+├── modules/                # Feature modules
+│   ├── auth/              # Authentication & authorization
+│   ├── users/             # User management
+│   ├── courses/           # Course management
+│   ├── blockchain/        # Stellar integration
+│   └── enrollment/        # Course enrollment
+└── utils/                 # Helper utilities
+```
+
+## 📖 API Documentation
+
+Once the server is running, access the interactive API documentation:
+
+- **Swagger UI**: `http://localhost:3000/api`
+- **JSON Spec**: `http://localhost:3000/api-json`
+
+## 🧪 Testing
+
+The project includes comprehensive test coverage:
+
+```bash
+# Run all tests
+npm run test
+
+# Run tests with coverage
+npm run test:cov
+
+# Run specific test file
+npm run test -- auth/auth.service.spec.ts
+
+# Run tests in watch mode for development
+npm run test:watch
+```
+
+## 🔒 Security Considerations
+
+- All sensitive data should be stored in environment variables
+- JWT secrets must be strong and unique
+- Database connections should use SSL in production
+- API endpoints should implement proper authentication and authorization
+- Regular security audits are recommended
+
+## 🚀 Deployment
+
+### Production Build
+
+```bash
+# Build the application
+npm run build
+
+# Start production server
+npm run start:prod
+```
+
+### Docker Deployment
+
+```bash
+# Build Docker image
+docker build -t strellerminds-backend .
+
+# Run container
+docker run -p 3000:3000 strellerminds-backend
+```
+
+### Environment-Specific Configurations
+
+- **Development**: Hot reload, detailed logging, relaxed security
+- **Staging**: Production-like environment for testing
+- **Production**: Optimized performance, enhanced security
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these guidelines:
+
+### Development Workflow
+
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
+3. **Make** your changes with proper testing
+4. **Follow** the existing code style and patterns
+5. **Run** tests and ensure they pass: `npm run test`
+6. **Commit** your changes with descriptive messages
+7. **Push** to your fork: `git push origin feature/amazing-feature`
+8. **Create** a Pull Request
+
+### Code Quality Standards
+
+- Follow TypeScript best practices
+- Write meaningful commit messages
+- Include tests for new functionality
+- Ensure all tests pass before submitting
+- Follow the existing code formatting (Prettier)
+
+### Reporting Issues
+
+- Use the GitHub issue tracker
+- Provide detailed reproduction steps
+- Include environment details
+- Add relevant logs or screenshots
+
+## 📚 Helpful Links
+
+- **NestJS Documentation**: https://docs.nestjs.com/
+- **Stellar Developers**: https://developers.stellar.org/
+- **TypeORM Documentation**: https://typeorm.io/
+- **TypeScript Handbook**: https://www.typescriptlang.org/docs/
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Errors**
+   - Verify PostgreSQL is running
+   - Check database credentials in `.env`
+   - Ensure database exists
+
+2. **Module Import Errors**
+   - Run `npm install` to ensure dependencies
+   - Check TypeScript configuration
+   - Verify file paths and module names
+
+3. **Port Already in Use**
+   - Change PORT in `.env` file
+   - Kill existing processes: `lsof -ti:3000 | xargs kill`
+
+### Getting Help
+
+- Check existing GitHub issues
+- Review the documentation
+- Join our community discussions
+- Contact maintainers for support
+
+## 📄 License
+
+This project is **UNLICENSED** - all rights reserved.
+
+## 🙏 Acknowledgments
+
+- NestJS team for the excellent framework
+- Stellar Development Foundation for blockchain infrastructure
+- Open source community for valuable tools and libraries
+
+---
+
+**Built with ❤️ for the blockchain education community**
