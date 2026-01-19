@@ -38,7 +38,7 @@ The platform is designed for educational institutions, online learning platforms
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/https://github.com/StarkMindsHQ/strellerminds-backend.git
+git clone https://github.com/StarkMindsHQ/StrellerMinds-Backend.git
 cd strellerminds-backend
 ```
 
