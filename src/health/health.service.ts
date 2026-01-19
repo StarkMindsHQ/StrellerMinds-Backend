@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common"
-import type { Connection } from "typeorm"
-import type Redis from "ioredis"
+import { Injectable } from '@nestjs/common';
+import type { Connection } from 'typeorm';
+import type Redis from 'ioredis';
 
 @Injectable()
 export class HealthService {
@@ -15,10 +15,10 @@ export class HealthService {
       this.checkRedis(),
       this.checkMemory(),
       this.checkDisk(),
-    ])
+    ]);
 
     const results = {
-      status: "ok",
+      status: 'ok',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       checks: {
@@ -27,88 +27,88 @@ export class HealthService {
         memory: this.getCheckResult(checks[2]),
         disk: this.getCheckResult(checks[3]),
       },
-    }
+    };
 
-    const hasFailures = Object.values(results.checks).some((check) => check.status === "error")
+    const hasFailures = Object.values(results.checks).some((check) => check.status === 'error');
     if (hasFailures) {
-      results.status = "error"
+      results.status = 'error';
     }
 
-    return results
+    return results;
   }
 
   async readiness() {
     try {
-      await this.checkDatabase()
-      await this.checkRedis()
+      await this.checkDatabase();
+      await this.checkRedis();
 
       return {
-        status: "ready",
+        status: 'ready',
         timestamp: new Date().toISOString(),
-      }
+      };
     } catch (error) {
-      throw new Error("Service not ready")
+      throw new Error('Service not ready');
     }
   }
 
   async liveness() {
     return {
-      status: "alive",
+      status: 'alive',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       memory: process.memoryUsage(),
-    }
+    };
   }
 
   private async checkDatabase() {
     try {
-      await this.connection.query("SELECT 1")
-      return { status: "ok", message: "Database connection successful" }
+      await this.connection.query('SELECT 1');
+      return { status: 'ok', message: 'Database connection successful' };
     } catch (error) {
-      throw new Error(`Database check failed: ${error.message}`)
+      throw new Error(`Database check failed: ${error.message}`);
     }
   }
 
   private async checkRedis() {
     try {
-      await this.redis.ping()
-      return { status: "ok", message: "Redis connection successful" }
+      await this.redis.ping();
+      return { status: 'ok', message: 'Redis connection successful' };
     } catch (error) {
-      throw new Error(`Redis check failed: ${error.message}`)
+      throw new Error(`Redis check failed: ${error.message}`);
     }
   }
 
   private checkMemory() {
-    const usage = process.memoryUsage()
-    const maxMemory = 512 * 1024 * 1024 // 512MB limit
+    const usage = process.memoryUsage();
+    const maxMemory = 512 * 1024 * 1024; // 512MB limit
 
     if (usage.heapUsed > maxMemory) {
-      throw new Error(`Memory usage too high: ${Math.round(usage.heapUsed / 1024 / 1024)}MB`)
+      throw new Error(`Memory usage too high: ${Math.round(usage.heapUsed / 1024 / 1024)}MB`);
     }
 
     return {
-      status: "ok",
+      status: 'ok',
       message: `Memory usage: ${Math.round(usage.heapUsed / 1024 / 1024)}MB`,
       details: usage,
-    }
+    };
   }
 
   private checkDisk() {
     // Simple disk check - in production, you might want more sophisticated checks
     return {
-      status: "ok",
-      message: "Disk space sufficient",
-    }
+      status: 'ok',
+      message: 'Disk space sufficient',
+    };
   }
 
   private getCheckResult(result: PromiseSettledResult<any>) {
-    if (result.status === "fulfilled") {
-      return result.value
+    if (result.status === 'fulfilled') {
+      return result.value;
     } else {
       return {
-        status: "error",
+        status: 'error',
         message: result.reason.message,
-      }
+      };
     }
   }
 }

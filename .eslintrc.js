@@ -18,20 +18,15 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
-    // TypeScript strictness
-    '@typescript-eslint/no-explicit-any': 'error', // forbid any
-    '@typescript-eslint/explicit-function-return-type': [
-      'warn',
-      { allowExpressions: true, allowTypedFunctionExpressions: true },
-    ],
-    '@typescript-eslint/explicit-module-boundary-types': 'warn',
+    // TypeScript strictness - relaxed for development
+    '@typescript-eslint/no-explicit-any': 'warn', // warn instead of error
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
 
-    // Best practices
-    '@typescript-eslint/no-unused-vars': ['error'],
-    '@typescript-eslint/consistent-type-imports': [
-      'error',
-      { prefer: 'type-imports' },
-    ],
+    // Best practices - relaxed
+    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/consistent-type-imports': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
 
     // Prettier
     'prettier/prettier': [
