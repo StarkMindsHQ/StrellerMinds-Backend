@@ -9,6 +9,7 @@ import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 
 @Module({
   imports: [
@@ -58,6 +59,10 @@ export class AppModule {
       .apply(SecurityHeadersMiddleware)
       .forRoutes('*');
     
+    consumer
+      .apply(InputSecurityMiddleware)
+      .forRoutes('*');
+
     consumer
       .apply(TokenBlacklistMiddleware)
       .forRoutes('*');
