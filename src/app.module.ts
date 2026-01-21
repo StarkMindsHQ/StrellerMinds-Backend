@@ -9,12 +9,15 @@ import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
-
+import configuration from './config/configuration';
+import { validationSchema } from './config/validation.schema';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
+      load: [configuration],        // <-- add this
+      validationSchema,      
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
