@@ -294,7 +294,7 @@ This project is **UNLICENSED** - all rights reserved.
 - Open source community for valuable tools and libraries
 
 
-## Environment Configuration
+## Environment configuration
 
 The application uses environment variables for configuration. All variables are required unless a default value is specified.
 
