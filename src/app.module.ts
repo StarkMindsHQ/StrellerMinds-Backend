@@ -18,6 +18,7 @@ import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
       },
     ]),
     AuthModule,
+    CourseModule,
     UserModule,
   ],
   providers: [
