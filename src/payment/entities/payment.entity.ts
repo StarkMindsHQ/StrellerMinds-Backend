@@ -7,11 +7,18 @@ import {
   UpdateDateColumn,
   OneToMany,
   JoinColumn,
+  Index,
+  Check,
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
 import { PaymentStatus, PaymentMethod } from '../enums';
 
 @Entity('payments')
+@Index(['userId', 'status', 'createdAt'])
+@Index(['transactionId'])
+@Index(['gatewayReferenceId'])
+@Index(['status'])
+@Check(`"amount" > 0`)
 export class Payment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
