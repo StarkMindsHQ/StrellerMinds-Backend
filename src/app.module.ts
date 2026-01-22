@@ -20,6 +20,10 @@ import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
 import { CourseModule } from './course/course.module';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
+import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -86,5 +90,6 @@ export class AppModule {
     consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
     consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
   }
 }
