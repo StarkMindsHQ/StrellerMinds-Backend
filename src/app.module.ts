@@ -5,7 +5,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module'; // include feature branch
+import { UserModule } from './user/user.module';
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
@@ -42,7 +42,7 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
       },
     ]),
     AuthModule,
-    UserModule, // merged
+    UserModule,
   ],
   providers: [
     {
