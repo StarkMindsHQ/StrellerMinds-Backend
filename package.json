@@ -19,7 +19,16 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "audit:security": "npm audit --audit-level=moderate",
     "audit:fix": "npm audit fix",
-    "audit:fix-force": "npm audit fix --force"
+    "audit:fix-force": "npm audit fix --force",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "migration:generate": "npm run typeorm -- migration:generate -d src/config/typeorm.config.ts",
+    "migration:create": "npm run typeorm -- migration:create",
+    "migration:run": "npm run typeorm -- migration:run -d src/config/typeorm.config.ts",
+    "migration:revert": "npm run typeorm -- migration:revert -d src/config/typeorm.config.ts",
+    "migration:show": "npm run typeorm -- migration:show -d src/config/typeorm.config.ts",
+    "seed": "ts-node -r tsconfig-paths/register src/database/seeds/seed.command.ts",
+    "backup": "bash scripts/backup.sh",
+    "backup:restore": "bash scripts/restore.sh"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.972.0",
