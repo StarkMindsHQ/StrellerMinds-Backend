@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { UserProfile } from './user/entities/user-profile.entity';
@@ -17,6 +18,9 @@ import { UserBadge } from './user/entities/user-badge.entity';
 import { Follow } from './user/entities/follow.entity';
 import { PrivacySettings } from './user/entities/privacy-settings.entity';
 import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
+import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
+import { SyncLog } from './integrations/common/entities/sync-log.entity';
+import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
@@ -45,6 +49,9 @@ import { CourseModule } from './course/course.module';
         Follow,
         PrivacySettings,
         ProfileAnalytics,
+        IntegrationConfig,
+        SyncLog,
+        IntegrationMapping,
       ],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
@@ -66,6 +73,7 @@ import { CourseModule } from './course/course.module';
     UserModule,
     I18nModule.register(),
     AccessibilityModule,
+    IntegrationsModule,
   ],
   providers: [
     {
