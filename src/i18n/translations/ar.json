@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "أهلا وسهلا",
+    "goodbye": "وداعا",
+    "yes": "نعم",
+    "no": "لا",
+    "ok": "حسنا",
+    "cancel": "الغاء",
+    "submit": "إرسال",
+    "close": "إغلاق",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "warning": "تحذير",
+    "info": "معلومة"
+  },
+  "navigation": {
+    "home": "الرئيسية",
+    "about": "حول",
+    "services": "الخدمات",
+    "contact": "اتصل",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
+    "login": "دخول"
+  },
+  "accessibility": {
+    "skipToMain": "انتقل إلى المحتوى الرئيسي",
+    "skipToNav": "انتقل إلى التنقل",
+    "skipToSearch": "انتقل إلى البحث",
+    "expandMenu": "توسيع القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "screenReaderOnly": "نص قارئ الشاشة فقط",
+    "focusMode": "تم تفعيل وضع التركيز"
+  },
+  "auth": {
+    "login": "دخول",
+    "register": "تسجيل",
+    "password": "كلمة السر",
+    "email": "البريد الالكتروني",
+    "username": "اسم المستخدم",
+    "forgotPassword": "هل نسيت كلمة السر؟",
+    "rememberMe": "تذكرني"
+  },
+  "errors": {
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "عنوان بريد إلكتروني غير صحيح",
+    "passwordTooShort": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "userNotFound": "المستخدم غير موجود",
+    "unauthorized": "الوصول غير مصرح به"
+  }
+}

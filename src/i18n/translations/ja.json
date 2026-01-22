@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "ようこそ",
+    "goodbye": "さようなら",
+    "yes": "はい",
+    "no": "いいえ",
+    "ok": "OK",
+    "cancel": "キャンセル",
+    "submit": "送信",
+    "close": "閉じる",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "warning": "警告",
+    "info": "情報"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "about": "について",
+    "services": "サービス",
+    "contact": "お問い合わせ",
+    "profile": "プロフィール",
+    "settings": "設定",
+    "logout": "ログアウト",
+    "login": "ログイン"
+  },
+  "accessibility": {
+    "skipToMain": "メインコンテンツにスキップ",
+    "skipToNav": "ナビゲーションにスキップ",
+    "skipToSearch": "検索にスキップ",
+    "expandMenu": "メニューを展開",
+    "closeMenu": "メニューを閉じる",
+    "screenReaderOnly": "スクリーンリーダーのみのテキスト",
+    "focusMode": "フォーカスモード有効"
+  },
+  "auth": {
+    "login": "ログイン",
+    "register": "登録",
+    "password": "パスワード",
+    "email": "メール",
+    "username": "ユーザー名",
+    "forgotPassword": "パスワードを忘れた?",
+    "rememberMe": "次回から省略"
+  },
+  "errors": {
+    "required": "このフィールドは必須です",
+    "invalidEmail": "無効なメールアドレス",
+    "passwordTooShort": "パスワードは8文字以上である必要があります",
+    "passwordMismatch": "パスワードが一致しません",
+    "userNotFound": "ユーザーが見つかりません",
+    "unauthorized": "アクセスが承認されていません"
+  }
+}
