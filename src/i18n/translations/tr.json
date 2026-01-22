@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "Hoş geldiniz",
+    "goodbye": "Hoşça kalın",
+    "yes": "Evet",
+    "no": "Hayır",
+    "ok": "Tamam",
+    "cancel": "İptal",
+    "submit": "Gönder",
+    "close": "Kapat",
+    "loading": "Yükleniyor...",
+    "error": "Hata",
+    "success": "Başarılı",
+    "warning": "Uyarı",
+    "info": "Bilgi"
+  },
+  "navigation": {
+    "home": "Ana Sayfa",
+    "about": "Hakkında",
+    "services": "Hizmetler",
+    "contact": "İletişim",
+    "profile": "Profil",
+    "settings": "Ayarlar",
+    "logout": "Çıkış",
+    "login": "Giriş"
+  },
+  "accessibility": {
+    "skipToMain": "Ana içeriğe atla",
+    "skipToNav": "Navigasyona atla",
+    "skipToSearch": "Aramaya atla",
+    "expandMenu": "Menüyü genişlet",
+    "closeMenu": "Menüyü kapat",
+    "screenReaderOnly": "Yalnızca ekran okuyucu metni",
+    "focusMode": "Odak modu etkinleştirildi"
+  },
+  "auth": {
+    "login": "Giriş",
+    "register": "Kaydol",
+    "password": "Parola",
+    "email": "E-posta",
+    "username": "Kullanıcı adı",
+    "forgotPassword": "Parolanızı mı unuttunuz?",
+    "rememberMe": "Beni hatırla"
+  },
+  "errors": {
+    "required": "Bu alan gereklidir",
+    "invalidEmail": "Geçersiz e-posta adresi",
+    "passwordTooShort": "Parola en az 8 karakter olmalıdır",
+    "passwordMismatch": "Parolalar eşleşmiyor",
+    "userNotFound": "Kullanıcı bulunamadı",
+    "unauthorized": "Yetkisiz erişim"
+  }
+}

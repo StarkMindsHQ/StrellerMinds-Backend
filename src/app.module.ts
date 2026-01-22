@@ -6,6 +6,8 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { I18nModule } from './i18n/i18n.module';
+import { AccessibilityModule } from './accessibility/accessibility.module';
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { UserProfile } from './user/entities/user-profile.entity';
@@ -18,6 +20,7 @@ import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 
 @Module({
   imports: [
@@ -60,6 +63,8 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
     ]),
     AuthModule,
     UserModule,
+    I18nModule.register(),
+    AccessibilityModule,
   ],
   providers: [
     {
@@ -76,5 +81,6 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
+    consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
   }
 }
