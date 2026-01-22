@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "Willkommen",
+    "goodbye": "Auf Wiedersehen",
+    "yes": "Ja",
+    "no": "Nein",
+    "ok": "OK",
+    "cancel": "Abbrechen",
+    "submit": "Absenden",
+    "close": "Schließen",
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "warning": "Warnung",
+    "info": "Information"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "about": "Über uns",
+    "services": "Dienstleistungen",
+    "contact": "Kontakt",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "login": "Anmelden"
+  },
+  "accessibility": {
+    "skipToMain": "Zum Hauptinhalt springen",
+    "skipToNav": "Zur Navigation springen",
+    "skipToSearch": "Zur Suche springen",
+    "expandMenu": "Menü erweitern",
+    "closeMenu": "Menü schließen",
+    "screenReaderOnly": "Nur Text für Bildschirmleser",
+    "focusMode": "Fokusmodus aktiviert"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "password": "Passwort",
+    "email": "E-Mail",
+    "username": "Benutzername",
+    "forgotPassword": "Passwort vergessen?",
+    "rememberMe": "An mich erinnern"
+  },
+  "errors": {
+    "required": "Dieses Feld ist erforderlich",
+    "invalidEmail": "Ungültige E-Mail-Adresse",
+    "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "userNotFound": "Benutzer nicht gefunden",
+    "unauthorized": "Zugriff nicht autorisiert"
+  }
+}

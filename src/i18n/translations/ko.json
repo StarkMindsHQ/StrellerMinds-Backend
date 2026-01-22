@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "환영합니다",
+    "goodbye": "안녕히 가세요",
+    "yes": "예",
+    "no": "아니오",
+    "ok": "확인",
+    "cancel": "취소",
+    "submit": "제출",
+    "close": "닫기",
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "warning": "경고",
+    "info": "정보"
+  },
+  "navigation": {
+    "home": "홈",
+    "about": "소개",
+    "services": "서비스",
+    "contact": "문의",
+    "profile": "프로필",
+    "settings": "설정",
+    "logout": "로그아웃",
+    "login": "로그인"
+  },
+  "accessibility": {
+    "skipToMain": "주요 콘텐츠로 이동",
+    "skipToNav": "네비게이션으로 이동",
+    "skipToSearch": "검색으로 이동",
+    "expandMenu": "메뉴 확장",
+    "closeMenu": "메뉴 닫기",
+    "screenReaderOnly": "스크린 리더 전용 텍스트",
+    "focusMode": "포커스 모드 활성화"
+  },
+  "auth": {
+    "login": "로그인",
+    "register": "등록",
+    "password": "비밀번호",
+    "email": "이메일",
+    "username": "사용자명",
+    "forgotPassword": "비밀번호를 잊으셨나요?",
+    "rememberMe": "기억하기"
+  },
+  "errors": {
+    "required": "이 필드는 필수입니다",
+    "invalidEmail": "유효하지 않은 이메일 주소",
+    "passwordTooShort": "비밀번호는 최소 8자 이상이어야 합니다",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다",
+    "userNotFound": "사용자를 찾을 수 없습니다",
+    "unauthorized": "접근 권한이 없습니다"
+  }
+}

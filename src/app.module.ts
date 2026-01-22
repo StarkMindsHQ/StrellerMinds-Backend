@@ -6,6 +6,8 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { I18nModule } from './i18n/i18n.module';
+import { AccessibilityModule } from './accessibility/accessibility.module';
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { UserProfile } from './user/entities/user-profile.entity';
@@ -18,7 +20,20 @@ import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware'; // <-- make sure to import
 import { CourseModule } from './course/course.module';
+import { PaymentModule } from './payment/payment.module';
+import {
+  Payment,
+  Subscription,
+  PaymentPlan,
+  Invoice,
+  Refund,
+  Dispute,
+  TaxRate,
+  FinancialReport,
+  PaymentMethodEntity,
+} from './payment/entities';
 
 @Module({
   imports: [
@@ -43,6 +58,15 @@ import { CourseModule } from './course/course.module';
         Follow,
         PrivacySettings,
         ProfileAnalytics,
+        Payment,
+        Subscription,
+        PaymentPlan,
+        Invoice,
+        Refund,
+        Dispute,
+        TaxRate,
+        FinancialReport,
+        PaymentMethodEntity,
       ],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
@@ -62,6 +86,9 @@ import { CourseModule } from './course/course.module';
     AuthModule,
     CourseModule,
     UserModule,
+    PaymentModule,                // <-- from feature branch
+    I18nModule.register(),        // <-- from main
+    AccessibilityModule,          // <-- from main
   ],
   providers: [
     {
@@ -78,5 +105,6 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
+    consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
   }
 }
