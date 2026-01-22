@@ -9,6 +9,7 @@ import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
       },
     ]),
     AuthModule,
+    CourseModule,
   ],
   providers: [
     {
