@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { UserProfile } from './user/entities/user-profile.entity';
@@ -20,23 +21,14 @@ import { Follow } from './user/entities/follow.entity';
 import { PrivacySettings } from './user/entities/privacy-settings.entity';
 import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import { SecurityAudit } from './auth/entities/security-audit.entity';
+import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
+import { SyncLog } from './integrations/common/entities/sync-log.entity';
+import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { CourseModule } from './course/course.module';
-import { PaymentModule } from './payment/payment.module';
-import {
-  Payment,
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Refund,
-  Dispute,
-  TaxRate,
-  FinancialReport,
-  PaymentMethodEntity,
-} from './payment/entities';
 
 @Module({
   imports: [
@@ -72,6 +64,9 @@ import {
         TaxRate,
         FinancialReport,
         PaymentMethodEntity,
+        IntegrationConfig,
+        SyncLog,
+        IntegrationMapping,
       ],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
@@ -100,9 +95,9 @@ import {
     AuthModule,
     CourseModule,
     UserModule,
-    PaymentModule,                // <-- from feature branch
-    I18nModule.register(),        // <-- from main
-    AccessibilityModule,          // <-- from main
+    I18nModule.register(),
+    AccessibilityModule,
+    IntegrationsModule,
   ],
   providers: [
     {
