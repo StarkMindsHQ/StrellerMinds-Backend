@@ -27,7 +27,7 @@ The API uses JWT bearer tokens for access. Token issuance and rotation are handl
 
 Use the access token in the `Authorization` header:
 
-```
+```text
 Authorization: Bearer <accessToken>
 ```
 
