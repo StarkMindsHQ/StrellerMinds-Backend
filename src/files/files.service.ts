@@ -6,6 +6,8 @@ import { ImageProcessor } from './processors/image.processor';
 import { VideoProcessor } from './processors/video.processor';
 import { StorageProvider } from './storage/storage.interface';
 import { v4 as uuid } from 'uuid';
+import type { File } from 'multer';
+
 
 @Injectable()
 export class FilesService {
@@ -18,7 +20,7 @@ export class FilesService {
     private readonly storage: StorageProvider,
   ) {}
 
-  async upload(file: Express.Multer.File, ownerId: string) {
+  async upload(file: File, ownerId: string) {
     const type = this.detectType(file.mimetype);
     const fileId = uuid();
     const path = `${ownerId}/${fileId}-${file.originalname}`;
