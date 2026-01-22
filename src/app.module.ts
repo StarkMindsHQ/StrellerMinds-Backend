@@ -19,6 +19,18 @@ import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
 import { CourseModule } from './course/course.module';
+import { PaymentModule } from './payment/payment.module';
+import {
+  Payment,
+  Subscription,
+  PaymentPlan,
+  Invoice,
+  Refund,
+  Dispute,
+  TaxRate,
+  FinancialReport,
+  PaymentMethodEntity,
+} from './payment/entities';
 
 @Module({
   imports: [
@@ -43,6 +55,15 @@ import { CourseModule } from './course/course.module';
         Follow,
         PrivacySettings,
         ProfileAnalytics,
+        Payment,
+        Subscription,
+        PaymentPlan,
+        Invoice,
+        Refund,
+        Dispute,
+        TaxRate,
+        FinancialReport,
+        PaymentMethodEntity,
       ],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
@@ -62,6 +83,7 @@ import { CourseModule } from './course/course.module';
     AuthModule,
     CourseModule,
     UserModule,
+    PaymentModule,
   ],
   providers: [
     {
