@@ -2,97 +2,62 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
-import { InvoiceEntity } from './invoice.entity';
-
-export enum PaymentStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled',
-  REFUNDED = 'refunded',
-}
-
-export enum PaymentType {
-  COURSE_PURCHASE = 'course_purchase',
-  SUBSCRIPTION = 'subscription',
-  RENEWAL = 'renewal',
-  UPGRADE = 'upgrade',
-  REFUND = 'refund',
-}
+import { User } from '../../auth/entities/user.entity';
+import { PaymentStatus, PaymentMethod } from '../enums';
 
 @Entity('payments')
-export class PaymentEntity {
+export class Payment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column('uuid')
   userId: string;
 
-  @Column()
-  stripePaymentIntentId: string;
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
-  @Column()
-  amount: number; // Amount in cents
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
 
-  @Column()
+  @Column('varchar', { default: 'USD' })
   currency: string;
 
-  @Column({
-    type: 'enum',
+  @Column('enum', {
     enum: PaymentStatus,
     default: PaymentStatus.PENDING,
   })
   status: PaymentStatus;
 
-  @Column({
-    type: 'enum',
-    enum: PaymentType,
-  })
-  type: PaymentType;
+  @Column('enum', { enum: PaymentMethod })
+  paymentMethod: PaymentMethod;
 
-  @Column({ nullable: true })
-  courseId?: string;
+  @Column('varchar', { nullable: true })
+  transactionId: string;
 
-  @Column({ nullable: true })
-  subscriptionId?: string;
+  @Column('varchar', { nullable: true })
+  gatewayReferenceId: string;
 
-  @Column({ nullable: true })
+  @Column('text', { nullable: true })
   description: string;
 
-  @Column({ nullable: true })
+  @Column('text', { nullable: true })
   failureReason: string;
 
-  @Column({ nullable: true })
-  refundReason: string;
+  @Column('varchar', { nullable: true })
+  invoiceId: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column('varchar', { nullable: true })
+  subscriptionId: string;
+
+  @Column('json', { nullable: true })
   metadata: Record<string, any>;
-
-  @Column({ nullable: true })
-  customerEmail: string;
-
-  @Column({ nullable: true })
-  customerName: string;
-
-  @Column({ nullable: true })
-  billingAddress: string;
-
-  @Column({ nullable: true })
-  taxAmount: number;
-
-  @Column({ nullable: true })
-  discountAmount: number;
-
-  @Column({ nullable: true })
-  couponCode: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -100,17 +65,6 @@ export class PaymentEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ nullable: true })
+  @Column('timestamp', { nullable: true })
   completedAt: Date;
-
-  @Column({ nullable: true })
-  refundedAt: Date;
-
-  // Relations
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' })
-  user: User;
-
-  @OneToMany(() => InvoiceEntity, (invoice) => invoice.payment)
-  invoices: InvoiceEntity[];
-} 
+}

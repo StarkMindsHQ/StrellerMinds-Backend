@@ -14,6 +14,7 @@ module.exports = {
     '<rootDir>/src/**/*.test.ts',
     '<rootDir>/test/unit/**/*.spec.ts',
     '<rootDir>/test/integration/**/*.spec.ts',
+    '<rootDir>/apps/backend/tests/contract/**/*.test.ts',
   ],
 
   // Ignore patterns

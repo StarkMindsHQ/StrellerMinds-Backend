@@ -1,17 +1,26 @@
-/**
- * FilesModule provides file management features.
- *
- * @module Files
- */
 import { Module } from '@nestjs/common';
-import { FilesController } from './files.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { FilesService } from './files.service';
-import { CloudinaryModule } from '../cloudinary/cloudinary.module';
-import { SharedModule } from '../shared/shared.module';
+import { FileEntity } from './entities/file.entity';
+import { ImageProcessor } from './processors/image.processor';
+import { VideoProcessor } from './processors/video.processor';
+import { VirusScanService } from './virus-scan.service';
+import { S3StorageService } from './storage/s3.storage';
+import { FilesController } from './files.controller';
 
 @Module({
-  imports: [CloudinaryModule, SharedModule],
+  imports: [TypeOrmModule.forFeature([FileEntity])],
   controllers: [FilesController],
-  providers: [FilesService],
+  providers: [
+    FilesService,
+    ImageProcessor,
+    VideoProcessor,
+    VirusScanService,
+    {
+      provide: 'StorageProvider',
+      useClass: S3StorageService,
+    },
+  ],
+  exports: [FilesService],
 })
 export class FilesModule {}

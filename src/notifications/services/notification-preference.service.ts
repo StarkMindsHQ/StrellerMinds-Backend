@@ -1,91 +1,164 @@
-import { Injectable, Logger } from "@nestjs/common"
-import type { Repository } from "typeorm"
-import type { UserNotificationPreference } from "../entities/user-notification-preference.entity"
-import type { UpdateNotificationPreferenceDto } from "../dto/update-preference.dto"
-import { NotificationChannel, NotificationType } from "../entities/notification.entity"
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { NotificationPreference } from '../entities/notification-preference.entity';
+import { CreateNotificationPreferenceDto, UpdateNotificationPreferenceDto } from '../dto/notification-preference.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class NotificationPreferenceService {
-  private readonly logger = new Logger(NotificationPreferenceService.name)
+  constructor(
+    @InjectRepository(NotificationPreference)
+    private notificationPreferenceRepository: Repository<NotificationPreference>,
+  ) {}
 
-  constructor(private readonly preferenceRepository: Repository<UserNotificationPreference>) {}
+  async createPreferences(createPrefDto: CreateNotificationPreferenceDto): Promise<NotificationPreference> {
+    // Check if preferences already exist for this user
+    let preferences = await this.notificationPreferenceRepository.findOne({
+      where: { userId: createPrefDto.userId },
+    });
 
-  async getPreferences(userId: string): Promise<UserNotificationPreference> {
-    let preferences = await this.preferenceRepository.findOne({ where: { userId } })
+    if (preferences) {
+      throw new Error(`Preferences already exist for user ${createPrefDto.userId}`);
+    }
+
+    preferences = new NotificationPreference();
+    preferences.userId = createPrefDto.userId;
+    preferences.preferences = createPrefDto.preferences || {};
+    preferences.emailEnabled = createPrefDto.emailEnabled ?? true;
+    preferences.smsEnabled = createPrefDto.smsEnabled ?? true;
+    preferences.pushEnabled = createPrefDto.pushEnabled ?? true;
+    preferences.inAppEnabled = createPrefDto.inAppEnabled ?? true;
+    preferences.unsubscribeToken = uuidv4(); // Generate unique unsubscribe token
+
+    return await this.notificationPreferenceRepository.save(preferences);
+  }
+
+  async getPreferences(userId: string): Promise<NotificationPreference> {
+    return await this.notificationPreferenceRepository.findOne({
+      where: { userId },
+    });
+  }
+
+  async updatePreferences(userId: string, updatePrefDto: UpdateNotificationPreferenceDto): Promise<NotificationPreference> {
+    const preferences = await this.notificationPreferenceRepository.findOne({
+      where: { userId },
+    });
 
     if (!preferences) {
-      // Initialize default preferences if none exist
-      preferences = await this.initializeDefaultPreferences(userId)
-      this.logger.log(`Initialized default preferences for user ${userId}`)
+      throw new Error(`Preferences not found for user ${userId}`);
     }
-    return preferences
+
+    if (updatePrefDto.preferences !== undefined) {
+      preferences.preferences = { ...preferences.preferences, ...updatePrefDto.preferences };
+    }
+
+    if (updatePrefDto.emailEnabled !== undefined) {
+      preferences.emailEnabled = updatePrefDto.emailEnabled;
+    }
+
+    if (updatePrefDto.smsEnabled !== undefined) {
+      preferences.smsEnabled = updatePrefDto.smsEnabled;
+    }
+
+    if (updatePrefDto.pushEnabled !== undefined) {
+      preferences.pushEnabled = updatePrefDto.pushEnabled;
+    }
+
+    if (updatePrefDto.inAppEnabled !== undefined) {
+      preferences.inAppEnabled = updatePrefDto.inAppEnabled;
+    }
+
+    return await this.notificationPreferenceRepository.save(preferences);
   }
 
-  async updatePreferences(userId: string, dto: UpdateNotificationPreferenceDto): Promise<UserNotificationPreference> {
-    let preferences = await this.preferenceRepository.findOne({ where: { userId } })
+  async toggleChannel(userId: string, channel: 'email' | 'sms' | 'push' | 'inApp', enabled: boolean): Promise<NotificationPreference> {
+    const preferences = await this.notificationPreferenceRepository.findOne({
+      where: { userId },
+    });
 
     if (!preferences) {
-      preferences = this.preferenceRepository.create({ userId })
+      throw new Error(`Preferences not found for user ${userId}`);
     }
 
-    // Update general channel preferences
-    if (dto.emailEnabled !== undefined) preferences.emailEnabled = dto.emailEnabled
-    if (dto.smsEnabled !== undefined) preferences.smsEnabled = dto.smsEnabled
-    if (dto.inAppEnabled !== undefined) preferences.inAppEnabled = dto.inAppEnabled
-    if (dto.pushEnabled !== undefined) preferences.pushEnabled = dto.pushEnabled
-
-    // Update type-specific preferences
-    if (dto.typePreferences) {
-      preferences.typePreferences = { ...preferences.typePreferences, ...dto.typePreferences }
+    switch (channel) {
+      case 'email':
+        preferences.emailEnabled = enabled;
+        break;
+      case 'sms':
+        preferences.smsEnabled = enabled;
+        break;
+      case 'push':
+        preferences.pushEnabled = enabled;
+        break;
+      case 'inApp':
+        preferences.inAppEnabled = enabled;
+        break;
     }
 
-    const savedPreferences = await this.preferenceRepository.save(preferences)
-    this.logger.log(`Updated preferences for user ${userId}`)
-    return savedPreferences
+    return await this.notificationPreferenceRepository.save(preferences);
   }
 
-  async initializeDefaultPreferences(userId: string): Promise<UserNotificationPreference> {
-    const defaultPreferences = this.preferenceRepository.create({
-      userId,
-      emailEnabled: true,
-      smsEnabled: false,
-      inAppEnabled: true,
-      pushEnabled: false,
-      typePreferences: {
-        [NotificationType.COURSE_UPDATE]: [NotificationChannel.EMAIL, NotificationChannel.IN_APP],
-        [NotificationType.NEW_MESSAGE]: [NotificationChannel.IN_APP, NotificationChannel.PUSH],
-        [NotificationType.REMINDER]: [NotificationChannel.EMAIL],
-        [NotificationType.PROMOTION]: [NotificationChannel.EMAIL],
-        [NotificationType.ACCOUNT_ALERT]: [
-          NotificationChannel.EMAIL,
-          NotificationChannel.IN_APP,
-          NotificationChannel.SMS,
-        ],
-        [NotificationType.COURSE_ENROLLMENT]: [NotificationChannel.EMAIL, NotificationChannel.IN_APP],
-        [NotificationType.COURSE_COMPLETION]: [NotificationChannel.EMAIL, NotificationChannel.IN_APP],
-      },
-    })
-    return this.preferenceRepository.save(defaultPreferences)
-  }
+  async getUnsubscribeToken(userId: string): Promise<string> {
+    let preferences = await this.notificationPreferenceRepository.findOne({
+      where: { userId },
+    });
 
-  async getPreferredChannelsForType(
-    userId: string,
-    notificationType: NotificationType,
-  ): Promise<NotificationChannel[]> {
-    const preferences = await this.getPreferences(userId)
-
-    // Start with general channel enablement
-    const enabledChannels: NotificationChannel[] = []
-    if (preferences.emailEnabled) enabledChannels.push(NotificationChannel.EMAIL)
-    if (preferences.smsEnabled) enabledChannels.push(NotificationChannel.SMS)
-    if (preferences.inAppEnabled) enabledChannels.push(NotificationChannel.IN_APP)
-    if (preferences.pushEnabled) enabledChannels.push(NotificationChannel.PUSH)
-
-    // Override with type-specific preferences if they exist
-    if (preferences.typePreferences && preferences.typePreferences[notificationType]) {
-      return preferences.typePreferences[notificationType] || []
+    if (!preferences) {
+      // Create default preferences if they don't exist
+      preferences = new NotificationPreference();
+      preferences.userId = userId;
+      preferences.unsubscribeToken = uuidv4();
+      preferences = await this.notificationPreferenceRepository.save(preferences);
     }
 
-    return enabledChannels
+    if (!preferences.unsubscribeToken) {
+      preferences.unsubscribeToken = uuidv4();
+      await this.notificationPreferenceRepository.save(preferences);
+    }
+
+    return preferences.unsubscribeToken;
+  }
+
+  async unsubscribeByToken(token: string, categories?: string[]): Promise<void> {
+    const preferences = await this.notificationPreferenceRepository.findOne({
+      where: { unsubscribeToken: token },
+    });
+
+    if (!preferences) {
+      throw new Error('Invalid unsubscribe token');
+    }
+
+    if (categories && categories.length > 0) {
+      // Add specific categories to unsubscribed list
+      preferences.unsubscribedCategories = [...new Set([...preferences.unsubscribedCategories, ...categories])];
+    } else {
+      // Unsubscribe from all emails
+      preferences.emailEnabled = false;
+    }
+
+    await this.notificationPreferenceRepository.save(preferences);
+  }
+
+  async isSubscribed(userId: string, category?: string): Promise<boolean> {
+    const preferences = await this.notificationPreferenceRepository.findOne({
+      where: { userId },
+    });
+
+    if (!preferences) {
+      return true; // Default to subscribed if no preferences exist
+    }
+
+    // Check if user has disabled all email notifications
+    if (!preferences.emailEnabled) {
+      return false;
+    }
+
+    // Check if user has unsubscribed from specific category
+    if (category && preferences.unsubscribedCategories.includes(category)) {
+      return false;
+    }
+
+    return true;
   }
 }

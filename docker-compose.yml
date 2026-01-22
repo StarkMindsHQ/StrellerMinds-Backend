@@ -1,134 +1,23 @@
+version: '3.8'
+
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: strellerminds-postgres
-    environment:
-      POSTGRES_DB: strellerminds_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: strellerminds-jaeger
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d strellerminds_dev"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      - "16686:16686"  # Jaeger UI
+      - "4318:4318"    # OTLP HTTP receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
     networks:
       - strellerminds-network
-
-  # Redis Cache and Queue
-  redis:
-    image: redis:7-alpine
-    container_name: strellerminds-redis
-    command: redis-server --requirepass redis_password --maxmemory 256mb --maxmemory-policy allkeys-lru
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:14269/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
       start_period: 10s
-    networks:
-      - strellerminds-network
-
-  # Mailhog for Email Testing
-  mailhog:
-    image: mailhog/mailhog:v1.0.1
-    container_name: strellerminds-mailhog
-    ports:
-      - "1025:1025"  # SMTP port
-      - "8025:8025"  # Web UI port
-    environment:
-      MH_STORAGE: maildir
-      MH_MAILDIR_PATH: /maildir
-    volumes:
-      - mailhog_data:/maildir
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8025/api/v1/messages"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    networks:
-      - strellerminds-network
-
-  # LocalStack for AWS S3 Emulation
-  localstack:
-    image: localstack/localstack:3.0
-    container_name: strellerminds-localstack
-    environment:
-      - SERVICES=s3
-      - DEBUG=1
-      - DATA_DIR=/var/lib/localstack/data
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - AWS_DEFAULT_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - EDGE_PORT=4566
-      - LAMBDA_EXECUTOR=docker
-      - LAMBDA_REMOVE_CONTAINERS=true
-    ports:
-      - "4566:4566"  # LocalStack Edge port
-    volumes:
-      - localstack_data:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - strellerminds-network
-
-  # S3 Bucket Initialization (depends on LocalStack)
-  s3-init:
-    image: amazon/aws-cli:2.13.0
-    container_name: strellerminds-s3-init
-    depends_on:
-      localstack:
-        condition: service_healthy
-    environment:
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - AWS_DEFAULT_REGION=us-east-1
-    command: >
-      sh -c "
-        aws --endpoint-url=http://localstack:4566 s3 mb s3://strellerminds-dev-storage &&
-        aws --endpoint-url=http://localstack:4566 s3api put-bucket-cors --bucket strellerminds-dev-storage --cors-configuration '{
-          \"CORSRules\": [{
-            \"AllowedHeaders\": [\"*\"],
-            \"AllowedMethods\": [\"GET\", \"PUT\", \"POST\", \"DELETE\", \"HEAD\"],
-            \"AllowedOrigins\": [\"*\"],
-            \"ExposeHeaders\": [\"ETag\"],
-            \"MaxAgeSeconds\": 3000
-          }]
-        }' &&
-        echo 'S3 bucket initialized successfully'
-      "
-    networks:
-      - strellerminds-network
-
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  mailhog_data:
-    driver: local
-  localstack_data:
-    driver: local
 
 networks:
   strellerminds-network:
     driver: bridge
-    name: strellerminds-network

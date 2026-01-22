@@ -1,15 +1,24 @@
-import { Module } from '@nestjs/common';
-import { CourseService } from './course.service';
-import { CourseController } from './course.controller';
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { CourseController } from "./course.controller";
+import { CourseModule as CourseModuleEntity } from "./entities/module.entity";
+import { CourseService } from "./course.service";
+import { CourseVersion } from "./entities/course-version.entity";
+import { Course } from "./entities/course.entity";
+import { Enrollment } from "./entities/enrollment.entity";
+import { Lesson } from "./entities/lesson.entity";
+import { Module } from "@nestjs/common/decorators";
 
-/**
- * CourseModule provides course management features.
- *
- * @module Course
- */
 @Module({
+  imports: [
+    TypeOrmModule.forFeature([
+      Course,
+      CourseModuleEntity,
+      Lesson,
+      Enrollment,
+      CourseVersion,
+    ]),
+  ],
   controllers: [CourseController],
   providers: [CourseService],
-  exports: [CourseService],
 })
 export class CourseModule {}

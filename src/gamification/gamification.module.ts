@@ -1,30 +1,26 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Achievement } from './entities/achievement.entity';
+import { GamificationProfile } from './entities/gamification-profile.entity';
+import { Badge } from './entities/badge.entity';
+import { UserBadge } from './entities/user-badge.entity';
 import { Reward } from './entities/reward.entity';
-import { UserAchievement } from './entities/user-achievement.entity';
-import { UserReward } from './entities/user-reward.entity';
-import { LeaderboardEntry } from './entities/leaderboard-entry.entity';
-import { GamificationEvent } from './entities/gamification-event.entity';
-import { AchievementService } from './services/achievement.service';
-import { RewardService } from './services/reward.service';
-import { LeaderboardService } from './services/leaderboard.service';
-import { GamificationEventService } from './services/gamification-event.service';
-import { GamificationController } from './controllers/gamification.controller';
+import { Challenge } from './entities/challenge.entity';
+import { GamificationService } from './gamification.service';
+import { GamificationController } from './gamification.controller';
+import { GamificationSeeder } from './gamification-seeder.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Achievement,
+      GamificationProfile,
+      Badge,
+      UserBadge,
       Reward,
-      UserAchievement,
-      UserReward,
-      LeaderboardEntry,
-      GamificationEvent,
+      Challenge,
     ]),
   ],
-  providers: [AchievementService, RewardService, LeaderboardService, GamificationEventService],
   controllers: [GamificationController],
-  exports: [AchievementService, RewardService, LeaderboardService, GamificationEventService],
+  providers: [GamificationService, GamificationSeeder],
+  exports: [GamificationService],
 })
-export class GamificationModule {} 
+export class GamificationModule {}

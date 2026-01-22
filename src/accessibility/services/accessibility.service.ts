@@ -1,471 +1,460 @@
-import { Injectable, Logger } from "@nestjs/common"
-import type { Repository } from "typeorm"
+import { Injectable } from '@nestjs/common';
 
-import { type AccessibilityMetadata, ContentType, type AriaRole } from "../entities/accessibility-metadata.entity"
-import type { ContentLabel } from "../entities/content-label.entity"
-import type { AccessibilityLoggingService } from "./accessibility-logging.service"
-
-export interface AccessibilityData {
-  contentId: string
-  contentType: ContentType
-  altText?: string
-  ariaLabel?: string
-  ariaRole?: AriaRole
-  title?: string
-  description?: string
-  languageCode?: string
-  isDecorative?: boolean
-  customAttributes?: Record<string, any>
+/**
+ * ARIA (Accessible Rich Internet Applications) roles
+ * Reference: https://www.w3.org/TR/wai-aria-1.2/
+ */
+export enum AriaRole {
+  ALERT = 'alert',
+  ALERTDIALOG = 'alertdialog',
+  APPLICATION = 'application',
+  BUTTON = 'button',
+  CHECKBOX = 'checkbox',
+  COLUMNHEADER = 'columnheader',
+  COMBOBOX = 'combobox',
+  COMPLEMENTARY = 'complementary',
+  CONTENTINFO = 'contentinfo',
+  DEFINITION = 'definition',
+  DIALOG = 'dialog',
+  DIRECTORY = 'directory',
+  DOCUMENT = 'document',
+  FEED = 'feed',
+  FIGURE = 'figure',
+  FORM = 'form',
+  GRID = 'grid',
+  GRIDCELL = 'gridcell',
+  GROUP = 'group',
+  HEADING = 'heading',
+  IMG = 'img',
+  LINK = 'link',
+  LIST = 'list',
+  LISTBOX = 'listbox',
+  LISTITEM = 'listitem',
+  LOG = 'log',
+  MAIN = 'main',
+  MARQUEE = 'marquee',
+  MATH = 'math',
+  MENU = 'menu',
+  MENUBAR = 'menubar',
+  MENUITEM = 'menuitem',
+  MENUITEMCHECKBOX = 'menuitemcheckbox',
+  MENUITEMRADIO = 'menuitemradio',
+  NAVIGATION = 'navigation',
+  NONE = 'none',
+  NOTE = 'note',
+  OPTION = 'option',
+  PRESENTATION = 'presentation',
+  PROGRESSBAR = 'progressbar',
+  RADIO = 'radio',
+  RADIOGROUP = 'radiogroup',
+  REGION = 'region',
+  ROWHEADER = 'rowheader',
+  SCROLLBAR = 'scrollbar',
+  SEARCH = 'search',
+  SEARCHBOX = 'searchbox',
+  SEPARATOR = 'separator',
+  SLIDER = 'slider',
+  SPINBUTTON = 'spinbutton',
+  STATUS = 'status',
+  SWITCH = 'switch',
+  TAB = 'tab',
+  TABLIST = 'tablist',
+  TABPANEL = 'tabpanel',
+  TERM = 'term',
+  TEXTBOX = 'textbox',
+  TIMER = 'timer',
+  TOOLBAR = 'toolbar',
+  TOOLTIP = 'tooltip',
+  TREE = 'tree',
+  TREEGRID = 'treegrid',
+  TREEITEM = 'treeitem',
 }
 
-export interface AccessibilityResponse {
-  data: any
-  accessibility: {
-    metadata?: AccessibilityMetadata
-    labels?: ContentLabel[]
-    structure?: {
-      headings?: Array<{ level: number; text: string; id?: string }>
-      landmarks?: Array<{ role: string; label?: string }>
-      skipLinks?: Array<{ href: string; text: string }>
-    }
-    navigation?: {
-      breadcrumbs?: Array<{ text: string; href?: string; current?: boolean }>
-      pagination?: {
-        current: number
-        total: number
-        hasNext: boolean
-        hasPrevious: boolean
-      }
-    }
-    forms?: {
-      fields?: Array<{
-        id: string
-        label: string
-        type: string
-        required: boolean
-        errors?: string[]
-        helpText?: string
-      }>
-      validation?: {
-        hasErrors: boolean
-        errorSummary?: string[]
-      }
-    }
-    media?: {
-      hasAudio: boolean
-      hasVideo: boolean
-      hasTranscript: boolean
-      hasCaptions: boolean
-      hasAudioDescription: boolean
-    }
-  }
+/**
+ * ARIA live region politeness levels
+ */
+export enum AriaPoliteness {
+  OFF = 'off',
+  POLITE = 'polite',
+  ASSERTIVE = 'assertive',
 }
 
+/**
+ * ARIA attributes builder
+ */
+export interface AriaAttributes {
+  [key: string]: string | number | boolean;
+}
+
+/**
+ * Keyboard key codes for common navigation
+ */
+export enum KeyCode {
+  ESCAPE = 27,
+  TAB = 9,
+  ENTER = 13,
+  SPACE = 32,
+  ARROW_LEFT = 37,
+  ARROW_UP = 38,
+  ARROW_RIGHT = 39,
+  ARROW_DOWN = 40,
+  HOME = 36,
+  END = 35,
+  PAGE_UP = 33,
+  PAGE_DOWN = 34,
+}
+
+/**
+ * Service for managing ARIA attributes and accessibility features
+ */
 @Injectable()
 export class AccessibilityService {
-  private readonly logger = new Logger(AccessibilityService.name)
+  /**
+   * Build ARIA attributes for a component
+   */
+  buildAriaAttributes(options: {
+    role?: AriaRole;
+    label?: string;
+    labelledBy?: string;
+    describedBy?: string;
+    ariaLive?: AriaPoliteness;
+    ariaAtomic?: boolean;
+    ariaRelevant?: string;
+    ariaHidden?: boolean;
+    ariaDisabled?: boolean;
+    ariaPressed?: boolean;
+    ariaChecked?: boolean | 'mixed';
+    ariaExpanded?: boolean;
+    ariaSelected?: boolean;
+    ariaRequired?: boolean;
+    ariaInvalid?: boolean;
+    ariaSort?: 'ascending' | 'descending' | 'none' | 'other';
+    ariaLevel?: number;
+    ariaValueMin?: number;
+    ariaValueMax?: number;
+    ariaValueNow?: number;
+    ariaValueText?: string;
+    ariaControls?: string;
+    ariaFlowTo?: string;
+    ariaOwns?: string;
+    ariaPosinset?: number;
+    ariaSetsize?: number;
+    ariaColindex?: number;
+    ariaRowindex?: number;
+    ariaColspan?: number;
+    ariaRowspan?: number;
+  }): AriaAttributes {
+    const attributes: AriaAttributes = {};
 
-  constructor(
-    private readonly metadataRepository: Repository<AccessibilityMetadata>,
-    private readonly labelRepository: Repository<ContentLabel>,
-    private readonly loggingService: AccessibilityLoggingService,
-  ) {}
+    if (options.role) attributes['role'] = options.role;
+    if (options.label) attributes['aria-label'] = options.label;
+    if (options.labelledBy) attributes['aria-labelledby'] = options.labelledBy;
+    if (options.describedBy) attributes['aria-describedby'] = options.describedBy;
+    if (options.ariaLive) attributes['aria-live'] = options.ariaLive;
+    if (options.ariaAtomic !== undefined) attributes['aria-atomic'] = options.ariaAtomic;
+    if (options.ariaRelevant) attributes['aria-relevant'] = options.ariaRelevant;
+    if (options.ariaHidden !== undefined) attributes['aria-hidden'] = options.ariaHidden;
+    if (options.ariaDisabled !== undefined) attributes['aria-disabled'] = options.ariaDisabled;
+    if (options.ariaPressed !== undefined) attributes['aria-pressed'] = options.ariaPressed;
+    if (options.ariaChecked !== undefined) attributes['aria-checked'] = options.ariaChecked;
+    if (options.ariaExpanded !== undefined) attributes['aria-expanded'] = options.ariaExpanded;
+    if (options.ariaSelected !== undefined) attributes['aria-selected'] = options.ariaSelected;
+    if (options.ariaRequired !== undefined) attributes['aria-required'] = options.ariaRequired;
+    if (options.ariaInvalid !== undefined) attributes['aria-invalid'] = options.ariaInvalid;
+    if (options.ariaSort) attributes['aria-sort'] = options.ariaSort;
+    if (options.ariaLevel) attributes['aria-level'] = options.ariaLevel;
+    if (options.ariaValueMin !== undefined) attributes['aria-valuemin'] = options.ariaValueMin;
+    if (options.ariaValueMax !== undefined) attributes['aria-valuemax'] = options.ariaValueMax;
+    if (options.ariaValueNow !== undefined) attributes['aria-valuenow'] = options.ariaValueNow;
+    if (options.ariaValueText) attributes['aria-valuetext'] = options.ariaValueText;
+    if (options.ariaControls) attributes['aria-controls'] = options.ariaControls;
+    if (options.ariaFlowTo) attributes['aria-flowto'] = options.ariaFlowTo;
+    if (options.ariaOwns) attributes['aria-owns'] = options.ariaOwns;
+    if (options.ariaPosinset) attributes['aria-posinset'] = options.ariaPosinset;
+    if (options.ariaSetsize) attributes['aria-setsize'] = options.ariaSetsize;
+    if (options.ariaColindex) attributes['aria-colindex'] = options.ariaColindex;
+    if (options.ariaRowindex) attributes['aria-rowindex'] = options.ariaRowindex;
+    if (options.ariaColspan) attributes['aria-colspan'] = options.ariaColspan;
+    if (options.ariaRowspan) attributes['aria-rowspan'] = options.ariaRowspan;
 
-  async createAccessibilityMetadata(data: AccessibilityData): Promise<AccessibilityMetadata> {
-    try {
-      const metadata = this.metadataRepository.create({
-        ...data,
-        languageCode: data.languageCode || "en",
-        isDecorative: data.isDecorative || false,
-        validationStatus: "pending",
-      })
-
-      const saved = await this.metadataRepository.save(metadata)
-
-      this.logger.log(`Created accessibility metadata for content: ${data.contentId}`)
-      return saved
-    } catch (error) {
-      this.logger.error(`Failed to create accessibility metadata: ${error.message}`, error.stack)
-      throw error
-    }
+    return attributes;
   }
 
-  async updateAccessibilityMetadata(
-    contentId: string,
-    updates: Partial<AccessibilityData>,
-  ): Promise<AccessibilityMetadata> {
-    try {
-      const existing = await this.metadataRepository.findOne({
-        where: { contentId },
-      })
-
-      if (!existing) {
-        throw new Error(`Accessibility metadata not found for content: ${contentId}`)
-      }
-
-      Object.assign(existing, updates)
-      existing.validationStatus = "pending"
-
-      const updated = await this.metadataRepository.save(existing)
-
-      this.logger.log(`Updated accessibility metadata for content: ${contentId}`)
-      return updated
-    } catch (error) {
-      this.logger.error(`Failed to update accessibility metadata: ${error.message}`, error.stack)
-      throw error
-    }
-  }
-
-  async getAccessibilityMetadata(contentId: string): Promise<AccessibilityMetadata | null> {
-    try {
-      return await this.metadataRepository.findOne({
-        where: { contentId },
-      })
-    } catch (error) {
-      this.logger.error(`Failed to get accessibility metadata: ${error.message}`, error.stack)
-      return null
-    }
-  }
-
-  async getContentLabels(contentId: string, contentType: string, languageCode = "en"): Promise<ContentLabel[]> {
-    try {
-      return await this.labelRepository.find({
-        where: {
-          contentId,
-          contentType,
-          languageCode,
-        },
-        order: { createdAt: "DESC" },
-      })
-    } catch (error) {
-      this.logger.error(`Failed to get content labels: ${error.message}`, error.stack)
-      return []
-    }
-  }
-
-  async createContentLabel(
-    contentId: string,
-    contentType: string,
-    labelType: ContentLabel["labelType"],
-    labelText: string,
-    options: {
-      languageCode?: string
-      context?: string
-      isAutoGenerated?: boolean
-      confidenceScore?: number
-      source?: ContentLabel["source"]
-    } = {},
-  ): Promise<ContentLabel> {
-    try {
-      const label = this.labelRepository.create({
-        contentId,
-        contentType,
-        labelType,
-        labelText,
-        languageCode: options.languageCode || "en",
-        context: options.context,
-        isAutoGenerated: options.isAutoGenerated || false,
-        confidenceScore: options.confidenceScore,
-        source: options.source || "manual",
-      })
-
-      const saved = await this.labelRepository.save(label)
-
-      this.logger.log(`Created content label for ${contentType}:${contentId}`)
-      return saved
-    } catch (error) {
-      this.logger.error(`Failed to create content label: ${error.message}`, error.stack)
-      throw error
-    }
-  }
-
-  async enhanceResponseWithAccessibility(
-    data: any,
-    options: {
-      includeMetadata?: boolean
-      includeLabels?: boolean
-      includeStructure?: boolean
-      includeNavigation?: boolean
-      includeForms?: boolean
-      includeMedia?: boolean
-      languageCode?: string
-    } = {},
-  ): Promise<AccessibilityResponse> {
-    const accessibility: AccessibilityResponse["accessibility"] = {}
-
-    try {
-      // Extract content IDs from response data
-      const contentIds = this.extractContentIds(data)
-
-      if (options.includeMetadata && contentIds.length > 0) {
-        const metadata = await this.metadataRepository.find({
-          where: contentIds.map((id) => ({ contentId: id })),
-        })
-        accessibility.metadata = metadata[0] // For simplicity, return first match
-      }
-
-      if (options.includeLabels && contentIds.length > 0) {
-        const labels = await this.labelRepository.find({
-          where: contentIds.map((id) => ({
-            contentId: id,
-            languageCode: options.languageCode || "en",
-          })),
-        })
-        accessibility.labels = labels
-      }
-
-      if (options.includeStructure) {
-        accessibility.structure = this.generateStructureInfo(data)
-      }
-
-      if (options.includeNavigation) {
-        accessibility.navigation = this.generateNavigationInfo(data)
-      }
-
-      if (options.includeForms) {
-        accessibility.forms = this.generateFormsInfo(data)
-      }
-
-      if (options.includeMedia) {
-        accessibility.media = this.generateMediaInfo(data)
-      }
-
-      return { data, accessibility }
-    } catch (error) {
-      this.logger.error(`Failed to enhance response with accessibility: ${error.message}`, error.stack)
-      return { data, accessibility }
-    }
-  }
-
-  async validateAccessibilityCompliance(contentId: string): Promise<{
-    isCompliant: boolean
-    level: "A" | "AA" | "AAA"
-    violations: Array<{
-      rule: string
-      severity: "low" | "medium" | "high" | "critical"
-      description: string
-      suggestion: string
-    }>
-    warnings: string[]
-  }> {
-    try {
-      const metadata = await this.getAccessibilityMetadata(contentId)
-
-      if (!metadata) {
-        return {
-          isCompliant: false,
-          level: "A",
-          violations: [
-            {
-              rule: "missing-metadata",
-              severity: "high",
-              description: "No accessibility metadata found",
-              suggestion: "Add accessibility metadata for this content",
-            },
-          ],
-          warnings: [],
-        }
-      }
-
-      const violations = []
-      const warnings = []
-
-      // Check for alt text on images
-      if (metadata.contentType === ContentType.IMAGE && !metadata.isDecorative && !metadata.altText) {
-        violations.push({
-          rule: "img-alt",
-          severity: "high" as const,
-          description: "Image missing alternative text",
-          suggestion: "Add descriptive alt text for the image",
-        })
-      }
-
-      // Check for proper heading structure
-      if (metadata.contentType === ContentType.HEADING && !metadata.headingLevel) {
-        violations.push({
-          rule: "heading-level",
-          severity: "medium" as const,
-          description: "Heading missing level information",
-          suggestion: "Specify the heading level (h1-h6)",
-        })
-      }
-
-      // Check for form labels
-      if (metadata.contentType === ContentType.FORM && !metadata.formLabels) {
-        violations.push({
-          rule: "form-labels",
-          severity: "high" as const,
-          description: "Form elements missing labels",
-          suggestion: "Add proper labels for all form elements",
-        })
-      }
-
-      // Check color contrast
-      if (metadata.colorContrast && metadata.colorContrast.ratio < 4.5) {
-        violations.push({
-          rule: "color-contrast",
-          severity: "medium" as const,
-          description: "Insufficient color contrast ratio",
-          suggestion: "Increase color contrast to meet WCAG AA standards (4.5:1)",
-        })
-      }
-
-      // Determine compliance level
-      const criticalViolations = violations.filter((v) => v.severity === "critical")
-      const highViolations = violations.filter((v) => v.severity === "high")
-      const mediumViolations = violations.filter((v) => v.severity === "medium")
-
-      let level: "A" | "AA" | "AAA" = "AAA"
-      let isCompliant = true
-
-      if (criticalViolations.length > 0 || highViolations.length > 0) {
-        level = "A"
-        isCompliant = false
-      } else if (mediumViolations.length > 0) {
-        level = "AA"
-      }
-
-      // Update metadata with validation results
-      metadata.validationStatus = isCompliant ? "valid" : "invalid"
-      metadata.validationErrors = violations.map((v) => v.description)
-      metadata.validationWarnings = warnings
-      metadata.complianceLevel = level
-
-      await this.metadataRepository.save(metadata)
-
-      return { isCompliant, level, violations, warnings }
-    } catch (error) {
-      this.logger.error(`Failed to validate accessibility compliance: ${error.message}`, error.stack)
-      throw error
-    }
-  }
-
-  private extractContentIds(data: any): string[] {
-    const ids: string[] = []
-
-    if (typeof data === "object" && data !== null) {
-      if (data.id) ids.push(data.id)
-      if (data.contentId) ids.push(data.contentId)
-
-      if (Array.isArray(data)) {
-        data.forEach((item) => {
-          ids.push(...this.extractContentIds(item))
-        })
-      } else {
-        Object.values(data).forEach((value) => {
-          if (typeof value === "object") {
-            ids.push(...this.extractContentIds(value))
+  /**
+   * Build keyboard navigation handler
+   */
+  createKeyboardNavigationHandler(handlers: {
+    onEscape?: () => void;
+    onEnter?: () => void;
+    onSpace?: () => void;
+    onArrowUp?: () => void;
+    onArrowDown?: () => void;
+    onArrowLeft?: () => void;
+    onArrowRight?: () => void;
+    onTab?: () => void;
+    onHome?: () => void;
+    onEnd?: () => void;
+  }) {
+    return (event: KeyboardEvent) => {
+      switch (event.keyCode) {
+        case KeyCode.ESCAPE:
+          if (handlers.onEscape) {
+            event.preventDefault();
+            handlers.onEscape();
           }
-        })
+          break;
+        case KeyCode.ENTER:
+          if (handlers.onEnter) {
+            event.preventDefault();
+            handlers.onEnter();
+          }
+          break;
+        case KeyCode.SPACE:
+          if (handlers.onSpace) {
+            event.preventDefault();
+            handlers.onSpace();
+          }
+          break;
+        case KeyCode.ARROW_UP:
+          if (handlers.onArrowUp) {
+            event.preventDefault();
+            handlers.onArrowUp();
+          }
+          break;
+        case KeyCode.ARROW_DOWN:
+          if (handlers.onArrowDown) {
+            event.preventDefault();
+            handlers.onArrowDown();
+          }
+          break;
+        case KeyCode.ARROW_LEFT:
+          if (handlers.onArrowLeft) {
+            event.preventDefault();
+            handlers.onArrowLeft();
+          }
+          break;
+        case KeyCode.ARROW_RIGHT:
+          if (handlers.onArrowRight) {
+            event.preventDefault();
+            handlers.onArrowRight();
+          }
+          break;
+        case KeyCode.TAB:
+          if (handlers.onTab) {
+            handlers.onTab();
+          }
+          break;
+        case KeyCode.HOME:
+          if (handlers.onHome) {
+            event.preventDefault();
+            handlers.onHome();
+          }
+          break;
+        case KeyCode.END:
+          if (handlers.onEnd) {
+            event.preventDefault();
+            handlers.onEnd();
+          }
+          break;
       }
-    }
-
-    return [...new Set(ids)] // Remove duplicates
+    };
   }
 
-  private generateStructureInfo(data: any) {
+  /**
+   * Get WCAG 2.1 AA compliance checklist
+   */
+  getWCAGComplianceChecklist() {
     return {
-      headings: this.extractHeadings(data),
-      landmarks: this.extractLandmarks(data),
-      skipLinks: this.generateSkipLinks(data),
-    }
+      level: 'AA',
+      principles: {
+        perceivable: [
+          {
+            criterion: '1.1.1',
+            name: 'Non-text Content',
+            level: 'A',
+            description: 'All non-text content has text alternatives',
+          },
+          {
+            criterion: '1.4.3',
+            name: 'Contrast (Minimum)',
+            level: 'AA',
+            description: 'Text and images of text have a contrast ratio of at least 4.5:1',
+          },
+          {
+            criterion: '1.4.5',
+            name: 'Images of Text',
+            level: 'AA',
+            description: 'Images of text are avoided except for logos',
+          },
+        ],
+        operable: [
+          {
+            criterion: '2.1.1',
+            name: 'Keyboard',
+            level: 'A',
+            description: 'All functionality available from keyboard',
+          },
+          {
+            criterion: '2.1.2',
+            name: 'No Keyboard Trap',
+            level: 'A',
+            description: 'Focus is not trapped when navigating',
+          },
+          {
+            criterion: '2.4.3',
+            name: 'Focus Order',
+            level: 'A',
+            description: 'Focus order is logical and meaningful',
+          },
+          {
+            criterion: '2.5.1',
+            name: 'Pointer Gestures',
+            level: 'A',
+            description: 'Alternatives to complex pointer gestures',
+          },
+        ],
+        understandable: [
+          {
+            criterion: '3.1.1',
+            name: 'Language of Page',
+            level: 'A',
+            description: 'Language of page is identified',
+          },
+          {
+            criterion: '3.3.1',
+            name: 'Error Identification',
+            level: 'A',
+            description: 'Errors are identified and suggestions provided',
+          },
+          {
+            criterion: '3.3.4',
+            name: 'Error Prevention (Legal, Financial, Data)',
+            level: 'AA',
+            description: 'For transactions, errors are prevented or confirmed',
+          },
+        ],
+        robust: [
+          {
+            criterion: '4.1.2',
+            name: 'Name, Role, Value',
+            level: 'A',
+            description: 'Name, role, and state of components are available',
+          },
+          {
+            criterion: '4.1.3',
+            name: 'Status Messages',
+            level: 'AA',
+            description: 'Status messages are conveyed to assistive technologies',
+          },
+        ],
+      },
+    };
   }
 
-  private generateNavigationInfo(data: any) {
+  /**
+   * Generate screen reader friendly text for common patterns
+   */
+  generateScreenReaderText(options: {
+    action?: string;
+    state?: string;
+    count?: number;
+    total?: number;
+    error?: string;
+    hint?: string;
+  }): string {
+    const parts: string[] = [];
+
+    if (options.action) parts.push(options.action);
+    if (options.state) parts.push(`State: ${options.state}`);
+    if (options.count !== undefined && options.total !== undefined) {
+      parts.push(`Item ${options.count} of ${options.total}`);
+    } else if (options.count !== undefined) {
+      parts.push(`${options.count} items`);
+    }
+    if (options.error) parts.push(`Error: ${options.error}`);
+    if (options.hint) parts.push(`Hint: ${options.hint}`);
+
+    return parts.join('. ');
+  }
+
+  /**
+   * Check if contrast ratio meets WCAG AA standards
+   */
+  checkContrastRatio(foreground: string, background: string): {
+    ratio: number;
+    meetsAA: boolean;
+    meetsAAA: boolean;
+  } {
+    const fg = this.hexToRgb(foreground);
+    const bg = this.hexToRgb(background);
+
+    const fgLuminance = this.calculateLuminance(fg);
+    const bgLuminance = this.calculateLuminance(bg);
+
+    const lighter = Math.max(fgLuminance, bgLuminance);
+    const darker = Math.min(fgLuminance, bgLuminance);
+
+    const ratio = (lighter + 0.05) / (darker + 0.05);
+
     return {
-      breadcrumbs: this.extractBreadcrumbs(data),
-      pagination: this.extractPagination(data),
-    }
+      ratio: Math.round(ratio * 100) / 100,
+      meetsAA: ratio >= 4.5,
+      meetsAAA: ratio >= 7,
+    };
   }
 
-  private generateFormsInfo(data: any) {
-    return {
-      fields: this.extractFormFields(data),
-      validation: this.extractValidationInfo(data),
-    }
+  private hexToRgb(hex: string): { r: number; g: number; b: number } {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 0, g: 0, b: 0 };
   }
 
-  private generateMediaInfo(data: any) {
-    return {
-      hasAudio: this.hasAudioContent(data),
-      hasVideo: this.hasVideoContent(data),
-      hasTranscript: this.hasTranscript(data),
-      hasCaptions: this.hasCaptions(data),
-      hasAudioDescription: this.hasAudioDescription(data),
-    }
+  private calculateLuminance(rgb: { r: number; g: number; b: number }): number {
+    const [r, g, b] = [rgb.r, rgb.g, rgb.b].map((val) => {
+      val = val / 255;
+      return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   }
 
-  private extractHeadings(data: any): Array<{ level: number; text: string; id?: string }> {
-    // Implementation would extract heading information from data
-    return []
-  }
-
-  private extractLandmarks(data: any): Array<{ role: string; label?: string }> {
-    // Implementation would extract landmark information from data
-    return []
-  }
-
-  private generateSkipLinks(data: any): Array<{ href: string; text: string }> {
-    // Implementation would generate appropriate skip links
+  /**
+   * Generate skip navigation link attributes
+   */
+  getSkipNavigationLinks() {
     return [
-      { href: "#main-content", text: "Skip to main content" },
-      { href: "#navigation", text: "Skip to navigation" },
-    ]
+      {
+        id: 'skip-to-main',
+        label: 'Skip to main content',
+        href: '#main-content',
+      },
+      {
+        id: 'skip-to-nav',
+        label: 'Skip to navigation',
+        href: '#main-nav',
+      },
+      {
+        id: 'skip-to-search',
+        label: 'Skip to search',
+        href: '#search',
+      },
+    ];
   }
 
-  private extractBreadcrumbs(data: any): Array<{ text: string; href?: string; current?: boolean }> {
-    // Implementation would extract breadcrumb information
-    return []
-  }
+  /**
+   * Generate focus trap management
+   */
+  manageFocusTrap(elements: HTMLElement[], direction: 'forward' | 'backward' = 'forward') {
+    if (elements.length === 0) return null;
 
-  private extractPagination(data: any) {
-    // Implementation would extract pagination information
-    if (data.pagination) {
-      return {
-        current: data.pagination.page || 1,
-        total: data.pagination.totalPages || 1,
-        hasNext: data.pagination.hasNext || false,
-        hasPrevious: data.pagination.hasPrevious || false,
-      }
+    if (direction === 'forward') {
+      return elements[0];
+    } else {
+      return elements[elements.length - 1];
     }
-    return null
-  }
-
-  private extractFormFields(data: any) {
-    // Implementation would extract form field information
-    return []
-  }
-
-  private extractValidationInfo(data: any) {
-    // Implementation would extract validation information
-    return {
-      hasErrors: false,
-      errorSummary: [],
-    }
-  }
-
-  private hasAudioContent(data: any): boolean {
-    // Implementation would check for audio content
-    return false
-  }
-
-  private hasVideoContent(data: any): boolean {
-    // Implementation would check for video content
-    return false
-  }
-
-  private hasTranscript(data: any): boolean {
-    // Implementation would check for transcript availability
-    return false
-  }
-
-  private hasCaptions(data: any): boolean {
-    // Implementation would check for captions availability
-    return false
-  }
-
-  private hasAudioDescription(data: any): boolean {
-    // Implementation would check for audio description availability
-    return false
   }
 }

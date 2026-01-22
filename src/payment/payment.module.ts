@@ -1,42 +1,81 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { PaymentController } from './payment.controller';
-import { PaymentService } from './payment.service';
-import { SubscriptionService } from './subscription.service';
-import { InvoiceService } from './invoice.service';
-import { PaymentAnalyticsService } from './payment-analytics.service';
-import { PaymentEntity } from './entities/payment.entity';
-import { SubscriptionEntity } from './entities/subscription.entity';
-import { InvoiceEntity } from './entities/invoice.entity';
-import { PaymentMethodEntity } from './entities/payment-method.entity';
-import { StripeService } from './stripe.service';
-import { PaymentWebhookController } from './payment-webhook.controller';
+import {
+  Payment,
+  Subscription,
+  PaymentPlan,
+  Invoice,
+  Refund,
+  Dispute,
+  TaxRate,
+  FinancialReport,
+  PaymentMethodEntity,
+} from './entities';
+import {
+  PaymentService,
+  StripeService,
+  PayPalService,
+  SubscriptionService,
+  InvoiceService,
+  FinancialReportingService,
+  TaxCalculationService,
+  DisputeService,
+  PaymentPlanService,
+} from './services';
+import {
+  PaymentController,
+  SubscriptionController,
+  InvoiceController,
+  TaxController,
+  FinancialReportController,
+  DisputeController,
+  WebhookController,
+} from './controllers';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      PaymentEntity,
-      SubscriptionEntity,
-      InvoiceEntity,
+      Payment,
+      Subscription,
+      PaymentPlan,
+      Invoice,
+      Refund,
+      Dispute,
+      TaxRate,
+      FinancialReport,
       PaymentMethodEntity,
     ]),
-    ConfigModule,
   ],
-  controllers: [PaymentController, PaymentWebhookController],
   providers: [
     PaymentService,
+    StripeService,
+    PayPalService,
     SubscriptionService,
     InvoiceService,
-    PaymentAnalyticsService,
-    StripeService,
+    FinancialReportingService,
+    TaxCalculationService,
+    DisputeService,
+    PaymentPlanService,
+  ],
+  controllers: [
+    PaymentController,
+    SubscriptionController,
+    InvoiceController,
+    TaxController,
+    FinancialReportController,
+    DisputeController,
+    WebhookController,
   ],
   exports: [
     PaymentService,
+    StripeService,
+    PayPalService,
     SubscriptionService,
     InvoiceService,
-    PaymentAnalyticsService,
-    StripeService,
+    FinancialReportingService,
+    TaxCalculationService,
+    DisputeService,
+    PaymentPlanService,
   ],
 })
-export class PaymentModule {} 
+export class PaymentModule {}

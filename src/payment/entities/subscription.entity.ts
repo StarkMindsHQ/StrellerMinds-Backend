@@ -2,135 +2,115 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
-import { PaymentEntity } from './payment.entity';
-
-export enum SubscriptionStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  CANCELLED = 'cancelled',
-  PAST_DUE = 'past_due',
-  UNPAID = 'unpaid',
-  TRIAL = 'trial',
-}
-
-export enum SubscriptionPlan {
-  BASIC = 'basic',
-  PREMIUM = 'premium',
-  ENTERPRISE = 'enterprise',
-  STUDENT = 'student',
-}
-
-export enum BillingCycle {
-  MONTHLY = 'monthly',
-  QUARTERLY = 'quarterly',
-  YEARLY = 'yearly',
-}
+import { User } from '../../auth/entities/user.entity';
+import { SubscriptionStatus, BillingCycle } from '../enums';
 
 @Entity('subscriptions')
-export class SubscriptionEntity {
+export class Subscription {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column('uuid')
   userId: string;
 
-  @Column()
-  stripeSubscriptionId: string;
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
-  @Column()
-  stripeCustomerId: string;
+  @Column('uuid')
+  paymentPlanId: string;
 
-  @Column({
-    type: 'enum',
+  @ManyToOne(() => PaymentPlan, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'paymentPlanId' })
+  paymentPlan: PaymentPlan;
+
+  @Column('enum', {
     enum: SubscriptionStatus,
-    default: SubscriptionStatus.INACTIVE,
+    default: SubscriptionStatus.PENDING,
   })
   status: SubscriptionStatus;
 
-  @Column({
-    type: 'enum',
-    enum: SubscriptionPlan,
-  })
-  plan: SubscriptionPlan;
-
-  @Column({
-    type: 'enum',
-    enum: BillingCycle,
-  })
+  @Column('enum', { enum: BillingCycle })
   billingCycle: BillingCycle;
 
-  @Column()
-  amount: number; // Amount in cents
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  currentAmount: number;
 
-  @Column()
-  currency: string;
+  @Column('varchar', { nullable: true })
+  externalSubscriptionId: string;
 
-  @Column()
-  currentPeriodStart: Date;
+  @Column('timestamp')
+  startDate: Date;
 
-  @Column()
-  currentPeriodEnd: Date;
-
-  @Column({ nullable: true })
-  trialStart: Date;
-
-  @Column({ nullable: true })
-  trialEnd: Date;
-
-  @Column({ nullable: true })
-  cancelledAt: Date;
-
-  @Column({ nullable: true })
-  cancelAtPeriodEnd: boolean;
-
-  @Column({ nullable: true })
-  cancelReason: string;
-
-  @Column({ type: 'jsonb', nullable: true })
-  features: Record<string, any>;
-
-  @Column({ type: 'jsonb', nullable: true })
-  metadata: Record<string, any>;
-
-  @Column({ nullable: true })
-  couponCode: string;
-
-  @Column({ nullable: true })
-  discountAmount: number;
-
-  @Column({ nullable: true })
-  taxAmount: number;
-
-  @Column({ nullable: true })
+  @Column('timestamp', { nullable: true })
   nextBillingDate: Date;
 
-  @Column({ nullable: true })
-  lastPaymentDate: Date;
+  @Column('timestamp', { nullable: true })
+  endDate: Date;
 
-  @Column({ nullable: true })
-  failedPaymentAttempts: number;
+  @Column('timestamp', { nullable: true })
+  cancelledAt: Date;
 
-  @Column({ nullable: true })
-  maxFailedAttempts: number;
+  @Column('varchar', { nullable: true })
+  cancellationReason: string;
+
+  @Column('int', { default: 0 })
+  failedPaymentCount: number;
+
+  @Column('json', { nullable: true })
+  metadata: Record<string, any>;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+}
 
-  // Relations
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'userId' })
-  user: User;
+@Entity('payment_plans')
+export class PaymentPlan {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @OneToMany(() => PaymentEntity, (payment) => payment.subscription)
-  payments: PaymentEntity[];
-} 
+  @Column('varchar')
+  name: string;
+
+  @Column('text', { nullable: true })
+  description: string;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  price: number;
+
+  @Column('varchar', { default: 'USD' })
+  currency: string;
+
+  @Column('enum', { enum: BillingCycle, default: BillingCycle.MONTHLY })
+  billingCycle: BillingCycle;
+
+  @Column('int', { nullable: true })
+  trialDays: number;
+
+  @Column('int', { nullable: true })
+  maxSubscribers: number;
+
+  @Column('boolean', { default: true })
+  isActive: boolean;
+
+  @Column('json', { nullable: true })
+  features: string[];
+
+  @Column('json', { nullable: true })
+  metadata: Record<string, any>;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

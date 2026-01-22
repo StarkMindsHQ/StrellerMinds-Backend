@@ -1,22 +1,48 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+export enum RewardType {
+  CERTIFICATE = 'certificate',
+  VIRTUAL_ITEM = 'virtual_item',
+  DISCOUNT = 'discount',
+  ACCESS_CODE = 'access_code',
+  OTHER = 'other',
+}
 
 @Entity('rewards')
 export class Reward {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ unique: true })
-  name: string;
-
-  @Column('text')
-  description: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  type: string; 
+  name: string;
 
-  @Column('int')
-  value: number;
+  @Column({ type: 'text' })
+  description: string;
 
-  @CreateDateColumn()
+  @Column({ type: 'enum', enum: RewardType })
+  type: RewardType;
+
+  @Column({ default: 0 })
+  cost: number; // Cost in virtual currency
+
+  @Column({ nullable: true })
+  image: string;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  expiresAt: Date;
+
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
-} 
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+}

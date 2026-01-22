@@ -1,87 +1,82 @@
-/**
- * AuthModule provides authentication and authorization features.
- *
- * @module Auth
- */
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UsersModule } from '../users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
-import { AuthToken } from './entities/auth-token.entity';
-import { RefreshToken } from './entities/refresh-token.entity';
-import { EmailModule } from 'src/email/email.module';
-import { PasswordValidationService } from './password-validation.service';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { RolesGuard } from './guards/roles.guard';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
 
-import { JwtLocalStrategy } from './strategies/jwt-local.strategy';
-import { IAuthStrategy } from './strategies/auth-strategy.interface';
-import { GoogleOAuthAdapter } from './adapters/google.strategy.adapter';
-import { FacebookOAuthAdapter } from './adapters/facebook.strategy.adapter';
-import { AppleOAuthAdapter } from './adapters/apple.strategy.adapter';
-import { SharedModule } from '../shared/shared.module';
+import { AuthController } from './controllers/auth.controller';
+import { AuthService } from './services/auth.service';
+import { BcryptService } from './services/bcrypt.service';
+import { JwtService } from './services/jwt.service';
+import { User } from './entities/user.entity';
+import { RefreshToken } from './entities/refresh-token.entity';
+import { JwtAuthGuard, RolesGuard, OptionalJwtAuthGuard } from './guards/auth.guard';
+import { ResponseInterceptor } from './interceptors/response.interceptor';
+import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './middleware/auth.middleware';
 
 @Module({
   imports: [
-    EmailModule,
-    UsersModule, // This imports the UsersModule which exports UsersService
-    PassportModule,
-    TypeOrmModule.forFeature([AuthToken, RefreshToken]),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env.local', '.env'],
+    }),
+    TypeOrmModule.forFeature([User, RefreshToken]),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+      useFactory: async () => ({
+        secret: process.env.JWT_SECRET,
         signOptions: {
-          expiresIn: '1h',
+          expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+        },
+      }),
+      global: true,
+    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 1 minute
+        limit: 10, // 10 requests per minute
+      },
+      {
+        ttl: 3600000, // 1 hour
+        limit: 100, // 100 requests per hour
+      },
+    ]),
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: {
+          host: process.env.SMTP_HOST || 'localhost',
+          port: parseInt(process.env.SMTP_PORT || '587'),
+          secure: process.env.SMTP_SECURE === 'true',
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        },
+        defaults: {
+          from: process.env.SMTP_FROM || 'noreply@strellerminds.com',
+        },
+        template: {
+          dir: join(__dirname, 'templates'),
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
         },
       }),
     }),
-    SharedModule,
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
-    JwtStrategy,
-    PasswordValidationService,
-    JwtLocalStrategy,
-    GoogleOAuthAdapter,
-    FacebookOAuthAdapter,
-    AppleOAuthAdapter,
-    {
-      provide: 'AUTH_STRATEGY',
-      useExisting: JwtLocalStrategy, // Use the JwtLocalStrategy as the default auth strategy
-    },
-    {
-      provide: 'AUTH_STRATEGIES',
-      useFactory: (
-        jwtLocalStrategy: JwtLocalStrategy,
-        google: GoogleOAuthAdapter,
-        facebook: FacebookOAuthAdapter,
-        apple: AppleOAuthAdapter,
-      ): IAuthStrategy[] => [jwtLocalStrategy, google, facebook, apple],
-      inject: [
-        JwtLocalStrategy,
-        GoogleOAuthAdapter,
-        FacebookOAuthAdapter,
-        AppleOAuthAdapter,
-      ],
-    },
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    BcryptService,
+    JwtService,
+    JwtAuthGuard,
+    RolesGuard,
+    OptionalJwtAuthGuard,
+    ResponseInterceptor,
   ],
-  exports: [AuthService],
+  exports: [AuthService, BcryptService, JwtService, JwtAuthGuard, RolesGuard, EmailService],
 })
 export class AuthModule {}

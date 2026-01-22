@@ -2,134 +2,80 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { PaymentEntity } from './payment.entity';
-
-export enum InvoiceStatus {
-  DRAFT = 'draft',
-  OPEN = 'open',
-  PAID = 'paid',
-  VOID = 'void',
-  UNCOLLECTIBLE = 'uncollectible',
-}
-
-export enum InvoiceType {
-  INVOICE = 'invoice',
-  CREDIT_NOTE = 'credit_note',
-  DEBIT_NOTE = 'debit_note',
-}
+import { User } from '../../auth/entities/user.entity';
+import { InvoiceStatus } from '../enums';
 
 @Entity('invoices')
-export class InvoiceEntity {
+export class Invoice {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  paymentId: string;
-
-  @Column()
-  stripeInvoiceId: string;
-
-  @Column()
+  @Column('varchar', { unique: true })
   invoiceNumber: string;
 
-  @Column({
-    type: 'enum',
+  @Column('uuid')
+  userId: string;
+
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column('varchar', { nullable: true })
+  subscriptionId: string;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  subtotal: number;
+
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  tax: number;
+
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  discount: number;
+
+  @Column('decimal', { precision: 10, scale: 2 })
+  total: number;
+
+  @Column('varchar', { default: 'USD' })
+  currency: string;
+
+  @Column('enum', {
     enum: InvoiceStatus,
     default: InvoiceStatus.DRAFT,
   })
   status: InvoiceStatus;
 
-  @Column({
-    type: 'enum',
-    enum: InvoiceType,
-    default: InvoiceType.INVOICE,
-  })
-  type: InvoiceType;
+  @Column('timestamp')
+  dueDate: Date;
 
-  @Column()
-  amount: number; // Amount in cents
+  @Column('timestamp', { nullable: true })
+  paidAt: Date;
 
-  @Column()
-  currency: string;
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  amountPaid: number;
 
-  @Column({ nullable: true })
-  taxAmount: number;
+  @Column('text', { nullable: true })
+  notes: string;
 
-  @Column({ nullable: true })
-  discountAmount: number;
-
-  @Column({ nullable: true })
-  subtotal: number;
-
-  @Column({ nullable: true })
-  total: number;
-
-  @Column({ nullable: true })
-  description: string;
-
-  @Column({ type: 'jsonb', nullable: true })
+  @Column('json', { nullable: true })
   lineItems: Array<{
     description: string;
     quantity: number;
-    unitAmount: number;
-    totalAmount: number;
+    unitPrice: number;
+    total: number;
   }>;
 
-  @Column({ nullable: true })
-  customerEmail: string;
-
-  @Column({ nullable: true })
-  customerName: string;
-
-  @Column({ nullable: true })
-  billingAddress: string;
-
-  @Column({ nullable: true })
-  shippingAddress: string;
-
-  @Column({ nullable: true })
-  dueDate: Date;
-
-  @Column({ nullable: true })
-  paidAt: Date;
-
-  @Column({ nullable: true })
-  voidedAt: Date;
-
-  @Column({ nullable: true })
-  voidReason: string;
-
-  @Column({ type: 'jsonb', nullable: true })
+  @Column('json', { nullable: true })
   metadata: Record<string, any>;
-
-  @Column({ nullable: true })
-  notes: string;
-
-  @Column({ nullable: true })
-  terms: string;
-
-  @Column({ nullable: true })
-  footer: string;
-
-  @Column({ nullable: true })
-  pdfUrl: string;
-
-  @Column({ nullable: true })
-  hostedInvoiceUrl: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  // Relations
-  @ManyToOne(() => PaymentEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'paymentId' })
-  payment: PaymentEntity;
-} 
+}

@@ -1,184 +1,197 @@
-import { Injectable, Logger } from "@nestjs/common"
-import type { I18nService as NestI18nService } from "nestjs-i18n"
-import type { Repository } from "typeorm"
+import { Injectable } from '@nestjs/common';
+import { join } from 'path';
+import * as fs from 'fs';
 
-import type { Translation } from "../entities/translation.entity"
-import type { LocaleMetadata } from "../entities/locale-metadata.entity"
-import type { TranslationService } from "./translation.service"
-import type { LocaleService } from "./locale.service"
-
-export interface TranslationOptions {
-  locale?: string
-  fallback?: string
-  args?: Record<string, any>
-  defaultValue?: string
-  namespace?: string
-}
-
-export interface LocalizedResponse<T = any> {
-  data: T
-  locale: string
-  fallbackUsed?: boolean
-  translations?: Record<string, string>
-}
+/**
+ * Supported languages in the system
+ * Extended to support 15+ languages for global accessibility
+ */
+export const SUPPORTED_LANGUAGES = {
+  en: { name: 'English', rtl: false, region: 'US' },
+  es: { name: 'Español', rtl: false, region: 'ES' },
+  fr: { name: 'Français', rtl: false, region: 'FR' },
+  de: { name: 'Deutsch', rtl: false, region: 'DE' },
+  it: { name: 'Italiano', rtl: false, region: 'IT' },
+  pt: { name: 'Português', rtl: false, region: 'PT' },
+  ru: { name: 'Русский', rtl: false, region: 'RU' },
+  ja: { name: '日本語', rtl: false, region: 'JP' },
+  zh: { name: '中文', rtl: false, region: 'CN' },
+  ko: { name: '한국어', rtl: false, region: 'KR' },
+  ar: { name: 'العربية', rtl: true, region: 'SA' },
+  hi: { name: 'हिन्दी', rtl: false, region: 'IN' },
+  th: { name: 'ไทย', rtl: false, region: 'TH' },
+  vi: { name: 'Tiếng Việt', rtl: false, region: 'VN' },
+  tr: { name: 'Türkçe', rtl: false, region: 'TR' },
+};
 
 @Injectable()
 export class I18nService {
-  private readonly logger = new Logger(I18nService.name)
+  private translations: Map<string, any> = new Map();
+  private defaultLanguage = 'en';
 
-  constructor(
-    private readonly nestI18nService: NestI18nService,
-    private readonly translationRepository: Repository<Translation>,
-    private readonly translationService: TranslationService,
-    private readonly localeService: LocaleService,
-  ) {}
+  constructor() {
+    this.loadTranslations();
+  }
 
-  async translate(key: string, options: TranslationOptions = {}): Promise<string> {
-    const { locale = "en", fallback = "en", args, defaultValue, namespace = "common" } = options
+  /**
+   * Load all translation files
+   */
+  private loadTranslations(): void {
+    const translationsPath = join(__dirname, '../translations');
 
-    try {
-      // Try to get translation from database first
-      const dbTranslation = await this.getTranslationFromDb(key, locale, namespace)
-      if (dbTranslation) {
-        return this.interpolateTranslation(dbTranslation.value, args)
+    if (!fs.existsSync(translationsPath)) {
+      console.warn(`Translations directory not found at ${translationsPath}`);
+      return;
+    }
+
+    for (const lang of Object.keys(SUPPORTED_LANGUAGES)) {
+      const filePath = join(translationsPath, `${lang}.json`);
+      try {
+        if (fs.existsSync(filePath)) {
+          const content = fs.readFileSync(filePath, 'utf-8');
+          this.translations.set(lang, JSON.parse(content));
+        }
+      } catch (error) {
+        console.error(`Failed to load translation for language ${lang}:`, error);
       }
+    }
+  }
 
-      // Fallback to file-based translations
-      const fileTranslation = await this.nestI18nService.translate(`${namespace}.${key}`, {
-        lang: locale,
-        args,
-        defaultValue,
+  /**
+   * Get translated text for a given key and language
+   * @param key Translation key (dot notation supported: "common.welcome")
+   * @param language Language code
+   * @param params Optional parameters for interpolation
+   */
+  translate(
+    key: string,
+    language: string = this.defaultLanguage,
+    params?: Record<string, any>,
+  ): string {
+    // Normalize language code
+    const normalizedLang = this.normalizeLanguageCode(language);
+
+    // Fallback to default language if translation not found
+    let translations = this.translations.get(normalizedLang);
+    if (!translations) {
+      translations = this.translations.get(this.defaultLanguage);
+    }
+
+    // Navigate through nested keys
+    let value = translations;
+    for (const part of key.split('.')) {
+      value = value?.[part];
+    }
+
+    if (!value) {
+      console.warn(`Translation key not found: ${key} for language ${normalizedLang}`);
+      return key;
+    }
+
+    // Interpolate parameters if provided
+    if (params) {
+      return this.interpolate(value, params);
+    }
+
+    return value;
+  }
+
+  /**
+   * Get multiple translations at once
+   */
+  translateMultiple(
+    keys: string[],
+    language: string = this.defaultLanguage,
+  ): Record<string, string> {
+    const result: Record<string, string> = {};
+    for (const key of keys) {
+      result[key] = this.translate(key, language);
+    }
+    return result;
+  }
+
+  /**
+   * Interpolate parameters into translation string
+   */
+  private interpolate(text: string, params: Record<string, any>): string {
+    let result = text;
+    for (const [key, value] of Object.entries(params)) {
+      result = result.replace(new RegExp(`{{\\s*${key}\\s*}}`, 'g'), String(value));
+    }
+    return result;
+  }
+
+  /**
+   * Normalize language code (e.g., en-US -> en)
+   */
+  normalizeLanguageCode(language: string): string {
+    const base = language.split('-')[0].toLowerCase();
+    return Object.keys(SUPPORTED_LANGUAGES).includes(base) ? base : this.defaultLanguage;
+  }
+
+  /**
+   * Get all supported languages
+   */
+  getSupportedLanguages(): typeof SUPPORTED_LANGUAGES {
+    return SUPPORTED_LANGUAGES;
+  }
+
+  /**
+   * Check if language is RTL
+   */
+  isRTL(language: string): boolean {
+    const normalized = this.normalizeLanguageCode(language);
+    return SUPPORTED_LANGUAGES[normalized]?.rtl ?? false;
+  }
+
+  /**
+   * Get language metadata
+   */
+  getLanguageMetadata(language: string) {
+    const normalized = this.normalizeLanguageCode(language);
+    return {
+      code: normalized,
+      ...SUPPORTED_LANGUAGES[normalized],
+    };
+  }
+
+  /**
+   * Set default language
+   */
+  setDefaultLanguage(language: string): void {
+    const normalized = this.normalizeLanguageCode(language);
+    if (Object.keys(SUPPORTED_LANGUAGES).includes(normalized)) {
+      this.defaultLanguage = normalized;
+    }
+  }
+
+  /**
+   * Detect language from Accept-Language header
+   */
+  detectLanguageFromHeader(acceptLanguageHeader: string): string {
+    if (!acceptLanguageHeader) {
+      return this.defaultLanguage;
+    }
+
+    // Parse Accept-Language header (e.g., "en-US,en;q=0.9,fr;q=0.8")
+    const languages = acceptLanguageHeader
+      .split(',')
+      .map((lang) => {
+        const [code, q] = lang.split(';');
+        return {
+          code: code.trim(),
+          quality: q ? parseFloat(q.split('=')[1]) : 1,
+        };
       })
+      .sort((a, b) => b.quality - a.quality);
 
-      if (fileTranslation && fileTranslation !== key) {
-        return fileTranslation
-      }
-
-      // Try fallback locale
-      if (locale !== fallback) {
-        return this.translate(key, { ...options, locale: fallback })
-      }
-
-      // Return default value or key
-      return defaultValue || key
-    } catch (error) {
-      this.logger.error(`Translation error for key ${key}:`, error)
-      return defaultValue || key
-    }
-  }
-
-  async translateMultiple(keys: string[], options: TranslationOptions = {}): Promise<Record<string, string>> {
-    const translations: Record<string, string> = {}
-
-    await Promise.all(
-      keys.map(async (key) => {
-        translations[key] = await this.translate(key, options)
-      }),
-    )
-
-    return translations
-  }
-
-  async localizeResponse<T>(data: T, locale: string, translationKeys?: string[]): Promise<LocalizedResponse<T>> {
-    const response: LocalizedResponse<T> = {
-      data,
-      locale,
-    }
-
-    if (translationKeys && translationKeys.length > 0) {
-      response.translations = await this.translateMultiple(translationKeys, { locale })
-    }
-
-    return response
-  }
-
-  async getUserLocale(userId: string): Promise<string> {
-    return this.localeService.getUserLocale(userId)
-  }
-
-  async setUserLocale(userId: string, locale: string): Promise<void> {
-    await this.localeService.setUserLocale(userId, locale)
-  }
-
-  async getSupportedLocales(): Promise<LocaleMetadata[]> {
-    return this.localeService.getSupportedLocales()
-  }
-
-  async detectLocaleFromRequest(request: any): Promise<string> {
-    // Check query parameter
-    if (request.query?.lang) {
-      return request.query.lang
-    }
-
-    // Check custom header
-    if (request.headers?.["x-custom-lang"]) {
-      return request.headers["x-custom-lang"]
-    }
-
-    // Check Accept-Language header
-    if (request.headers?.["accept-language"]) {
-      const acceptedLanguages = request.headers["accept-language"]
-        .split(",")
-        .map((lang: string) => lang.split(";")[0].trim())
-
-      const supportedLocales = await this.getSupportedLocales()
-      const supportedCodes = supportedLocales.map((locale) => locale.code)
-
-      for (const lang of acceptedLanguages) {
-        if (supportedCodes.includes(lang)) {
-          return lang
-        }
-
-        // Try language code without country
-        const langCode = lang.split("-")[0]
-        const matchingLocale = supportedCodes.find((code) => code.startsWith(langCode))
-        if (matchingLocale) {
-          return matchingLocale
-        }
+    for (const { code } of languages) {
+      const normalized = this.normalizeLanguageCode(code);
+      if (Object.keys(SUPPORTED_LANGUAGES).includes(normalized)) {
+        return normalized;
       }
     }
 
-    return "en" // Default fallback
-  }
-
-  private async getTranslationFromDb(key: string, locale: string, namespace: string): Promise<Translation | null> {
-    return this.translationRepository.findOne({
-      where: {
-        key,
-        locale,
-        namespace,
-        status: "published",
-      },
-    })
-  }
-
-  private interpolateTranslation(template: string, args?: Record<string, any>): string {
-    if (!args) return template
-
-    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-      return args[key] !== undefined ? String(args[key]) : match
-    })
-  }
-
-  async getNamespaceTranslations(namespace: string, locale: string): Promise<Record<string, string>> {
-    const translations = await this.translationRepository.find({
-      where: {
-        namespace,
-        locale,
-        status: "published",
-      },
-    })
-
-    const result: Record<string, string> = {}
-    for (const translation of translations) {
-      result[translation.key] = translation.value
-    }
-
-    return result
-  }
-
-  async invalidateCache(locale?: string, namespace?: string): Promise<void> {
-    // Implementation for cache invalidation
-    this.logger.log(`Cache invalidated for locale: ${locale}, namespace: ${namespace}`)
+    return this.defaultLanguage;
   }
 }

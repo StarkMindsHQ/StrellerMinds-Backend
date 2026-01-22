@@ -1,150 +1,186 @@
-/**
- * FilesService provides logic for file management (upload, download, etc.).
- */
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, ForbiddenException, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { FileEntity } from './entities/file.entity';
+import { ImageProcessor } from './processors/image.processor';
+import { VideoProcessor } from './processors/video.processor';
+import { VirusScanService } from './virus-scan.service';
+import { StorageProvider } from './storage/storage.interface';
+import { v4 as uuid } from 'uuid';
+import type { File } from 'multer';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
-import * as crypto from 'crypto';
-import ffmpeg from 'fluent-ffmpeg';
-import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { RedisService } from '../shared/services/redis.service';
+
 
 @Injectable()
 export class FilesService {
-  private readonly tempDir = path.join(process.cwd(), 'uploads', 'tmp');
+  private readonly logger = new Logger(FilesService.name);
 
   constructor(
-    private readonly cloudinaryService: CloudinaryService,
-    private readonly redisService: RedisService,
-  ) {
-    if (!fs.existsSync(this.tempDir)) {
-      fs.mkdirSync(this.tempDir, { recursive: true });
-    }
-  }
+    @InjectRepository(FileEntity)
+    private readonly repo: Repository<FileEntity>,
+    private readonly imageProcessor: ImageProcessor,
+    private readonly videoProcessor: VideoProcessor,
+    private readonly virusScanService: VirusScanService,
+    @Inject('StorageProvider')
+    private readonly storage: StorageProvider,
+  ) {}
 
-  async saveChunk(
-    uploadId: string,
-    chunkIndex: number,
-    file: Express.Multer.File,
-  ) {
-    const chunkDir = path.join(this.tempDir, uploadId);
-    if (!fs.existsSync(chunkDir)) {
-      fs.mkdirSync(chunkDir, { recursive: true });
-    }
-    const chunkPath = path.join(chunkDir, `${chunkIndex}`);
-    await fs.promises.writeFile(chunkPath, file.buffer);
-  }
-
-  /**
-   * Assembles file chunks, compresses if video, uploads to Cloudinary, and returns the CDN URL.
-   * @returns The Cloudinary CDN URL for the uploaded file
-   */
-  async assembleChunks(
-    uploadId: string,
-    fileName: string,
-    totalChunks: number,
-  ): Promise<string> {
-    const chunkDir = path.join(this.tempDir, uploadId);
-    const finalPath = path.join(process.cwd(), 'uploads', fileName);
-    const writeStream = fs.createWriteStream(finalPath);
-    for (let i = 0; i < totalChunks; i++) {
-      const chunkPath = path.join(chunkDir, `${i}`);
-      const data = await fs.promises.readFile(chunkPath);
-      writeStream.write(data);
-    }
-    writeStream.end();
-
-    // Wait for the write stream to finish
-    await new Promise<void>((resolve) =>
-      writeStream.on('finish', () => resolve()),
-    );
-
-    // Cleanup chunks
-    const files = await fs.promises.readdir(chunkDir);
-    for (const file of files) {
-      await fs.promises.unlink(path.join(chunkDir, file));
-    }
-    await fs.promises.rmdir(chunkDir);
-
-    // Calculate file hash for deduplication
-    const fileBuffer = await fs.promises.readFile(finalPath);
-    const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
-    const redisKey = `filehash:${hash}`;
-    const existingUrl = await this.redisService.get(redisKey);
-    if (existingUrl) {
-      // Remove the just-assembled file since it's a duplicate
-      await fs.promises.unlink(finalPath);
-      return existingUrl;
+  async upload(file: File, ownerId: string) {
+    // 1. Virus Scan
+    const scanResult = await this.virusScanService.scanBuffer(file.buffer);
+    if (scanResult === 'infected') {
+      throw new BadRequestException('File is infected with a virus');
     }
 
-    // If video, compress
-    if (this.isVideoFile(fileName)) {
-      await this.compressVideo(finalPath);
+    const type = this.detectType(file.mimetype);
+    const fileId = uuid();
+    const path = `${ownerId}/${fileId}-${file.originalname}`;
+
+    // 2. Upload to Storage
+    await this.storage.upload(file.buffer, path, file.mimetype);
+
+    let thumbnailPath: string = null;
+
+    // 3. Process File (Thumbnail)
+    try {
+      if (type === 'image') {
+        thumbnailPath = await this.imageProcessor.process(file, ownerId);
+      } else if (type === 'video') {
+        // Await here to ensure thumbnail is ready, or move to background
+        thumbnailPath = await this.videoProcessor.process(file, ownerId);
+      }
+    } catch (e) {
+      this.logger.error('Thumbnail generation failed', e);
+      // Continue without thumbnail
     }
 
-    // Upload to Cloudinary and return the CDN URL
-    const uploadResult =
-      await this.cloudinaryService.uploadVideoFromPath(finalPath);
-    // Store hash-to-url mapping in Redis (no expiration)
-    await this.redisService.set(redisKey, uploadResult.secure_url);
-    return uploadResult.secure_url;
-  }
-
-  /**
-   * Checks if a file is a video based on its extension.
-   * @param fileName The file name to check
-   */
-  private isVideoFile(fileName: string): boolean {
-    const videoExtensions = ['.mp4', '.mov', '.avi', '.mkv', '.webm'];
-    return videoExtensions.includes(path.extname(fileName).toLowerCase());
-  }
-
-  /**
-   * Compresses a video file using ffmpeg and replaces the original with the compressed version.
-   * @param filePath The path to the video file
-   */
-  private compressVideo(filePath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const tempCompressed = filePath + '.compressed.mp4';
-      ffmpeg(filePath)
-        .outputOptions([
-          '-vcodec libx264',
-          '-crf 28', // Adjust CRF for desired quality/size
-          '-preset fast',
-          '-acodec aac',
-          '-b:a 128k',
-        ])
-        .on('end', async () => {
-          try {
-            await fs.promises.rename(tempCompressed, filePath);
-            resolve();
-          } catch (err) {
-            reject(err);
-          }
-        })
-        .on('error', (err) => {
-          reject(err);
-        })
-        .save(tempCompressed);
+    const entity = this.repo.create({
+      id: fileId,
+      ownerId,
+      type,
+      mimeType: file.mimetype,
+      size: file.size,
+      path,
+      thumbnailPath,
+      virusScanStatus: 'clean',
+      sharedWith: [],
+      isPublic: false,
     });
+
+    return this.repo.save(entity);
   }
-  /**
-   * Returns the upload progress for a given uploadId.
-   * Lists which chunks have been received so far.
-   */
-  async getUploadProgress(uploadId: string, totalChunks?: number) {
-    const chunkDir = path.join(this.tempDir, uploadId);
-    let receivedChunks: number[] = [];
-    if (fs.existsSync(chunkDir)) {
-      const files = await fs.promises.readdir(chunkDir);
-      receivedChunks = files
-        .map((f) => parseInt(f, 10))
-        .filter((n) => !isNaN(n));
+
+  async getFile(id: string, userId: string) {
+    const file = await this.repo.findOne({ where: { id } });
+    if (!file) throw new NotFoundException();
+
+    // Permission Check
+    const isOwner = file.ownerId === userId;
+    const isShared = file.sharedWith && file.sharedWith.includes(userId);
+    const isPublic = file.isPublic;
+
+    if (!isOwner && !isShared && !isPublic) {
+      throw new ForbiddenException('You do not have access to this file');
     }
+
     return {
-      uploadId,
-      receivedChunks,
-      totalChunks,
+      ...file,
+      url: this.storage.getPublicUrl(file.path),
+      thumbnailUrl: file.thumbnailPath
+        ? this.storage.getPublicUrl(file.thumbnailPath)
+        : null,
     };
+  }
+
+  async deleteFile(id: string, userId: string) {
+    const file = await this.repo.findOne({ where: { id } });
+    if (!file) throw new NotFoundException();
+
+    if (file.ownerId !== userId) {
+      throw new ForbiddenException();
+    }
+
+    await this.storage.delete(file.path);
+    if (file.thumbnailPath) {
+        await this.storage.delete(file.thumbnailPath);
+    }
+    await this.repo.delete(id);
+
+    return { message: 'File deleted successfully' };
+  }
+
+  async shareFile(id: string, ownerId: string, targetUserId: string) {
+    const file = await this.repo.findOne({ where: { id } });
+    if (!file) throw new NotFoundException();
+    if (file.ownerId !== ownerId) throw new ForbiddenException();
+
+    if (!file.sharedWith) file.sharedWith = [];
+    if (!file.sharedWith.includes(targetUserId)) {
+      file.sharedWith.push(targetUserId);
+      await this.repo.save(file);
+    }
+    return file;
+  }
+
+  async setPublic(id: string, ownerId: string, isPublic: boolean) {
+    const file = await this.repo.findOne({ where: { id } });
+    if (!file) throw new NotFoundException();
+    if (file.ownerId !== ownerId) throw new ForbiddenException();
+
+    file.isPublic = isPublic;
+    return this.repo.save(file);
+  }
+
+  async uploadChunk(file: File, uploadId: string, chunkIndex: number) {
+    const tempDir = path.join(os.tmpdir(), 'uploads', uploadId);
+    await fs.promises.mkdir(tempDir, { recursive: true });
+    
+    await fs.promises.writeFile(path.join(tempDir, chunkIndex.toString()), file.buffer);
+    return { message: 'Chunk uploaded' };
+  }
+
+  async assembleUpload(uploadId: string, totalChunks: number, originalname: string, mimetype: string, ownerId: string) {
+    const tempDir = path.join(os.tmpdir(), 'uploads', uploadId);
+    
+    // Check if all chunks exist
+    for (let i = 0; i < totalChunks; i++) {
+        if (!fs.existsSync(path.join(tempDir, i.toString()))) {
+            throw new BadRequestException(`Missing chunk ${i}`);
+        }
+    }
+
+    const buffers: Buffer[] = [];
+    for (let i = 0; i < totalChunks; i++) {
+        const buffer = await fs.promises.readFile(path.join(tempDir, i.toString()));
+        buffers.push(buffer);
+    }
+    
+    const combinedBuffer = Buffer.concat(buffers);
+    
+    // Clean up
+    await fs.promises.rm(tempDir, { recursive: true, force: true });
+    
+    const fakeFile: File = {
+        fieldname: 'file',
+        originalname,
+        encoding: '7bit',
+        mimetype,
+        buffer: combinedBuffer,
+        size: combinedBuffer.length,
+        stream: null,
+        destination: '',
+        filename: originalname,
+        path: ''
+    };
+    
+    return this.upload(fakeFile, ownerId);
+  }
+
+  private detectType(mime: string): 'image' | 'video' | 'document' {
+    if (mime.startsWith('image')) return 'image';
+    if (mime.startsWith('video')) return 'video';
+    return 'document';
   }
 }

@@ -1,93 +1,82 @@
-
-/**
- * FilesController handles endpoints for file management (upload, download, etc.).
- *
- * @module Files
- */
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
   Controller,
   Post,
-  UploadedFile,
-  Body,
   UseInterceptors,
+  UploadedFile,
   Req,
-  HttpException,
-  HttpStatus,
+  Get,
+  Param,
+  Delete,
+  Body,
+  Put,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
-import { UploadChunkDto } from './dto/upload-chunk.dto';
-import { CompleteUploadDto } from './dto/complete-upload.dto';
-import { UploadProgressDto } from './dto/upload-progress.dto';
-import { FileRateLimit } from '../common/decorators/rate-limit.decorator';
+import type { File } from 'multer';
 
-@ApiTags('Files')
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  // Endpoint to receive a file chunk
-  @FileRateLimit.chunkUpload()
-  @Post('upload/chunk')
-  @UseInterceptors(FileInterceptor('chunk'))
-  @ApiOperation({ summary: 'Upload file chunk' })
-  @ApiResponse({ status: 200, description: 'Chunk uploaded successfully' })
-  @ApiResponse({ status: 429, description: 'Too many chunk upload attempts' })
-  async uploadChunk(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: UploadChunkDto,
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 500 * 1024 * 1024 },
+    }),
+  )
+  uploadFile(
+    @UploadedFile() file: File,
+    @Req() req,
   ) {
-    const { uploadId, chunkIndex, totalChunks } = body;
-    if (!file || !uploadId || chunkIndex === undefined || !totalChunks) {
-      throw new HttpException(
-        'Missing required fields',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    await this.filesService.saveChunk(uploadId, chunkIndex, file);
-    return { message: 'Chunk uploaded' };
+    return this.filesService.upload(file, req.user.id);
   }
 
-  // Endpoint to assemble chunks into the final file
-  @FileRateLimit.upload()
-  @Post('upload/complete')
-  @ApiOperation({ summary: 'Complete file upload' })
-  @ApiResponse({ status: 200, description: 'File upload completed successfully' })
-  @ApiResponse({ status: 429, description: 'Too many upload completion attempts' })
-  async completeUpload(@Body() body: CompleteUploadDto) {
-    const { uploadId, fileName, totalChunks } = body;
-    if (!uploadId || !fileName || !totalChunks) {
-      throw new HttpException(
-        'Missing required fields',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const cdnUrl = await this.filesService.assembleChunks(
-      uploadId,
-      fileName,
-      totalChunks,
-    );
-    return { message: 'File uploaded and available on CDN', url: cdnUrl };
-  }
-
-  // Endpoint to get upload progress
-  @FileRateLimit.download()
-  @Post('upload/progress')
-  @ApiOperation({ summary: 'Get upload progress' })
-  @ApiResponse({ status: 200, description: 'Upload progress retrieved' })
-  @ApiResponse({ status: 429, description: 'Too many progress check attempts' })
-  async getUploadProgress(
+  @Post('upload-chunk')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadChunk(
+    @UploadedFile() file: File,
     @Body('uploadId') uploadId: string,
-    @Body('totalChunks') totalChunks?: number,
-  ): Promise<UploadProgressDto> {
-    if (!uploadId) {
-      throw new HttpException('Missing uploadId', HttpStatus.BAD_REQUEST);
-    }
-    const progress = await this.filesService.getUploadProgress(
-      uploadId,
-      totalChunks,
-    );
-    return progress;
+    @Body('chunkIndex') chunkIndex: number,
+  ) {
+    return this.filesService.uploadChunk(file, uploadId, chunkIndex);
+  }
+
+  @Post('complete-upload')
+  completeUpload(
+    @Body('uploadId') uploadId: string,
+    @Body('totalChunks') totalChunks: number,
+    @Body('originalname') originalname: string,
+    @Body('mimetype') mimetype: string,
+    @Req() req,
+  ) {
+    return this.filesService.assembleUpload(uploadId, totalChunks, originalname, mimetype, req.user.id);
+  }
+
+  @Get(':id')
+  getFile(@Param('id') id: string, @Req() req) {
+    return this.filesService.getFile(id, req.user.id);
+  }
+
+  @Delete(':id')
+  deleteFile(@Param('id') id: string, @Req() req) {
+    return this.filesService.deleteFile(id, req.user.id);
+  }
+
+  @Post(':id/share')
+  shareFile(
+    @Param('id') id: string,
+    @Body('targetUserId') targetUserId: string,
+    @Req() req,
+  ) {
+    return this.filesService.shareFile(id, req.user.id, targetUserId);
+  }
+
+  @Put(':id/public')
+  setPublic(
+    @Param('id') id: string,
+    @Body('isPublic') isPublic: boolean,
+    @Req() req,
+  ) {
+    return this.filesService.setPublic(id, req.user.id, isPublic);
   }
 }
