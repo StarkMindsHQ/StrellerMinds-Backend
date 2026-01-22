@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "Bem-vindo",
+    "goodbye": "Adeus",
+    "yes": "Sim",
+    "no": "Não",
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "submit": "Enviar",
+    "close": "Fechar",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Aviso",
+    "info": "Informação"
+  },
+  "navigation": {
+    "home": "Início",
+    "about": "Sobre",
+    "services": "Serviços",
+    "contact": "Contato",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "logout": "Sair",
+    "login": "Entrar"
+  },
+  "accessibility": {
+    "skipToMain": "Ir para o conteúdo principal",
+    "skipToNav": "Ir para navegação",
+    "skipToSearch": "Ir para busca",
+    "expandMenu": "Expandir menu",
+    "closeMenu": "Fechar menu",
+    "screenReaderOnly": "Apenas texto do leitor de tela",
+    "focusMode": "Modo de foco ativado"
+  },
+  "auth": {
+    "login": "Entrar",
+    "register": "Registrar",
+    "password": "Senha",
+    "email": "Email",
+    "username": "Nome de usuário",
+    "forgotPassword": "Esqueceu a senha?",
+    "rememberMe": "Lembre-me"
+  },
+  "errors": {
+    "required": "Este campo é obrigatório",
+    "invalidEmail": "Endereço de email inválido",
+    "passwordTooShort": "A senha deve ter pelo menos 8 caracteres",
+    "passwordMismatch": "As senhas não correspondem",
+    "userNotFound": "Usuário não encontrado",
+    "unauthorized": "Acesso não autorizado"
+  }
+}

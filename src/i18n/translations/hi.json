@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "स्वागत है",
+    "goodbye": "अलविदा",
+    "yes": "हाँ",
+    "no": "नहीं",
+    "ok": "ठीक है",
+    "cancel": "रद्द करें",
+    "submit": "जमा करें",
+    "close": "बंद करें",
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफलता",
+    "warning": "चेतावनी",
+    "info": "जानकारी"
+  },
+  "navigation": {
+    "home": "होम",
+    "about": "के बारे में",
+    "services": "सेवाएं",
+    "contact": "संपर्क",
+    "profile": "प्रोफाइल",
+    "settings": "सेटिंग्स",
+    "logout": "लॉगआउट",
+    "login": "लॉगिन"
+  },
+  "accessibility": {
+    "skipToMain": "मुख्य सामग्री पर जाएं",
+    "skipToNav": "नेविगेशन पर जाएं",
+    "skipToSearch": "खोज पर जाएं",
+    "expandMenu": "मेनू विस्तार करें",
+    "closeMenu": "मेनू बंद करें",
+    "screenReaderOnly": "केवल स्क्रीन रीडर पाठ",
+    "focusMode": "फोकस मोड सक्षम"
+  },
+  "auth": {
+    "login": "लॉगिन",
+    "register": "रजिस्टर",
+    "password": "पासवर्ड",
+    "email": "ईमेल",
+    "username": "उपयोगकर्ता नाम",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "rememberMe": "मुझे याद रखें"
+  },
+  "errors": {
+    "required": "यह फील्ड आवश्यक है",
+    "invalidEmail": "अमान्य ईमेल पता",
+    "passwordTooShort": "पासवर्ड कम से कम 8 वर्ण होना चाहिए",
+    "passwordMismatch": "पासवर्ड मेल नहीं खाते",
+    "userNotFound": "उपयोगकर्ता नहीं मिला",
+    "unauthorized": "अनुमति नहीं है"
+  }
+}

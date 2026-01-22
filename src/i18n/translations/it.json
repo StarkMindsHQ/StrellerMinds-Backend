@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "Benvenuto",
+    "goodbye": "Arrivederci",
+    "yes": "Sì",
+    "no": "No",
+    "ok": "OK",
+    "cancel": "Annulla",
+    "submit": "Invia",
+    "close": "Chiudi",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "warning": "Avvertenza",
+    "info": "Informazione"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "Chi siamo",
+    "services": "Servizi",
+    "contact": "Contatti",
+    "profile": "Profilo",
+    "settings": "Impostazioni",
+    "logout": "Esci",
+    "login": "Accedi"
+  },
+  "accessibility": {
+    "skipToMain": "Vai al contenuto principale",
+    "skipToNav": "Vai alla navigazione",
+    "skipToSearch": "Vai alla ricerca",
+    "expandMenu": "Espandi menu",
+    "closeMenu": "Chiudi menu",
+    "screenReaderOnly": "Solo testo per lettore di schermo",
+    "focusMode": "Modalità focus abilitata"
+  },
+  "auth": {
+    "login": "Accedi",
+    "register": "Registrati",
+    "password": "Password",
+    "email": "Email",
+    "username": "Nome utente",
+    "forgotPassword": "Password dimenticata?",
+    "rememberMe": "Ricordami"
+  },
+  "errors": {
+    "required": "Questo campo è obbligatorio",
+    "invalidEmail": "Indirizzo email non valido",
+    "passwordTooShort": "La password deve essere di almeno 8 caratteri",
+    "passwordMismatch": "Le password non corrispondono",
+    "userNotFound": "Utente non trovato",
+    "unauthorized": "Accesso non autorizzato"
+  }
+}

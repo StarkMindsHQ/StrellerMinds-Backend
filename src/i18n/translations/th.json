@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "ยินดีต้อนรับ",
+    "goodbye": "ลาก่อน",
+    "yes": "ใช่",
+    "no": "ไม่",
+    "ok": "ตกลง",
+    "cancel": "ยกเลิก",
+    "submit": "ส่ง",
+    "close": "ปิด",
+    "loading": "กำลังโหลด...",
+    "error": "ข้อผิดพลาด",
+    "success": "สำเร็จ",
+    "warning": "คำเตือน",
+    "info": "ข้อมูล"
+  },
+  "navigation": {
+    "home": "หน้าแรก",
+    "about": "เกี่ยวกับ",
+    "services": "บริการ",
+    "contact": "ติดต่อ",
+    "profile": "โปรไฟล์",
+    "settings": "การตั้งค่า",
+    "logout": "ออกจากระบบ",
+    "login": "เข้าสู่ระบบ"
+  },
+  "accessibility": {
+    "skipToMain": "ข้ามไปยังเนื้อหาหลัก",
+    "skipToNav": "ข้ามไปยังการนำทาง",
+    "skipToSearch": "ข้ามไปยังการค้นหา",
+    "expandMenu": "ขยายเมนู",
+    "closeMenu": "ปิดเมนู",
+    "screenReaderOnly": "ข้อความสำหรับผู้อ่านหน้าจออย่างเดียว",
+    "focusMode": "โฟกัสโหมดเปิดใช้งาน"
+  },
+  "auth": {
+    "login": "เข้าสู่ระบบ",
+    "register": "ลงทะเบียน",
+    "password": "รหัสผ่าน",
+    "email": "อีเมล",
+    "username": "ชื่อผู้ใช้",
+    "forgotPassword": "ลืมรหัสผ่านหรือ",
+    "rememberMe": "จำฉันไว้"
+  },
+  "errors": {
+    "required": "ต้องการเขตข้อมูลนี้",
+    "invalidEmail": "ที่อยู่อีเมลไม่ถูกต้อง",
+    "passwordTooShort": "รหัสผ่านต้องมีอย่างน้อย 8 อักขระ",
+    "passwordMismatch": "รหัสผ่านไม่ตรงกัน",
+    "userNotFound": "ไม่พบผู้ใช้",
+    "unauthorized": "ไม่ได้รับอนุญาต"
+  }
+}
