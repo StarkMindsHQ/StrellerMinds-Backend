@@ -1,9 +1,8 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { RolesGuard } from './role/roles.guard';
-import { GlobalExceptionsFilter } from './common/filters/global-exception.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import compress from '@fastify/compress';
 import {
   FastifyAdapter,
@@ -11,60 +10,41 @@ import {
 } from '@nestjs/platform-fastify';
 import fastifyHelmet from '@fastify/helmet';
 import fastifyCsrf from '@fastify/csrf-protection';
-
 import { setupTracing } from './monitoring/tracing.bootstrap';
 
 async function bootstrap() {
-    await setupTracing();
+  await setupTracing();
 
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
   );
 
-  // Register compression
-  await app.register(compress, {
-    threshold: 1024, // Only compress if response > 1KB
-    global: true,
-    encodings: ['gzip', 'deflate', 'br'],
+  // --- REQUIREMENT #471: API Versioning (URI Strategy) ---
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
   });
 
-  // Register Helmet for security headers
+  // Fastify Middlewares
+  await app.register(compress, { threshold: 1024, global: true });
   await app.register(fastifyHelmet);
-
-  // Register CSRF protection globally
   await app.register(fastifyCsrf);
 
-  // Global Validation Pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
+  // Global Validation
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+  }));
 
-  // Global exception and role guards
-  const i18n = app.get('I18nService');
-  const loggerService = app.get('LoggerService');
-  const sentryService = app.get('SentryService');
-  const alertingService = app.get('AlertingService');
-  const errorDashboardService = app.get('ErrorDashboardService');
-  app.useGlobalFilters(new GlobalExceptionsFilter(
-    i18n,
-    loggerService,
-    sentryService,
-    alertingService,
-    errorDashboardService
-  ));
+  // Global Guards
   app.useGlobalGuards(new RolesGuard(new Reflector()));
 
-  // Swagger setup
+  // Swagger Configuration
   const config = new DocumentBuilder()
-    .setTitle('Mentor Grading API')
-    .setDescription(
-      'APIs for mentors to grade student assignments and provide feedback. Admin API for course management.'
-    )
+    .setTitle('StrellerMinds API')
+    .setDescription('Standardized API with Versioning and Uniform Responses.')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -72,7 +52,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ? Number(process.env.PORT) : 3000);
+  const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 API Standardized & Versioned at: http://localhost:${port}/v1`);
 }
-
 bootstrap();

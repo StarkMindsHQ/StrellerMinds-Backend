@@ -1,7 +1,11 @@
-// import { I18nModule } from './i18n/i18n.module';
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_INTERCEPTOR, APP_GUARD, APP_FILTER } from '@nestjs/core';
+
+// Feature Modules
 import { UsersModule } from './users/users.module';
 import { CoursesModule } from './courses/courses.module';
 import { AuthModule } from './auth/auth.module';
@@ -15,50 +19,50 @@ import { SubmissionModule } from './submission/submission.module';
 import { UserProfilesModule } from './user-profiles/user-profiles.module';
 import { CredentialModule } from './credential/credential.module';
 import { TranslationModule } from './translation/translation.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-// import { FeedbackModule } from './feedback/feedback.module';
 import { MentorshipModule } from './mentorship/mentorship.module';
 import { ArchiveModule } from './archive/archive.module';
-import databaseConfig from './config/database.config';
-import { ScheduleModule } from '@nestjs/schedule';
 import { GdprModule } from './gdpr/gdpr.module';
 import { MonitoringModule } from './monitoring/monitoring-module';
 import { CoursesAdvancesModule } from './courses-advances/courses-advances.module';
-import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
-import { ApiUsageLoggerMiddleware } from './common/middleware/api-usage-logger.middleware';
-import { DeprecationWarningMiddleware } from './common/middleware/deprecation-warning.middleware';
-import { VersionTrackingInterceptor } from './common/interceptors/version-tracking.interceptor';
-import { VersionAnalyticsService } from './common/services/version-analytics.service';
-import { PerformanceInterceptor } from './monitoring/performance.interceptor';
-import { ApiUsageLog } from './common/entities/api-usage-log.entity';
-import { AuthControllerV1 } from './modules/auth/controllers/auth.controller.v1';
-import { AuthControllerV2 } from './modules/auth/controllers/auth.controller.v2';
-// import { CoursesControllerV1 } from './modules/courses/controllers/courses.controller.v1';
-// import { CoursesControllerV2 } from './modules/courses/controllers/courses.controller.v2';
-import { VersionController } from './modules/version/version.controller';
-import { apiVersionConfig } from './config/api-version.config';
-import { VersionHeaderMiddleware } from './common/middleware/version-header.middleware';
-import { PaymentModule } from './payment/payment.module';
 import { CmsModule } from './cms/cms.module';
-import { StellarService } from './blockchain/stellar/stellar.service';
+import { PaymentModule } from './payment/payment.module';
 import { ErrorDashboardModule } from './error-dashboard/error-dashboard.module';
-import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { DatabaseOptimizationModule } from './database-optimization/database-optimization.module';
 
-const ENV = process.env.NODE_ENV;;
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('ENV:', ENV);
+// Controllers and Services
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { VersionController } from './modules/version/version.controller';
+import { AuthControllerV1 } from './modules/auth/controllers/auth.controller.v1';
+import { AuthControllerV2 } from './modules/auth/controllers/auth.controller.v2';
+import { StellarService } from './blockchain/stellar/stellar.service';
+import { VersionAnalyticsService } from './common/services/version-analytics.service';
+
+// Core Standardization (Requirement #471)
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { GlobalExceptionsFilter } from './common/filters/global-exception.filter';
+
+// Existing Guards/Interceptors/Middleware
+import { CustomThrottlerGuard } from './common/guards/custom-throttler.guard';
+import { VersionTrackingInterceptor } from './common/interceptors/version-tracking.interceptor';
+import { PerformanceInterceptor } from './monitoring/performance.interceptor';
+import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
+import { VersionHeaderMiddleware } from './common/middleware/version-header.middleware';
+import { DeprecationWarningMiddleware } from './common/middleware/deprecation-warning.middleware';
+import { ApiUsageLoggerMiddleware } from './common/middleware/api-usage-logger.middleware';
+
+// Config
+import databaseConfig from './config/database.config';
+import { apiVersionConfig } from './config/api-version.config';
+
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
     ThrottlerModule.forRoot({
-      ttl: 60, // 60 seconds
+      ttl: 60,
       limit: 100,
     }),
-    // Global Config
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -66,7 +70,7 @@ console.log('ENV:', ENV);
       load: [databaseConfig, () => ({ api: apiVersionConfig })],
     }),
 
-    // Database
+    // Database Configuration
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -79,19 +83,17 @@ console.log('ENV:', ENV);
         database: configService.get<string>('database.name'),
         autoLoadEntities: configService.get<boolean>('database.autoload'),
         synchronize: configService.get<boolean>('database.synchronize'),
-        // Connection Pool Settings
         extra: {
           max: configService.get<number>('database.maxPoolSize'),
           min: configService.get<number>('database.minPoolSize'),
-          idleTimeoutMillis: configService.get<number>(
-            'database.poolIdleTimeout',
-          ),
+          idleTimeoutMillis: configService.get<number>('database.poolIdleTimeout'),
         },
-        // Retry Mechanism
         retryAttempts: configService.get<number>('database.retryAttempts'),
         retryDelay: configService.get<number>('database.retryDelay'),
       }),
     }),
+
+    // Feature Modules
     UsersModule,
     CoursesModule,
     AuthModule,
@@ -105,28 +107,34 @@ console.log('ENV:', ENV);
     UserProfilesModule,
     CredentialModule,
     ArchiveModule,
-    // FeedbackModule,
-    // I18nModule,
     MentorshipModule,
     TranslationModule,
     GdprModule,
     MonitoringModule,
-    UsersModule,
     CoursesAdvancesModule,
-    AuthControllerV1,
-    AuthControllerV2,
-    // CoursesControllerV1,
-    // CoursesControllerV2,
-    VersionController,
     CmsModule,
     PaymentModule,
     ErrorDashboardModule,
     DatabaseOptimizationModule.forRoot(),
   ],
-  controllers: [AppController],
+  controllers: [AppController, VersionController, AuthControllerV1, AuthControllerV2],
   providers: [
     AppService,
     VersionAnalyticsService,
+    StellarService,
+
+    // --- REQUIREMENT #471: Global Response Standardization ---
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+    // --- REQUIREMENT #471: Global Exception Handling (Unified Format) ---
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionsFilter,
+    },
+
+    // Existing App-level Guards and Interceptors
     {
       provide: APP_INTERCEPTOR,
       useClass: VersionTrackingInterceptor,
@@ -139,7 +147,6 @@ console.log('ENV:', ENV);
       provide: APP_GUARD,
       useClass: CustomThrottlerGuard,
     },
-    StellarService,
   ],
 })
 export class AppModule implements NestModule {
