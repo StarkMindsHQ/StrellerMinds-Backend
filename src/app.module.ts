@@ -20,7 +20,7 @@ import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
-import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -62,6 +62,7 @@ import { LanguageDetectionMiddleware } from './i18n/middleware/language-detectio
       },
     ]),
     AuthModule,
+    CourseModule,
     UserModule,
     I18nModule.register(),
     AccessibilityModule,
