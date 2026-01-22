@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module'; // include feature branch
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
@@ -31,15 +33,16 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
     }),
     ThrottlerModule.forRoot([
       {
-        ttl: 60000, // 1 minute
-        limit: 10, // 10 requests per minute for auth endpoints
+        ttl: 60_000, // 1 minute
+        limit: 10,
       },
       {
-        ttl: 3600000, // 1 hour
-        limit: 1000, // 1000 requests per hour for general endpoints
+        ttl: 3_600_000, // 1 hour
+        limit: 1000,
       },
     ]),
     AuthModule,
+    UserModule, // merged
   ],
   providers: [
     {
@@ -53,13 +56,8 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
   ],
 })
 export class AppModule {
-  configure(consumer: any) {
-    consumer
-      .apply(SecurityHeadersMiddleware)
-      .forRoutes('*');
-    
-    consumer
-      .apply(TokenBlacklistMiddleware)
-      .forRoutes('*');
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
+    consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
   }
 }
