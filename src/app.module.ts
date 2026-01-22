@@ -20,6 +20,7 @@ import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
 import { CourseModule } from './course/course.module';
+import { ConfigModule } from './config/config.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { CourseModule } from './course/course.module';
     I18nModule.register(),
     AccessibilityModule,
     IntegrationsModule,
+    ConfigModule,
   ],
   providers: [
     {
