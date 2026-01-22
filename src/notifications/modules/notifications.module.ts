@@ -8,11 +8,11 @@ import { NotificationPreference } from '../entities/notification-preference.enti
 import { EmailAnalytics } from '../entities/email-analytics.entity';
 import { EmailNotificationsService } from '../services/email-notifications.service';
 import { TemplateService } from '../services/template.service';
-import { NotificationPreferenceService } from '../services\notification-preference.service';
-import { EmailAnalyticsService } from '../services\email-analytics.service';
-import { DigestEmailService } from '../services\digest-email.service';
-import { UnsubscribeService } from '../services\unsubscribe.service';
-import { NotificationsController } from '../controllers\notifications.controller';
+import { NotificationPreferenceService } from '../services/notification-preference.service';
+import { EmailAnalyticsService } from '../services/email-analytics.service';
+import { DigestEmailService } from '../services/digest-email.service';
+import { UnsubscribeService } from '../services/unsubscribe.service';
+import { NotificationsController } from '../controllers/notifications.controller';
 import { AuthModule } from '../../auth/auth.module';
 
 @Module({

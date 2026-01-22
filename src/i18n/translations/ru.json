@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "Добро пожаловать",
+    "goodbye": "До свидания",
+    "yes": "Да",
+    "no": "Нет",
+    "ok": "ОК",
+    "cancel": "Отмена",
+    "submit": "Отправить",
+    "close": "Закрыть",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех",
+    "warning": "Предупреждение",
+    "info": "Информация"
+  },
+  "navigation": {
+    "home": "Главная",
+    "about": "О нас",
+    "services": "Услуги",
+    "contact": "Контакты",
+    "profile": "Профиль",
+    "settings": "Параметры",
+    "logout": "Выход",
+    "login": "Вход"
+  },
+  "accessibility": {
+    "skipToMain": "Перейти к основному содержимому",
+    "skipToNav": "Перейти к навигации",
+    "skipToSearch": "Перейти к поиску",
+    "expandMenu": "Развернуть меню",
+    "closeMenu": "Закрыть меню",
+    "screenReaderOnly": "Только текст для читалки с экрана",
+    "focusMode": "Режим фокуса включен"
+  },
+  "auth": {
+    "login": "Вход",
+    "register": "Регистрация",
+    "password": "Пароль",
+    "email": "Электронная почта",
+    "username": "Имя пользователя",
+    "forgotPassword": "Забыли пароль?",
+    "rememberMe": "Запомнить меня"
+  },
+  "errors": {
+    "required": "Это поле обязательно",
+    "invalidEmail": "Недействительный адрес электронной почты",
+    "passwordTooShort": "Пароль должен содержать не менее 8 символов",
+    "passwordMismatch": "Пароли не совпадают",
+    "userNotFound": "Пользователь не найден",
+    "unauthorized": "Доступ не авторизован"
+  }
+}
