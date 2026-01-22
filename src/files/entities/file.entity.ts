@@ -26,6 +26,19 @@ export class FileEntity {
   @Column({ default: 1 })
   version: number;
 
+  @Column({
+    type: 'enum',
+    enum: ['pending', 'clean', 'infected'],
+    default: 'pending',
+  })
+  virusScanStatus: 'pending' | 'clean' | 'infected';
+
+  @Column({ default: false })
+  isPublic: boolean;
+
+  @Column('simple-array', { nullable: true })
+  sharedWith: string[]; // Array of User IDs
+
   @CreateDateColumn()
   createdAt: Date;
 }

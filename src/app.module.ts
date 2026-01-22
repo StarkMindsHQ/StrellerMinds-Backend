@@ -8,9 +8,17 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
+import { UserProfile } from './user/entities/user-profile.entity';
+import { PortfolioItem } from './user/entities/portfolio-item.entity';
+import { Badge } from './user/entities/badge.entity';
+import { UserBadge } from './user/entities/user-badge.entity';
+import { Follow } from './user/entities/follow.entity';
+import { PrivacySettings } from './user/entities/privacy-settings.entity';
+import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import { CourseModule } from './course/course.module';
 
 @Module({
   imports: [
@@ -25,7 +33,17 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
       username: process.env.DATABASE_USER || 'postgres',
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME || 'strellerminds',
-      entities: [User, RefreshToken],
+      entities: [
+        User,
+        RefreshToken,
+        UserProfile,
+        PortfolioItem,
+        Badge,
+        UserBadge,
+        Follow,
+        PrivacySettings,
+        ProfileAnalytics,
+      ],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
       migrations: ['dist/migrations/*.js'],
@@ -42,6 +60,7 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
       },
     ]),
     AuthModule,
+    CourseModule,
     UserModule,
   ],
   providers: [
