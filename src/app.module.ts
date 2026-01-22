@@ -1,8 +1,3 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
