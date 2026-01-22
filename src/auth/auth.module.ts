@@ -77,6 +77,6 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './middlewar
     OptionalJwtAuthGuard,
     ResponseInterceptor,
   ],
-  exports: [AuthService, BcryptService, JwtService, JwtAuthGuard, RolesGuard],
+  exports: [AuthService, BcryptService, JwtService, JwtAuthGuard, RolesGuard, EmailService],
 })
 export class AuthModule {}
