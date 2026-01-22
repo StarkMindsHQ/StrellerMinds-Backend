@@ -34,6 +34,7 @@ import {
   FinancialReport,
   PaymentMethodEntity,
 } from './payment/entities';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -88,7 +89,7 @@ import {
     UserModule,
     PaymentModule,                // <-- from feature branch
     I18nModule.register(),        // <-- from main
-    AccessibilityModule,          // <-- from main
+    AccessibilityModule, SearchModule,          // <-- from main
   ],
   providers: [
     {
