@@ -29,6 +29,11 @@ export class NotificationPreferenceService {
     preferences.smsEnabled = createPrefDto.smsEnabled ?? true;
     preferences.pushEnabled = createPrefDto.pushEnabled ?? true;
     preferences.inAppEnabled = createPrefDto.inAppEnabled ?? true;
+    preferences.quietHoursEnabled = createPrefDto.quietHoursEnabled ?? false;
+    preferences.quietHoursStart = createPrefDto.quietHoursStart;
+    preferences.quietHoursEnd = createPrefDto.quietHoursEnd;
+    preferences.timezone = createPrefDto.timezone || 'UTC';
+    preferences.doNotDisturb = createPrefDto.doNotDisturb ?? false;
     preferences.unsubscribeToken = uuidv4(); // Generate unique unsubscribe token
 
     return await this.notificationPreferenceRepository.save(preferences);
@@ -69,7 +74,69 @@ export class NotificationPreferenceService {
       preferences.inAppEnabled = updatePrefDto.inAppEnabled;
     }
 
+    if (updatePrefDto.doNotDisturb !== undefined) {
+      preferences.doNotDisturb = updatePrefDto.doNotDisturb;
+    }
+
+    if (updatePrefDto.quietHoursEnabled !== undefined) {
+      preferences.quietHoursEnabled = updatePrefDto.quietHoursEnabled;
+    }
+
+    if (updatePrefDto.quietHoursStart !== undefined) {
+      preferences.quietHoursStart = updatePrefDto.quietHoursStart;
+    }
+
+    if (updatePrefDto.quietHoursEnd !== undefined) {
+      preferences.quietHoursEnd = updatePrefDto.quietHoursEnd;
+    }
+
+    if (updatePrefDto.timezone !== undefined) {
+      preferences.timezone = updatePrefDto.timezone;
+    }
+
     return await this.notificationPreferenceRepository.save(preferences);
+  }
+
+  async shouldDeliverNow(userId: string): Promise<boolean> {
+    const preferences = await this.getPreferences(userId);
+    if (!preferences) return true;
+
+    if (preferences.doNotDisturb) return false;
+
+    if (preferences.quietHoursEnabled && preferences.quietHoursStart && preferences.quietHoursEnd) {
+      return !this.isInQuietHours(
+        preferences.quietHoursStart,
+        preferences.quietHoursEnd,
+        preferences.timezone,
+      );
+    }
+
+    return true;
+  }
+
+  private isInQuietHours(start: string, end: string, timezone: string): boolean {
+    try {
+      const now = new Date();
+      const userTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+      const currentHour = userTime.getHours();
+      const currentMinute = userTime.getMinutes();
+      const currentTimeInMinutes = currentHour * 60 + currentMinute;
+
+      const [startHour, startMinute] = start.split(':').map(Number);
+      const [endHour, endMinute] = end.split(':').map(Number);
+      
+      const startTimeInMinutes = startHour * 60 + startMinute;
+      const endTimeInMinutes = endHour * 60 + endMinute;
+
+      if (startTimeInMinutes < endTimeInMinutes) {
+        return currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes;
+      } else {
+        // Overnights (e.g., 22:00 to 07:00)
+        return currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes < endTimeInMinutes;
+      }
+    } catch (error) {
+      return false; // Default to not in quiet hours if error
+    }
   }
 
   async toggleChannel(userId: string, channel: 'email' | 'sms' | 'push' | 'inApp', enabled: boolean): Promise<NotificationPreference> {
