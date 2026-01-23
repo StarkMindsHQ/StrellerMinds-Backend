@@ -14,6 +14,8 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/midd
 import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware';
 import { CourseModule } from './course/course.module';
 import { PaymentModule } from './payment/payment.module';
+import { FilesModule } from './files/files.module';
+import { GamificationModule } from './gamification/gamification.module';
 import { DatabaseConfig } from './config/database.config';
 import { DatabaseModule } from './database/database.module';
 
@@ -45,6 +47,8 @@ import { DatabaseModule } from './database/database.module';
     CourseModule,
     UserModule,
     PaymentModule,
+    FilesModule,
+    GamificationModule,
     I18nModule.register(),
     AccessibilityModule,
     DatabaseModule,  // Add database utilities module
