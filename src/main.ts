@@ -1,44 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { ValidationPipe } from '@nestjs/common';
-import { ValidationException } from './common/decorators/errors/validation-exception';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './logging/winston.config';
+import * as Sentry from '@sentry/node';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  // Global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-      exceptionFactory: (errors:any ) => {
-      return new ValidationException(errors)
-      },
-    }),
-  );
-
-  // CORS configuration
-  app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
-    credentials: true,
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger(winstonConfig),
   });
 
-  // API prefix
-  app.setGlobalPrefix('api');
-
-  // Swagger documentation
-  const config = new DocumentBuilder()
-    .setTitle('StrellerMinds Backend API')
-    .setDescription('A comprehensive blockchain education platform backend')
-    .setVersion('1.0.0')
-    .addBearerAuth()
+  .addBearerAuth()
     .addTag('Authentication')
     .addTag('Users')
     .addTag('Courses')
@@ -50,10 +23,31 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
+  // Sentry
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+  });
 
-  console.log(`🚀 StrellerMinds Backend is running on port ${port}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
-  console.log(`🔐 Health Check: http://localhost:${port}/api/health`);
+  // Security Headers
+  app.use(helmet());
+
+  // CORS
+  app.enableCors({
+    origin: ['https://your-frontend.com'],
+    methods: 'GET,POST,PUT,DELETE',
+    credentials: true,
+  });
+
+  // Input Validation
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+
+  await app.listen(3000);
 }
-
 bootstrap();
