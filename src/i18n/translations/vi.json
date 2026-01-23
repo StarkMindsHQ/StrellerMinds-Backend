@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "Chào mừng",
+    "goodbye": "Tạm biệt",
+    "yes": "Có",
+    "no": "Không",
+    "ok": "OK",
+    "cancel": "Hủy",
+    "submit": "Gửi",
+    "close": "Đóng",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "warning": "Cảnh báo",
+    "info": "Thông tin"
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "services": "Dịch vụ",
+    "contact": "Liên hệ",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất",
+    "login": "Đăng nhập"
+  },
+  "accessibility": {
+    "skipToMain": "Bỏ qua nội dung chính",
+    "skipToNav": "Bỏ qua điều hướng",
+    "skipToSearch": "Bỏ qua tìm kiếm",
+    "expandMenu": "Mở rộng menu",
+    "closeMenu": "Đóng menu",
+    "screenReaderOnly": "Văn bản chỉ dành cho trình đọc màn hình",
+    "focusMode": "Chế độ tập trung bật"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "password": "Mật khẩu",
+    "email": "Email",
+    "username": "Tên đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "rememberMe": "Nhớ tôi"
+  },
+  "errors": {
+    "required": "Trường này là bắt buộc",
+    "invalidEmail": "Địa chỉ email không hợp lệ",
+    "passwordTooShort": "Mật khẩu phải dài ít nhất 8 ký tự",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "userNotFound": "Không tìm thấy người dùng",
+    "unauthorized": "Truy cập không được phép"
+  }
+}

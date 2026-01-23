@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "欢迎",
+    "goodbye": "再见",
+    "yes": "是",
+    "no": "否",
+    "ok": "确定",
+    "cancel": "取消",
+    "submit": "提交",
+    "close": "关闭",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "warning": "警告",
+    "info": "信息"
+  },
+  "navigation": {
+    "home": "首页",
+    "about": "关于",
+    "services": "服务",
+    "contact": "联系",
+    "profile": "个人资料",
+    "settings": "设置",
+    "logout": "登出",
+    "login": "登录"
+  },
+  "accessibility": {
+    "skipToMain": "跳转到主要内容",
+    "skipToNav": "跳转到导航",
+    "skipToSearch": "跳转到搜索",
+    "expandMenu": "展开菜单",
+    "closeMenu": "关闭菜单",
+    "screenReaderOnly": "仅屏幕阅读器文本",
+    "focusMode": "焦点模式已启用"
+  },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "password": "密码",
+    "email": "电邮",
+    "username": "用户名",
+    "forgotPassword": "忘记密码?",
+    "rememberMe": "记住我"
+  },
+  "errors": {
+    "required": "此字段为必填项",
+    "invalidEmail": "电邮地址无效",
+    "passwordTooShort": "密码长度至少8个字符",
+    "passwordMismatch": "密码不匹配",
+    "userNotFound": "用户未找到",
+    "unauthorized": "访问未授权"
+  }
+}

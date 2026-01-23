@@ -164,8 +164,10 @@ src/
 
 Once the server is running, access the interactive API documentation:
 
-- **Swagger UI**: `http://localhost:3000/api`
-- **JSON Spec**: `http://localhost:3000/api-json`
+- **Swagger UI**: `http://localhost:3000/api/docs`
+- **OpenAPI JSON**: `http://localhost:3000/api/docs-json`
+
+For onboarding, SDK generation, and multi-language examples, see `DEVELOPER_PORTAL.md`.
 
 ## 🧪 Testing
 

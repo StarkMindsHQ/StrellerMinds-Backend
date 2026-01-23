@@ -8,6 +8,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 
 import { AuthController } from './controllers/auth.controller';
+import { SecurityController } from './controllers/security.controller';
 import { AuthService } from './services/auth.service';
 import { BcryptService } from './services/bcrypt.service';
 import { JwtService } from './services/jwt.service';
@@ -17,13 +18,22 @@ import { JwtAuthGuard, RolesGuard, OptionalJwtAuthGuard } from './guards/auth.gu
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './middleware/auth.middleware';
 
+import { TwoFactorAuthService } from './services/two-factor-auth.service';
+import { EmailService } from './services/email.service';
+
+import { SecurityAudit } from './entities/security-audit.entity';
+import { SecurityAuditService } from './services/security-audit.service';
+import { GeoIpService } from './services/geo-ip.service';
+import { PasswordHistory } from './entities/password-history.entity';
+import { PasswordHistoryService } from './services/password-history.service';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
-    TypeOrmModule.forFeature([User, RefreshToken]),
+    TypeOrmModule.forFeature([User, RefreshToken, SecurityAudit, PasswordHistory]),
     JwtModule.registerAsync({
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
@@ -67,7 +77,7 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './middlewar
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, SecurityController],
   providers: [
     AuthService,
     BcryptService,
@@ -76,7 +86,12 @@ import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './middlewar
     RolesGuard,
     OptionalJwtAuthGuard,
     ResponseInterceptor,
+    TwoFactorAuthService,
+    EmailService,
+    SecurityAuditService,
+    GeoIpService,
+    PasswordHistoryService,
   ],
-  exports: [AuthService, BcryptService, JwtService, JwtAuthGuard, RolesGuard],
+  exports: [AuthService, BcryptService, JwtService, JwtAuthGuard, RolesGuard, EmailService, TwoFactorAuthService, SecurityAuditService, GeoIpService, PasswordHistoryService],
 })
-export class AuthModule {}
+export class AuthModule { }

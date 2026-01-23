@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "goodbye": "Goodbye",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "contact": "Contact",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "accessibility": {
+    "skipToMain": "Skip to main content",
+    "skipToNav": "Skip to navigation",
+    "skipToSearch": "Skip to search",
+    "expandMenu": "Expand menu",
+    "closeMenu": "Close menu",
+    "screenReaderOnly": "Screen reader only text",
+    "focusMode": "Focus mode enabled"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "password": "Password",
+    "email": "Email",
+    "username": "Username",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordMismatch": "Passwords do not match",
+    "userNotFound": "User not found",
+    "unauthorized": "Unauthorized access"
+  }
+}

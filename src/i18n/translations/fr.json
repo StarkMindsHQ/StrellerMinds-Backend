@@ -1,0 +1,53 @@
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "goodbye": "Au revoir",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "cancel": "Annuler",
+    "submit": "Soumettre",
+    "close": "Fermer",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "info": "Information"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "about": "À propos",
+    "services": "Services",
+    "contact": "Contact",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "login": "Connexion"
+  },
+  "accessibility": {
+    "skipToMain": "Aller au contenu principal",
+    "skipToNav": "Aller à la navigation",
+    "skipToSearch": "Aller à la recherche",
+    "expandMenu": "Développer le menu",
+    "closeMenu": "Fermer le menu",
+    "screenReaderOnly": "Texte lecteur d'écran uniquement",
+    "focusMode": "Mode de focus activé"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "password": "Mot de passe",
+    "email": "Adresse e-mail",
+    "username": "Nom d'utilisateur",
+    "forgotPassword": "Mot de passe oublié?",
+    "rememberMe": "Souvenez-vous de moi"
+  },
+  "errors": {
+    "required": "Ce champ est obligatoire",
+    "invalidEmail": "Adresse e-mail invalide",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "userNotFound": "Utilisateur non trouvé",
+    "unauthorized": "Accès non autorisé"
+  }
+}

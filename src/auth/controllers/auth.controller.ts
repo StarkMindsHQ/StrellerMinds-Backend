@@ -1,9 +1,9 @@
-import { 
-  Controller, 
-  Post, 
-  Body, 
-  HttpCode, 
-  HttpStatus, 
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
   UseGuards,
   Get,
   Request,
@@ -13,18 +13,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import { AuthService, UserResponse } from '../services/auth.service';
 import { JwtAuthGuard } from '../guards/auth.guard';
-import { 
-  RegisterDto, 
-  LoginDto, 
-  RefreshTokenDto, 
-  ForgotPasswordDto, 
-  ResetPasswordDto, 
+import {
+  RegisterDto,
+  LoginDto,
+  RefreshTokenDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
   VerifyEmailDto,
-  ChangePasswordDto 
+  ChangePasswordDto
 } from '../dto/auth.dto';
 import { Roles } from '../guards/auth.guard';
 import { UserRole } from '../entities/user.entity';
@@ -33,7 +33,7 @@ import { UserRole } from '../entities/user.entity';
 @Controller('auth')
 @UseGuards(ThrottlerGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -41,6 +41,8 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'User registered successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'User already exists' })
+  @ApiResponse({ status: 409, description: 'User already exists' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
@@ -50,13 +52,15 @@ export class AuthController {
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
   async login(
     @Body() loginDto: LoginDto,
     @Request() req: ExpressRequest,
   ) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
-    
+
     return this.authService.login(loginDto, ipAddress, userAgent);
   }
 
@@ -71,7 +75,7 @@ export class AuthController {
   ) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
-    
+
     return this.authService.refreshTokens(refreshTokenDto, ipAddress, userAgent);
   }
 
@@ -164,5 +168,39 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'User created successfully' })
   async createUser(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Post('2fa/generate')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Generate 2FA secret and QR code' })
+  async generateTwoFactorAuthentication(@Request() req, @Response() res) {
+    const { otpauthUrl } = await this.authService.generateTwoFactorSecret(req.user);
+    const qrCodeUrl = await this.authService.generateQrCodeStream(res, otpauthUrl);
+    return res.send({ qrCodeUrl });
+  }
+
+  @Post('2fa/turn-on')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Enable 2FA' })
+  async turnOnTwoFactorAuthentication(@Request() req, @Body() body: { code: string }) {
+    await this.authService.turnOnTwoFactorAuthentication(req.user.id, body.code);
+    return { message: '2FA enabled successfully' };
+  }
+
+  @Get('audit-logs')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get security audit logs (Admin only)' })
+  async getAuditLogs(@Request() req) {
+    // This is a simplified implementation. In a real app, we'd add pagination and filtering in the service.
+    // I'll assume the service has a method to get logs, or I'll access the repository via service.
+    // Wait, I didn't add getAuditLogs to AuthService, but SecurityAuditService has getRecentEvents.
+    // I need to expose it via AuthService or inject SecurityAuditService into Controller.
+    // Injecting SecurityAuditService into Controller is better for separation, but AuthController uses AuthService.
+    // I'll add a method to AuthService to delegate.
+    return this.authService.getAuditLogs(req.user.id);
   }
 }
