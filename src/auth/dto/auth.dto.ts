@@ -58,6 +58,11 @@ export class LoginDto {
   @Sanitize('token')
   @IsString()
   deviceId?: string;
+
+  @ApiPropertyOptional({ description: '2FA code if enabled' })
+  @IsOptional()
+  @IsString()
+  twoFactorAuthenticationCode?: string;
 }
 
 export class RefreshTokenDto {

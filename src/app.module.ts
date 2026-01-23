@@ -1,13 +1,16 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
+import Redis from 'ioredis';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
 import { UserProfile } from './user/entities/user-profile.entity';
@@ -17,6 +20,10 @@ import { UserBadge } from './user/entities/user-badge.entity';
 import { Follow } from './user/entities/follow.entity';
 import { PrivacySettings } from './user/entities/privacy-settings.entity';
 import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
+import { SecurityAudit } from './auth/entities/security-audit.entity';
+import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
+import { SyncLog } from './integrations/common/entities/sync-log.entity';
+import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import {
@@ -26,6 +33,7 @@ import {
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { CourseModule } from './course/course.module';
+import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 import { PaymentModule } from './payment/payment.module';
 import {
   Payment,
@@ -62,6 +70,7 @@ import {
         Follow,
         PrivacySettings,
         ProfileAnalytics,
+        SecurityAudit,
         Payment,
         Subscription,
         PaymentPlan,
@@ -71,26 +80,39 @@ import {
         TaxRate,
         FinancialReport,
         PaymentMethodEntity,
+        IntegrationConfig,
+        SyncLog,
+        IntegrationMapping,
       ],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
       migrations: ['dist/migrations/*.js'],
       migrationsRun: true,
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60_000, // 1 minute
-        limit: 10,
-      },
-      {
-        ttl: 3_600_000, // 1 hour
-        limit: 1000,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: config.get('RATE_LIMIT_TTL', 60000),
+            limit: config.get('RATE_LIMIT_MAX', 10),
+          },
+        ],
+        storage: new ThrottlerStorageRedisService(
+          new Redis({
+            host: config.get('REDIS_HOST', 'localhost'),
+            port: config.get('REDIS_PORT', 6379),
+            password: config.get('REDIS_PASSWORD'),
+          }),
+        ),
+      }),
+    }),
     AuthModule,
     CourseModule,
     UserModule,
     PaymentModule,
+    IntegrationsModule,
     I18nModule.register(),
     AccessibilityModule,
   ],
@@ -111,5 +133,6 @@ export class AppModule {
     consumer.apply(InputSecurityMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
     consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
   }
 }
