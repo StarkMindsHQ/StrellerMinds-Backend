@@ -8,16 +8,18 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
-import { JwtAuthGuard } from './auth/guards/auth.guard';
-import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
-import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
-import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware';
 import { CourseModule } from './course/course.module';
 import { PaymentModule } from './payment/payment.module';
 import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
-import { DatabaseConfig } from './config/database.config';
 import { DatabaseModule } from './database/database.module';
+
+import { JwtAuthGuard } from './auth/guards/auth.guard';
+import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
+import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
+
+import { DatabaseConfig } from './config/database.config';
 
 @Module({
   imports: [
@@ -51,7 +53,7 @@ import { DatabaseModule } from './database/database.module';
     GamificationModule,
     I18nModule.register(),
     AccessibilityModule,
-    DatabaseModule,  // Add database utilities module
+    DatabaseModule,
   ],
   providers: [
     {
