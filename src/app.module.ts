@@ -21,6 +21,7 @@ import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
 import { CourseModule } from './course/course.module';
+import { ForumModule } from './forum/forum.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { CourseModule } from './course/course.module';
     UserModule,
     I18nModule.register(),
     AccessibilityModule,
+    ForumModule,
   ],
   providers: [
     {
