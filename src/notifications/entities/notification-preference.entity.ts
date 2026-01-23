@@ -25,11 +25,11 @@ export class NotificationPreference {
   userId: string;
 
   @Column({ type: 'json', default: {} })
-  preferences: Record<NotificationType, {
+  preferences: Partial<Record<NotificationType, {
     channels: NotificationChannel[];
     enabled: boolean;
     frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
-  }>;
+  }>>;
 
   @Column({ default: true })
   emailEnabled: boolean;
@@ -48,6 +48,21 @@ export class NotificationPreference {
 
   @Column({ name: 'unsubscribed_categories', type: 'simple-array', default: [] })
   unsubscribedCategories: string[];
+
+  @Column({ name: 'quiet_hours_enabled', default: false })
+  quietHoursEnabled: boolean;
+
+  @Column({ name: 'quiet_hours_start', nullable: true })
+  quietHoursStart: string; // HH:mm format
+
+  @Column({ name: 'quiet_hours_end', nullable: true })
+  quietHoursEnd: string; // HH:mm format
+
+  @Column({ name: 'timezone', default: 'UTC' })
+  timezone: string;
+
+  @Column({ name: 'do_not_disturb', default: false })
+  doNotDisturb: boolean;
 
   @Column({ name: 'created_by', nullable: true })
   createdBy?: string;
