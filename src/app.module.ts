@@ -2,6 +2,8 @@ import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
+import Redis from 'ioredis';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
@@ -30,12 +32,14 @@ import { UserBadge } from './user/entities/user-badge.entity';
 import { Follow } from './user/entities/follow.entity';
 import { PrivacySettings } from './user/entities/privacy-settings.entity';
 import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
+import { SecurityAudit } from './auth/entities/security-audit.entity';
 import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
 import { SyncLog } from './integrations/common/entities/sync-log.entity';
 import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { CourseModule } from './course/course.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
@@ -71,7 +75,18 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
         UserBadge,
         Follow,
         PrivacySettings,
+        PrivacySettings,
         ProfileAnalytics,
+        SecurityAudit,
+        Payment,
+        Subscription,
+        PaymentPlan,
+        Invoice,
+        Refund,
+        Dispute,
+        TaxRate,
+        FinancialReport,
+        PaymentMethodEntity,
         IntegrationConfig,
         SyncLog,
         IntegrationMapping,
@@ -81,16 +96,25 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
       migrations: ['dist/migrations/*.js'],
       migrationsRun: true,
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60_000, // 1 minute
-        limit: 10,
-      },
-      {
-        ttl: 3_600_000, // 1 hour
-        limit: 1000,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: config.get('RATE_LIMIT_TTL', 60000),
+            limit: config.get('RATE_LIMIT_MAX', 10),
+          },
+        ],
+        storage: new ThrottlerStorageRedisService(
+          new Redis({
+            host: config.get('REDIS_HOST', 'localhost'),
+            port: config.get('REDIS_PORT', 6379),
+            password: config.get('REDIS_PASSWORD'),
+          }),
+        ),
+      }),
+    }),
     AuthModule,
     CourseModule,
     UserModule,

@@ -60,6 +60,13 @@ export class User {
   @Column({ default: false })
   isEmailVerified: boolean;
 
+  @Column({ nullable: true })
+  @Exclude()
+  twoFactorAuthenticationSecret?: string;
+
+  @Column({ default: false })
+  isTwoFactorAuthenticationEnabled: boolean;
+
   @ApiProperty({ description: 'Email verification token' })
   @Column({ nullable: true })
   emailVerificationToken?: string;
