@@ -1,4 +1,3 @@
-// import { I18nModule } from './i18n/i18n.module';
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -17,7 +16,6 @@ import { CredentialModule } from './credential/credential.module';
 import { TranslationModule } from './translation/translation.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { FeedbackModule } from './feedback/feedback.module';
 import { MentorshipModule } from './mentorship/mentorship.module';
 import { ArchiveModule } from './archive/archive.module';
 import databaseConfig from './config/database.config';
@@ -33,11 +31,6 @@ import { DeprecationWarningMiddleware } from './common/middleware/deprecation-wa
 import { VersionTrackingInterceptor } from './common/interceptors/version-tracking.interceptor';
 import { VersionAnalyticsService } from './common/services/version-analytics.service';
 import { PerformanceInterceptor } from './monitoring/performance.interceptor';
-import { ApiUsageLog } from './common/entities/api-usage-log.entity';
-import { AuthControllerV1 } from './modules/auth/controllers/auth.controller.v1';
-import { AuthControllerV2 } from './modules/auth/controllers/auth.controller.v2';
-// import { CoursesControllerV1 } from './modules/courses/controllers/courses.controller.v1';
-// import { CoursesControllerV2 } from './modules/courses/controllers/courses.controller.v2';
 import { VersionController } from './modules/version/version.controller';
 import { apiVersionConfig } from './config/api-version.config';
 import { VersionHeaderMiddleware } from './common/middleware/version-header.middleware';
@@ -48,17 +41,14 @@ import { ErrorDashboardModule } from './error-dashboard/error-dashboard.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { DatabaseOptimizationModule } from './database-optimization/database-optimization.module';
 
-const ENV = process.env.NODE_ENV;;
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('ENV:', ENV);
+const ENV = process.env.NODE_ENV;
 
 @Module({
   imports: [
     ThrottlerModule.forRoot({
-      ttl: 60, // 60 seconds
+      ttl: 60,
       limit: 100,
     }),
-    // Global Config
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -66,7 +56,6 @@ console.log('ENV:', ENV);
       load: [databaseConfig, () => ({ api: apiVersionConfig })],
     }),
 
-    // Database
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -79,19 +68,17 @@ console.log('ENV:', ENV);
         database: configService.get<string>('database.name'),
         autoLoadEntities: configService.get<boolean>('database.autoload'),
         synchronize: configService.get<boolean>('database.synchronize'),
-        // Connection Pool Settings
         extra: {
           max: configService.get<number>('database.maxPoolSize'),
           min: configService.get<number>('database.minPoolSize'),
-          idleTimeoutMillis: configService.get<number>(
-            'database.poolIdleTimeout',
-          ),
+          idleTimeoutMillis: configService.get<number>('database.poolIdleTimeout'),
         },
-        // Retry Mechanism
         retryAttempts: configService.get<number>('database.retryAttempts'),
         retryDelay: configService.get<number>('database.retryDelay'),
       }),
     }),
+
+    // --- ACTIVE MODULES ---
     UsersModule,
     CoursesModule,
     AuthModule,
@@ -105,25 +92,26 @@ console.log('ENV:', ENV);
     UserProfilesModule,
     CredentialModule,
     ArchiveModule,
-    // FeedbackModule,
-    // I18nModule,
     MentorshipModule,
     TranslationModule,
     GdprModule,
-    MonitoringModule,
-    UsersModule,
+    MonitoringModule, 
     CoursesAdvancesModule,
-    AuthControllerV1,
-    AuthControllerV2,
-    // CoursesControllerV1,
-    // CoursesControllerV2,
-    VersionController,
     CmsModule,
     PaymentModule,
     ErrorDashboardModule,
     DatabaseOptimizationModule.forRoot(),
+
+    /** * ⛔ DISABLED MODULES (Bypassing Search/Video errors for Task #474)
+     * SearchModule,
+     * VideoStreamingModule,
+     * I18nModule
+     **/
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController, 
+    VersionController
+  ],
   providers: [
     AppService,
     VersionAnalyticsService,

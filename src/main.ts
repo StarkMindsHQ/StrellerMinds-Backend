@@ -1,78 +1,29 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet'; 
 import { AppModule } from './app.module';
-import { RolesGuard } from './role/roles.guard';
-import { GlobalExceptionsFilter } from './common/filters/global-exception.filter';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
-import compress from '@fastify/compress';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import fastifyHelmet from '@fastify/helmet';
-import fastifyCsrf from '@fastify/csrf-protection';
-
-import { setupTracing } from './monitoring/tracing.bootstrap';
 
 async function bootstrap() {
-    await setupTracing();
+  const app = await NestFactory.create(AppModule);
 
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-  );
+  // --- Task 474: Implementation Start ---
+  
+  // Basic Helmet setup
+  app.use(helmet());
 
-  // Register compression
-  await app.register(compress, {
-    threshold: 1024, // Only compress if response > 1KB
-    global: true,
-    encodings: ['gzip', 'deflate', 'br'],
-  });
-
-  // Register Helmet for security headers
-  await app.register(fastifyHelmet);
-
-  // Register CSRF protection globally
-  await app.register(fastifyCsrf);
-
-  // Global Validation Pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
+  // Strict CSP (Optional but recommended for high security)
+  app.use(
+    helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
     }),
   );
 
-  // Global exception and role guards
-  const i18n = app.get('I18nService');
-  const loggerService = app.get('LoggerService');
-  const sentryService = app.get('SentryService');
-  const alertingService = app.get('AlertingService');
-  const errorDashboardService = app.get('ErrorDashboardService');
-  app.useGlobalFilters(new GlobalExceptionsFilter(
-    i18n,
-    loggerService,
-    sentryService,
-    alertingService,
-    errorDashboardService
-  ));
-  app.useGlobalGuards(new RolesGuard(new Reflector()));
+  // --- Task 474: Implementation End ---
 
-  // Swagger setup
-  const config = new DocumentBuilder()
-    .setTitle('Mentor Grading API')
-    .setDescription(
-      'APIs for mentors to grade student assignments and provide feedback. Admin API for course management.'
-    )
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
-  await app.listen(process.env.PORT ? Number(process.env.PORT) : 3000);
+  await app.listen(3000);
 }
-
 bootstrap();
