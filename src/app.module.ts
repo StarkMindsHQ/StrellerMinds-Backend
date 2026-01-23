@@ -53,6 +53,8 @@ import {
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
+      load: [configuration],        // <-- add this
+      validationSchema,      
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
