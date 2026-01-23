@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,6 +12,7 @@ import { SecurityAuditService } from './security-audit.service';
 import { PasswordHistoryService } from './password-history.service';
 import { SecurityEvent } from '../entities/security-audit.entity';
 import { v4 as uuidv4 } from 'uuid';
+import * as crypto from 'crypto';
 
 // Type for user response without sensitive data
 export type UserResponse = Omit<User, 'password'> & {
@@ -229,17 +230,40 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(refreshTokenDto: RefreshTokenDto, ipAddress?: string, userAgent?: string): Promise<{
+  async refreshTokens(
+    refreshTokenDto: RefreshTokenDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<{
     accessToken: string;
     refreshToken: string;
   }> {
+    // First, cryptographically validate the refresh token and ensure it is of the correct type.
+    let payload: { sub: string; type?: string };
+    try {
+      payload = await this.jwtService.verifyAsync(refreshTokenDto.refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    if (!payload?.sub || payload.type !== 'refresh') {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(refreshTokenDto.refreshToken)
+      .digest('hex');
+
     const token = await this.refreshTokenRepository.findOne({
-      where: { token: refreshTokenDto.refreshToken },
+      where: { token: tokenHash },
       relations: ['user'],
     });
 
-    if (!token || !token.isValid) {
-      throw new Error('Invalid or expired refresh token');
+    if (!token || !token.isValid || token.userId !== payload.sub) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
     // Revoke old token
@@ -247,7 +271,12 @@ export class AuthService {
 
     // Generate new tokens
     const accessToken = this.generateAccessToken(token.user);
-    const refreshToken = await this.generateRefreshToken(token.user, token.deviceId, ipAddress, userAgent);
+    const refreshToken = await this.generateRefreshToken(
+      token.user,
+      token.deviceId,
+      ipAddress,
+      userAgent,
+    );
 
     return {
       accessToken,
@@ -256,14 +285,25 @@ export class AuthService {
   }
 
   async logout(refreshToken: string): Promise<void> {
-    const token = await this.refreshTokenRepository.findOne({ where: { token: refreshToken }, relations: ['user'] });
+    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+    const token = await this.refreshTokenRepository.findOne({
+      where: { token: tokenHash },
+      relations: ['user'],
+    });
+
     if (token) {
-      await this.securityAuditService.log(token.userId, SecurityEvent.LOGOUT, token.ipAddress, token.userAgent);
+      await this.securityAuditService.log(
+        token.userId,
+        SecurityEvent.LOGOUT,
+        token.ipAddress,
+        token.userAgent,
+      );
     }
 
     await this.refreshTokenRepository.update(
-      { token: refreshToken },
-      { isRevoked: true }
+      { token: tokenHash },
+      { isRevoked: true },
     );
   }
 
@@ -408,6 +448,8 @@ export class AuthService {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
     });
 
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
@@ -426,7 +468,7 @@ export class AuthService {
     }
 
     const refreshTokenEntity = this.refreshTokenRepository.create({
-      token,
+      token: tokenHash,
       userId: user.id,
       expiresAt,
       deviceId,
