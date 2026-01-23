@@ -33,6 +33,7 @@ import {
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { CourseModule } from './course/course.module';
+import { ConfigModule } from './config/config.module';
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 import { PaymentModule } from './payment/payment.module';
 import {
@@ -117,6 +118,8 @@ import {
     IntegrationsModule,
     I18nModule.register(),
     AccessibilityModule,
+    IntegrationsModule,
+    ConfigModule,
   ],
   providers: [
     {
