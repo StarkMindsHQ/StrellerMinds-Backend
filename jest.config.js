@@ -1,5 +1,3 @@
-const { pathsToModuleNameMapper } = require('ts-jest');
-
 module.exports = {
   displayName: 'StrellerMinds Backend',
   preset: 'ts-jest',
@@ -18,11 +16,7 @@ module.exports = {
   ],
 
   // Ignore patterns
-  testPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/dist/',
-    '<rootDir>/test/e2e/',
-  ],
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/test/e2e/'],
 
   // Module name mapping for path aliases
   moduleNameMapper: {
@@ -32,13 +26,11 @@ module.exports = {
   },
 
   // Setup files
-  setupFilesAfterEnv: [
-    '<rootDir>/test/setup/jest.setup.ts',
-  ],
+  setupFilesAfterEnv: [],
 
   // Transform configuration
   transform: {
-    '^.+\\.(t|j)s$': [
+    '^.+\\.ts$': [
       'ts-jest',
       {
         tsconfig: 'tsconfig.json',
@@ -66,15 +58,7 @@ module.exports = {
   ],
 
   coverageDirectory: '<rootDir>/coverage',
-  coverageReporters: [
-    'text',
-    'text-summary',
-    'html',
-    'lcov',
-    'json',
-    'json-summary',
-    'cobertura',
-  ],
+  coverageReporters: ['text', 'text-summary', 'html', 'lcov', 'json', 'json-summary', 'cobertura'],
 
   // Coverage thresholds
   coverageThreshold: {
@@ -117,37 +101,8 @@ module.exports = {
   },
 
   // Reporters
-  reporters: [
-    'default',
-    [
-      'jest-html-reporters',
-      {
-        publicPath: './coverage/html-report',
-        filename: 'test-report.html',
-        expand: true,
-        hideIcon: false,
-        pageTitle: 'StrellerMinds Test Report',
-        inlineSource: false,
-      },
-    ],
-    [
-      'jest-junit',
-      {
-        outputDirectory: './coverage',
-        outputName: 'junit.xml',
-        ancestorSeparator: ' › ',
-        uniqueOutputName: 'false',
-        suiteNameTemplate: '{filepath}',
-        classNameTemplate: '{classname}',
-        titleTemplate: '{title}',
-      },
-    ],
-  ],
+  reporters: ['default'],
 
   // Watch mode configuration
-  watchPathIgnorePatterns: [
-    '<rootDir>/node_modules/',
-    '<rootDir>/dist/',
-    '<rootDir>/coverage/',
-  ],
+  watchPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/coverage/'],
 };
