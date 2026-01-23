@@ -19,7 +19,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "audit:security": "npm audit --audit-level=moderate",
     "audit:fix": "npm audit fix",
-    "audit:fix-force": "npm audit fix --force"
+    "audit:fix-force": "npm audit fix --force",
+    "test:integration": "jest test/integration"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.972.0",

@@ -5,6 +5,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import Redis from 'ioredis';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { AnalyticsModule } from './analytics/analytics.module';
+
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -83,6 +85,8 @@ import {
         IntegrationConfig,
         SyncLog,
         IntegrationMapping,
+        AnalyticsModule,
+
       ],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
