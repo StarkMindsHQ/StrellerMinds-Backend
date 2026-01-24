@@ -1,5 +1,7 @@
-import { defineConfig } from 'cypress';
-export default defineConfig({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var cypress_1 = require("cypress");
+exports.default = (0, cypress_1.defineConfig)({
     e2e: {
         baseUrl: 'http://localhost:3000',
         supportFile: 'test/e2e/support/e2e.ts',
@@ -37,48 +39,49 @@ export default defineConfig({
                 password: 'admin123',
             },
         },
-        setupNodeEvents(on, config) {
+        setupNodeEvents: function (on, config) {
             // Task definitions
             on('task', {
                 // Database tasks
-                clearDatabase() {
+                clearDatabase: function () {
                     // Implementation to clear test database
                     return null;
                 },
-                seedDatabase(data) {
+                seedDatabase: function (data) {
                     // Implementation to seed test database
                     return null;
                 },
                 // API tasks
-                createTestUser(userData) {
+                createTestUser: function (userData) {
                     // Implementation to create test user via API
                     return null;
                 },
-                createTestCourse(courseData) {
+                createTestCourse: function (courseData) {
                     // Implementation to create test course via API
                     return null;
                 },
                 // File system tasks
-                readFile(filename) {
+                readFile: function (filename) {
                     // Implementation to read files
                     return null;
                 },
-                writeFile({ filename, content }) {
+                writeFile: function (_a) {
+                    var filename = _a.filename, content = _a.content;
                     // Implementation to write files
                     return null;
                 },
                 // Email tasks
-                getLastEmail() {
+                getLastEmail: function () {
                     // Implementation to get last sent email (for testing)
                     return null;
                 },
-                clearEmails() {
+                clearEmails: function () {
                     // Implementation to clear email queue
                     return null;
                 },
             });
             // Plugin configurations
-            on('before:browser:launch', (browser, launchOptions) => {
+            on('before:browser:launch', function (browser, launchOptions) {
                 if (browser.name === 'chrome') {
                     launchOptions.args.push('--disable-dev-shm-usage');
                     launchOptions.args.push('--no-sandbox');
