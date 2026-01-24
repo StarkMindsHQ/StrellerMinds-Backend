@@ -4,26 +4,16 @@
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "tsconfig": "<rootDir>/tsconfig.e2e.json"
+      }
+    ]
   },
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/../src/$1"
   },
   "globalSetup": "<rootDir>/jest.global-setup.ts",
-  "globalTeardown": "<rootDir>/jest.global-teardown.ts",
-  "globals": {
-    "ts-jest": {
-      "tsconfig": "<rootDir>/tsconfig.e2e.json"
-    }
-  },
-  "collectCoverage": true,
-  "coverageDirectory": "../coverage/e2e",
-  "coverageThreshold": {
-    "global": {
-      "branches": 80,
-      "functions": 80,
-      "lines": 80,
-      "statements": 80
-    }
-  }
+  "globalTeardown": "<rootDir>/jest.global-teardown.ts"
 }

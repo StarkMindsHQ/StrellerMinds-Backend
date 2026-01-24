@@ -48,16 +48,17 @@ import { ErrorDashboardModule } from './error-dashboard/error-dashboard.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
 import { DatabaseOptimizationModule } from './database-optimization/database-optimization.module';
 
-const ENV = process.env.NODE_ENV;;
+const ENV = process.env.NODE_ENV;
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('ENV:', ENV);
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot({
-      ttl: 60, // 60 seconds
+    // Updated Throttler configuration to v5+ Array syntax
+    ThrottlerModule.forRoot([{
+      ttl: 60000, 
       limit: 100,
-    }),
+    }]),
     // Global Config
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({

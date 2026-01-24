@@ -30,114 +30,115 @@ import { CoursesAdvance } from 'src/courses-advances/entities/courses-advance.en
 export class User {
   @ApiProperty({ description: 'Unique user ID', example: 'uuid-v4' })
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @ApiProperty({ description: 'First name', example: 'John' })
   @Column()
-  firstName: string;
+  firstName!: string;
 
   @ApiProperty({ description: 'Last name', example: 'Doe' })
   @Column()
-  lastName: string;
+  lastName!: string;
 
   @ApiProperty({ description: 'Email address', example: 'user@example.com' })
   @Column({ unique: true })
   @Index()
-  email: string;
+  email!: string;
 
   @ApiProperty({ description: 'Password hash', example: 'hashed-password', writeOnly: true })
   @Column({ select: false })
-  password: string;
+  password!: string;
 
   @ApiProperty({ description: 'Is user an instructor', example: false })
   @Column({ default: false })
-  isInstructor: boolean;
+  isInstructor!: boolean;
 
   @ApiPropertyOptional({ description: 'User biography', example: 'A short bio' })
   @Column({ nullable: true, type: 'text' })
-  bio: string;
+  bio!: string;
 
   @ApiProperty({ enum: UserRole, description: 'User role', example: UserRole.STUDENT })
   @Column({ type: 'enum', enum: UserRole, default: UserRole.STUDENT })
   @Index()
-  role: UserRole;
+  role!: UserRole;
 
   @ApiPropertyOptional({ description: 'Profile image URL', example: 'https://cdn.com/profile.jpg' })
   @OneToMany(() => CoursesAdvance, (course) => course.instructor)
-  courses: CoursesAdvance;
+  courses!: CoursesAdvance;
+
   @Column({ nullable: true })
   profileImageUrl?: string;
 
   @ApiPropertyOptional({ description: 'Preferred language', example: 'en' })
   @Column({ nullable: true })
-  preferredLanguage: string;
+  preferredLanguage!: string;
 
   @ApiProperty({ description: 'Date created', example: '2024-01-01T00:00:00Z' })
   @CreateDateColumn()
   @Index()
-  createdAt: Date;
+  createdAt!: Date;
 
   @ApiProperty({ description: 'Date updated', example: '2024-01-01T00:00:00Z' })
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
   @ApiProperty({ enum: AccountStatus, description: 'Account status', example: AccountStatus.ACTIVE })
   @Column({ type: 'enum', enum: AccountStatus, default: AccountStatus.ACTIVE })
   @Index()
-  status: AccountStatus;
+  status!: AccountStatus;
 
   @ApiPropertyOptional({ description: 'Date deactivated', example: '2024-01-01T00:00:00Z' })
   @Column({ nullable: true })
-  deactivatedAt: Date;
+  deactivatedAt!: Date;
 
   @ApiPropertyOptional({ description: 'Date deletion requested', example: '2024-01-01T00:00:00Z' })
   @Column({ nullable: true })
-  deletionRequestedAt: Date;
+  deletionRequestedAt!: Date;
 
   @ApiPropertyOptional({ description: 'Date deleted', example: '2024-01-01T00:00:00Z' })
   @DeleteDateColumn({ nullable: true })
-  deletedAt: Date;
+  deletedAt!: Date;
 
   @OneToMany(() => UserProgress, (progress) => progress.user)
-  progress: Promise<UserProgress[]>;
+  progress!: Promise<UserProgress[]>;
 
   @OneToMany(() => Course, (course) => course.instructor)
-  instructorCourses: Course[];
+  instructorCourses!: Course[];
 
   @OneToMany(() => Certificate, (certificate) => certificate.user)
-  certificates: Certificate[];
+  certificates!: Certificate[];
 
   @OneToMany(() => CourseReview, (courseReview) => courseReview.user)
-  reviews: CourseReview[];
+  reviews!: CourseReview[];
 
   @OneToMany(() => AuthToken, (authToken) => authToken.user)
-  authTokens: Promise<AuthToken[]>;
+  authTokens!: Promise<AuthToken[]>;
 
   @OneToOne(() => WalletInfo, (walletInfo) => walletInfo.user)
-  walletInfo: WalletInfo;
+  walletInfo!: WalletInfo;
 
   @Column({ nullable: true })
   refreshToken?: string;
 
   @Column({ default: false })
-  isEmailVerified: boolean;
+  isEmailVerified!: boolean;
 
   @OneToOne(() => UserProfile, (profile) => profile.user, { cascade: true })
-  profile: UserProfile;
+  profile!: UserProfile;
 
   @OneToOne(() => UserSettings, (settings) => settings.user, {
     cascade: true,
     eager: true,
   })
-  settings: UserSettings;
+  settings!: UserSettings;
 
   @ApiProperty({ description: 'Username', example: 'johndoe', uniqueItems: true })
   @Column({ unique: true, nullable: false })
-  username: string;
+  username!: string;
 
   gradesGiven: any;
   gradesReceived: any;
-  reputation: number;
+  reputation!: number;
 
   async setPassword(password: string): Promise<void> {
     const salt = await bcrypt.genSalt();

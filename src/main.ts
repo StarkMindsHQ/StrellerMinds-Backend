@@ -1,78 +1,50 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe, Logger } from '@nestjs/common';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
-import { RolesGuard } from './role/roles.guard';
-import { GlobalExceptionsFilter } from './common/filters/global-exception.filter';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
-import compress from '@fastify/compress';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import fastifyHelmet from '@fastify/helmet';
-import fastifyCsrf from '@fastify/csrf-protection';
-
-import { setupTracing } from './monitoring/tracing.bootstrap';
+import helmet from '@fastify/helmet';
 
 async function bootstrap() {
-    await setupTracing();
-
+  const logger = new Logger('Bootstrap');
+  
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
   );
 
-  // Register compression
-  await app.register(compress, {
-    threshold: 1024, // Only compress if response > 1KB
-    global: true,
-    encodings: ['gzip', 'deflate', 'br'],
+  // Security Hardening - Cast to 'any' if 'register' shows a type error
+  await (app as any).register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [`'self'`],
+        styleSrc: [`'self'`, `'unsafe-inline'`],
+        imgSrc: [`'self'`, 'data:', 'validator.swagger.io'],
+        scriptSrc: [`'self'`, `'unsafe-inline'`],
+      },
+    },
   });
 
-  // Register Helmet for security headers
-  await app.register(fastifyHelmet);
+  const origins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',') 
+    : '*';
 
-  // Register CSRF protection globally
-  await app.register(fastifyCsrf);
+  app.enableCors({
+    origin: origins,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
-  // Global Validation Pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe({ 
+    whitelist: true, 
+    transform: true 
+  }));
 
-  // Global exception and role guards
-  const i18n = app.get('I18nService');
-  const loggerService = app.get('LoggerService');
-  const sentryService = app.get('SentryService');
-  const alertingService = app.get('AlertingService');
-  const errorDashboardService = app.get('ErrorDashboardService');
-  app.useGlobalFilters(new GlobalExceptionsFilter(
-    i18n,
-    loggerService,
-    sentryService,
-    alertingService,
-    errorDashboardService
-  ));
-  app.useGlobalGuards(new RolesGuard(new Reflector()));
-
-  // Swagger setup
-  const config = new DocumentBuilder()
-    .setTitle('Mentor Grading API')
-    .setDescription(
-      'APIs for mentors to grade student assignments and provide feedback. Admin API for course management.'
-    )
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
-  await app.listen(process.env.PORT ? Number(process.env.PORT) : 3000);
+  const port = parseInt(process.env.PORT || '3000', 10);
+  
+  // Explicitly cast to 'any' to avoid the Nest 10/11 version mismatch error
+  await (app as any).listen(port, '0.0.0.0');
+  
+  logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 
 bootstrap();

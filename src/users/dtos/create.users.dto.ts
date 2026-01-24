@@ -1,10 +1,3 @@
-/**
- * DTO for creating a new user.
- *
- * Used for user registration and admin user creation.
- *
- * All fields are documented for OpenAPI/Swagger UI.
- */
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
@@ -21,23 +14,23 @@ export class CreateUsersDto {
   @ApiProperty({ example: 'user@example.com', description: 'User email address' })
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email!: string; // Added !
 
   @ApiProperty({ example: 'StrongPassword123', minLength: 8, description: 'User password (min 8 chars)' })
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @IsNotEmpty()
-  password: string;
+  password!: string; // Added !
 
   @ApiProperty({ example: 'John', description: 'First name' })
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  firstName!: string; // Added !
 
   @ApiProperty({ example: 'Doe', description: 'Last name' })
   @IsString()
   @IsNotEmpty()
-  lastName: string;
+  lastName!: string; // Added !
 
   @ApiPropertyOptional({ example: 'https://cdn.com/profile.jpg', description: 'Profile image URL (optional)' })
   @IsOptional()

@@ -1,8 +1,12 @@
- {
+{
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": "../",
     "types": ["node", "jest"],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "paths": {
+      "src/*": ["src/*"]
+    }
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "../src/**/*.ts"]
 }
