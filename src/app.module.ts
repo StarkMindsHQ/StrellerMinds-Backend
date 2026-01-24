@@ -56,6 +56,7 @@ import {
 import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
 import { SyncLog } from './integrations/common/entities/sync-log.entity';
 import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
+import { AssignmentsModule } from './assignments/assignments.module';
 
 @Module({
   imports: [
@@ -107,6 +108,7 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
     AppConfigModule,
     DatabaseModule,
     IntegrationsModule,
+    AssignmentsModule,
   ],
   providers: [
     {
