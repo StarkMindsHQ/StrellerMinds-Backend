@@ -1,14 +1,15 @@
-import { 
-  Injectable, 
-  NestMiddleware, 
-  HttpException, 
+import {
+  Injectable,
+  NestMiddleware,
+  HttpException,
   HttpStatus,
-  InternalServerErrorException 
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RefreshToken } from '../entities/refresh-token.entity';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class TokenBlacklistMiddleware implements NestMiddleware {
@@ -18,21 +19,27 @@ export class TokenBlacklistMiddleware implements NestMiddleware {
   ) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    // Skip blacklist check for non-authenticated routes
-    if (!req.headers.authorization) {
+    // Skip blacklist check if there is no Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
       return next();
     }
 
     try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader.replace('Bearer ', '');
-      
-      // Check if token is a refresh token and is blacklisted
+      const [scheme, token] = authHeader.split(' ');
+      if (scheme !== 'Bearer' || !token) {
+        return next();
+      }
+
+      // Tokens are stored as a SHA-256 hash in the database for security.
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+      // Check if the corresponding stored refresh token has been revoked.
       const blacklistedToken = await this.refreshTokenRepository.findOne({
-        where: { 
-          token: token,
-          isRevoked: true 
-        }
+        where: {
+          token: tokenHash,
+          isRevoked: true,
+        },
       });
 
       if (blacklistedToken) {
