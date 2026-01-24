@@ -3,10 +3,14 @@
 ## Overview
 This document centralizes API onboarding, interactive documentation, SDK generation, and example requests for the StrellerMinds Backend.
 
+
+
 ## Prerequisites
 - A running StrellerMinds Backend instance. Follow `README.md` to install and start the API.
 
-## Base URL
+
+
+## Base URL 
 - Local development: `http://localhost:3000/api`
 - All routes are prefixed with `/api` (see `src/main.ts`).
 
