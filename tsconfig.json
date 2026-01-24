@@ -15,7 +15,7 @@
     "baseUrl": "./",
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "types": ["node"],
+    "types": ["node", "jest"],
     "removeComments": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
