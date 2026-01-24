@@ -25,6 +25,8 @@ import {
 } from './auth/middleware/auth.middleware';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
+import { HealthModule } from './health/health.module';
+
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 
 import { DatabaseConfig } from './config/database.config';
@@ -98,6 +100,11 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
     GamificationModule,
     I18nModule.register(),
     AccessibilityModule,
+    IntegrationsModule,
+    ConfigModule,
+    HealthModule,
+    ForumModule,
+    AppConfigModule,
     DatabaseModule,
     IntegrationsModule,
   ],
