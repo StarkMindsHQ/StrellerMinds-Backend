@@ -1,5 +1,8 @@
 # StrellerMinds Backend Developer Portal
 
+
+
+
 ## Overview
 This document centralizes API onboarding, interactive documentation, SDK generation, and example requests for the StrellerMinds Backend.
 
