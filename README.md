@@ -164,8 +164,10 @@ src/
 
 Once the server is running, access the interactive API documentation:
 
-- **Swagger UI**: `http://localhost:3000/api`
-- **JSON Spec**: `http://localhost:3000/api-json`
+- **Swagger UI**: `http://localhost:3000/api/docs`
+- **OpenAPI JSON**: `http://localhost:3000/api/docs-json`
+
+For onboarding, SDK generation, and multi-language examples, see `DEVELOPER_PORTAL.md`.
 
 ## 🧪 Testing
 
@@ -293,6 +295,57 @@ This project is **UNLICENSED** - all rights reserved.
 - Stellar Development Foundation for blockchain infrastructure
 - Open source community for valuable tools and libraries
 
+
+## Environment configuration
+
+The application uses environment variables for configuration. All variables are required unless a default value is specified.
+
+### Server
+| Variable | Description | Default / Required |
+|----------|-------------|------------------|
+| PORT | Server port | 3000 |
+
+### Database
+| Variable | Description | Required |
+|----------|-------------|----------|
+| DATABASE_HOST | PostgreSQL host | localhost |
+| DATABASE_PORT | PostgreSQL port | 5432 |
+| DATABASE_USER | PostgreSQL username | Required |
+| DATABASE_PASSWORD | PostgreSQL password | Required |
+| DATABASE_NAME | PostgreSQL database name | StrellerMinds |
+
+### Authentication
+| Variable | Description | Required |
+|----------|-------------|----------|
+| JWT_SECRET | Secret key for JWT authentication | mysecretJourney |
+
+### Cloudinary
+| Variable | Description | Required |
+|----------|-------------|----------|
+| CLOUDINARY_CLOUD_NAME | Cloudinary cloud name | ds3czwdtg |
+| CLOUDINARY_API_KEY | Cloudinary API key | 377545627931675 |
+| CLOUDINARY_API_SECRET | Cloudinary API secret | pFrg1_s63mhEQ_v9w-IVdDFq3jE |
+
+### Stellar
+| Variable | Description | Required |
+|----------|-------------|----------|
+| STELLAR_SECRET_KEY | Secret key for Stellar network | jgjxvsjxvwjxsjxgskjxksmxjswkxwgxwdcj |
+
+### Email
+| Variable | Description | Required |
+|----------|-------------|----------|
+| EMAIL_ENABLED | Enable email sending | false |
+| EMAIL_TRACKING_ENABLED | Enable tracking | true |
+| EMAIL_TRACKING_SECRET | Secret for tracking | <minimum-32-character-secret> |
+| EMAIL_TRACKING_BASE_URL | Base URL for email links | http://localhost:3000 |
+
+### Redis
+| Variable | Description | Required |
+|----------|-------------|----------|
+| REDIS_HOST | Redis host | localhost |
+| REDIS_PORT | Redis port | 6379 |
+
 ---
 
 **Built with ❤️ for the blockchain education community**
+

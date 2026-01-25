@@ -1,27 +1,31 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ValidationException } from './common/decorators/errors/validation-exception';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { applyGlobalSecurity } from './common/security/bootstrap';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './logging/winston.config';
+import * as Sentry from '@sentry/node';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // Sentry should initialize as early as possible.
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+  });
 
-  // Global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-      exceptionFactory: (errors:any ) => {
-      return new ValidationException(errors)
-      },
-    }),
-  );
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger(winstonConfig),
+  });
+
+  // Security headers
+  app.use(helmet());
+
+  // Global input security + validation (centralized)
+  applyGlobalSecurity(app);
 
     app.useGlobalFilters(new AllExceptionsFilter());
 
@@ -53,10 +57,5 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-
-  console.log(`🚀 StrellerMinds Backend is running on port ${port}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
-  console.log(`🔐 Health Check: http://localhost:${port}/api/health`);
 }
-
 bootstrap();

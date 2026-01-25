@@ -1,15 +1,30 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-
+import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
+import Redis from 'ioredis';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
+import { FilesModule } from './files/files.module';
+import { GamificationModule } from './gamification/gamification.module';
+import { DatabaseModule } from './database/database.module';
+import { IntegrationsModule } from './integrations/integrations.module';
+import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
+import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
+import { HealthModule } from './health/health.module';
+
+import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
+
+import { DatabaseConfig } from './config/database.config';
+import configuration, { validationSchema } from './config/configuration';
+
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
+import { SecurityAudit } from './auth/entities/security-audit.entity';
 import { UserProfile } from './user/entities/user-profile.entity';
 import { PortfolioItem } from './user/entities/portfolio-item.entity';
 import { Badge } from './user/entities/badge.entity';
@@ -38,61 +53,63 @@ import { SearchModule } from './search/search.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
+import { SyncLog } from './integrations/common/entities/sync-log.entity';
+import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['.env.local', '.env', '.env.development'],
+      load: [configuration],
+      validationSchema,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DATABASE_HOST || 'localhost',
-      port: parseInt(process.env.DATABASE_PORT || '5432'),
-      username: process.env.DATABASE_USER || 'postgres',
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME || 'strellerminds',
-      entities: [
-        User,
-        RefreshToken,
-        UserProfile,
-        PortfolioItem,
-        Badge,
-        UserBadge,
-        Follow,
-        PrivacySettings,
-        ProfileAnalytics,
-        Payment,
-        Subscription,
-        PaymentPlan,
-        Invoice,
-        Refund,
-        Dispute,
-        TaxRate,
-        FinancialReport,
-        PaymentMethodEntity,
-      ],
-      synchronize: process.env.NODE_ENV === 'development',
-      logging: process.env.NODE_ENV === 'development',
-      migrations: ['dist/migrations/*.js'],
-      migrationsRun: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const dbConfig = new DatabaseConfig(configService);
+        return dbConfig.createTypeOrmOptions();
+      },
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60_000, // 1 minute
-        limit: 10,
-      },
-      {
-        ttl: 3_600_000, // 1 hour
-        limit: 1000,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: config.get('RATE_LIMIT_TTL', 60000),
+            limit: config.get('RATE_LIMIT_MAX', 10),
+          },
+        ],
+        storage: new ThrottlerStorageRedisService(
+          new Redis({
+            host: config.get('REDIS_HOST', 'localhost'),
+            port: config.get('REDIS_PORT', 6379),
+            password: config.get('REDIS_PASSWORD'),
+          }),
+        ),
+      }),
+    }),
     AuthModule,
     CourseModule,
     UserModule,
     PaymentModule,                // <-- from feature branch
     I18nModule.register(),        // <-- from main
     AccessibilityModule, SearchModule,          // <-- from main
+    PaymentModule,
+    FilesModule,
+    GamificationModule,
+    I18nModule.register(),
+    AccessibilityModule,
+    IntegrationsModule,
+    ConfigModule,
+    HealthModule,
+    ForumModule,
+    AppConfigModule,
+    DatabaseModule,
+    IntegrationsModule,
   ],
   providers: [
     {
@@ -116,8 +133,11 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
+    consumer.apply(InputSecurityMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
     // consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
     consumer.apply(RequestIdMiddleware).forRoutes('*');
+    consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
   }
 }
