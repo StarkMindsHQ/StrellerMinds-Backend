@@ -20,6 +20,8 @@ import { Category } from './category.entity';
 import { Tag } from './tag.entity';
 import { User } from '../../auth/entities/user.entity';
 
+export { CourseStatus };
+
 @Entity('courses')
 @Index(['status', 'createdAt'])
 @Index(['instructorId'])
@@ -67,12 +69,12 @@ export class Course {
   @Column({ type: 'timestamp', nullable: true })
   publishedAt: Date;
 
-  @OneToMany(() => CourseModule, (module) => module.course, {
+  @OneToMany('CourseModule', 'course', {
     cascade: true,
   })
   modules: CourseModule[];
 
-  @OneToMany(() => CourseVersion, (version) => version.course)
+  @OneToMany('CourseVersion', 'course')
   versions: CourseVersion[];
 
   @ManyToMany(() => Category)

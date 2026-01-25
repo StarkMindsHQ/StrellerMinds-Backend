@@ -428,7 +428,7 @@ export class AuthService {
     };
 
     return this.jwtService.sign(payload, {
-      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m'),
+      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m') as any,
     });
   }
 
@@ -444,7 +444,7 @@ export class AuthService {
     };
 
     const token = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
+      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d') as any,
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
     });
 
