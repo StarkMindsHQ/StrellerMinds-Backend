@@ -94,7 +94,7 @@ export class CreateIntegrationTables1704900000000 implements MigrationInterface 
       'integration_configs',
       new TableIndex({
         name: 'IDX_integration_userId_type',
-        columns: ['userId', 'integrationType'],
+        columnNames: ['userId', 'integrationType'],
         isUnique: true,
       }),
     );
@@ -189,7 +189,7 @@ export class CreateIntegrationTables1704900000000 implements MigrationInterface 
       'sync_logs',
       new TableIndex({
         name: 'IDX_sync_logs_config_date',
-        columns: ['integrationConfigId', 'startedAt'],
+        columnNames: ['integrationConfigId', 'startedAt'],
         isUnique: false,
       }),
     );
@@ -198,7 +198,7 @@ export class CreateIntegrationTables1704900000000 implements MigrationInterface 
       'sync_logs',
       new TableIndex({
         name: 'IDX_sync_logs_status_date',
-        columns: ['status', 'startedAt'],
+        columnNames: ['status', 'startedAt'],
         isUnique: false,
       }),
     );
@@ -291,7 +291,7 @@ export class CreateIntegrationTables1704900000000 implements MigrationInterface 
       'integration_mappings',
       new TableIndex({
         name: 'IDX_integration_mappings_config_local',
-        columns: ['integrationConfigId', 'localResourceId'],
+        columnNames: ['integrationConfigId', 'localResourceId'],
         isUnique: true,
       }),
     );

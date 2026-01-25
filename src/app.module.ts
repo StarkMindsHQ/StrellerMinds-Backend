@@ -17,6 +17,7 @@ import { GamificationModule } from './gamification/gamification.module';
 import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { VideoModule } from './video/video.module';
+import { SecurityModule } from './security/security.module';
 
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
@@ -103,7 +104,7 @@ import { ForumModule } from './forum/forum.module';
     I18nModule.register(),
     AccessibilityModule,
     IntegrationsModule,
-    ConfigModule,
+    SecurityModule,
     HealthModule,
     ForumModule,
     ConfigModule,

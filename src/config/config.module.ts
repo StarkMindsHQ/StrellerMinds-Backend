@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import configuration, { validationSchema } from './configuration';
+import { ConfigModule as NestConfigModule } from '@nestjs/config';
+import { configuration, validationSchema } from './configuration';
 import { ConfigurationService } from './config.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
+    NestConfigModule.forRoot({
       load: [configuration],
       validationSchema,
       isGlobal: true,

@@ -18,7 +18,7 @@ export class Lesson {
   @Column({ default: true })
   isDraft: boolean;
 
-  @ManyToOne(() => CourseModule, (module) => module.lessons, {
+  @ManyToOne('CourseModule', 'lessons', {
     onDelete: 'CASCADE',
   })
   module: CourseModule;
