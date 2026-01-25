@@ -2,7 +2,7 @@ import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -20,7 +20,7 @@ import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
-import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware'; // <-- make sure to import
+// import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware'; // <-- make sure to import
 import { CourseModule } from './course/course.module';
 import { PaymentModule } from './payment/payment.module';
 import {
@@ -35,6 +35,9 @@ import {
   PaymentMethodEntity,
 } from './payment/entities';
 import { SearchModule } from './search/search.module';
+import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -100,12 +103,21 @@ import { SearchModule } from './search/search.module';
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
     },
+     {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
-    consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
+    // consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
   }
 }
