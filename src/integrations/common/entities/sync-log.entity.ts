@@ -16,7 +16,7 @@ export enum SyncDirection {
 }
 
 @Entity('sync_logs')
-@Index(['integrationConfigId', 'createdAt'], { order: { createdAt: 'DESC' } })
+@Index('IDX_sync_config_created', ['integrationConfigId', 'createdAt'])
 @Index(['status', 'createdAt'])
 export class SyncLog {
   @PrimaryGeneratedColumn('uuid')

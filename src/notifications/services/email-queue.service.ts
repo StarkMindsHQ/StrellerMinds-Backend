@@ -104,7 +104,7 @@ export class EmailQueueService {
       await this.emailQueueRepository.save(emailJob);
 
       // Send the email
-      const emailResult = await this.emailService.mailerService.sendMail({
+      const emailResult = await (this.emailService as any).mailerService.sendMail({
         to: emailJob.recipientEmail,
         subject: emailJob.subject,
         html: emailJob.htmlContent,
@@ -151,12 +151,11 @@ export class EmailQueueService {
   }
 
   async getFailedEmails(): Promise<EmailQueue[]> {
-    return await this.emailQueueRepository.find({
-      where: {
-        status: EmailStatus.FAILED,
-        retryCount: () => 'retry_count < max_retries',
-      },
-    });
+    return await this.emailQueueRepository
+      .createQueryBuilder('email')
+      .where('email.status = :status', { status: EmailStatus.FAILED })
+      .andWhere('email.retryCount < email.maxRetries')
+      .getMany();
   }
 
   async getQueuedEmails(): Promise<EmailQueue[]> {

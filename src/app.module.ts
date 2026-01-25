@@ -16,6 +16,7 @@ import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { SecurityModule } from './security/security.module';
 
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
@@ -101,12 +102,9 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
     I18nModule.register(),
     AccessibilityModule,
     IntegrationsModule,
-    ConfigModule,
+    SecurityModule,
     HealthModule,
-    ForumModule,
-    AppConfigModule,
     DatabaseModule,
-    IntegrationsModule,
   ],
   providers: [
     {

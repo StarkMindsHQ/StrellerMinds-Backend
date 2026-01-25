@@ -25,7 +25,9 @@ export class AchievementService {
   async createBadge(createDto: any): Promise<BadgeResponseDto> {
     const badge = this.badgeRepository.create(createDto);
     const saved = await this.badgeRepository.save(badge);
-    return this.mapBadgeToResponseDto(saved);
+    // save can return Badge | Badge[], handle both cases
+    const savedBadge = Array.isArray(saved) ? saved[0] : saved;
+    return this.mapBadgeToResponseDto(savedBadge);
   }
 
   async getAllBadges(): Promise<BadgeResponseDto[]> {

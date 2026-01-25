@@ -16,12 +16,11 @@ export class RateLimitService {
     const periodStart = new Date();
     periodStart.setMinutes(periodStart.getMinutes() - periodMinutes);
 
-    const recentEmailsCount = await this.emailQueueRepository.count({
-      where: {
-        recipientEmail: recipient,
-        createdAt: () => `created_at >= '${periodStart.toISOString()}'`,
-      },
-    });
+    const recentEmailsCount = await this.emailQueueRepository
+      .createQueryBuilder('email')
+      .where('email.recipientEmail = :recipient', { recipient })
+      .andWhere('email.createdAt >= :periodStart', { periodStart })
+      .getCount();
 
     // Default rate limit: 5 emails per 15 minutes
     const maxEmailsPerPeriod = this.configService.get<number>('EMAIL_RATE_LIMIT_PER_PERIOD', 5);
@@ -33,12 +32,11 @@ export class RateLimitService {
     const periodStart = new Date();
     periodStart.setMinutes(periodStart.getMinutes() - periodMinutes);
 
-    const recentEmailsCount = await this.emailQueueRepository.count({
-      where: {
-        recipientEmail: recipient,
-        createdAt: () => `created_at >= '${periodStart.toISOString()}'`,
-      },
-    });
+    const recentEmailsCount = await this.emailQueueRepository
+      .createQueryBuilder('email')
+      .where('email.recipientEmail = :recipient', { recipient })
+      .andWhere('email.createdAt >= :periodStart', { periodStart })
+      .getCount();
 
     const maxEmailsPerPeriod = this.configService.get<number>('EMAIL_RATE_LIMIT_PER_PERIOD', 5);
     
@@ -56,12 +54,11 @@ export class RateLimitService {
     const resetTime = new Date();
     resetTime.setMinutes(resetTime.getMinutes() + periodMinutes);
 
-    const recentEmailsCount = await this.emailQueueRepository.count({
-      where: {
-        recipientEmail: recipient,
-        createdAt: () => `created_at >= '${periodStart.toISOString()}'`,
-      },
-    });
+    const recentEmailsCount = await this.emailQueueRepository
+      .createQueryBuilder('email')
+      .where('email.recipientEmail = :recipient', { recipient })
+      .andWhere('email.createdAt >= :periodStart', { periodStart })
+      .getCount();
 
     const maxEmailsPerPeriod = this.configService.get<number>('EMAIL_RATE_LIMIT_PER_PERIOD', 5);
     
