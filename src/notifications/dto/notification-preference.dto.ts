@@ -7,11 +7,11 @@ export class CreateNotificationPreferenceDto {
 
   @IsObject()
   @IsOptional()
-  preferences?: Record<NotificationType, {
+  preferences?: Partial<Record<NotificationType, {
     channels: NotificationChannel[];
     enabled: boolean;
     frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
-  }>;
+  }>>;
 
   @IsBoolean()
   @IsOptional()
@@ -28,16 +28,36 @@ export class CreateNotificationPreferenceDto {
   @IsBoolean()
   @IsOptional()
   inAppEnabled?: boolean = true;
+
+  @IsBoolean()
+  @IsOptional()
+  quietHoursEnabled?: boolean = false;
+
+  @IsString()
+  @IsOptional()
+  quietHoursStart?: string;
+
+  @IsString()
+  @IsOptional()
+  quietHoursEnd?: string;
+
+  @IsString()
+  @IsOptional()
+  timezone?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  doNotDisturb?: boolean = false;
 }
 
 export class UpdateNotificationPreferenceDto {
   @IsObject()
   @IsOptional()
-  preferences?: Record<NotificationType, {
+  preferences?: Partial<Record<NotificationType, {
     channels: NotificationChannel[];
     enabled: boolean;
     frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
-  }>;
+  }>>;
 
   @IsBoolean()
   @IsOptional()
@@ -54,6 +74,26 @@ export class UpdateNotificationPreferenceDto {
   @IsBoolean()
   @IsOptional()
   inAppEnabled?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  quietHoursEnabled?: boolean;
+
+  @IsString()
+  @IsOptional()
+  quietHoursStart?: string;
+
+  @IsString()
+  @IsOptional()
+  quietHoursEnd?: string;
+
+  @IsString()
+  @IsOptional()
+  timezone?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  doNotDisturb?: boolean;
 }
 
 export class UnsubscribeDto {
