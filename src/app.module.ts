@@ -16,6 +16,7 @@ import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { VideoModule } from './video/video.module';
 
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
@@ -56,6 +57,7 @@ import {
 import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
 import { SyncLog } from './integrations/common/entities/sync-log.entity';
 import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
+import { ForumModule } from './forum/forum.module';
 
 @Module({
   imports: [
@@ -104,9 +106,10 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
     ConfigModule,
     HealthModule,
     ForumModule,
-    AppConfigModule,
+    ConfigModule,
     DatabaseModule,
     IntegrationsModule,
+    VideoModule,
   ],
   providers: [
     {

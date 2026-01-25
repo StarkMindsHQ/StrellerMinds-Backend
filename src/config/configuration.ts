@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 
-export default () => ({
+export const configuration = () => ({
   port: parseInt(process.env.APP_PORT, 10) || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
   databaseUrl: process.env.DATABASE_URL,
