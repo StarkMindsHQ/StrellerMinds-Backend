@@ -11,8 +11,8 @@ import {
   NotFoundException,
   Query,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/guards/auth.guard';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IntegrationConfig } from './common/entities/integration-config.entity';
@@ -294,23 +294,21 @@ export class IntegrationDashboardController {
 
     const activeCount = configs.filter(c => c.isActive).length;
     const inactiveCount = configs.filter(c => !c.isActive).length;
+    const configIds = configs.map(c => c.id);
     const totalMappings = await this.mappingRepository.count({
       where: {
-        integrationConfigId: configs.map(c => c.id).length > 0 
-          ? configs.map(c => c.id) 
-          : [''],
+        integrationConfigId: configIds.length > 0 
+          ? { $in: configIds } as any
+          : '',
       },
     });
 
-    const recentSyncs = await this.syncLogRepository.find({
-      where: {
-        integrationConfigId: configs.map(c => c.id).length > 0 
-          ? configs.map(c => c.id)
-          : [''],
-      },
-      order: { startedAt: 'DESC' },
-      take: 10,
-    });
+    const recentSyncs = await this.syncLogRepository
+      .createQueryBuilder('sync')
+      .where('sync.integrationConfigId IN (:...configIds)', { configIds: configIds.length > 0 ? configIds : [''] })
+      .orderBy('sync.startedAt', 'DESC')
+      .take(10)
+      .getMany();
 
     const integrationsByType = {};
     for (const config of configs) {

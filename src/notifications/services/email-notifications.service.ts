@@ -2,12 +2,12 @@ import { Injectable, Logger, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EmailQueue, EmailStatus } from '../entities/email-queue.entity';
-import { EmailTemplate } from '../entities/email-template.entity';
+import { EmailTemplate, EmailTemplateType } from '../entities/email-template.entity';
 import { SendEmailDto } from '../dto/send-email.dto';
 import { CreateEmailTemplateDto } from '../dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from '../dto/update-email-template.dto';
 import { NotificationPreference } from '../entities/notification-preference.entity';
-import { EmailAnalytics } from '../entities\email-analytics.entity';
+import { EmailAnalytics } from '../entities/email-analytics.entity';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 
@@ -182,7 +182,7 @@ export class EmailNotificationsService {
     return await this.emailTemplateRepository.findOne({ where: { id } });
   }
 
-  async getTemplateByType(type: string): Promise<EmailTemplate> {
+  async getTemplateByType(type: EmailTemplateType): Promise<EmailTemplate> {
     return await this.emailTemplateRepository.findOne({ where: { type, isActive: true } });
   }
 

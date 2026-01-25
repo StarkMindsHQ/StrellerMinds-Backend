@@ -13,6 +13,7 @@ import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
@@ -20,7 +21,7 @@ import { HealthModule } from './health/health.module';
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 
 import { DatabaseConfig } from './config/database.config';
-import configuration, { validationSchema } from './config/configuration';
+import { configuration, validationSchema } from './config/configuration';
 
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
@@ -104,12 +105,9 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
     I18nModule.register(),
     AccessibilityModule,
     IntegrationsModule,
-    ConfigModule,
+    SecurityModule,
     HealthModule,
-    ForumModule,
-    AppConfigModule,
     DatabaseModule,
-    IntegrationsModule,
   ],
   providers: [
     {

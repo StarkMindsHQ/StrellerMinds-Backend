@@ -1,4 +1,5 @@
 export * from './payment.entity';
+export * from './payment-plan.entity';
 export * from './subscription.entity';
 export * from './invoice.entity';
 export * from './refund.entity';

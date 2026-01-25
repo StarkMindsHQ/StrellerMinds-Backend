@@ -94,9 +94,9 @@ export class LtiService {
   ): Promise<any> {
     try {
       const decoded = this.jwtService.verify(token, {
-        key: publicKey,
+        publicKey: publicKey,
         algorithms: ['RS256'],
-      });
+      } as any);
       return decoded;
     } catch (error) {
       this.logger.error(`Platform response verification failed: ${error.message}`);
