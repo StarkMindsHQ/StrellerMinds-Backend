@@ -35,6 +35,7 @@ import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 
 import { DatabaseConfig } from './config/database.config';
 import { configuration, validationSchema } from './config/configuration';
+import { SearchModule } from './search/search.module';
 
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
@@ -137,6 +138,10 @@ import { ForumModule } from './forum/forum.module';
     AuthModule,
     CourseModule,
     UserModule,
+    PaymentModule, // <-- from feature branch
+    I18nModule.register(), // <-- from main
+    AccessibilityModule,
+    SearchModule, // <-- from main
     PaymentModule,
     FilesModule,
     GamificationModule,
