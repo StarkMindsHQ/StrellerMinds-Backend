@@ -5,6 +5,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import Redis from 'ioredis';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { AnalyticsModule } from './analytics/analytics.module';
+
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -69,6 +71,43 @@ import { ForumModule } from './forum/forum.module';
       load: [configuration],
       validationSchema,
     }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DATABASE_HOST || 'localhost',
+      port: parseInt(process.env.DATABASE_PORT || '5432'),
+      username: process.env.DATABASE_USER || 'postgres',
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_NAME || 'strellerminds',
+      entities: [
+        User,
+        RefreshToken,
+        UserProfile,
+        PortfolioItem,
+        Badge,
+        UserBadge,
+        Follow,
+        PrivacySettings,
+        ProfileAnalytics,
+        SecurityAudit,
+        Payment,
+        Subscription,
+        PaymentPlan,
+        Invoice,
+        Refund,
+        Dispute,
+        TaxRate,
+        FinancialReport,
+        PaymentMethodEntity,
+        IntegrationConfig,
+        SyncLog,
+        IntegrationMapping,
+        AnalyticsModule,
+
+      ],
+      synchronize: process.env.NODE_ENV === 'development',
+      logging: process.env.NODE_ENV === 'development',
+      migrations: ['dist/migrations/*.js'],
+      migrationsRun: true,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
