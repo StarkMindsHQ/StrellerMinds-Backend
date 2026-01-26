@@ -31,34 +31,8 @@ import { HealthModule } from './health/health.module';
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 
 import { DatabaseConfig } from './config/database.config';
-import configuration from './config/configuration';
-import { validationSchema } from './config/configuration';
-
-import { User } from './auth/entities/user.entity';
-import { RefreshToken } from './auth/entities/refresh-token.entity';
-import { SecurityAudit } from './auth/entities/security-audit.entity';
-import { UserProfile } from './user/entities/user-profile.entity';
-import { PortfolioItem } from './user/entities/portfolio-item.entity';
-import { Badge } from './user/entities/badge.entity';
-import { UserBadge } from './user/entities/user-badge.entity';
-import { Follow } from './user/entities/follow.entity';
-import { PrivacySettings } from './user/entities/privacy-settings.entity';
-import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
-import {
-  Payment,
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Refund,
-  Dispute,
-  TaxRate,
-  FinancialReport,
-  PaymentMethodEntity,
-} from './payment/entities';
+import { configuration, validationSchema } from './config/configuration';
 import { SearchModule } from './search/search.module';
-import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
-import { SyncLog } from './integrations/common/entities/sync-log.entity';
-import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
 
 @Module({
   imports: [
@@ -98,9 +72,10 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
     AuthModule,
     CourseModule,
     UserModule,
-    PaymentModule,                // <-- from feature branch
-    I18nModule.register(),        // <-- from main
-    AccessibilityModule, SearchModule,          // <-- from main
+    PaymentModule, // <-- from feature branch
+    I18nModule.register(), // <-- from main
+    AccessibilityModule,
+    SearchModule, // <-- from main
     PaymentModule,
     FilesModule,
     GamificationModule,

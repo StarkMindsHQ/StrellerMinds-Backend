@@ -4,7 +4,6 @@ import { Cache } from 'cache-manager';
 import { Inject } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import * as natural from 'natural';
-import { compareTwoStrings } from 'string-similarity';
 import { SearchQueryDto, AutoSuggestDto } from './dto/search-query.dto';
 import { ContentDocument, SearchAnalytics, UserPreference } from './entities/content.entity';
 
@@ -22,7 +21,13 @@ export class SearchService implements OnModuleInit {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     this.tokenizer = new natural.WordTokenizer();
-    this.spellCheck = new natural.Spellcheck(['programming', 'javascript', 'python', 'react', 'design']);
+    this.spellCheck = new natural.Spellcheck([
+      'programming',
+      'javascript',
+      'python',
+      'react',
+      'design',
+    ]);
   }
 
   async onModuleInit() {
@@ -43,43 +48,41 @@ export class SearchService implements OnModuleInit {
       if (!contentExists) {
         await this.elasticsearchService.indices.create({
           index: this.CONTENT_INDEX,
-          body: {
-            settings: {
-              analysis: {
-                analyzer: {
-                  custom_analyzer: {
-                    type: 'custom',
-                    tokenizer: 'standard',
-                    filter: ['lowercase', 'asciifolding', 'stop', 'snowball'],
-                  },
+          settings: {
+            analysis: {
+              analyzer: {
+                custom_analyzer: {
+                  type: 'custom',
+                  tokenizer: 'standard',
+                  filter: ['lowercase', 'asciifolding', 'stop', 'snowball'],
                 },
               },
-              number_of_shards: 1,
-              number_of_replicas: 0,
             },
-            mappings: {
-              properties: {
-                id: { type: 'keyword' },
-                title: {
-                  type: 'text',
-                  analyzer: 'custom_analyzer',
-                  fields: {
-                    keyword: { type: 'keyword' },
-                    suggest: { type: 'completion' },
-                  },
+            number_of_shards: 1,
+            number_of_replicas: 0,
+          },
+          mappings: {
+            properties: {
+              id: { type: 'keyword' },
+              title: {
+                type: 'text',
+                analyzer: 'custom_analyzer',
+                fields: {
+                  keyword: { type: 'keyword' },
+                  suggest: { type: 'completion' },
                 },
-                description: { type: 'text', analyzer: 'custom_analyzer' },
-                content: { type: 'text', analyzer: 'custom_analyzer' },
-                category: { type: 'keyword' },
-                difficulty: { type: 'keyword' },
-                duration: { type: 'integer' },
-                author: { type: 'keyword' },
-                tags: { type: 'keyword' },
-                createdAt: { type: 'date' },
-                updatedAt: { type: 'date' },
-                viewCount: { type: 'integer' },
-                rating: { type: 'float' },
               },
+              description: { type: 'text', analyzer: 'custom_analyzer' },
+              content: { type: 'text', analyzer: 'custom_analyzer' },
+              category: { type: 'keyword' },
+              difficulty: { type: 'keyword' },
+              duration: { type: 'integer' },
+              author: { type: 'keyword' },
+              tags: { type: 'keyword' },
+              createdAt: { type: 'date' },
+              updatedAt: { type: 'date' },
+              viewCount: { type: 'integer' },
+              rating: { type: 'float' },
             },
           },
         });
@@ -94,17 +97,15 @@ export class SearchService implements OnModuleInit {
       if (!analyticsExists) {
         await this.elasticsearchService.indices.create({
           index: this.ANALYTICS_INDEX,
-          body: {
-            mappings: {
-              properties: {
-                userId: { type: 'keyword' },
-                query: { type: 'text' },
-                filters: { type: 'object', enabled: false },
-                resultsCount: { type: 'integer' },
-                clickedResults: { type: 'keyword' },
-                timestamp: { type: 'date' },
-                duration: { type: 'integer' },
-              },
+          mappings: {
+            properties: {
+              userId: { type: 'keyword' },
+              query: { type: 'text' },
+              filters: { type: 'object', enabled: false },
+              resultsCount: { type: 'integer' },
+              clickedResults: { type: 'keyword' },
+              timestamp: { type: 'date' },
+              duration: { type: 'integer' },
             },
           },
         });
@@ -119,16 +120,14 @@ export class SearchService implements OnModuleInit {
       if (!preferencesExists) {
         await this.elasticsearchService.indices.create({
           index: this.PREFERENCES_INDEX,
-          body: {
-            mappings: {
-              properties: {
-                userId: { type: 'keyword' },
-                categories: { type: 'keyword' },
-                difficulty: { type: 'keyword' },
-                searchHistory: { type: 'text' },
-                clickedItems: { type: 'keyword' },
-                lastUpdated: { type: 'date' },
-              },
+          mappings: {
+            properties: {
+              userId: { type: 'keyword' },
+              categories: { type: 'keyword' },
+              difficulty: { type: 'keyword' },
+              searchHistory: { type: 'text' },
+              clickedItems: { type: 'keyword' },
+              lastUpdated: { type: 'date' },
             },
           },
         });
@@ -147,16 +146,16 @@ export class SearchService implements OnModuleInit {
       await this.elasticsearchService.index({
         index: this.CONTENT_INDEX,
         id: content.id,
-        body: content,
+        document: content,
       });
-      
+
       await this.elasticsearchService.indices.refresh({
         index: this.CONTENT_INDEX,
       });
 
       // Invalidate cache
       await this.cacheManager.del(`search:*`);
-      
+
       return { success: true, id: content.id };
     } catch (error) {
       this.logger.error('Error indexing content', error);
@@ -165,17 +164,17 @@ export class SearchService implements OnModuleInit {
   }
 
   async bulkIndexContent(contents: ContentDocument[]) {
-    const body = contents.flatMap(doc => [
+    const operations = contents.flatMap((doc) => [
       { index: { _index: this.CONTENT_INDEX, _id: doc.id } },
       doc,
     ]);
 
     try {
-      const result = await this.elasticsearchService.bulk({ body });
+      const result = await this.elasticsearchService.bulk({ operations });
       await this.elasticsearchService.indices.refresh({
         index: this.CONTENT_INDEX,
       });
-      
+
       return { success: true, indexed: contents.length, errors: result.errors };
     } catch (error) {
       this.logger.error('Error bulk indexing', error);
@@ -186,16 +185,37 @@ export class SearchService implements OnModuleInit {
   // ============================================
   // FULL-TEXT SEARCH WITH FACETED FILTERING
   // ============================================
-  async search(searchDto: SearchQueryDto) {
+  async search(searchDto: SearchQueryDto): Promise<{
+    total: number;
+    page: number;
+    size: number;
+    results: any[];
+    facets: any;
+  }> {
     const cacheKey = `search:${JSON.stringify(searchDto)}`;
-    
+
     // Check cache
     const cached = await this.cacheManager.get(cacheKey);
-    if (cached) {
-      return cached;
+    if (
+      cached &&
+      typeof cached === 'object' &&
+      'total' in cached &&
+      'page' in cached &&
+      'size' in cached &&
+      'results' in cached &&
+      'facets' in cached
+    ) {
+      return cached as {
+        total: number;
+        page: number;
+        size: number;
+        results: any[];
+        facets: any;
+      };
     }
 
-    const { query, categories, difficulty, minDuration, maxDuration, page, size, sortBy, userId } = searchDto;
+    const { query, categories, difficulty, minDuration, maxDuration, page, size, sortBy, userId } =
+      searchDto;
     const from = (page - 1) * size;
 
     // Build query
@@ -254,56 +274,57 @@ export class SearchService implements OnModuleInit {
     try {
       const result = await this.elasticsearchService.search({
         index: this.CONTENT_INDEX,
-        body: {
-          from,
-          size,
-          query: {
-            bool: {
-              must: must.length > 0 ? must : { match_all: {} },
-              filter,
-              should,
+        from,
+        size,
+        query: {
+          bool: {
+            must: must.length > 0 ? must : { match_all: {} },
+            filter,
+            should,
+          },
+        },
+        sort,
+        highlight: {
+          fields: {
+            title: { pre_tags: ['<mark>'], post_tags: ['</mark>'] },
+            description: { pre_tags: ['<mark>'], post_tags: ['</mark>'] },
+            content: {
+              pre_tags: ['<mark>'],
+              post_tags: ['</mark>'],
+              fragment_size: 150,
+              number_of_fragments: 3,
             },
           },
-          sort,
-          highlight: {
-            fields: {
-              title: { pre_tags: ['<mark>'], post_tags: ['</mark>'] },
-              description: { pre_tags: ['<mark>'], post_tags: ['</mark>'] },
-              content: { 
-                pre_tags: ['<mark>'], 
-                post_tags: ['</mark>'],
-                fragment_size: 150,
-                number_of_fragments: 3,
-              },
-            },
+        },
+        aggs: {
+          categories: {
+            terms: { field: 'category', size: 20 },
           },
-          aggs: {
-            categories: {
-              terms: { field: 'category', size: 20 },
-            },
-            difficulty: {
-              terms: { field: 'difficulty', size: 10 },
-            },
-            duration_stats: {
-              stats: { field: 'duration' },
-            },
+          difficulty: {
+            terms: { field: 'difficulty', size: 10 },
+          },
+          duration_stats: {
+            stats: { field: 'duration' },
           },
         },
       });
 
+      const total =
+        typeof result.hits.total === 'number' ? result.hits.total : (result.hits.total?.value ?? 0);
+
       const response = {
-        total: result.hits.total.value,
+        total,
         page,
         size,
-        results: result.hits.hits.map(hit => ({
+        results: result.hits.hits.map((hit) => ({
           id: hit._id,
           score: hit._score,
-          ...hit._source,
+          ...(typeof hit._source === 'object' && hit._source !== null ? hit._source : {}),
           highlights: hit.highlight,
         })),
         facets: {
-          categories: result.aggregations.categories.buckets,
-          difficulty: result.aggregations.difficulty.buckets,
+          categories: (result.aggregations.categories as any)?.buckets ?? [],
+          difficulty: (result.aggregations.difficulty as any)?.buckets ?? [],
           durationStats: result.aggregations.duration_stats,
         },
       };
@@ -317,10 +338,12 @@ export class SearchService implements OnModuleInit {
           userId,
           query,
           filters: { categories, difficulty, minDuration, maxDuration },
-          resultsCount: result.hits.total.value,
+          resultsCount:
+            typeof result.hits.total === 'number' ? result.hits.total : result.hits.total.value,
           clickedResults: [],
           timestamp: new Date(),
           duration: 0,
+          id: '',
         });
       }
 
@@ -344,32 +367,31 @@ export class SearchService implements OnModuleInit {
       // Get suggestions from Elasticsearch
       const result = await this.elasticsearchService.search({
         index: this.CONTENT_INDEX,
-        body: {
-          suggest: {
-            title_suggest: {
-              prefix: query,
-              completion: {
-                field: 'title.suggest',
-                size: limit,
-                skip_duplicates: true,
-                fuzzy: {
-                  fuzziness: 'AUTO',
-                },
-              },
+        suggest: {
+          title_suggest: {
+            prefix: query,
+            completion: {
+              field: 'title.suggest',
+              size: limit,
+              skip_duplicates: true,
+              fuzzy: { fuzziness: 'AUTO' },
             },
           },
-          _source: ['title', 'category'],
-          size: 0,
         },
+        _source: ['title', 'category'],
+        size: 0,
       });
 
+      const suggestEntries = result.suggest?.title_suggest ?? [];
+      const suggestArray = Array.isArray(suggestEntries) ? suggestEntries : [suggestEntries];
+      const options = suggestArray.flatMap((entry) => entry.options ?? []);
       // Get popular searches
+
       const popularSearches = await this.getPopularSearches(limit);
 
       return {
-        suggestions: result.suggest.title_suggest[0].options.map(opt => ({
-          text: opt._source.title,
-          category: opt._source.category,
+        suggestions: options.map((opt: any) => ({
+          text: opt.text,
           score: opt._score,
         })),
         correctedQuery: correctedQuery !== query ? correctedQuery : null,
@@ -383,7 +405,7 @@ export class SearchService implements OnModuleInit {
 
   correctSpelling(query: string): string {
     const tokens = this.tokenizer.tokenize(query.toLowerCase());
-    const corrected = tokens.map(token => {
+    const corrected = tokens.map((token) => {
       const corrections = this.spellCheck.getCorrections(token, 1);
       return corrections.length > 0 ? corrections[0] : token;
     });
@@ -397,7 +419,8 @@ export class SearchService implements OnModuleInit {
     try {
       await this.elasticsearchService.index({
         index: this.ANALYTICS_INDEX,
-        body: analytics,
+        id: analytics.id,
+        document: analytics,
       });
 
       // Update user preferences
@@ -412,11 +435,10 @@ export class SearchService implements OnModuleInit {
       await this.elasticsearchService.update({
         index: this.ANALYTICS_INDEX,
         id: searchId,
-        body: {
-          script: {
-            source: 'ctx._source.clickedResults.add(params.itemId)',
-            params: { itemId: clickedItemId },
-          },
+        script: {
+          source: 'ctx._source.clickedResults.add(params.itemId)',
+          lang: 'painless',
+          params: { itemId: clickedItemId },
         },
       });
 
@@ -435,47 +457,45 @@ export class SearchService implements OnModuleInit {
     try {
       const result = await this.elasticsearchService.search({
         index: this.ANALYTICS_INDEX,
-        body: {
-          query: {
-            bool: {
-              must: [
-                {
-                  range: {
-                    timestamp: {
-                      gte: `now-${days}d/d`,
-                    },
+        query: {
+          bool: {
+            must: [
+              {
+                range: {
+                  timestamp: {
+                    gte: `now-${days}d/d`,
                   },
                 },
-                ...(userId ? [{ term: { userId } }] : []),
-              ],
-            },
-          },
-          aggs: {
-            top_queries: {
-              terms: { field: 'query.keyword', size: 10 },
-            },
-            avg_results: {
-              avg: { field: 'resultsCount' },
-            },
-            total_searches: {
-              value_count: { field: 'userId' },
-            },
-            queries_over_time: {
-              date_histogram: {
-                field: 'timestamp',
-                calendar_interval: 'day',
               },
+              ...(userId ? [{ term: { userId } }] : []),
+            ],
+          },
+        },
+        aggs: {
+          top_queries: {
+            terms: { field: 'query.keyword', size: 10 },
+          },
+          avg_results: {
+            avg: { field: 'resultsCount' },
+          },
+          total_searches: {
+            value_count: { field: 'userId' },
+          },
+          queries_over_time: {
+            date_histogram: {
+              field: 'timestamp',
+              calendar_interval: 'day',
             },
           },
-          size: 0,
         },
+        size: 0,
       });
 
       return {
-        topQueries: result.aggregations.top_queries.buckets,
-        avgResults: result.aggregations.avg_results.value,
-        totalSearches: result.aggregations.total_searches.value,
-        queriesOverTime: result.aggregations.queries_over_time.buckets,
+        topQueries: (result.aggregations.top_queries as any).buckets,
+        avgResults: (result.aggregations.avg_results as any).value,
+        totalSearches: (result.aggregations.total_searches as any).value,
+        queriesOverTime: (result.aggregations.queries_over_time as any).buckets,
       };
     } catch (error) {
       this.logger.error('Error getting analytics', error);
@@ -487,22 +507,21 @@ export class SearchService implements OnModuleInit {
     try {
       const result = await this.elasticsearchService.search({
         index: this.ANALYTICS_INDEX,
-        body: {
-          query: {
-            range: {
-              timestamp: { gte: 'now-7d/d' },
-            },
+        query: {
+          range: {
+            timestamp: { gte: 'now-7d/d' },
           },
-          aggs: {
-            popular: {
-              terms: { field: 'query.keyword', size: limit },
-            },
-          },
-          size: 0,
         },
+        aggs: {
+          popular: {
+            terms: { field: 'query.keyword', size: limit },
+          },
+        },
+        size: 0,
       });
 
-      return result.aggregations.popular.buckets.map(b => b.key);
+      const buckets = (result.aggregations.popular as any).buckets || [];
+      return buckets.map((b: any) => b.key);
     } catch (error) {
       return [];
     }
@@ -554,7 +573,7 @@ export class SearchService implements OnModuleInit {
     await this.elasticsearchService.index({
       index: this.PREFERENCES_INDEX,
       id: preferences.userId,
-      body: preferences,
+      document: preferences,
     });
   }
 
@@ -584,8 +603,8 @@ export class SearchService implements OnModuleInit {
     if (data.length === 0) return '';
 
     const headers = ['id', 'title', 'category', 'difficulty', 'duration', 'rating'];
-    const rows = data.map(item =>
-      headers.map(header => JSON.stringify(item[header] || '')).join(','),
+    const rows = data.map((item) =>
+      headers.map((header) => JSON.stringify(item[header] || '')).join(','),
     );
 
     return [headers.join(','), ...rows].join('\n');
@@ -594,17 +613,17 @@ export class SearchService implements OnModuleInit {
   // ============================================
   // UTILITIES
   // ============================================
-  private buildSort(sortBy: string) {
+  private buildSort(sortBy: string): any {
     switch (sortBy) {
       case 'date':
-        return [{ createdAt: { order: 'desc' } }];
+        return { createdAt: { order: 'desc' } };
       case 'popularity':
-        return [{ viewCount: { order: 'desc' } }];
+        return { viewCount: { order: 'desc' } };
       case 'duration':
-        return [{ duration: { order: 'asc' } }];
+        return { duration: { order: 'asc' } };
       case 'relevance':
       default:
-        return ['_score'];
+        return '_score';
     }
   }
 
@@ -617,7 +636,8 @@ export class SearchService implements OnModuleInit {
         id: '1',
         title: 'Introduction to React Hooks',
         description: 'Learn the basics of React Hooks including useState and useEffect',
-        content: 'React Hooks allow you to use state and lifecycle features in functional components...',
+        content:
+          'React Hooks allow you to use state and lifecycle features in functional components...',
         category: 'Programming',
         difficulty: 'Beginner',
         duration: 30,
@@ -632,7 +652,8 @@ export class SearchService implements OnModuleInit {
         id: '2',
         title: 'Advanced TypeScript Patterns',
         description: 'Deep dive into advanced TypeScript design patterns',
-        content: 'TypeScript provides powerful type system features for building robust applications...',
+        content:
+          'TypeScript provides powerful type system features for building robust applications...',
         category: 'Programming',
         difficulty: 'Advanced',
         duration: 60,
@@ -647,7 +668,8 @@ export class SearchService implements OnModuleInit {
         id: '3',
         title: 'UI/UX Design Principles',
         description: 'Master the fundamentals of user interface and experience design',
-        content: 'Good design is about solving problems and creating delightful user experiences...',
+        content:
+          'Good design is about solving problems and creating delightful user experiences...',
         category: 'Design',
         difficulty: 'Intermediate',
         duration: 45,
