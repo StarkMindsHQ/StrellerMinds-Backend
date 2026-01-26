@@ -13,12 +13,12 @@ export class CourseModule {
   @Column()
   order: number;
 
-  @ManyToOne(() => Course, (course) => course.modules, {
+  @ManyToOne('Course', 'modules', {
     onDelete: 'CASCADE',
   })
   course: Course;
 
-  @OneToMany(() => Lesson, (lesson) => lesson.module, {
+  @OneToMany('Lesson', 'module', {
     cascade: true,
   })
   lessons: Lesson[];

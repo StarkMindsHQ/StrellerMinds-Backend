@@ -6,7 +6,7 @@ export class CourseVersion {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Course, (course) => course.versions)
+  @ManyToOne('Course', 'versions')
   course: Course;
 
   @Column()
