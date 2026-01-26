@@ -8,7 +8,7 @@ import { SearchService } from './search.service';
   imports: [
     SearchElasticsearchModule,
     CacheModule.register({
-      ttl: 300, 
+      ttl: 300,
       max: 100,
     }),
   ],

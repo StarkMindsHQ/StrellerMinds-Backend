@@ -13,6 +13,7 @@ import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { VideoModule } from './video/video.module';
 import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
@@ -22,6 +23,7 @@ import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 
 import { DatabaseConfig } from './config/database.config';
 import { configuration, validationSchema } from './config/configuration';
+import { SearchModule } from './search/search.module';
 
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
@@ -35,7 +37,10 @@ import { PrivacySettings } from './user/entities/privacy-settings.entity';
 import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
-import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './auth/middleware/auth.middleware';
+import {
+  TokenBlacklistMiddleware,
+  SecurityHeadersMiddleware,
+} from './auth/middleware/auth.middleware';
 // import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware'; // <-- make sure to import
 import { CourseModule } from './course/course.module';
 import { PaymentModule } from './payment/payment.module';
@@ -50,13 +55,14 @@ import {
   FinancialReport,
   PaymentMethodEntity,
 } from './payment/entities';
-import { SearchModule } from './search/search.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
 import { SyncLog } from './integrations/common/entities/sync-log.entity';
 import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
+
+import { ForumModule } from './forum/forum.module';
 
 @Module({
   imports: [
@@ -96,9 +102,10 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
     AuthModule,
     CourseModule,
     UserModule,
-    PaymentModule,                // <-- from feature branch
-    I18nModule.register(),        // <-- from main
-    AccessibilityModule, SearchModule,          // <-- from main
+    PaymentModule, // <-- from feature branch
+    I18nModule.register(), // <-- from main
+    AccessibilityModule,
+    SearchModule, // <-- from main
     PaymentModule,
     FilesModule,
     GamificationModule,
@@ -107,7 +114,11 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
     IntegrationsModule,
     SecurityModule,
     HealthModule,
+    ForumModule,
+    ConfigModule,
     DatabaseModule,
+    IntegrationsModule,
+    VideoModule,
   ],
   providers: [
     {
@@ -118,7 +129,7 @@ import { IntegrationMapping } from './integrations/common/entities/integration-m
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
     },
-     {
+    {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
