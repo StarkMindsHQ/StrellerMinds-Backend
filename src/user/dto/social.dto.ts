@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsArray, ValidateNested, Type } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, ValidateNested } from 'class-validator';
 
 export class FollowUserDto {
   @IsString()

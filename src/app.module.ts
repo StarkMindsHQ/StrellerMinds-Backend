@@ -12,20 +12,15 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
+import { CourseModule } from './course/course.module';
+import { PaymentModule } from './payment/payment.module';
+import { FilesModule } from './files/files.module';
+import { GamificationModule } from './gamification/gamification.module';
+import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
-import { User } from './auth/entities/user.entity';
-import { RefreshToken } from './auth/entities/refresh-token.entity';
-import { UserProfile } from './user/entities/user-profile.entity';
-import { PortfolioItem } from './user/entities/portfolio-item.entity';
-import { Badge } from './user/entities/badge.entity';
-import { UserBadge } from './user/entities/user-badge.entity';
-import { Follow } from './user/entities/follow.entity';
-import { PrivacySettings } from './user/entities/privacy-settings.entity';
-import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
-import { SecurityAudit } from './auth/entities/security-audit.entity';
-import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
-import { SyncLog } from './integrations/common/entities/sync-log.entity';
-import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
+import { VideoModule } from './video/video.module';
+import { SecurityModule } from './security/security.module';
+
 import { JwtAuthGuard } from './auth/guards/auth.guard';
 import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
 import {
@@ -34,9 +29,23 @@ import {
 } from './auth/middleware/auth.middleware';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
-import { CourseModule } from './course/course.module';
+import { HealthModule } from './health/health.module';
+
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
-import { PaymentModule } from './payment/payment.module';
+
+import { DatabaseConfig } from './config/database.config';
+import { configuration, validationSchema } from './config/configuration';
+
+import { User } from './auth/entities/user.entity';
+import { RefreshToken } from './auth/entities/refresh-token.entity';
+import { SecurityAudit } from './auth/entities/security-audit.entity';
+import { UserProfile } from './user/entities/user-profile.entity';
+import { PortfolioItem } from './user/entities/portfolio-item.entity';
+import { Badge } from './user/entities/badge.entity';
+import { UserBadge } from './user/entities/user-badge.entity';
+import { Follow } from './user/entities/follow.entity';
+import { PrivacySettings } from './user/entities/privacy-settings.entity';
+import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
 import {
   Payment,
   Subscription,
@@ -48,12 +57,18 @@ import {
   FinancialReport,
   PaymentMethodEntity,
 } from './payment/entities';
+import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
+import { SyncLog } from './integrations/common/entities/sync-log.entity';
+import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
+import { ForumModule } from './forum/forum.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['.env.local', '.env', '.env.development'],
+      load: [configuration],
+      validationSchema,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -92,6 +107,13 @@ import {
       logging: process.env.NODE_ENV === 'development',
       migrations: ['dist/migrations/*.js'],
       migrationsRun: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const dbConfig = new DatabaseConfig(configService);
+        return dbConfig.createTypeOrmOptions();
+      },
     }),
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
@@ -116,9 +138,18 @@ import {
     CourseModule,
     UserModule,
     PaymentModule,
-    IntegrationsModule,
+    FilesModule,
+    GamificationModule,
     I18nModule.register(),
     AccessibilityModule,
+    IntegrationsModule,
+    SecurityModule,
+    HealthModule,
+    ForumModule,
+    ConfigModule,
+    DatabaseModule,
+    IntegrationsModule,
+    VideoModule,
   ],
   providers: [
     {

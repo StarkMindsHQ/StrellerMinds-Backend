@@ -4,6 +4,7 @@ import { EmailNotificationsService } from '../services/email-notifications.servi
 import { TemplateService } from '../services/template.service';
 import { NotificationPreferenceService } from '../services/notification-preference.service';
 import { EmailAnalyticsService } from '../services/email-analytics.service';
+import { EmailTemplateType } from '../entities/email-template.entity';
 import { SendEmailDto } from '../dto/send-email.dto';
 import { CreateEmailTemplateDto } from '../dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from '../dto/update-email-template.dto';
@@ -56,7 +57,7 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Get an email template by type' })
   @ApiResponse({ status: 200, description: 'Template retrieved successfully' })
   async getTemplateByType(@Param('type') type: string) {
-    const template = await this.templateService.getTemplateByType(type);
+    const template = await this.templateService.getTemplateByType(type as EmailTemplateType);
     return { success: true, data: template };
   }
 

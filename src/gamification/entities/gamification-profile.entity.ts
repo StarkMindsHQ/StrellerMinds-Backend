@@ -6,10 +6,19 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
+  Check,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
 @Entity('gamification_profiles')
+@Index(['userId'], { unique: true })
+@Check(`"points" >= 0`)
+@Check(`"xp" >= 0`)
+@Check(`"level" >= 1`)
+@Check(`"virtualCurrency" >= 0`)
+@Check(`"currentStreak" >= 0`)
+@Check(`"longestStreak" >= 0`)
 export class GamificationProfile {
   @PrimaryGeneratedColumn('uuid')
   id: string;

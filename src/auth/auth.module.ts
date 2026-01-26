@@ -6,6 +6,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
+import type { JwtModuleOptions } from '@nestjs/jwt';
 
 import { AuthController } from './controllers/auth.controller';
 import { SecurityController } from './controllers/security.controller';
@@ -35,10 +36,10 @@ import { PasswordHistoryService } from './services/password-history.service';
     }),
     TypeOrmModule.forFeature([User, RefreshToken, SecurityAudit, PasswordHistory]),
     JwtModule.registerAsync({
-      useFactory: async () => ({
-        secret: process.env.JWT_SECRET,
+      useFactory: async (): Promise<JwtModuleOptions> => ({
+        secret: process.env.JWT_SECRET || 'default-secret',
         signOptions: {
-          expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+          expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as any,
         },
       }),
       global: true,

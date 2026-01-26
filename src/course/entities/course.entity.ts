@@ -4,19 +4,29 @@ import {
   Column,
   OneToMany,
   ManyToMany,
+  ManyToOne,
   JoinTable,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
+  Index,
+  Check,
 } from 'typeorm';
 import { CourseStatus } from '../enums/course-status.enum';
 import { CourseModule } from './module.entity';
 import { CourseVersion } from './course-version.entity';
 import { Category } from './category.entity';
 import { Tag } from './tag.entity';
+import { User } from '../../auth/entities/user.entity';
 
+export { CourseStatus };
 
-
-@Entity()
+@Entity('courses')
+@Index(['status', 'createdAt'])
+@Index(['instructorId'])
+@Index(['publishedAt'])
+@Check(`"durationMinutes" >= 0`)
 export class Course {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -40,22 +50,47 @@ export class Course {
   durationMinutes: number;
 
   @Column({ type: 'enum', enum: CourseStatus, default: CourseStatus.DRAFT })
+  @Index()
   status: CourseStatus;
 
-  @OneToMany(() => CourseModule, (module) => module.course, {
+  @Column({ type: 'uuid', nullable: true })
+  instructorId: string;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'instructorId' })
+  instructor: User;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  price: number;
+
+  @Column({ default: 'USD' })
+  currency: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  publishedAt: Date;
+
+  @OneToMany('CourseModule', 'course', {
     cascade: true,
   })
   modules: CourseModule[];
 
-  @OneToMany(() => CourseVersion, (version) => version.course)
+  @OneToMany('CourseVersion', 'course')
   versions: CourseVersion[];
 
   @ManyToMany(() => Category)
-  @JoinTable()
+  @JoinTable({
+    name: 'course_categories',
+    joinColumn: { name: 'courseId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'categoryId', referencedColumnName: 'id' },
+  })
   categories: Category[];
 
   @ManyToMany(() => Tag)
-  @JoinTable()
+  @JoinTable({
+    name: 'course_tags',
+    joinColumn: { name: 'courseId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
+  })
   tags: Tag[];
 
   @CreateDateColumn()
@@ -63,4 +98,7 @@ export class Course {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
