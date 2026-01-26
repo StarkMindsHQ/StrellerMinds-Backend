@@ -16,6 +16,7 @@ import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
+import { VideoModule } from './video/video.module';
 import { SecurityModule } from './security/security.module';
 
 import { JwtAuthGuard } from './auth/guards/auth.guard';
@@ -33,6 +34,32 @@ import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 import { DatabaseConfig } from './config/database.config';
 import { configuration, validationSchema } from './config/configuration';
 import { SearchModule } from './search/search.module';
+
+import { User } from './auth/entities/user.entity';
+import { RefreshToken } from './auth/entities/refresh-token.entity';
+import { SecurityAudit } from './auth/entities/security-audit.entity';
+import { UserProfile } from './user/entities/user-profile.entity';
+import { PortfolioItem } from './user/entities/portfolio-item.entity';
+import { Badge } from './user/entities/badge.entity';
+import { UserBadge } from './user/entities/user-badge.entity';
+import { Follow } from './user/entities/follow.entity';
+import { PrivacySettings } from './user/entities/privacy-settings.entity';
+import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
+import {
+  Payment,
+  Subscription,
+  PaymentPlan,
+  Invoice,
+  Refund,
+  Dispute,
+  TaxRate,
+  FinancialReport,
+  PaymentMethodEntity,
+} from './payment/entities';
+import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
+import { SyncLog } from './integrations/common/entities/sync-log.entity';
+import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
+import { ForumModule } from './forum/forum.module';
 
 @Module({
   imports: [
@@ -84,7 +111,11 @@ import { SearchModule } from './search/search.module';
     IntegrationsModule,
     SecurityModule,
     HealthModule,
+    ForumModule,
+    ConfigModule,
     DatabaseModule,
+    IntegrationsModule,
+    VideoModule,
   ],
   providers: [
     {
