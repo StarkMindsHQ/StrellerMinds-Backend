@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EmailTemplate } from '../entities/email-template.entity';
+import { EmailTemplate, EmailTemplateType } from '../entities/email-template.entity';
 import { CreateEmailTemplateDto } from '../dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from '../dto/update-email-template.dto';
 
@@ -32,7 +32,7 @@ export class TemplateService {
     return await this.templateRepository.findOne({ where: { id } });
   }
 
-  async getTemplateByType(type: string): Promise<EmailTemplate> {
+  async getTemplateByType(type: EmailTemplateType): Promise<EmailTemplate> {
     return await this.templateRepository.findOne({ where: { type, isActive: true } });
   }
 

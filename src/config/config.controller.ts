@@ -1,34 +1,29 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ConfigService } from './config.service';
+import { ConfigurationService } from './config.service';
 import { CreateConfigDto } from './dto/create-config.dto';
 import { UpdateConfigDto } from './dto/update-config.dto';
 
 @Controller('config')
 export class ConfigController {
-  constructor(private readonly configService: ConfigService) {}
-
-  @Post()
-  create(@Body() createConfigDto: CreateConfigDto) {
-    return this.configService.create(createConfigDto);
-  }
+  constructor(private readonly configService: ConfigurationService) {}
 
   @Get()
   findAll() {
-    return this.configService.findAll();
+    return this.configService.get('all');
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.configService.findOne(+id);
+  @Get(':key')
+  findOne(@Param('key') key: string) {
+    return this.configService.get(key);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateConfigDto: UpdateConfigDto) {
-    return this.configService.update(+id, updateConfigDto);
+  @Post('secret')
+  getSecret(@Body('secretName') secretName?: string) {
+    return this.configService.getSecret(secretName);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.configService.remove(+id);
+  @Get('feature/:flag')
+  checkFeature(@Param('flag') flag: string) {
+    return { enabled: this.configService.isFeatureEnabled(flag) };
   }
 }
