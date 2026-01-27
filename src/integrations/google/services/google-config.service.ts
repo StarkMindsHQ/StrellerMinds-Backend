@@ -156,23 +156,34 @@ export class GoogleConfigService {
       let processedCount = 0;
       for (const assignment of assignments) {
         try {
-          await this.mappingRepository.upsert(
-            {
+          const existingMapping = await this.mappingRepository.findOne({
+            where: {
               integrationConfigId: configId,
               localResourceId: assignment.id,
-              localResourceType: 'assignment',
-              externalResourceId: assignment.id,
-              externalResourceType: 'assignment',
-              externalPlatform: 'google_classroom',
-              mappingData: {
-                courseId,
-                title: assignment.title,
-                description: assignment.description,
-                maxPoints: assignment.maxPoints,
-              },
             },
-            ['integrationConfigId', 'localResourceId'],
-          );
+          });
+
+          const mappingData = {
+            integrationConfigId: configId,
+            localResourceId: assignment.id,
+            localResourceType: 'assignment',
+            externalResourceId: assignment.id,
+            externalResourceType: 'assignment',
+            externalPlatform: 'google_classroom',
+            mappingData: {
+              courseId: courseId,
+              title: assignment.title,
+              description: assignment.description,
+              maxPoints: assignment.maxPoints,
+            },
+          };
+
+          if (existingMapping) {
+            Object.assign(existingMapping, mappingData);
+            await this.mappingRepository.save(existingMapping);
+          } else {
+            await this.mappingRepository.save(mappingData);
+          }
           processedCount++;
         } catch (error) {
           this.logger.error(`Failed to process assignment: ${error.message}`);

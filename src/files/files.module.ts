@@ -21,6 +21,6 @@ import { FilesController } from './files.controller';
       useClass: S3StorageService,
     },
   ],
-  exports: [FilesService],
+  exports: [FilesService, 'StorageProvider'],
 })
 export class FilesModule {}
