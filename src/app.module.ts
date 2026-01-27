@@ -2,29 +2,19 @@ import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import Redis from 'ioredis';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
-import { CourseModule } from './course/course.module';
-import { PaymentModule } from './payment/payment.module';
 import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { VideoModule } from './video/video.module';
 import { SecurityModule } from './security/security.module';
-
-import { JwtAuthGuard } from './auth/guards/auth.guard';
-import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
-import {
-  TokenBlacklistMiddleware,
-  SecurityHeadersMiddleware,
-} from './auth/middleware/auth.middleware';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
@@ -45,6 +35,15 @@ import { UserBadge } from './user/entities/user-badge.entity';
 import { Follow } from './user/entities/follow.entity';
 import { PrivacySettings } from './user/entities/privacy-settings.entity';
 import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
+import { JwtAuthGuard } from './auth/guards/auth.guard';
+import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
+import {
+  TokenBlacklistMiddleware,
+  SecurityHeadersMiddleware,
+} from './auth/middleware/auth.middleware';
+// import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware'; // <-- make sure to import
+import { CourseModule } from './course/course.module';
+import { PaymentModule } from './payment/payment.module';
 import {
   Payment,
   Subscription,
@@ -56,9 +55,13 @@ import {
   FinancialReport,
   PaymentMethodEntity,
 } from './payment/entities';
+import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
 import { SyncLog } from './integrations/common/entities/sync-log.entity';
 import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
+
 import { ForumModule } from './forum/forum.module';
 
 @Module({
@@ -126,6 +129,14 @@ import { ForumModule } from './forum/forum.module';
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
     },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export class AppModule {
@@ -133,6 +144,8 @@ export class AppModule {
     consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
     consumer.apply(InputSecurityMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
+    // consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
     consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
     consumer.apply(RequestLoggerMiddleware).forRoutes('*');
   }

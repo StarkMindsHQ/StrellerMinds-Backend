@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+import { ValidationException } from './common/decorators/errors/validation-exception';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { applyGlobalSecurity } from './common/security/bootstrap';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './logging/winston.config';
@@ -25,6 +28,15 @@ async function bootstrap() {
   // Global input security + validation (centralized)
   applyGlobalSecurity(app);
 
+    app.useGlobalFilters(new AllExceptionsFilter());
+
+  // CORS configuration
+  // app.enableCors({
+  //   origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+  //   credentials: true,
+  //   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  //   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  // });
   // Enhanced CORS configuration
   app.enableCors(SECURITY_CONFIG.cors);
 
