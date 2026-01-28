@@ -17,12 +17,11 @@ export class PlagiarismService {
 
   async checkPlagiarism(content: string, fileName?: string): Promise<{ score: number; reportUrl?: string }> {
     try {
-      // For demo/development, use simple text similarity
       if (!this.turnitinApiKey) {
         return this.simpleTextCheck(content);
       }
 
-      // Real Turnitin integration
+
       const response = await axios.post(`${this.turnitinUrl}/submissions`, {
         title: fileName || 'submission',
         submitter: 'system',
@@ -45,7 +44,6 @@ export class PlagiarismService {
   }
 
   private simpleTextCheck(content: string): { score: number } {
-    // Simple similarity check using fingerprinting
     const words = content.toLowerCase().split(/\s+/);
     const uniqueWords = new Set(words);
     const uniqueness = uniqueWords.size / words.length;
