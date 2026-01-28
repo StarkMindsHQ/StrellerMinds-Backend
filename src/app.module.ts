@@ -61,6 +61,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
 import { SyncLog } from './integrations/common/entities/sync-log.entity';
 import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
+import { AssignmentModule } from './assignments/assignments.module';
 
 import { ForumModule } from './forum/forum.module';
 import { LearningPathModule } from './learning-path/learning-path.module';
@@ -119,6 +120,7 @@ import { LearningPathModule } from './learning-path/learning-path.module';
     ConfigModule,
     DatabaseModule,
     IntegrationsModule,
+    AssignmentModule,
     VideoModule,
     LearningPathModule,
   ],
