@@ -1,7 +1,7 @@
 import { Module, Global } from '@nestjs/common';
-import { BackupService } from './backup/backup.service';
 import { DatabaseMonitorService } from './database.monitor.service';
 import { DatabaseMetricsController } from './database.metrics.controller';
+import { BackupModule } from './backup/backup.module';
 
 /**
  * Global module for database utilities
@@ -9,8 +9,9 @@ import { DatabaseMetricsController } from './database.metrics.controller';
  */
 @Global()
 @Module({
-    providers: [BackupService, DatabaseMonitorService],
-    controllers: [DatabaseMetricsController],
-    exports: [BackupService, DatabaseMonitorService],
+  imports: [BackupModule],
+  providers: [DatabaseMonitorService],
+  controllers: [DatabaseMetricsController],
+  exports: [DatabaseMonitorService, BackupModule],
 })
-export class DatabaseModule { }
+export class DatabaseModule {}
