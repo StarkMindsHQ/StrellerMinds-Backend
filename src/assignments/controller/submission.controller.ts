@@ -1,10 +1,11 @@
 import { Controller, Post, Get, Put, Delete, Body, Param, Query, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
+import * as Express from 'express';
 import { SubmissionService } from '../services/submission.service';
 import { SubmitAssignmentDto } from '../dto/submit-assignment.dto';
 import { GradeSubmissionDto } from '../dto/grade-submission.dto';
-import { RolesGuard } from '../../auth/guards/roles.guard';
+import { RolesGuard } from 'src/auth/guards/auth.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserRole } from '../../auth/entities/user.entity';
 
@@ -18,7 +19,7 @@ export class SubmissionController {
   async submitAssignment(
     @Param('assignmentId') assignmentId: string,
     @Body() submitDto: SubmitAssignmentDto,
-    @UploadedFile() file?: Express.Multer.File
+    @UploadedFile() file?: Express.MediaType
   ) {
     return this.submissionService.submitAssignment(assignmentId, submitDto, file);
   }
@@ -41,7 +42,7 @@ export class SubmissionController {
   }
 
   @Post(':submissionId/grade')
-  @Roles(UserRole.TEACHER, UserRole.ADMIN)
+  @Roles(UserRole.INSTRUCTOR, UserRole.ADMIN)
   async gradeSubmission(
     @Param('submissionId') submissionId: string,
     @Body() gradeDto: GradeSubmissionDto
