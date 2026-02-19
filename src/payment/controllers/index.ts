@@ -5,3 +5,4 @@ export * from './tax.controller';
 export * from './financial-report.controller';
 export * from './dispute.controller';
 export * from './webhook.controller';
+export * from './payment-method.controller';
