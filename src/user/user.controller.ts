@@ -182,10 +182,7 @@ export class UserController {
     type: UserResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async suspend(
-    @Param('id') id: string,
-    @Request() req?: any,
-  ): Promise<UserResponseDto> {
+  async suspend(@Param('id') id: string, @Request() req?: any): Promise<UserResponseDto> {
     return this.userService.suspend(id, req?.user?.id);
   }
 
@@ -198,10 +195,7 @@ export class UserController {
     type: UserResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async reactivate(
-    @Param('id') id: string,
-    @Request() req?: any,
-  ): Promise<UserResponseDto> {
+  async reactivate(@Param('id') id: string, @Request() req?: any): Promise<UserResponseDto> {
     return this.userService.reactivate(id, req?.user?.id);
   }
 
@@ -210,10 +204,7 @@ export class UserController {
   @ApiOperation({ summary: 'Soft delete a user' })
   @ApiResponse({ status: 204, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async remove(
-    @Param('id') id: string,
-    @Request() req?: any,
-  ): Promise<void> {
+  async remove(@Param('id') id: string, @Request() req?: any): Promise<void> {
     return this.userService.remove(id, req?.user?.id);
   }
 
@@ -255,10 +246,7 @@ export class UserController {
     status: 200,
     description: 'Activities retrieved successfully',
   })
-  async getActivities(
-    @Param('id') id: string,
-    @Query('limit') limit?: number,
-  ) {
+  async getActivities(@Param('id') id: string, @Query('limit') limit?: number) {
     return this.userService.getUserActivities(id, limit);
   }
 }

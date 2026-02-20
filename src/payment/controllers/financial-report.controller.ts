@@ -21,9 +21,7 @@ export class FinancialReportController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async generateReport(
-    @Body() dto: GenerateReportDto,
-  ): Promise<FinancialReportResponseDto> {
+  async generateReport(@Body() dto: GenerateReportDto): Promise<FinancialReportResponseDto> {
     return this.financialReportingService.generateReport(dto);
   }
 
@@ -33,9 +31,7 @@ export class FinancialReportController {
   }
 
   @Get()
-  async listReports(
-    @Query('period') period?: string,
-  ): Promise<FinancialReportResponseDto[]> {
+  async listReports(@Query('period') period?: string): Promise<FinancialReportResponseDto[]> {
     return this.financialReportingService.listReports(period);
   }
 }

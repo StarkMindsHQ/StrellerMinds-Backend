@@ -1,4 +1,11 @@
-import { Inject, Injectable, ForbiddenException, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FileEntity } from './entities/file.entity';
@@ -11,7 +18,6 @@ import type { File } from 'multer';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-
 
 @Injectable()
 export class FilesService {
@@ -88,9 +94,7 @@ export class FilesService {
     return {
       ...file,
       url: this.storage.getPublicUrl(file.path),
-      thumbnailUrl: file.thumbnailPath
-        ? this.storage.getPublicUrl(file.thumbnailPath)
-        : null,
+      thumbnailUrl: file.thumbnailPath ? this.storage.getPublicUrl(file.thumbnailPath) : null,
     };
   }
 
@@ -104,7 +108,7 @@ export class FilesService {
 
     await this.storage.delete(file.path);
     if (file.thumbnailPath) {
-        await this.storage.delete(file.thumbnailPath);
+      await this.storage.delete(file.thumbnailPath);
     }
     await this.repo.delete(id);
 
@@ -136,45 +140,51 @@ export class FilesService {
   async uploadChunk(file: File, uploadId: string, chunkIndex: number) {
     const tempDir = path.join(os.tmpdir(), 'uploads', uploadId);
     await fs.promises.mkdir(tempDir, { recursive: true });
-    
+
     await fs.promises.writeFile(path.join(tempDir, chunkIndex.toString()), file.buffer);
     return { message: 'Chunk uploaded' };
   }
 
-  async assembleUpload(uploadId: string, totalChunks: number, originalname: string, mimetype: string, ownerId: string) {
+  async assembleUpload(
+    uploadId: string,
+    totalChunks: number,
+    originalname: string,
+    mimetype: string,
+    ownerId: string,
+  ) {
     const tempDir = path.join(os.tmpdir(), 'uploads', uploadId);
-    
+
     // Check if all chunks exist
     for (let i = 0; i < totalChunks; i++) {
-        if (!fs.existsSync(path.join(tempDir, i.toString()))) {
-            throw new BadRequestException(`Missing chunk ${i}`);
-        }
+      if (!fs.existsSync(path.join(tempDir, i.toString()))) {
+        throw new BadRequestException(`Missing chunk ${i}`);
+      }
     }
 
     const buffers: Buffer[] = [];
     for (let i = 0; i < totalChunks; i++) {
-        const buffer = await fs.promises.readFile(path.join(tempDir, i.toString()));
-        buffers.push(buffer);
+      const buffer = await fs.promises.readFile(path.join(tempDir, i.toString()));
+      buffers.push(buffer);
     }
-    
+
     const combinedBuffer = Buffer.concat(buffers);
-    
+
     // Clean up
     await fs.promises.rm(tempDir, { recursive: true, force: true });
-    
+
     const fakeFile: File = {
-        fieldname: 'file',
-        originalname,
-        encoding: '7bit',
-        mimetype,
-        buffer: combinedBuffer,
-        size: combinedBuffer.length,
-        stream: null,
-        destination: '',
-        filename: originalname,
-        path: ''
+      fieldname: 'file',
+      originalname,
+      encoding: '7bit',
+      mimetype,
+      buffer: combinedBuffer,
+      size: combinedBuffer.length,
+      stream: null,
+      destination: '',
+      filename: originalname,
+      path: '',
     };
-    
+
     return this.upload(fakeFile, ownerId);
   }
 

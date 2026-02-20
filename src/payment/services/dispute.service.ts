@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Dispute, Payment } from '../entities';
@@ -73,18 +69,15 @@ export class DisputeService {
     });
   }
 
-  async submitEvidence(
-    disputeId: string,
-    evidence: string[],
-  ): Promise<Dispute> {
+  async submitEvidence(disputeId: string, evidence: string[]): Promise<Dispute> {
     const dispute = await this.getDispute(disputeId);
 
-    if (![DisputeStatus.INITIATED, DisputeStatus.UNDER_REVIEW].includes(
-      dispute.status as DisputeStatus,
-    )) {
-      throw new BadRequestException(
-        'Evidence cannot be submitted for this dispute',
-      );
+    if (
+      ![DisputeStatus.INITIATED, DisputeStatus.UNDER_REVIEW].includes(
+        dispute.status as DisputeStatus,
+      )
+    ) {
+      throw new BadRequestException('Evidence cannot be submitted for this dispute');
     }
 
     dispute.evidence = evidence;
@@ -93,11 +86,7 @@ export class DisputeService {
     return this.disputeRepository.save(dispute);
   }
 
-  async resolveDispute(
-    disputeId: string,
-    resolution: string,
-    won: boolean,
-  ): Promise<Dispute> {
+  async resolveDispute(disputeId: string, resolution: string, won: boolean): Promise<Dispute> {
     const dispute = await this.getDispute(disputeId);
 
     dispute.status = won ? DisputeStatus.WON : DisputeStatus.LOST;
@@ -118,10 +107,7 @@ export class DisputeService {
     return this.disputeRepository.save(dispute);
   }
 
-  async listDisputes(
-    status?: DisputeStatus,
-    userId?: string,
-  ): Promise<Dispute[]> {
+  async listDisputes(status?: DisputeStatus, userId?: string): Promise<Dispute[]> {
     const query = this.disputeRepository.createQueryBuilder('dispute');
 
     if (status) {

@@ -42,11 +42,11 @@ export class VideoService {
 
     const videoId = uuid();
     const video = this.videoRepo.create({
-        id: videoId,
-        title,
-        description,
-        ownerId,
-        status: VideoStatus.PROCESSING,
+      id: videoId,
+      title,
+      description,
+      ownerId,
+      status: VideoStatus.PROCESSING,
     });
     await this.videoRepo.save(video);
 
@@ -57,51 +57,51 @@ export class VideoService {
   }
 
   async addChapter(videoId: string, createChapterDto: any) {
-      const chapter = this.chapterRepo.create({ ...createChapterDto, videoId });
-      return this.chapterRepo.save(chapter);
+    const chapter = this.chapterRepo.create({ ...createChapterDto, videoId });
+    return this.chapterRepo.save(chapter);
   }
 
   async addQuiz(videoId: string, createQuizDto: any) {
-      const quiz = this.quizRepo.create({ ...createQuizDto, videoId });
-      return this.quizRepo.save(quiz);
+    const quiz = this.quizRepo.create({ ...createQuizDto, videoId });
+    return this.quizRepo.save(quiz);
   }
 
   async trackProgress(videoId: string, userId: string, progressDto: any) {
-      let analytics = await this.analyticsRepo.findOne({ where: { videoId, userId } });
-      if (!analytics) {
-          analytics = this.analyticsRepo.create({ videoId, userId });
-      }
-      analytics.watchTime = progressDto.watchTime;
-      analytics.lastPosition = progressDto.lastPosition;
-      analytics.completed = progressDto.completed;
-      return this.analyticsRepo.save(analytics);
+    let analytics = await this.analyticsRepo.findOne({ where: { videoId, userId } });
+    if (!analytics) {
+      analytics = this.analyticsRepo.create({ videoId, userId });
+    }
+    analytics.watchTime = progressDto.watchTime;
+    analytics.lastPosition = progressDto.lastPosition;
+    analytics.completed = progressDto.completed;
+    return this.analyticsRepo.save(analytics);
   }
 
   async findOne(id: string) {
-      const video = await this.videoRepo.findOne({
-          where: { id },
-          relations: ['chapters', 'quizzes']
-      });
-      if (!video) throw new NotFoundException(`Video with ID ${id} not found`);
-      return video;
+    const video = await this.videoRepo.findOne({
+      where: { id },
+      relations: ['chapters', 'quizzes'],
+    });
+    if (!video) throw new NotFoundException(`Video with ID ${id} not found`);
+    return video;
   }
 
   private async processVideo(videoId: string, inputPath: string, ownerId: string) {
-      try {
-          const outputDir = `videos/${videoId}/hls`;
-          const manifestPath = await this.transcodingService.transcodeToHls(inputPath, outputDir);
+    try {
+      const outputDir = `videos/${videoId}/hls`;
+      const manifestPath = await this.transcodingService.transcodeToHls(inputPath, outputDir);
 
-          await this.videoRepo.update(videoId, {
-              status: VideoStatus.READY,
-              hlsManifestPath: manifestPath,
-              // duration: ... // could be parsed from ffmpeg metadata
-          });
-      } catch (e) {
-          this.logger.error(`Video processing failed for ${videoId}`, e);
-          await this.videoRepo.update(videoId, { status: VideoStatus.FAILED });
-      } finally {
-          // Cleanup temp input
-          if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
-      }
+      await this.videoRepo.update(videoId, {
+        status: VideoStatus.READY,
+        hlsManifestPath: manifestPath,
+        // duration: ... // could be parsed from ffmpeg metadata
+      });
+    } catch (e) {
+      this.logger.error(`Video processing failed for ${videoId}`, e);
+      await this.videoRepo.update(videoId, { status: VideoStatus.FAILED });
+    } finally {
+      // Cleanup temp input
+      if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
+    }
   }
 }

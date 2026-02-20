@@ -7,9 +7,7 @@ import { SyncEngineService } from './services/sync-engine.service';
 import { SyncController } from './controllers/sync.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([SyncLog, IntegrationMapping, IntegrationConfig]),
-  ],
+  imports: [TypeOrmModule.forFeature([SyncLog, IntegrationMapping, IntegrationConfig])],
   controllers: [SyncController],
   providers: [SyncEngineService],
   exports: [SyncEngineService],

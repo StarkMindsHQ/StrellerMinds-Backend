@@ -69,10 +69,7 @@ export class SSOConfigService {
     userId: string,
     updates: Partial<IntegrationConfig>,
   ): Promise<IntegrationConfig> {
-    await this.configRepository.update(
-      { id: configId, userId },
-      updates,
-    );
+    await this.configRepository.update({ id: configId, userId }, updates);
     return this.getSSOConfig(configId, userId);
   }
 

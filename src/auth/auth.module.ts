@@ -93,6 +93,17 @@ import { PasswordHistoryService } from './services/password-history.service';
     GeoIpService,
     PasswordHistoryService,
   ],
-  exports: [AuthService, BcryptService, JwtService, JwtAuthGuard, RolesGuard, EmailService, TwoFactorAuthService, SecurityAuditService, GeoIpService, PasswordHistoryService],
+  exports: [
+    AuthService,
+    BcryptService,
+    JwtService,
+    JwtAuthGuard,
+    RolesGuard,
+    EmailService,
+    TwoFactorAuthService,
+    SecurityAuditService,
+    GeoIpService,
+    PasswordHistoryService,
+  ],
 })
-export class AuthModule { }
+export class AuthModule {}

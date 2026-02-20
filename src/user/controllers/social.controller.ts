@@ -44,12 +44,8 @@ export class SocialController {
     @Request() req,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<FollowResponseDto> {
-    const followerProfile = await this.userProfileService.getProfileByUserId(
-      req.user.id,
-    );
-    const followingProfile = await this.userProfileService.getProfileByUserId(
-      userId,
-    );
+    const followerProfile = await this.userProfileService.getProfileByUserId(req.user.id);
+    const followingProfile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.followUser(followerProfile.id, followingProfile.id);
   }
 
@@ -61,12 +57,8 @@ export class SocialController {
     @Request() req,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<void> {
-    const followerProfile = await this.userProfileService.getProfileByUserId(
-      req.user.id,
-    );
-    const followingProfile = await this.userProfileService.getProfileByUserId(
-      userId,
-    );
+    const followerProfile = await this.userProfileService.getProfileByUserId(req.user.id);
+    const followingProfile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.unfollowUser(followerProfile.id, followingProfile.id);
   }
 
@@ -89,9 +81,7 @@ export class SocialController {
   @Get(':userId/followers')
   @ApiOperation({ summary: 'Get user followers' })
   @ApiResponse({ status: 200, description: 'Followers retrieved' })
-  async getUserFollowers(
-    @Param('userId', new ParseUUIDPipe()) userId: string,
-  ): Promise<any[]> {
+  async getUserFollowers(@Param('userId', new ParseUUIDPipe()) userId: string): Promise<any[]> {
     const profile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.getFollowers(profile.id);
   }
@@ -99,9 +89,7 @@ export class SocialController {
   @Get(':userId/following')
   @ApiOperation({ summary: 'Get users followed by user' })
   @ApiResponse({ status: 200, description: 'Following retrieved' })
-  async getUserFollowing(
-    @Param('userId', new ParseUUIDPipe()) userId: string,
-  ): Promise<any[]> {
+  async getUserFollowing(@Param('userId', new ParseUUIDPipe()) userId: string): Promise<any[]> {
     const profile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.getFollowing(profile.id);
   }
@@ -150,9 +138,7 @@ export class SocialController {
     @Request() req,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<FollowResponseDto> {
-    const blockerProfile = await this.userProfileService.getProfileByUserId(
-      req.user.id,
-    );
+    const blockerProfile = await this.userProfileService.getProfileByUserId(req.user.id);
     const blockedProfile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.blockUser(blockerProfile.id, blockedProfile.id);
   }
@@ -165,9 +151,7 @@ export class SocialController {
     @Request() req,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<void> {
-    const unblockerProfile = await this.userProfileService.getProfileByUserId(
-      req.user.id,
-    );
+    const unblockerProfile = await this.userProfileService.getProfileByUserId(req.user.id);
     const blockedProfile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.unblockUser(unblockerProfile.id, blockedProfile.id);
   }
@@ -182,9 +166,7 @@ export class SocialController {
     @Request() req,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<FollowResponseDto> {
-    const muterProfile = await this.userProfileService.getProfileByUserId(
-      req.user.id,
-    );
+    const muterProfile = await this.userProfileService.getProfileByUserId(req.user.id);
     const mutedProfile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.muteUser(muterProfile.id, mutedProfile.id);
   }
@@ -197,9 +179,7 @@ export class SocialController {
     @Request() req,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<void> {
-    const unmutterProfile = await this.userProfileService.getProfileByUserId(
-      req.user.id,
-    );
+    const unmutterProfile = await this.userProfileService.getProfileByUserId(req.user.id);
     const mutedProfile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.unmuteUser(unmutterProfile.id, mutedProfile.id);
   }
@@ -213,13 +193,8 @@ export class SocialController {
     @Request() req,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<any[]> {
-    const userProfile = await this.userProfileService.getProfileByUserId(
-      req.user.id,
-    );
+    const userProfile = await this.userProfileService.getProfileByUserId(req.user.id);
     const otherProfile = await this.userProfileService.getProfileByUserId(userId);
-    return this.socialService.getMutualConnections(
-      userProfile.id,
-      otherProfile.id,
-    );
+    return this.socialService.getMutualConnections(userProfile.id, otherProfile.id);
   }
 }

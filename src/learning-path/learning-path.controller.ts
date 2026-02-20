@@ -49,14 +49,11 @@ export class LearningPathController {
   @Get()
   @ApiOperation({ summary: 'Get all learning paths' })
   @ApiResponse({ status: 200, description: 'List of learning paths' })
-  async findAll(
-    @Request() req,
-    @Query('instructorId') instructorId?: string,
-  ) {
+  async findAll(@Request() req, @Query('instructorId') instructorId?: string) {
     // Instructors can see their own paths, admins can see all
     const canSeeAll = req.user.role === UserRole.ADMIN;
     const filterInstructorId = canSeeAll ? instructorId : req.user.id;
-    
+
     return this.curriculumBuilderService.findAll(filterInstructorId);
   }
 
@@ -72,10 +69,7 @@ export class LearningPathController {
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Update learning path' })
   @ApiResponse({ status: 200, description: 'Learning path updated successfully' })
-  async update(
-    @Param('id') id: string,
-    @Body() updateDto: UpdateLearningPathDto,
-  ) {
+  async update(@Param('id') id: string, @Body() updateDto: UpdateLearningPathDto) {
     return this.curriculumBuilderService.updateLearningPath(id, updateDto);
   }
 
@@ -94,10 +88,7 @@ export class LearningPathController {
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Add node to learning path' })
   @ApiResponse({ status: 201, description: 'Node added successfully' })
-  async addNode(
-    @Param('id') learningPathId: string,
-    @Body() nodeDto: any,
-  ) {
+  async addNode(@Param('id') learningPathId: string, @Body() nodeDto: any) {
     return this.curriculumBuilderService.addNodeToPath(learningPathId, nodeDto);
   }
 
@@ -116,10 +107,7 @@ export class LearningPathController {
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Create dependency between nodes' })
   @ApiResponse({ status: 201, description: 'Dependency created successfully' })
-  async createDependency(
-    @Param('nodeId') sourceNodeId: string,
-    @Body() dependencyDto: any,
-  ) {
+  async createDependency(@Param('nodeId') sourceNodeId: string, @Body() dependencyDto: any) {
     return this.curriculumBuilderService.createDependency(sourceNodeId, dependencyDto);
   }
 
@@ -148,9 +136,7 @@ export class LearningPathController {
   @Get('enrollments/:enrollmentId/performance')
   @ApiOperation({ summary: 'Get student performance metrics' })
   @ApiResponse({ status: 200, description: 'Performance metrics' })
-  async getPerformanceMetrics(
-    @Param('enrollmentId') enrollmentId: string,
-  ) {
+  async getPerformanceMetrics(@Param('enrollmentId') enrollmentId: string) {
     const enrollment = await this.progressTrackingService.getUserProgress(
       '', // userId would be extracted from enrollment
       '', // learningPathId would be extracted from enrollment
@@ -179,10 +165,7 @@ export class LearningPathController {
   @Post('enrollments/:enrollmentId/progress')
   @ApiOperation({ summary: 'Update learning progress' })
   @ApiResponse({ status: 200, description: 'Progress updated successfully' })
-  async updateProgress(
-    @Param('enrollmentId') enrollmentId: string,
-    @Body() progressDto: any,
-  ) {
+  async updateProgress(@Param('enrollmentId') enrollmentId: string, @Body() progressDto: any) {
     return this.progressTrackingService.updateProgress(enrollmentId, progressDto);
   }
 
@@ -261,10 +244,7 @@ export class LearningPathController {
   @Get('objectives/:id/suggestions/:nodeId')
   @ApiOperation({ summary: 'Get suggested objectives for node' })
   @ApiResponse({ status: 200, description: 'Suggested objectives' })
-  async getSuggestedObjectives(
-    @Param('id') objectiveId: string,
-    @Param('nodeId') nodeId: string,
-  ) {
+  async getSuggestedObjectives(@Param('id') objectiveId: string, @Param('nodeId') nodeId: string) {
     return this.objectiveMappingService.suggestObjectivesForNode(nodeId);
   }
 
@@ -281,10 +261,7 @@ export class LearningPathController {
   @Get('templates')
   @ApiOperation({ summary: 'Get learning path templates' })
   @ApiResponse({ status: 200, description: 'List of templates' })
-  async getTemplates(
-    @Query('category') category?: string,
-    @Query('search') search?: string,
-  ) {
+  async getTemplates(@Query('category') category?: string, @Query('search') search?: string) {
     return this.templateLibraryService.findAll(category as any, search);
   }
 

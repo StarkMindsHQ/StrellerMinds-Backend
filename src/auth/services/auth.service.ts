@@ -32,7 +32,7 @@ export class AuthService {
     private readonly twoFactorAuthService: TwoFactorAuthService,
     private readonly securityAuditService: SecurityAuditService,
     private readonly passwordHistoryService: PasswordHistoryService,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto): Promise<{ user: UserResponse; message: string }> {
     const existingUser = await this.userRepository.findOne({
@@ -67,7 +67,11 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto, ipAddress?: string, userAgent?: string): Promise<{
+  async login(
+    loginDto: LoginDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<{
     user: UserResponse;
     accessToken: string | null;
     refreshToken: string | null;
@@ -79,28 +83,55 @@ export class AuthService {
     });
 
     if (!user) {
-      await this.securityAuditService.log(null, SecurityEvent.LOGIN_FAILED, ipAddress, userAgent, { email: loginDto.email, reason: 'User not found' });
+      await this.securityAuditService.log(null, SecurityEvent.LOGIN_FAILED, ipAddress, userAgent, {
+        email: loginDto.email,
+        reason: 'User not found',
+      });
       throw new Error('Invalid credentials');
     }
 
     if (user.status === UserStatus.PENDING) {
-      await this.securityAuditService.log(user.id, SecurityEvent.LOGIN_FAILED, ipAddress, userAgent, { reason: 'Email not verified' });
+      await this.securityAuditService.log(
+        user.id,
+        SecurityEvent.LOGIN_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Email not verified' },
+      );
       throw new Error('Please verify your email before logging in');
     }
 
     if (user.status === UserStatus.SUSPENDED) {
-      await this.securityAuditService.log(user.id, SecurityEvent.ACCOUNT_LOCKED, ipAddress, userAgent, { reason: 'Account suspended' });
+      await this.securityAuditService.log(
+        user.id,
+        SecurityEvent.ACCOUNT_LOCKED,
+        ipAddress,
+        userAgent,
+        { reason: 'Account suspended' },
+      );
       throw new Error('Account suspended');
     }
 
     if (user.status === UserStatus.INACTIVE) {
-      await this.securityAuditService.log(user.id, SecurityEvent.LOGIN_FAILED, ipAddress, userAgent, { reason: 'Account inactive' });
+      await this.securityAuditService.log(
+        user.id,
+        SecurityEvent.LOGIN_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Account inactive' },
+      );
       throw new Error('Account inactive');
     }
 
     const isPasswordValid = await this.bcryptService.compare(loginDto.password, user.password);
     if (!isPasswordValid) {
-      await this.securityAuditService.log(user.id, SecurityEvent.LOGIN_FAILED, ipAddress, userAgent, { reason: 'Invalid password' });
+      await this.securityAuditService.log(
+        user.id,
+        SecurityEvent.LOGIN_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Invalid password' },
+      );
       throw new Error('Invalid credentials');
     }
 
@@ -113,7 +144,13 @@ export class AuthService {
         );
 
         if (!isCodeValid) {
-          await this.securityAuditService.log(user.id, SecurityEvent.LOGIN_FAILED, ipAddress, userAgent, { reason: 'Invalid 2FA code' });
+          await this.securityAuditService.log(
+            user.id,
+            SecurityEvent.LOGIN_FAILED,
+            ipAddress,
+            userAgent,
+            { reason: 'Invalid 2FA code' },
+          );
           throw new Error('Invalid authentication code');
         }
       } else {
@@ -134,7 +171,12 @@ export class AuthService {
 
     // Generate tokens
     const accessToken = this.generateAccessToken(user);
-    const refreshToken = await this.generateRefreshToken(user, loginDto.deviceId, ipAddress, userAgent);
+    const refreshToken = await this.generateRefreshToken(
+      user,
+      loginDto.deviceId,
+      ipAddress,
+      userAgent,
+    );
 
     return {
       user: this.sanitizeUser(user),
@@ -144,15 +186,17 @@ export class AuthService {
     };
   }
 
-  async loginWith2fa(user: User, code: string, ipAddress?: string, userAgent?: string): Promise<{
+  async loginWith2fa(
+    user: User,
+    code: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<{
     user: UserResponse;
     accessToken: string;
     refreshToken: string;
   }> {
-    const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(
-      code,
-      user,
-    );
+    const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(code, user);
 
     if (!isCodeValid) {
       throw new Error('Invalid authentication code');
@@ -172,7 +216,8 @@ export class AuthService {
   }
 
   async generateTwoFactorSecret(user: User) {
-    const { secret, otpauthUrl } = this.twoFactorAuthService.generateTwoFactorAuthenticationSecret(user);
+    const { secret, otpauthUrl } =
+      this.twoFactorAuthService.generateTwoFactorAuthenticationSecret(user);
 
     await this.userRepository.update(user.id, {
       twoFactorAuthenticationSecret: secret,
@@ -190,10 +235,7 @@ export class AuthService {
       throw new Error('User not found');
     }
 
-    const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(
-      code,
-      user,
-    );
+    const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(code, user);
 
     if (!isCodeValid) {
       throw new Error('Invalid authentication code');
@@ -214,7 +256,7 @@ export class AuthService {
     // For admins, we might want to see all logs, but for now let's just return recent events for the user
     // or if admin, return all?
     // The requirement says "Security audit logs and reporting".
-    // I'll return recent events for the user calling (if admin, maybe they want to see system wide? 
+    // I'll return recent events for the user calling (if admin, maybe they want to see system wide?
     // The controller restricts to ADMIN. So this should probably return system wide logs.
     // But SecurityAuditService.getRecentEvents takes userId.
     // I'll update SecurityAuditService to allow fetching all if userId is not provided or separate method.
@@ -301,17 +343,11 @@ export class AuthService {
       );
     }
 
-    await this.refreshTokenRepository.update(
-      { token: tokenHash },
-      { isRevoked: true },
-    );
+    await this.refreshTokenRepository.update({ token: tokenHash }, { isRevoked: true });
   }
 
   async logoutAllDevices(userId: string): Promise<void> {
-    await this.refreshTokenRepository.update(
-      { userId },
-      { isRevoked: true }
-    );
+    await this.refreshTokenRepository.update({ userId }, { isRevoked: true });
   }
 
   async forgotPassword(email: string): Promise<void> {
@@ -347,7 +383,10 @@ export class AuthService {
       throw new Error('Invalid or expired reset token');
     }
 
-    const isUsedRecently = await this.passwordHistoryService.isPasswordInHistory(user.id, newPassword);
+    const isUsedRecently = await this.passwordHistoryService.isPasswordInHistory(
+      user.id,
+      newPassword,
+    );
     if (isUsedRecently) {
       throw new Error('Password has been used recently');
     }
@@ -363,10 +402,7 @@ export class AuthService {
     });
 
     // Revoke all refresh tokens for this user
-    await this.refreshTokenRepository.update(
-      { userId: user.id },
-      { isRevoked: true }
-    );
+    await this.refreshTokenRepository.update({ userId: user.id }, { isRevoked: true });
   }
 
   async verifyEmail(verificationToken: string): Promise<void> {
@@ -385,7 +421,11 @@ export class AuthService {
     });
   }
 
-  async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
@@ -397,7 +437,10 @@ export class AuthService {
       throw new Error('Current password is incorrect');
     }
 
-    const isUsedRecently = await this.passwordHistoryService.isPasswordInHistory(userId, newPassword);
+    const isUsedRecently = await this.passwordHistoryService.isPasswordInHistory(
+      userId,
+      newPassword,
+    );
     if (isUsedRecently) {
       throw new Error('Password has been used recently');
     }
@@ -413,10 +456,7 @@ export class AuthService {
     await this.securityAuditService.log(userId, SecurityEvent.PASSWORD_CHANGE);
 
     // Revoke all refresh tokens for this user
-    await this.refreshTokenRepository.update(
-      { userId },
-      { isRevoked: true }
-    );
+    await this.refreshTokenRepository.update({ userId }, { isRevoked: true });
   }
 
   private generateAccessToken(user: User): string {

@@ -40,10 +40,7 @@ export class SyncEngineService {
   /**
    * Update sync log
    */
-  async updateSyncLog(
-    syncLogId: string,
-    updates: Partial<SyncLog>,
-  ): Promise<SyncLog> {
+  async updateSyncLog(syncLogId: string, updates: Partial<SyncLog>): Promise<SyncLog> {
     await this.syncLogRepository.update(syncLogId, updates);
     return this.syncLogRepository.findOne({ where: { id: syncLogId } });
   }
@@ -161,7 +158,8 @@ export class SyncEngineService {
     integrationConfigId: string,
     resourceType?: string,
   ): Promise<IntegrationMapping[]> {
-    const query = this.mappingRepository.createQueryBuilder('m')
+    const query = this.mappingRepository
+      .createQueryBuilder('m')
       .where('m.integrationConfigId = :configId', { configId: integrationConfigId });
 
     if (resourceType) {
@@ -229,7 +227,7 @@ export class SyncEngineService {
         this.logger.warn(
           `Sync attempt ${attempt + 1} failed, retrying in ${delay}ms: ${error.message}`,
         );
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
@@ -250,12 +248,11 @@ export class SyncEngineService {
       take: 5,
     });
 
-    const successCount = logs.filter(log => log.status === SyncStatus.SUCCESS).length;
-    const failureCount = logs.filter(log => log.status === SyncStatus.FAILED).length;
+    const successCount = logs.filter((log) => log.status === SyncStatus.SUCCESS).length;
+    const failureCount = logs.filter((log) => log.status === SyncStatus.FAILED).length;
     const totalItems = logs.reduce((sum, log) => sum + log.itemsProcessed, 0);
-    const avgDuration = logs.length > 0
-      ? logs.reduce((sum, log) => sum + (log.durationMs || 0), 0) / logs.length
-      : 0;
+    const avgDuration =
+      logs.length > 0 ? logs.reduce((sum, log) => sum + (log.durationMs || 0), 0) / logs.length : 0;
 
     return {
       integrationId: integrationConfigId,

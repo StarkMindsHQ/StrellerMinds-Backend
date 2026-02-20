@@ -7,47 +7,60 @@ import { ThreatDetectionService } from 'src/forum/threat-detection.service';
 
 @Injectable()
 export class SecurityAuditService {
+<<<<<<< HEAD
     constructor(
         @InjectRepository(SecurityAudit)
         private readonly auditRepository: Repository<SecurityAudit>,
         private readonly geoIpService: GeoIpService,
         private readonly threatDetectionService: ThreatDetectionService,
     ) { }
+=======
+  constructor(
+    @InjectRepository(SecurityAudit)
+    private readonly auditRepository: Repository<SecurityAudit>,
+    private readonly geoIpService: GeoIpService,
+  ) {}
+>>>>>>> 8b8a4810eed8b4d9a858e9af25e476ce76ee138d
 
-    async log(
-        userId: string | null,
-        event: SecurityEvent,
-        ipAddress?: string,
-        userAgent?: string,
-        metadata?: any,
-    ): Promise<void> {
-        const location = ipAddress ? this.geoIpService.lookup(ipAddress) : null;
+  async log(
+    userId: string | null,
+    event: SecurityEvent,
+    ipAddress?: string,
+    userAgent?: string,
+    metadata?: any,
+  ): Promise<void> {
+    const location = ipAddress ? this.geoIpService.lookup(ipAddress) : null;
 
-        const audit = this.auditRepository.create({
-            userId,
-            event,
-            ipAddress,
-            userAgent,
-            metadata: { ...metadata, location },
-        });
+    const audit = this.auditRepository.create({
+      userId,
+      event,
+      ipAddress,
+      userAgent,
+      metadata: { ...metadata, location },
+    });
 
+<<<<<<< HEAD
         const savedAudit = await this.auditRepository.save(audit);
 
         // Analyze event for threats asynchronously
         this.threatDetectionService.analyzeEvent(savedAudit).catch(err => {
             console.error('Threat detection analysis failed:', err);
         });
+=======
+    await this.auditRepository.save(audit);
+  }
+
+  async getRecentEvents(userId: string | null, limit: number = 10): Promise<SecurityAudit[]> {
+    const query = this.auditRepository
+      .createQueryBuilder('audit')
+      .orderBy('audit.createdAt', 'DESC')
+      .take(limit);
+
+    if (userId) {
+      query.where('audit.userId = :userId', { userId });
+>>>>>>> 8b8a4810eed8b4d9a858e9af25e476ce76ee138d
     }
 
-    async getRecentEvents(userId: string | null, limit: number = 10): Promise<SecurityAudit[]> {
-        const query = this.auditRepository.createQueryBuilder('audit')
-            .orderBy('audit.createdAt', 'DESC')
-            .take(limit);
-
-        if (userId) {
-            query.where('audit.userId = :userId', { userId });
-        }
-
-        return query.getMany();
-    }
+    return query.getMany();
+  }
 }

@@ -24,10 +24,7 @@ export class FilesController {
       limits: { fileSize: 500 * 1024 * 1024 },
     }),
   )
-  uploadFile(
-    @UploadedFile() file: File,
-    @Req() req,
-  ) {
+  uploadFile(@UploadedFile() file: File, @Req() req) {
     return this.filesService.upload(file, req.user.id);
   }
 
@@ -49,7 +46,13 @@ export class FilesController {
     @Body('mimetype') mimetype: string,
     @Req() req,
   ) {
-    return this.filesService.assembleUpload(uploadId, totalChunks, originalname, mimetype, req.user.id);
+    return this.filesService.assembleUpload(
+      uploadId,
+      totalChunks,
+      originalname,
+      mimetype,
+      req.user.id,
+    );
   }
 
   @Get(':id')
@@ -63,20 +66,12 @@ export class FilesController {
   }
 
   @Post(':id/share')
-  shareFile(
-    @Param('id') id: string,
-    @Body('targetUserId') targetUserId: string,
-    @Req() req,
-  ) {
+  shareFile(@Param('id') id: string, @Body('targetUserId') targetUserId: string, @Req() req) {
     return this.filesService.shareFile(id, req.user.id, targetUserId);
   }
 
   @Put(':id/public')
-  setPublic(
-    @Param('id') id: string,
-    @Body('isPublic') isPublic: boolean,
-    @Req() req,
-  ) {
+  setPublic(@Param('id') id: string, @Body('isPublic') isPublic: boolean, @Req() req) {
     return this.filesService.setPublic(id, req.user.id, isPublic);
   }
 }

@@ -7,9 +7,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-} from "typeorm";
-import { Course } from "./course.entity";
-import { User } from "../../auth/entities/user.entity";
+} from 'typeorm';
+import { Course } from './course.entity';
+import { User } from '../../auth/entities/user.entity';
 
 export enum EnrollmentStatus {
   ACTIVE = 'active',
@@ -44,7 +44,7 @@ export class Enrollment {
   @Column({
     type: 'enum',
     enum: EnrollmentStatus,
-    default: EnrollmentStatus.ACTIVE
+    default: EnrollmentStatus.ACTIVE,
   })
   status: EnrollmentStatus;
 

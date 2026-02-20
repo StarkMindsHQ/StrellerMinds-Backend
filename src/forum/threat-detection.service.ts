@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
-import { SecurityAudit, SecurityEvent } from '../../auth/entities/security-audit.entity';
+import { SecurityAudit } from 'src/auth/entities/security-audit.entity';
 import { SecurityResponseService } from './security-response.service';
-import { IncidentSeverity } from '../entities/security-incident.entity';
+import { IncidentSeverity } from './security-incident.entity';
+import { SecurityEvent } from 'src/auth/entities/security-audit.entity';
 
 @Injectable()
 export class ThreatDetectionService {
@@ -62,10 +63,10 @@ export class ThreatDetectionService {
       where: { 
         userId: audit.userId,
         event: 'LOGIN_SUCCESS' as SecurityEvent
-      },
+      } as any,
       order: { createdAt: 'DESC' },
-      skip: 1, // Skip the current event
-    });
+      skip: 1, // Skip the current event to find the previous one
+    } as any);
 
     if (lastLogin && lastLogin.metadata?.location) {
       const currentLoc = audit.metadata.location;

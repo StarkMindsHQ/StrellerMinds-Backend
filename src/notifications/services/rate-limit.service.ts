@@ -24,7 +24,7 @@ export class RateLimitService {
 
     // Default rate limit: 5 emails per 15 minutes
     const maxEmailsPerPeriod = this.configService.get<number>('EMAIL_RATE_LIMIT_PER_PERIOD', 5);
-    
+
     return recentEmailsCount >= maxEmailsPerPeriod;
   }
 
@@ -39,11 +39,14 @@ export class RateLimitService {
       .getCount();
 
     const maxEmailsPerPeriod = this.configService.get<number>('EMAIL_RATE_LIMIT_PER_PERIOD', 5);
-    
+
     return Math.max(0, maxEmailsPerPeriod - recentEmailsCount);
   }
 
-  async getRateLimitInfo(recipient: string, periodMinutes: number = 15): Promise<{
+  async getRateLimitInfo(
+    recipient: string,
+    periodMinutes: number = 15,
+  ): Promise<{
     isLimited: boolean;
     remaining: number;
     resetTime: Date;
@@ -61,7 +64,7 @@ export class RateLimitService {
       .getCount();
 
     const maxEmailsPerPeriod = this.configService.get<number>('EMAIL_RATE_LIMIT_PER_PERIOD', 5);
-    
+
     return {
       isLimited: recentEmailsCount >= maxEmailsPerPeriod,
       remaining: Math.max(0, maxEmailsPerPeriod - recentEmailsCount),
@@ -72,7 +75,7 @@ export class RateLimitService {
   async applyRateLimit(recipient: string): Promise<boolean> {
     // Check if user is rate limited
     const isLimited = await this.isRateLimited(recipient);
-    
+
     if (isLimited) {
       return false; // Rate limited
     }

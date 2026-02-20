@@ -40,7 +40,7 @@ export class ValidationUtil {
   static sanitizeCredentials(credentials: any): any {
     const sanitized = { ...credentials };
     const sensitiveFields = ['password', 'secret', 'token', 'apiKey', 'refreshToken'];
-    
+
     for (const field of sensitiveFields) {
       if (sanitized[field]) {
         sanitized[field] = '***';

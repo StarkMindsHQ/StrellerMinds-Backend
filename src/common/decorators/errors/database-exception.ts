@@ -5,11 +5,6 @@ import { ErrorCode } from './error-code';
 
 export class DatabaseException extends BaseException {
   constructor(message = 'Database operation failed', details?: any) {
-    super(
-      HttpStatus.INTERNAL_SERVER_ERROR,
-      ErrorCode.DATABASE_ERROR,
-      message,
-      details,
-    );
+    super(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, message, details);
   }
 }

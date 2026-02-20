@@ -10,17 +10,17 @@ import { SecurityAuditService } from '../services/security-audit.service';
 @Roles(UserRole.ADMIN)
 @ApiBearerAuth()
 export class SecurityController {
-    constructor(private readonly securityAuditService: SecurityAuditService) { }
+  constructor(private readonly securityAuditService: SecurityAuditService) {}
 
-    @Get('dashboard')
-    @ApiOperation({ summary: 'Get security dashboard stats' })
-    @ApiResponse({ status: 200, description: 'Security stats retrieved successfully' })
-    async getDashboardStats() {
-        // In a real app, this would aggregate data from DB
-        // For now, returning mock/simple data or recent events
-        return {
-            recentEvents: await this.securityAuditService.getRecentEvents(null, 20), // Pass null to get all users? Need to update service
-            // Add more stats here
-        };
-    }
+  @Get('dashboard')
+  @ApiOperation({ summary: 'Get security dashboard stats' })
+  @ApiResponse({ status: 200, description: 'Security stats retrieved successfully' })
+  async getDashboardStats() {
+    // In a real app, this would aggregate data from DB
+    // For now, returning mock/simple data or recent events
+    return {
+      recentEvents: await this.securityAuditService.getRecentEvents(null, 20), // Pass null to get all users? Need to update service
+      // Add more stats here
+    };
+  }
 }

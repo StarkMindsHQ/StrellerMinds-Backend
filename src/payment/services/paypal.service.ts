@@ -38,9 +38,7 @@ export class PayPalService {
 
       return response.data.access_token;
     } catch (error) {
-      throw new BadRequestException(
-        `Failed to get PayPal access token: ${error.message}`,
-      );
+      throw new BadRequestException(`Failed to get PayPal access token: ${error.message}`);
     }
   }
 
@@ -74,9 +72,7 @@ export class PayPalService {
 
       return response.data;
     } catch (error) {
-      throw new BadRequestException(
-        `Failed to create PayPal order: ${error.message}`,
-      );
+      throw new BadRequestException(`Failed to create PayPal order: ${error.message}`);
     }
   }
 
@@ -107,16 +103,13 @@ export class PayPalService {
         paymentMethod: PaymentMethod.PAYPAL,
         status: PaymentStatus.COMPLETED,
         transactionId: orderId,
-        gatewayReferenceId:
-          response.data.purchase_units[0].payments.captures[0].id,
+        gatewayReferenceId: response.data.purchase_units[0].payments.captures[0].id,
         completedAt: new Date(),
       });
 
       return this.paymentRepository.save(payment);
     } catch (error) {
-      throw new BadRequestException(
-        `Failed to capture PayPal order: ${error.message}`,
-      );
+      throw new BadRequestException(`Failed to capture PayPal order: ${error.message}`);
     }
   }
 
@@ -147,9 +140,7 @@ export class PayPalService {
 
       return response.data;
     } catch (error) {
-      throw new BadRequestException(
-        `Failed to create PayPal subscription: ${error.message}`,
-      );
+      throw new BadRequestException(`Failed to create PayPal subscription: ${error.message}`);
     }
   }
 
@@ -168,9 +159,7 @@ export class PayPalService {
         },
       );
     } catch (error) {
-      throw new BadRequestException(
-        `Failed to cancel PayPal subscription: ${error.message}`,
-      );
+      throw new BadRequestException(`Failed to cancel PayPal subscription: ${error.message}`);
     }
   }
 
@@ -193,9 +182,7 @@ export class PayPalService {
 
       return response.data;
     } catch (error) {
-      throw new BadRequestException(
-        `Failed to refund PayPal payment: ${error.message}`,
-      );
+      throw new BadRequestException(`Failed to refund PayPal payment: ${error.message}`);
     }
   }
 }

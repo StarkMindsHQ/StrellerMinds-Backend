@@ -1,12 +1,6 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from "@nestjs/common";
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { BaseException } from "src/common/decorators/errors/base-exception";
+import { BaseException } from 'src/common/decorators/errors/base-exception';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -25,16 +19,14 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       errorCode = (exception as BaseException).errorCode;
       message = (exception as BaseException).message;
       details = (exception as BaseException).details;
-    } 
-    else if (exception instanceof HttpException) {
+    } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const errorResponse = exception.getResponse();
       if (typeof errorResponse === 'object' && errorResponse !== null) {
         message = (errorResponse as any).message || exception.message;
         errorCode = (errorResponse as any).errorCode || errorCode;
         details = (errorResponse as any).details || details;
-      }
-      else {
+      } else {
         message = exception.message;
       }
     }

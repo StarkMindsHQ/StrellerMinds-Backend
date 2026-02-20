@@ -30,23 +30,14 @@ export class SearchController {
   }
 
   @Get('analytics')
-  async getAnalytics(
-    @Query('userId') userId?: string,
-    @Query('days') days: number = 30,
-  ) {
+  async getAnalytics(@Query('userId') userId?: string, @Query('days') days: number = 30) {
     return this.searchService.getSearchAnalytics(userId, days);
   }
 
   @Post('track-click')
   @HttpCode(HttpStatus.OK)
-  async trackClick(
-    @Body() body: { userId: string; searchId: string; clickedItemId: string },
-  ) {
-    return this.searchService.trackClick(
-      body.userId,
-      body.searchId,
-      body.clickedItemId,
-    );
+  async trackClick(@Body() body: { userId: string; searchId: string; clickedItemId: string }) {
+    return this.searchService.trackClick(body.userId, body.searchId, body.clickedItemId);
   }
 
   @Get('export')
