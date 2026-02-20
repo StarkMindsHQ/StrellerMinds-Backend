@@ -3,7 +3,8 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SearchLog } from '../entities/search.entity';
-import { SearchQueryDto, IndexContentDto } from '../entities/search.dto';
+import {  IndexContentDto } from '../entities/search.dto';
+import { SearchQueryDto } from '../dto/search-query.dto';
 import { CONTENT_INDEX_MAPPING } from '../entities/content.entity';
 
 @Injectable()
