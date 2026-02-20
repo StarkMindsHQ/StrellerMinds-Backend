@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SecurityAudit, SecurityEvent } from '../entities/security-audit.entity';
 import { GeoIpService } from './geo-ip.service';
+import { ThreatDetectionService } from 'src/forum/threat-detection.service';
 
 @Injectable()
 export class SecurityAuditService {
@@ -28,6 +29,7 @@ export class SecurityAuditService {
       userAgent,
       metadata: { ...metadata, location },
     });
+
 
     await this.auditRepository.save(audit);
   }
