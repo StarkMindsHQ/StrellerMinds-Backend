@@ -50,6 +50,13 @@ export class ProcessPaymentDto {
   @IsString()
   @IsOptional()
   idempotencyKey?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsOptional()
+  metadata?: Record<string, any>;
 }
 
 export class PaymentResponseDto {
