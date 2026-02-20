@@ -7,20 +7,12 @@ import { ThreatDetectionService } from 'src/forum/threat-detection.service';
 
 @Injectable()
 export class SecurityAuditService {
-<<<<<<< HEAD
     constructor(
         @InjectRepository(SecurityAudit)
         private readonly auditRepository: Repository<SecurityAudit>,
         private readonly geoIpService: GeoIpService,
         private readonly threatDetectionService: ThreatDetectionService,
     ) { }
-=======
-  constructor(
-    @InjectRepository(SecurityAudit)
-    private readonly auditRepository: Repository<SecurityAudit>,
-    private readonly geoIpService: GeoIpService,
-  ) {}
->>>>>>> 8b8a4810eed8b4d9a858e9af25e476ce76ee138d
 
   async log(
     userId: string | null,
