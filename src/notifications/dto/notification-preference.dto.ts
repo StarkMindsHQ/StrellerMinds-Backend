@@ -7,11 +7,16 @@ export class CreateNotificationPreferenceDto {
 
   @IsObject()
   @IsOptional()
-  preferences?: Partial<Record<NotificationType, {
-    channels: NotificationChannel[];
-    enabled: boolean;
-    frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
-  }>>;
+  preferences?: Partial<
+    Record<
+      NotificationType,
+      {
+        channels: NotificationChannel[];
+        enabled: boolean;
+        frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
+      }
+    >
+  >;
 
   @IsBoolean()
   @IsOptional()
@@ -53,11 +58,16 @@ export class CreateNotificationPreferenceDto {
 export class UpdateNotificationPreferenceDto {
   @IsObject()
   @IsOptional()
-  preferences?: Partial<Record<NotificationType, {
-    channels: NotificationChannel[];
-    enabled: boolean;
-    frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
-  }>>;
+  preferences?: Partial<
+    Record<
+      NotificationType,
+      {
+        channels: NotificationChannel[];
+        enabled: boolean;
+        frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
+      }
+    >
+  >;
 
   @IsBoolean()
   @IsOptional()

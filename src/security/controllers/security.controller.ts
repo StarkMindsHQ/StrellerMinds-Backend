@@ -17,12 +17,7 @@ export class SecurityController {
   @Post('validate-request')
   @ApiOperation({ summary: 'Validate request security' })
   @ApiResponse({ status: 200, description: 'Request validated successfully' })
-  validateRequest(
-    @Body() body: any,
-    @Headers() headers: any,
-    @Ip() ip: string,
-    @Req() req: any
-  ) {
+  validateRequest(@Body() body: any, @Headers() headers: any, @Ip() ip: string, @Req() req: any) {
     return this.securityService.validateRequest(body, headers, ip, req);
   }
 
@@ -44,11 +39,7 @@ export class SecurityController {
   @ApiOperation({ summary: 'Report suspicious activity' })
   @ApiResponse({ status: 200, description: 'Activity reported successfully' })
   reportSuspiciousActivity(
-    @Body() reportData: {
-      type: string;
-      description: string;
-      evidence?: any;
-    }
+    @Body() reportData: { type: string; description: string; evidence?: any },
   ) {
     return this.securityService.reportSuspiciousActivity(reportData);
   }

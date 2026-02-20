@@ -35,12 +35,12 @@ export class GamificationService {
     const profile = await this.getProfile(userId);
     profile.xp += amount;
     profile.points += amount;
-    
+
     const newLevel = Math.floor(Math.sqrt(profile.xp / 100)) + 1;
     if (newLevel > profile.level) {
       profile.level = newLevel;
     }
-    
+
     return await this.profileRepository.save(profile);
   }
 
@@ -72,7 +72,9 @@ export class GamificationService {
     const badge = await this.badgeRepository.findOne({ where: { code: badgeCode } });
     if (!badge) throw new NotFoundException('Badge not found');
 
-    const existing = await this.userBadgeRepository.findOne({ where: { userId, badgeId: badge.id } });
+    const existing = await this.userBadgeRepository.findOne({
+      where: { userId, badgeId: badge.id },
+    });
     if (existing) return existing;
 
     const userBadge = this.userBadgeRepository.create({ userId, badgeId: badge.id });
@@ -95,10 +97,10 @@ export class GamificationService {
 
   async handleActivity(userId: string, activityType: string): Promise<void> {
     const xpMap: Record<string, number> = {
-      'login': 10,
-      'course_completed': 100,
-      'lesson_completed': 20,
-      'quiz_passed': 50,
+      login: 10,
+      course_completed: 100,
+      lesson_completed: 20,
+      quiz_passed: 50,
     };
     const amount = xpMap[activityType] || 0;
     if (amount > 0) {
@@ -114,7 +116,7 @@ export class GamificationService {
     const currentLevelXP = Math.pow(profile.level - 1, 2) * 100;
     const nextLevelXP = Math.pow(profile.level, 2) * 100;
     const progress = ((profile.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
-    
+
     return {
       level: profile.level,
       xp: profile.xp,

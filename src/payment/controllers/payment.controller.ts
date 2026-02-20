@@ -12,11 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/auth.guard';
 import { PaymentService, StripeService, PayPalService } from '../services';
-import {
-  CreatePaymentDto,
-  ProcessPaymentDto,
-  PaymentResponseDto,
-} from '../dto';
+import { CreatePaymentDto, ProcessPaymentDto, PaymentResponseDto } from '../dto';
 
 @Controller('payments')
 export class PaymentController {
@@ -28,15 +24,8 @@ export class PaymentController {
 
   @Post('initialize')
   @UseGuards(JwtAuthGuard)
-  async initializePayment(
-    @Request() req,
-    @Body() dto: ProcessPaymentDto,
-  ): Promise<any> {
-    return this.paymentService.initializePayment(
-      req.user.id,
-      dto.amount,
-      dto.paymentMethod,
-    );
+  async initializePayment(@Request() req, @Body() dto: ProcessPaymentDto): Promise<any> {
+    return this.paymentService.initializePayment(req.user.id, dto.amount, dto.paymentMethod);
   }
 
   @Post('stripe/confirm')
@@ -46,11 +35,7 @@ export class PaymentController {
     @Request() req,
     @Body() body: { paymentIntentId: string; paymentDto: CreatePaymentDto },
   ): Promise<PaymentResponseDto> {
-    return this.stripeService.confirmPayment(
-      req.user.id,
-      body.paymentIntentId,
-      body.paymentDto,
-    );
+    return this.stripeService.confirmPayment(req.user.id, body.paymentIntentId, body.paymentDto);
   }
 
   @Post('paypal/capture')
@@ -82,10 +67,6 @@ export class PaymentController {
     @Param('id') id: string,
     @Body() body: { amount?: number; reason: string },
   ): Promise<any> {
-    return this.paymentService.createRefundRequest(
-      id,
-      body.amount,
-      body.reason,
-    );
+    return this.paymentService.createRefundRequest(id, body.amount, body.reason);
   }
 }

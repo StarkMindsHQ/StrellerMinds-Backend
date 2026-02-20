@@ -13,10 +13,7 @@ import * as fs from 'fs/promises';
 import * as fsSync from 'fs';
 import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
-import {
-  CloudUploadResult,
-  CrossRegionReplicationResult,
-} from './interfaces';
+import { CloudUploadResult, CrossRegionReplicationResult } from './interfaces';
 import { RetentionTier } from './entities';
 
 @Injectable()
@@ -32,24 +29,15 @@ export class BackupCloudStorageService {
   private readonly crossRegionEnabled: boolean;
 
   constructor(private readonly configService: ConfigService) {
-    this.cloudUploadEnabled = this.configService.get<boolean>(
-      'BACKUP_CLOUD_UPLOAD_ENABLED',
-      false,
-    );
+    this.cloudUploadEnabled = this.configService.get<boolean>('BACKUP_CLOUD_UPLOAD_ENABLED', false);
     this.crossRegionEnabled = this.configService.get<boolean>(
       'BACKUP_CROSS_REGION_REPLICATION',
       false,
     );
 
     this.primaryRegion = this.configService.get('AWS_REGION', 'us-east-1');
-    this.replicaRegion = this.configService.get(
-      'AWS_BACKUP_REPLICA_REGION',
-      'us-west-2',
-    );
-    this.primaryBucket = this.configService.get(
-      'AWS_BACKUP_BUCKET',
-      'strellerminds-backups',
-    );
+    this.replicaRegion = this.configService.get('AWS_BACKUP_REPLICA_REGION', 'us-west-2');
+    this.primaryBucket = this.configService.get('AWS_BACKUP_BUCKET', 'strellerminds-backups');
     this.replicaBucket = this.configService.get(
       'AWS_BACKUP_REPLICA_BUCKET',
       'strellerminds-backups-replica',
@@ -124,9 +112,7 @@ export class BackupCloudStorageService {
       const response = await this.s3Primary.send(command);
 
       const duration = Date.now() - startTime;
-      this.logger.log(
-        `Backup uploaded to S3 in ${duration}ms: ${this.primaryBucket}/${key}`,
-      );
+      this.logger.log(`Backup uploaded to S3 in ${duration}ms: ${this.primaryBucket}/${key}`);
 
       return {
         bucket: this.primaryBucket,
@@ -182,9 +168,7 @@ export class BackupCloudStorageService {
     }
   }
 
-  async replicateCrossRegion(
-    sourceKey: string,
-  ): Promise<CloudUploadResult> {
+  async replicateCrossRegion(sourceKey: string): Promise<CloudUploadResult> {
     if (!this.s3Replica) {
       throw new Error('Cross-region replication is not enabled');
     }
@@ -204,9 +188,7 @@ export class BackupCloudStorageService {
       const response = await this.s3Replica.send(command);
 
       const duration = Date.now() - startTime;
-      this.logger.log(
-        `Backup replicated to ${this.replicaRegion} in ${duration}ms`,
-      );
+      this.logger.log(`Backup replicated to ${this.replicaRegion} in ${duration}ms`);
 
       return {
         bucket: this.replicaBucket,
@@ -228,12 +210,7 @@ export class BackupCloudStorageService {
     metadata?: Record<string, string>,
   ): Promise<CrossRegionReplicationResult> {
     // Upload to primary
-    const primaryUpload = await this.uploadBackup(
-      filePath,
-      backupId,
-      tier,
-      metadata,
-    );
+    const primaryUpload = await this.uploadBackup(filePath, backupId, tier, metadata);
 
     // Replicate to secondary region if enabled
     let replicaUpload: CloudUploadResult;
@@ -285,10 +262,7 @@ export class BackupCloudStorageService {
     }
   }
 
-  async downloadBackupStream(
-    key: string,
-    fromReplica: boolean = false,
-  ): Promise<Readable> {
+  async downloadBackupStream(key: string, fromReplica: boolean = false): Promise<Readable> {
     const bucket = fromReplica ? this.replicaBucket : this.primaryBucket;
     const client = fromReplica && this.s3Replica ? this.s3Replica : this.s3Primary;
 
@@ -333,9 +307,7 @@ export class BackupCloudStorageService {
             }),
           );
         } catch (error) {
-          this.logger.warn(
-            `Failed to delete replica backup (may not exist): ${error.message}`,
-          );
+          this.logger.warn(`Failed to delete replica backup (may not exist): ${error.message}`);
         }
       }
 
@@ -372,10 +344,7 @@ export class BackupCloudStorageService {
     }
   }
 
-  async verifyBackupExists(
-    key: string,
-    checkReplica: boolean = false,
-  ): Promise<boolean> {
+  async verifyBackupExists(key: string, checkReplica: boolean = false): Promise<boolean> {
     try {
       await this.s3Primary.send(
         new HeadObjectCommand({

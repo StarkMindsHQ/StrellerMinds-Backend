@@ -32,7 +32,15 @@ export class CreatePaymentTables1704890000000 implements MigrationInterface {
           {
             name: 'status',
             type: 'enum',
-            enum: ['pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded', 'disputed'],
+            enum: [
+              'pending',
+              'processing',
+              'completed',
+              'failed',
+              'cancelled',
+              'refunded',
+              'disputed',
+            ],
             default: "'pending'",
           },
           {
@@ -344,7 +352,17 @@ export class CreatePaymentTables1704890000000 implements MigrationInterface {
           {
             name: 'status',
             type: 'enum',
-            enum: ['draft', 'issued', 'sent', 'viewed', 'partially_paid', 'paid', 'overdue', 'cancelled', 'refunded'],
+            enum: [
+              'draft',
+              'issued',
+              'sent',
+              'viewed',
+              'partially_paid',
+              'paid',
+              'overdue',
+              'cancelled',
+              'refunded',
+            ],
             default: "'draft'",
           },
           {

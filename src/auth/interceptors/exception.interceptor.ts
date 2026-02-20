@@ -16,7 +16,7 @@ export interface ErrorResponse {
 export class ExceptionInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    
+
     return next.handle().pipe(
       catchError((error) => {
         const response: ErrorResponse = {

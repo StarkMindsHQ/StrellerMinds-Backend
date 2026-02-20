@@ -8,9 +8,7 @@ import { Comment } from './entities/comment.entity';
 import { ReputationEvent } from './entities/reputation-event.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Thread, Comment, ReputationEvent]),
-  ],
+  imports: [TypeOrmModule.forFeature([Thread, Comment, ReputationEvent])],
   providers: [ForumService, ForumGateway],
   controllers: [ForumController],
 })

@@ -12,13 +12,16 @@ export class SubmissionService {
   async submitAssignment(
     assignmentId: string,
     submitDto: SubmitAssignmentDto,
-    file?: Express.MediaType
+    file?: Express.MediaType,
   ): Promise<any> {
     // TODO: save submission to DB and return the created submission
     throw new NotImplementedException('submitAssignment not implemented yet');
   }
 
-  async getSubmissions(assignmentId: string, filters?: { studentId?: string; status?: string }): Promise<any[]> {
+  async getSubmissions(
+    assignmentId: string,
+    filters?: { studentId?: string; status?: string },
+  ): Promise<any[]> {
     // TODO: query submissions for an assignment
     throw new NotImplementedException('getSubmissions not implemented yet');
   }

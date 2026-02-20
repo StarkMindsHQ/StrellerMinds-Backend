@@ -29,7 +29,9 @@ export class NodeProgress {
   @Column({ type: 'uuid' })
   enrollmentId: string;
 
-  @ManyToOne(() => LearningPathEnrollment, enrollment => enrollment.nodeProgress, { onDelete: 'CASCADE' })
+  @ManyToOne(() => LearningPathEnrollment, (enrollment) => enrollment.nodeProgress, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'enrollmentId' })
   enrollment: LearningPathEnrollment;
 

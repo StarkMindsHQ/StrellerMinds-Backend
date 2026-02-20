@@ -26,12 +26,12 @@ import { AuthModule } from '../../auth/auth.module';
   imports: [
     ConfigModule,
     TypeOrmModule.forFeature([
-      EmailQueue, 
-      EmailTemplate, 
-      NotificationPreference, 
+      EmailQueue,
+      EmailTemplate,
+      NotificationPreference,
       EmailAnalytics,
       Notification,
-      NotificationLog
+      NotificationLog,
     ]),
     MailerModule,
     AuthModule,

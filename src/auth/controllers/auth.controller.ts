@@ -24,7 +24,7 @@ import {
   ForgotPasswordDto,
   ResetPasswordDto,
   VerifyEmailDto,
-  ChangePasswordDto
+  ChangePasswordDto,
 } from '../dto/auth.dto';
 import { Roles } from '../guards/auth.guard';
 import { UserRole } from '../entities/user.entity';
@@ -33,7 +33,7 @@ import { UserRole } from '../entities/user.entity';
 @Controller('auth')
 @UseGuards(ThrottlerGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -54,10 +54,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
-  async login(
-    @Body() loginDto: LoginDto,
-    @Request() req: ExpressRequest,
-  ) {
+  async login(@Body() loginDto: LoginDto, @Request() req: ExpressRequest) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
 
@@ -69,10 +66,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  async refreshTokens(
-    @Body() refreshTokenDto: RefreshTokenDto,
-    @Request() req: ExpressRequest,
-  ) {
+  async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto, @Request() req: ExpressRequest) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
 

@@ -127,7 +127,7 @@ export class FinancialReportingService {
     });
 
     // In production, calculate actual tax based on jurisdiction
-    const totalTax = payments.reduce((sum, p) => sum + (Number(p.amount) * 0.1), 0);
+    const totalTax = payments.reduce((sum, p) => sum + Number(p.amount) * 0.1, 0);
     const totalRevenue = payments.reduce((sum, p) => sum + Number(p.amount), 0);
 
     return this.reportRepository.create({
@@ -274,8 +274,6 @@ export class FinancialReportingService {
       counts[p.paymentMethod] = (counts[p.paymentMethod] || 0) + 1;
     });
 
-    return Object.keys(counts).reduce((a, b) =>
-      counts[a] > counts[b] ? a : b,
-    ) || 'unknown';
+    return Object.keys(counts).reduce((a, b) => (counts[a] > counts[b] ? a : b)) || 'unknown';
   }
 }

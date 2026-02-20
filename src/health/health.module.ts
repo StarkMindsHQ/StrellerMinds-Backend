@@ -11,7 +11,7 @@ import { HttpModule } from '@nestjs/axios';
       errorLogStyle: 'json',
       gracefulShutdownTimeoutMs: 1000,
     }),
-    
+
     PrometheusModule.register({
       path: '/metrics',
       defaultMetrics: {
@@ -21,7 +21,7 @@ import { HttpModule } from '@nestjs/axios';
         },
       },
     }),
-    
+
     HttpModule.register({
       timeout: 5000,
       maxRedirects: 5,

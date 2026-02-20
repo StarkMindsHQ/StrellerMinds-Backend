@@ -14,49 +14,49 @@ export class EmailAnalyticsService {
   ) {}
 
   async recordEmailSent(emailQueueId: string): Promise<void> {
-    let analytics = await this.getOrCreateAnalytics(emailQueueId);
+    const analytics = await this.getOrCreateAnalytics(emailQueueId);
     analytics.sentCount += 1;
     await this.updateMetrics(analytics);
     await this.emailAnalyticsRepository.save(analytics);
   }
 
   async recordEmailDelivered(emailQueueId: string): Promise<void> {
-    let analytics = await this.getOrCreateAnalytics(emailQueueId);
+    const analytics = await this.getOrCreateAnalytics(emailQueueId);
     analytics.deliveredCount += 1;
     await this.updateMetrics(analytics);
     await this.emailAnalyticsRepository.save(analytics);
   }
 
   async recordEmailOpened(emailQueueId: string): Promise<void> {
-    let analytics = await this.getOrCreateAnalytics(emailQueueId);
+    const analytics = await this.getOrCreateAnalytics(emailQueueId);
     analytics.openCount += 1;
     await this.updateMetrics(analytics);
     await this.emailAnalyticsRepository.save(analytics);
   }
 
   async recordEmailClicked(emailQueueId: string): Promise<void> {
-    let analytics = await this.getOrCreateAnalytics(emailQueueId);
+    const analytics = await this.getOrCreateAnalytics(emailQueueId);
     analytics.clickCount += 1;
     await this.updateMetrics(analytics);
     await this.emailAnalyticsRepository.save(analytics);
   }
 
   async recordBounce(emailQueueId: string): Promise<void> {
-    let analytics = await this.getOrCreateAnalytics(emailQueueId);
+    const analytics = await this.getOrCreateAnalytics(emailQueueId);
     analytics.bounceCount += 1;
     await this.updateMetrics(analytics);
     await this.emailAnalyticsRepository.save(analytics);
   }
 
   async recordComplaint(emailQueueId: string): Promise<void> {
-    let analytics = await this.getOrCreateAnalytics(emailQueueId);
+    const analytics = await this.getOrCreateAnalytics(emailQueueId);
     analytics.complaintCount += 1;
     await this.updateMetrics(analytics);
     await this.emailAnalyticsRepository.save(analytics);
   }
 
   async recordUnsubscribe(emailQueueId: string): Promise<void> {
-    let analytics = await this.getOrCreateAnalytics(emailQueueId);
+    const analytics = await this.getOrCreateAnalytics(emailQueueId);
     analytics.unsubscribeCount += 1;
     await this.updateMetrics(analytics);
     await this.emailAnalyticsRepository.save(analytics);
@@ -93,10 +93,13 @@ export class EmailAnalyticsService {
     // Calculate engagement rates
     analytics.metrics = {
       openRate: analytics.sentCount > 0 ? (analytics.openCount / analytics.sentCount) * 100 : 0,
-      clickRate: analytics.deliveredCount > 0 ? (analytics.clickCount / analytics.deliveredCount) * 100 : 0,
+      clickRate:
+        analytics.deliveredCount > 0 ? (analytics.clickCount / analytics.deliveredCount) * 100 : 0,
       bounceRate: analytics.sentCount > 0 ? (analytics.bounceCount / analytics.sentCount) * 100 : 0,
-      complaintRate: analytics.sentCount > 0 ? (analytics.complaintCount / analytics.sentCount) * 100 : 0,
-      unsubscribeRate: analytics.sentCount > 0 ? (analytics.unsubscribeCount / analytics.sentCount) * 100 : 0,
+      complaintRate:
+        analytics.sentCount > 0 ? (analytics.complaintCount / analytics.sentCount) * 100 : 0,
+      unsubscribeRate:
+        analytics.sentCount > 0 ? (analytics.unsubscribeCount / analytics.sentCount) * 100 : 0,
     };
   }
 
@@ -137,12 +140,21 @@ export class EmailAnalyticsService {
     }
 
     const totalSent = allAnalytics.reduce((sum, analytics) => sum + analytics.sentCount, 0);
-    const totalDelivered = allAnalytics.reduce((sum, analytics) => sum + analytics.deliveredCount, 0);
+    const totalDelivered = allAnalytics.reduce(
+      (sum, analytics) => sum + analytics.deliveredCount,
+      0,
+    );
     const totalOpens = allAnalytics.reduce((sum, analytics) => sum + analytics.openCount, 0);
     const totalClicks = allAnalytics.reduce((sum, analytics) => sum + analytics.clickCount, 0);
     const totalBounces = allAnalytics.reduce((sum, analytics) => sum + analytics.bounceCount, 0);
-    const totalComplaints = allAnalytics.reduce((sum, analytics) => sum + analytics.complaintCount, 0);
-    const totalUnsubscribes = allAnalytics.reduce((sum, analytics) => sum + analytics.unsubscribeCount, 0);
+    const totalComplaints = allAnalytics.reduce(
+      (sum, analytics) => sum + analytics.complaintCount,
+      0,
+    );
+    const totalUnsubscribes = allAnalytics.reduce(
+      (sum, analytics) => sum + analytics.unsubscribeCount,
+      0,
+    );
 
     return {
       totalEmails: allAnalytics.length,
@@ -160,7 +172,7 @@ export class EmailAnalyticsService {
 
   async logEvent(emailQueueId: string, event: string, data?: Record<string, any>): Promise<void> {
     const analytics = await this.getOrCreateAnalytics(emailQueueId);
-    
+
     analytics.eventLogs.push({
       event,
       timestamp: new Date(),

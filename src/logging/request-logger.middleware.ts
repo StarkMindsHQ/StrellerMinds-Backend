@@ -12,9 +12,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
 
     res.on('finish', () => {
       const duration = Date.now() - start;
-      this.logger.log(
-        `${method} ${originalUrl} ${res.statusCode} - ${duration}ms`,
-      );
+      this.logger.log(`${method} ${originalUrl} ${res.statusCode} - ${duration}ms`);
     });
 
     next();

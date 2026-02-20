@@ -18,7 +18,7 @@ export class SmsChannel implements INotificationChannel {
 
       this.logger.log(`[SMS Simulation] Sending SMS to ${phoneNumber}: ${notification.title}`);
       // Integrate with Twilio or similar here
-      
+
       return true;
     } catch (error) {
       this.logger.error(`Failed to send SMS to ${notification.userId}: ${error.message}`);

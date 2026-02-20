@@ -30,15 +30,9 @@ export class UserService {
     private activityRepository: Repository<UserActivity>,
   ) {}
 
-  async create(
-    createUserDto: CreateUserDto,
-    createdBy?: string,
-  ): Promise<UserResponseDto> {
+  async create(createUserDto: CreateUserDto, createdBy?: string): Promise<UserResponseDto> {
     const existingUser = await this.userRepository.findOne({
-      where: [
-        { email: createUserDto.email },
-        { username: createUserDto.username },
-      ],
+      where: [{ email: createUserDto.email }, { username: createUserDto.username }],
     });
 
     if (existingUser) {
@@ -76,7 +70,8 @@ export class UserService {
     limit: number;
     totalPages: number;
   }> {
-    const { page, limit, search, status, role, sortBy, sortOrder, createdAfter, createdBefore } = query;
+    const { page, limit, search, status, role, sortBy, sortOrder, createdAfter, createdBefore } =
+      query;
 
     const qb = this.userRepository.createQueryBuilder('user');
 
@@ -112,7 +107,7 @@ export class UserService {
     const users = await qb.getMany();
 
     return {
-      data: users.map(user => this.toResponseDto(user)),
+      data: users.map((user) => this.toResponseDto(user)),
       total,
       page,
       limit,
@@ -183,10 +178,7 @@ export class UserService {
     return this.toResponseDto(updatedUser);
   }
 
-  async updateProfile(
-    id: string,
-    updateProfileDto: UpdateProfileDto,
-  ): Promise<UserResponseDto> {
+  async updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<UserResponseDto> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
@@ -206,20 +198,14 @@ export class UserService {
     return this.toResponseDto(updatedUser);
   }
 
-  async changePassword(
-    id: string,
-    changePasswordDto: ChangePasswordDto,
-  ): Promise<void> {
+  async changePassword(id: string, changePasswordDto: ChangePasswordDto): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      changePasswordDto.currentPassword,
-      user.password,
-    );
+    const isPasswordValid = await bcrypt.compare(changePasswordDto.currentPassword, user.password);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Current password is incorrect');
@@ -315,7 +301,10 @@ export class UserService {
     await this.userRepository.softDelete(id);
   }
 
-  async bulkUpdate(bulkUpdateDto: BulkUpdateDto, updatedBy?: string): Promise<{
+  async bulkUpdate(
+    bulkUpdateDto: BulkUpdateDto,
+    updatedBy?: string,
+  ): Promise<{
     success: number;
     failed: number;
   }> {
@@ -340,15 +329,12 @@ export class UserService {
         }
 
         if (bulkUpdateDto.addPermissions) {
-          user.permissions = [
-            ...(user.permissions || []),
-            ...bulkUpdateDto.addPermissions,
-          ];
+          user.permissions = [...(user.permissions || []), ...bulkUpdateDto.addPermissions];
         }
 
         if (bulkUpdateDto.removePermissions) {
           user.permissions = (user.permissions || []).filter(
-            p => !bulkUpdateDto.removePermissions.includes(p),
+            (p) => !bulkUpdateDto.removePermissions.includes(p),
           );
         }
 
@@ -397,10 +383,7 @@ export class UserService {
     };
   }
 
-  async getUserActivities(
-    userId: string,
-    limit: number = 50,
-  ): Promise<UserActivity[]> {
+  async getUserActivities(userId: string, limit: number = 50): Promise<UserActivity[]> {
     return this.activityRepository.find({
       where: { userId },
       order: { createdAt: 'DESC' },

@@ -38,7 +38,7 @@ export class LearningPathEnrollment {
   @Column({ type: 'uuid' })
   learningPathId: string;
 
-  @ManyToOne(() => LearningPath, path => path.enrollments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => LearningPath, (path) => path.enrollments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'learningPathId' })
   learningPath: LearningPath;
 
@@ -61,7 +61,7 @@ export class LearningPathEnrollment {
   @Column({ type: 'simple-json', default: {} })
   metadata: Record<string, any>; // Additional tracking data
 
-  @OneToMany(() => NodeProgress, progress => progress.enrollment)
+  @OneToMany(() => NodeProgress, (progress) => progress.enrollment)
   nodeProgress: NodeProgress[];
 
   @CreateDateColumn()

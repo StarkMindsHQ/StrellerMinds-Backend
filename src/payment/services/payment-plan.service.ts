@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaymentPlan, Subscription } from '../entities';
-import {
-  CreatePaymentPlanDto,
-  UpdatePaymentPlanDto,
-} from '../dto';
+import { CreatePaymentPlanDto, UpdatePaymentPlanDto } from '../dto';
 
 @Injectable()
 export class PaymentPlanService {

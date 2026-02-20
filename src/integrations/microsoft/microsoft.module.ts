@@ -8,9 +8,7 @@ import { MicrosoftConfigService } from './services/microsoft-config.service';
 import { MicrosoftController } from './controllers/microsoft.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([IntegrationConfig, SyncLog, IntegrationMapping]),
-  ],
+  imports: [TypeOrmModule.forFeature([IntegrationConfig, SyncLog, IntegrationMapping])],
   controllers: [MicrosoftController],
   providers: [MicrosoftService, MicrosoftConfigService],
   exports: [MicrosoftService, MicrosoftConfigService],

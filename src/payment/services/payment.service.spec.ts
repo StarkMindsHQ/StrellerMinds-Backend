@@ -4,12 +4,7 @@ import { PaymentService } from './payment.service';
 import { StripeService } from './stripe.service';
 import { PayPalService } from './paypal.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  Payment,
-  Subscription,
-  Invoice,
-  Refund,
-} from '../entities';
+import { Payment, Subscription, Invoice, Refund } from '../entities';
 import { PaymentStatus, PaymentMethod } from '../enums';
 
 describe('PaymentService', () => {
@@ -148,9 +143,7 @@ describe('PaymentService', () => {
     it('should throw error when payment not found', async () => {
       mockPaymentRepository.findOneBy.mockResolvedValue(null);
 
-      expect(service.getPayment('invalid-id')).rejects.toThrow(
-        'Payment not found',
-      );
+      expect(service.getPayment('invalid-id')).rejects.toThrow('Payment not found');
     });
   });
 
@@ -170,10 +163,7 @@ describe('PaymentService', () => {
         completedAt: expect.any(Date),
       });
 
-      const result = await service.updatePaymentStatus(
-        paymentId,
-        PaymentStatus.COMPLETED,
-      );
+      const result = await service.updatePaymentStatus(paymentId, PaymentStatus.COMPLETED);
 
       expect(result.status).toBe(PaymentStatus.COMPLETED);
       expect(mockPaymentRepository.save).toHaveBeenCalled();
@@ -215,9 +205,9 @@ describe('PaymentService', () => {
 
       mockPaymentRepository.findOneBy.mockResolvedValue(mockPayment);
 
-      expect(
-        service.createRefundRequest(paymentId),
-      ).rejects.toThrow('Only completed payments can be refunded');
+      expect(service.createRefundRequest(paymentId)).rejects.toThrow(
+        'Only completed payments can be refunded',
+      );
     });
   });
 });

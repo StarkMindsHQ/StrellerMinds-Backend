@@ -12,11 +12,7 @@ export class SSOService {
   /**
    * Generate OpenID Connect authorization URL
    */
-  generateOpenIDAuthUrl(
-    config: any,
-    state: string,
-    nonce: string,
-  ): string {
+  generateOpenIDAuthUrl(config: any, state: string, nonce: string): string {
     const params = new URLSearchParams({
       client_id: config.clientId,
       response_type: 'code',
@@ -33,10 +29,7 @@ export class SSOService {
   /**
    * Exchange OpenID authorization code for tokens
    */
-  async exchangeOpenIDCode(
-    config: any,
-    code: string,
-  ): Promise<any> {
+  async exchangeOpenIDCode(config: any, code: string): Promise<any> {
     try {
       // In production, exchange code with token endpoint
       // const response = await axios.post(config.tokenUrl, {
@@ -63,10 +56,7 @@ export class SSOService {
   /**
    * Get user info from OpenID provider
    */
-  async getOpenIDUserInfo(
-    config: any,
-    accessToken: string,
-  ): Promise<any> {
+  async getOpenIDUserInfo(config: any, accessToken: string): Promise<any> {
     try {
       // In production:
       // const response = await axios.get(config.userInfoUrl, {
@@ -89,14 +79,11 @@ export class SSOService {
   /**
    * Verify and decode ID token
    */
-  async verifyIdToken(
-    idToken: string,
-    config: any,
-  ): Promise<any> {
+  async verifyIdToken(idToken: string, config: any): Promise<any> {
     try {
       // In production, fetch JWKS and verify signature
       const decoded = this.jwtService.decode(idToken, { complete: true }) as any;
-      
+
       if (!decoded || !decoded.payload) {
         throw new UnauthorizedException('Invalid token format');
       }
@@ -111,10 +98,7 @@ export class SSOService {
   /**
    * Generate SAML authentication request
    */
-  generateSAMLAuthRequest(
-    config: any,
-    relayState: string,
-  ): string {
+  generateSAMLAuthRequest(config: any, relayState: string): string {
     const id = `_${crypto.randomBytes(16).toString('hex')}`;
     const instant = new Date().toISOString();
 
@@ -139,13 +123,10 @@ export class SSOService {
   /**
    * Parse SAML response
    */
-  async parseSAMLResponse(
-    samlResponse: string,
-    config: any,
-  ): Promise<any> {
+  async parseSAMLResponse(samlResponse: string, config: any): Promise<any> {
     try {
       const decodedResponse = Buffer.from(samlResponse, 'base64').toString();
-      
+
       // In production, verify signature and parse XML
       // This is a simplified version
       const parser = new xmldom.DOMParser();
@@ -172,10 +153,7 @@ export class SSOService {
   /**
    * Verify SAML response signature
    */
-  async verifySAMLSignature(
-    samlResponse: string,
-    config: any,
-  ): Promise<boolean> {
+  async verifySAMLSignature(samlResponse: string, config: any): Promise<boolean> {
     try {
       // In production, use xml-crypto or similar
       // For now, placeholder implementation
@@ -189,10 +167,7 @@ export class SSOService {
   /**
    * Authenticate with OAuth 2.0
    */
-  generateOAuth2AuthUrl(
-    config: any,
-    state: string,
-  ): string {
+  generateOAuth2AuthUrl(config: any, state: string): string {
     const params = new URLSearchParams({
       client_id: config.clientId,
       response_type: 'code',
@@ -207,10 +182,7 @@ export class SSOService {
   /**
    * Exchange OAuth 2.0 code for token
    */
-  async exchangeOAuth2Code(
-    config: any,
-    code: string,
-  ): Promise<any> {
+  async exchangeOAuth2Code(config: any, code: string): Promise<any> {
     try {
       // Placeholder
       return {

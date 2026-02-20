@@ -1,11 +1,11 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
-import { 
-  HealthCheckService, 
+import {
+  HealthCheckService,
   HealthIndicatorResult,
   HealthCheckResult,
   MemoryHealthIndicator,
   DiskHealthIndicator,
-  HttpHealthIndicator
+  HttpHealthIndicator,
 } from '@nestjs/terminus';
 import { Gauge, Counter, Registry, collectDefaultMetrics } from 'prom-client';
 
@@ -13,7 +13,7 @@ import { Gauge, Counter, Registry, collectDefaultMetrics } from 'prom-client';
 export class HealthService {
   private readonly logger = new Logger(HealthService.name);
   private readonly registry = new Registry();
-  
+
   private readonly healthCheckCounter: Counter<string>;
   private readonly serviceUptime: Gauge<string>;
   private readonly serviceHealthStatus: Gauge<string>;
@@ -93,7 +93,7 @@ export class HealthService {
     } catch (error) {
       this.logger.error('Health check failed', error.stack);
       this.serviceHealthStatus.set({ service: 'application' }, 0);
-      
+
       return {
         status: 'error',
         timestamp: new Date().toISOString(),
@@ -175,9 +175,9 @@ export class HealthService {
 
   private async checkDiskHealth(): Promise<HealthIndicatorResult> {
     try {
-      const result = await this.diskHealthIndicator.checkStorage('disk', { 
-        path: '/', 
-        thresholdPercent: 0.9, 
+      const result = await this.diskHealthIndicator.checkStorage('disk', {
+        path: '/',
+        thresholdPercent: 0.9,
       });
       this.serviceHealthStatus.set({ service: 'disk' }, 1);
       return result;
@@ -189,7 +189,6 @@ export class HealthService {
 
   private async checkApplicationHealth(): Promise<HealthIndicatorResult> {
     try {
-   
       const memoryUsage = process.memoryUsage();
       const heapUsedPercent = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
 
@@ -198,7 +197,7 @@ export class HealthService {
       }
 
       this.serviceHealthStatus.set({ service: 'application' }, 1);
-      
+
       return {
         application: {
           status: 'up',
@@ -234,7 +233,7 @@ export class HealthService {
   async getDetailedHealth() {
     const [fullCheck, readiness, liveness] = await Promise.allSettled([
       this.check(),
-      this.readiness().catch(err => ({ status: 'error', message: err.message })),
+      this.readiness().catch((err) => ({ status: 'error', message: err.message })),
       this.liveness(),
     ]);
 
@@ -276,4 +275,3 @@ export class HealthService {
     };
   }
 }
-

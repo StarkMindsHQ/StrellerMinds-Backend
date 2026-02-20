@@ -30,11 +30,6 @@ import { BackupRecord, BackupSchedule, RecoveryTest } from './entities';
     BackupSchedulerService,
     BackupRecoveryService,
   ],
-  exports: [
-    BackupService,
-    BackupSchedulerService,
-    BackupRecoveryService,
-    BackupMetricsService,
-  ],
+  exports: [BackupService, BackupSchedulerService, BackupRecoveryService, BackupMetricsService],
 })
 export class BackupModule {}

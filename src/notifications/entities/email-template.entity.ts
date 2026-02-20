@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum EmailTemplateType {
   WELCOME = 'welcome',
@@ -36,11 +42,14 @@ export class EmailTemplate {
   placeholders: Record<string, string>;
 
   @Column({ type: 'json', default: {} })
-  languages: Record<string, {
-    subject: string;
-    htmlContent: string;
-    textContent?: string;
-  }>;
+  languages: Record<
+    string,
+    {
+      subject: string;
+      htmlContent: string;
+      textContent?: string;
+    }
+  >;
 
   @Column({ default: true })
   isActive: boolean;

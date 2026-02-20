@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Param } from "@nestjs/common";
-import { CourseService } from "./course.service";
-import { CreateCourseDto } from "./dto/create-course.dto";
-import { CreateLessonDto } from "./dto/create-lesson.dto";
-import { CreateModuleDto } from "./dto/create-module.dto";
+import { Controller, Post, Body, Param } from '@nestjs/common';
+import { CourseService } from './course.service';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { CreateLessonDto } from './dto/create-lesson.dto';
+import { CreateModuleDto } from './dto/create-module.dto';
 
 // Controller for handling course-related API requests
 @Controller('courses')
