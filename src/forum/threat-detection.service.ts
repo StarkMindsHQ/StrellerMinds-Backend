@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
-import { SecurityAudit, SecurityEvent } from '../../auth/entities/security-audit.entity';
+import { SecurityAudit, SecurityEvent } from '../auth/entities/security-audit.entity';
 import { SecurityResponseService } from './security-response.service';
-import { IncidentSeverity } from '../entities/security-incident.entity';
+import { IncidentSeverity } from './security-incident.entity';
 
 @Injectable()
 export class ThreatDetectionService {
@@ -58,14 +58,16 @@ export class ThreatDetectionService {
   private async detectImpossibleTravel(audit: SecurityAudit): Promise<void> {
     if (!audit.userId || !audit.metadata?.location || audit.event !== 'LOGIN_SUCCESS' as SecurityEvent) return;
 
-    const lastLogin = await this.auditRepo.findOne({
+    const previousLogins = await this.auditRepo.find({
       where: { 
         userId: audit.userId,
         event: 'LOGIN_SUCCESS' as SecurityEvent
       },
       order: { createdAt: 'DESC' },
-      skip: 1, // Skip the current event
+      take: 2,
     });
+
+    const lastLogin = previousLogins[1]; // The second most recent is the previous login
 
     if (lastLogin && lastLogin.metadata?.location) {
       const currentLoc = audit.metadata.location;
