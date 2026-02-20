@@ -219,9 +219,7 @@ export class UserProfileController {
   @Get(':profileId/badges')
   @ApiOperation({ summary: 'Get user badges' })
   @ApiResponse({ status: 200, description: 'Badges retrieved' })
-  async getUserBadges(
-    @Param('profileId', new ParseUUIDPipe()) profileId: string,
-  ): Promise<any[]> {
+  async getUserBadges(@Param('profileId', new ParseUUIDPipe()) profileId: string): Promise<any[]> {
     return this.achievementService.getUserBadges(profileId);
   }
 

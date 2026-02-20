@@ -6,7 +6,11 @@ import { LearningPath } from '../entities/learning-path.entity';
 import { LearningPathNode } from '../entities/learning-path-node.entity';
 import { NodeDependency, DependencyType } from '../entities/node-dependency.entity';
 import { LearningObjective } from '../entities/learning-objective.entity';
-import { CreateLearningPathDto, CreateNodeDto, CreateDependencyDto } from '../dto/create-learning-path.dto';
+import {
+  CreateLearningPathDto,
+  CreateNodeDto,
+  CreateDependencyDto,
+} from '../dto/create-learning-path.dto';
 import { UpdateLearningPathDto } from '../dto/update-learning-path.dto';
 
 @Injectable()
@@ -22,7 +26,10 @@ export class CurriculumBuilderService {
     private readonly objectiveRepository: Repository<LearningObjective>,
   ) {}
 
-  async createLearningPath(userId: string, createDto: CreateLearningPathDto): Promise<LearningPath> {
+  async createLearningPath(
+    userId: string,
+    createDto: CreateLearningPathDto,
+  ): Promise<LearningPath> {
     const learningPath = this.learningPathRepository.create({
       title: createDto.title,
       description: createDto.description,
@@ -42,7 +49,7 @@ export class CurriculumBuilderService {
       const nodes = await this.createNodes(savedPath.id, createDto.nodes);
       // Update the savedPath with nodes for return
       (savedPath as any).nodes = nodes;
-      
+
       // Update total nodes count
       await this.learningPathRepository.update(savedPath.id, {
         totalNodes: nodes.length,
@@ -52,7 +59,10 @@ export class CurriculumBuilderService {
     return this.findOne(savedPath.id);
   }
 
-  async createNodes(learningPathId: string, nodeDtos: CreateNodeDto[]): Promise<LearningPathNode[]> {
+  async createNodes(
+    learningPathId: string,
+    nodeDtos: CreateNodeDto[],
+  ): Promise<LearningPathNode[]> {
     const nodes: LearningPathNode[] = [];
 
     // First, create all nodes without dependencies
@@ -94,9 +104,14 @@ export class CurriculumBuilderService {
     return nodes;
   }
 
-  async createDependency(sourceNodeId: string, dependencyDto: CreateDependencyDto): Promise<NodeDependency> {
+  async createDependency(
+    sourceNodeId: string,
+    dependencyDto: CreateDependencyDto,
+  ): Promise<NodeDependency> {
     const sourceNode = await this.nodeRepository.findOne({ where: { id: sourceNodeId } });
-    const targetNode = await this.nodeRepository.findOne({ where: { id: dependencyDto.targetNodeId } });
+    const targetNode = await this.nodeRepository.findOne({
+      where: { id: dependencyDto.targetNodeId },
+    });
 
     if (!sourceNode || !targetNode) {
       throw new NotFoundException('Source or target node not found');
@@ -118,9 +133,9 @@ export class CurriculumBuilderService {
   }
 
   async updateLearningPath(id: string, updateDto: UpdateLearningPathDto): Promise<LearningPath> {
-    const learningPath = await this.learningPathRepository.findOne({ 
+    const learningPath = await this.learningPathRepository.findOne({
       where: { id },
-      relations: ['nodes'] 
+      relations: ['nodes'],
     });
 
     if (!learningPath) {
@@ -128,7 +143,7 @@ export class CurriculumBuilderService {
     }
 
     Object.assign(learningPath, updateDto);
-    
+
     if (updateDto.nodes) {
       learningPath.totalNodes = updateDto.nodes.length;
     }
@@ -147,7 +162,7 @@ export class CurriculumBuilderService {
         'nodes.incomingDependencies',
         'nodes.learningObjectives',
         'template',
-        'instructor'
+        'instructor',
       ],
     });
 
@@ -159,7 +174,8 @@ export class CurriculumBuilderService {
   }
 
   async findAll(instructorId?: string): Promise<LearningPath[]> {
-    const queryBuilder = this.learningPathRepository.createQueryBuilder('learningPath')
+    const queryBuilder = this.learningPathRepository
+      .createQueryBuilder('learningPath')
       .leftJoinAndSelect('learningPath.nodes', 'nodes')
       .leftJoinAndSelect('learningPath.template', 'template')
       .leftJoinAndSelect('learningPath.instructor', 'instructor')
@@ -180,7 +196,9 @@ export class CurriculumBuilderService {
   }
 
   async addNodeToPath(learningPathId: string, nodeDto: CreateNodeDto): Promise<LearningPathNode> {
-    const learningPath = await this.learningPathRepository.findOne({ where: { id: learningPathId } });
+    const learningPath = await this.learningPathRepository.findOne({
+      where: { id: learningPathId },
+    });
     if (!learningPath) {
       throw new NotFoundException(`Learning path with ID ${learningPathId} not found`);
     }
@@ -207,9 +225,9 @@ export class CurriculumBuilderService {
   }
 
   async removeNodeFromPath(nodeId: string): Promise<void> {
-    const node = await this.nodeRepository.findOne({ 
+    const node = await this.nodeRepository.findOne({
       where: { id: nodeId },
-      relations: ['learningPath']
+      relations: ['learningPath'],
     });
 
     if (!node) {
@@ -231,7 +249,7 @@ export class CurriculumBuilderService {
     });
 
     const graph = {
-      nodes: nodes.map(node => ({
+      nodes: nodes.map((node) => ({
         id: node.id,
         title: node.title,
         type: node.type,
@@ -254,7 +272,9 @@ export class CurriculumBuilderService {
     return graph;
   }
 
-  async validateDependencies(learningPathId: string): Promise<{ valid: boolean; errors: string[] }> {
+  async validateDependencies(
+    learningPathId: string,
+  ): Promise<{ valid: boolean; errors: string[] }> {
     const nodes = await this.nodeRepository.find({
       where: { learningPathId },
       relations: ['outgoingDependencies', 'incomingDependencies'],
@@ -269,8 +289,8 @@ export class CurriculumBuilderService {
       if (visited.has(nodeId)) return false;
 
       visited.add(nodeId);
-      const node = nodes.find(n => n.id === nodeId);
-      
+      const node = nodes.find((n) => n.id === nodeId);
+
       if (!node) return false;
 
       for (const dep of node.outgoingDependencies) {
@@ -299,10 +319,10 @@ export class CurriculumBuilderService {
     while (queue.length > 0) {
       const currentId = queue.shift()!;
       if (reachable.has(currentId)) continue;
-      
+
       reachable.add(currentId);
-      const node = nodes.find(n => n.id === currentId);
-      
+      const node = nodes.find((n) => n.id === currentId);
+
       if (node) {
         for (const dep of node.outgoingDependencies) {
           if (!reachable.has(dep.targetNodeId)) {
@@ -312,8 +332,8 @@ export class CurriculumBuilderService {
       }
     }
 
-    const unreachableNodes = nodes.filter(node => !reachable.has(node.id) && node.position !== 0);
-    unreachableNodes.forEach(node => {
+    const unreachableNodes = nodes.filter((node) => !reachable.has(node.id) && node.position !== 0);
+    unreachableNodes.forEach((node) => {
       errors.push(`Unreachable node: ${node.title} (${node.id})`);
     });
 
@@ -331,18 +351,18 @@ export class CurriculumBuilderService {
     while (queue.length > 0) {
       const currentId = queue.shift()!;
       if (visited.has(currentId)) continue;
-      
+
       if (currentId === sourceId) return true;
-      
+
       visited.add(currentId);
-      
+
       const node = await this.nodeRepository.findOne({
         where: { id: currentId },
         relations: ['outgoingDependencies'],
       });
-      
+
       if (node) {
-        node.outgoingDependencies.forEach(dep => {
+        node.outgoingDependencies.forEach((dep) => {
           if (!visited.has(dep.targetNodeId)) {
             queue.push(dep.targetNodeId);
           }

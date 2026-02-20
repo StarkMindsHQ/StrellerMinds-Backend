@@ -1,0 +1,332 @@
+name: Enhanced Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run comprehensive security scan daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  # Dependency Security Audit
+  dependency-audit:
+    runs-on: ubuntu-latest
+    name: Dependency Security Audit
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Run npm audit
+      id: npm-audit
+      run: |
+        npm audit --audit-level=moderate --json > audit-report.json || true
+        if [ -s audit-report.json ]; then
+          VULNERABILITIES=$(cat audit-report.json | jq '.metadata.vulnerabilities | if . then .high + .critical + .moderate else 0 end')
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          if [ "$VULNERABILITIES" -gt 0 ]; then
+            echo "::error::Found $VULNERABILITIES vulnerabilities"
+            cat audit-report.json | jq '.vulnerabilities'
+          fi
+        fi
+      continue-on-error: false
+      
+    - name: Upload audit report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: npm-audit-report
+        path: audit-report.json
+        retention-days: 30
+
+  # Snyk Security Scan
+  snyk-scan:
+    runs-on: ubuntu-latest
+    name: Snyk Security Scan
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Run Snyk to check for vulnerabilities
+      uses: snyk/actions/node@master
+      continue-on-error: true
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high --all-projects
+        
+    - name: Upload Snyk report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: snyk-report
+        path: snyk-report.html
+        retention-days: 30
+
+  # CodeQL Analysis
+  codeql:
+    runs-on: ubuntu-latest
+    name: CodeQL Analysis
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+        
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+      
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
+
+  # Container Security Scan
+  container-scan:
+    runs-on: ubuntu-latest
+    name: Container Security Scan
+    needs: [dependency-audit]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker image
+      run: |
+        docker build -t strellerminds-backend:test .
+        
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'strellerminds-backend:test'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+    - name: Upload Trivy report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: trivy-report
+        path: trivy-results.sarif
+        retention-days: 30
+
+  # OWASP ZAP Baseline Scan
+  zap-baseline:
+    runs-on: ubuntu-latest
+    name: OWASP ZAP Baseline Scan
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Start application
+      run: |
+        npm run start:prod &
+        sleep 30
+        
+    - name: Wait for application to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done'
+        
+    - name: Run OWASP ZAP Baseline Scan
+      uses: zaproxy/action-baseline@v0.7.0
+      with:
+        target: 'http://localhost:3000/api'
+        rules_file_name: '.zap/rules.tsv'
+        cmd_options: '-a'
+        
+    - name: Upload ZAP report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: zap-report
+        path: report_html.html
+        retention-days: 30
+
+  # Secret Scanning
+  secret-scan:
+    runs-on: ubuntu-latest
+    name: Secret Scanning
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Run Gitleaks
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+      with:
+        config-path: '.gitleaks.toml'
+        report-path: 'gitleaks-report.json'
+        
+    - name: Upload Gitleaks report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: gitleaks-report
+        path: gitleaks-report.json
+        retention-days: 30
+
+  # Security Scorecard
+  security-scorecard:
+    runs-on: ubuntu-latest
+    name: OSSF Security Scorecard
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+        
+    - name: Run OSSF Scorecard
+      uses: ossf/scorecard-action@v2.3.1
+      with:
+        results_file: results.json
+        results_format: json
+        repo: ${{ github.repository }}
+        
+    - name: Upload Scorecard results
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-scorecard
+        path: results.json
+        retention-days: 30
+
+  # Security Summary Report
+  security-summary:
+    runs-on: ubuntu-latest
+    name: Security Summary
+    needs: [dependency-audit, snyk-scan, codeql, container-scan, zap-baseline, secret-scan]
+    if: always()
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      
+    - name: Create Security Summary
+      run: |
+        echo "# Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Scan Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Dependency Audit
+        if [ -f npm-audit-report/audit-report.json ]; then
+          VULNS=$(cat npm-audit-report/audit-report.json | jq '.metadata.vulnerabilities.total // 0')
+          echo "- **Dependency Audit**: $VULNS vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- **Dependency Audit**: ✅ Passed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Container Scan
+        if [ -f trivy-report/trivy-results.sarif ]; then
+          CRITICAL=$(cat trivy-report/trivy-results.sarif | jq '.runs[0].results[] | select(.level == "error") | .level' | wc -l)
+          HIGH=$(cat trivy-report/trivy-results.sarif | jq '.runs[0].results[] | select(.level == "warning") | .level' | wc -l)
+          echo "- **Container Scan**: $CRITICAL critical, $HIGH high vulnerabilities" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- **Container Scan**: ✅ Passed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Secret Scan
+        if [ -f gitleaks-report/gitleaks-report.json ]; then
+          SECRETS=$(cat gitleaks-report/gitleaks-report.json | jq '. | length')
+          if [ "$SECRETS" -gt 0 ]; then
+            echo "- **Secret Scan**: ❌ $SECRETS secrets found" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- **Secret Scan**: ✅ No secrets found" >> $GITHUB_STEP_SUMMARY
+          fi
+        else
+          echo "- **Secret Scan**: ✅ Passed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Recommendations" >> $GITHUB_STEP_SUMMARY
+        echo "- Review and fix any high/critical vulnerabilities" >> $GITHUB_STEP_SUMMARY
+        echo "- Update dependencies to latest secure versions" >> $GITHUB_STEP_SUMMARY
+        echo "- Implement proper secret management" >> $GITHUB_STEP_SUMMARY
+        echo "- Regular security scanning and monitoring" >> $GITHUB_STEP_SUMMARY

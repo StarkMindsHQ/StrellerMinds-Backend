@@ -1,0 +1,443 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+  CACHE_VERSION: 'v1'
+
+jobs:
+  # Code Quality and Linting
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality Checks
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Run ESLint
+      run: npm run lint
+      
+    - name: Run Prettier check
+      run: npm run format -- --check
+      
+    - name: TypeScript compilation check
+      run: npx tsc --noEmit --project tsconfig.json
+
+  # Unit and Integration Tests
+  test:
+    runs-on: ubuntu-latest
+    name: Unit & Integration Tests
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Run unit tests with coverage
+      run: npm run test:cov
+      
+    - name: Run integration tests
+      run: npm run test -- --testPathPattern=integration
+      
+    - name: Upload coverage to Codecov
+      if: matrix.node-version == '20.x'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  # E2E Tests
+  e2e-test:
+    runs-on: ubuntu-latest
+    name: E2E Tests
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Install Cypress
+      run: npx cypress install
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Start application
+      run: |
+        npm run start:prod &
+        sleep 30
+      
+    - name: Run Cypress E2E tests
+      run: npx cypress run --config baseUrl=http://localhost:3000
+      
+    - name: Upload Cypress videos
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-videos
+        path: cypress/videos
+        retention-days: 7
+        
+    - name: Upload Cypress screenshots
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cypress-screenshots
+        path: cypress/screenshots
+        retention-days: 7
+
+  # API Tests with Newman
+  api-test:
+    runs-on: ubuntu-latest
+    name: API Tests
+    needs: [code-quality, test]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Install Newman
+      run: npm install -g newman newman-reporter-html
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Start application
+      run: |
+        npm run start:prod &
+        sleep 30
+        
+    - name: Wait for application to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done'
+        
+    - name: Run Newman API tests
+      run: |
+        mkdir -p test-reports/newman
+        newman run postman/collection.json \
+          --reporters cli,html \
+          --reporter-html-export test-reports/newman/api-test-report.html \
+          --global-var "baseUrl=http://localhost:3000/api" \
+          --bail
+          
+    - name: Upload Newman reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: newman-reports
+        path: test-reports/newman
+        retention-days: 7
+
+  # Security Scanning
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Scanning
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Run npm audit
+      run: npm audit --audit-level=moderate
+      
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      continue-on-error: true
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+        
+    - name: Upload Snyk report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: snyk-report
+        path: snyk-report.html
+        retention-days: 7
+
+  # Performance Testing
+  performance-test:
+    runs-on: ubuntu-latest
+    name: Performance Tests
+    needs: [test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Install Artillery
+      run: npm install -g artillery
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Start application
+      run: |
+        npm run start:prod &
+        sleep 30
+        
+    - name: Wait for application to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done'
+        
+    - name: Run performance tests
+      run: |
+        artillery run artillery-config.yml
+        
+    - name: Upload performance reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-reports
+        path: artillery-report.html
+        retention-days: 7
+
+  # Build and Deploy
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    name: Build & Deploy
+    needs: [code-quality, test, e2e-test, api-test, security-scan]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Build Docker image
+      run: |
+        docker build -t strellerminds-backend:${{ github.sha }} .
+        docker tag strellerminds-backend:${{ github.sha }} strellerminds-backend:latest
+        
+    - name: Log in to Docker Hub
+      if: github.event_name != 'pull_request'
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Push to Docker Hub
+      if: github.event_name != 'pull_request'
+      run: |
+        docker push strellerminds-backend:${{ github.sha }}
+        docker push strellerminds-backend:latest
+        
+    - name: Deploy to production
+      if: github.event_name != 'pull_request'
+      run: |
+        echo "Deployment step would go here"
+        # Add your deployment logic here
+
+  # Documentation Generation
+  docs:
+    runs-on: ubuntu-latest
+    name: Generate Documentation
+    needs: [test]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Generate API documentation
+      run: |
+        npm run start:prod &
+        sleep 30
+        curl -o api-docs.json http://localhost:3000/api/docs-json
+        
+    - name: Upload documentation
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-documentation
+        path: api-docs.json
+        retention-days: 30

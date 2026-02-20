@@ -15,27 +15,33 @@ export class PlagiarismService {
     this.turnitinUrl = this.configService.get('TURNITIN_API_URL');
   }
 
-  async checkPlagiarism(content: string, fileName?: string): Promise<{ score: number; reportUrl?: string }> {
+  async checkPlagiarism(
+    content: string,
+    fileName?: string,
+  ): Promise<{ score: number; reportUrl?: string }> {
     try {
       if (!this.turnitinApiKey) {
         return this.simpleTextCheck(content);
       }
 
-
-      const response = await axios.post(`${this.turnitinUrl}/submissions`, {
-        title: fileName || 'submission',
-        submitter: 'system',
-        content: content
-      }, {
-        headers: {
-          'Authorization': `Bearer ${this.turnitinApiKey}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await axios.post(
+        `${this.turnitinUrl}/submissions`,
+        {
+          title: fileName || 'submission',
+          submitter: 'system',
+          content: content,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.turnitinApiKey}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
       return {
         score: response.data.similarity,
-        reportUrl: response.data.report_url
+        reportUrl: response.data.report_url,
       };
     } catch (error) {
       this.logger.error('Plagiarism check failed:', error);
@@ -47,9 +53,9 @@ export class PlagiarismService {
     const words = content.toLowerCase().split(/\s+/);
     const uniqueWords = new Set(words);
     const uniqueness = uniqueWords.size / words.length;
-    
+
     return {
-      score: Math.round((1 - uniqueness) * 100)
+      score: Math.round((1 - uniqueness) * 100),
     };
   }
 

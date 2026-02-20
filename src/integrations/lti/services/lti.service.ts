@@ -14,7 +14,7 @@ export class LtiService {
   async validateLaunchToken(idToken: string, clientId: string, clientSecret: string): Promise<any> {
     try {
       const decoded = this.jwtService.decode(idToken, { complete: true }) as any;
-      
+
       if (!decoded || !decoded.payload) {
         throw new UnauthorizedException('Invalid token format');
       }
@@ -27,7 +27,10 @@ export class LtiService {
       }
 
       // Validate audience
-      if (aud !== clientId && !Array.isArray(aud) || (Array.isArray(aud) && !aud.includes(clientId))) {
+      if (
+        (aud !== clientId && !Array.isArray(aud)) ||
+        (Array.isArray(aud) && !aud.includes(clientId))
+      ) {
         throw new UnauthorizedException('Invalid audience');
       }
 
@@ -88,10 +91,7 @@ export class LtiService {
   /**
    * Verify LTI response from platform
    */
-  async verifyPlatformResponse(
-    token: string,
-    publicKey: string,
-  ): Promise<any> {
+  async verifyPlatformResponse(token: string, publicKey: string): Promise<any> {
     try {
       const decoded = this.jwtService.verify(token, {
         publicKey: publicKey,
@@ -143,12 +143,7 @@ export class LtiService {
       comment,
     };
 
-    return this.callAgsApi(
-      `/lineItems/${lineItemId}/scores`,
-      'POST',
-      accessToken,
-      payload,
-    );
+    return this.callAgsApi(`/lineItems/${lineItemId}/scores`, 'POST', accessToken, payload);
   }
 
   /**
@@ -170,11 +165,7 @@ export class LtiService {
   /**
    * Get course members
    */
-  async getMembers(
-    accessToken: string,
-    contextId: string,
-    limit: number = 100,
-  ): Promise<any> {
+  async getMembers(accessToken: string, contextId: string, limit: number = 100): Promise<any> {
     return this.callNrpsApi(
       `/contexts/${contextId}/memberships?limit=${limit}`,
       'GET',

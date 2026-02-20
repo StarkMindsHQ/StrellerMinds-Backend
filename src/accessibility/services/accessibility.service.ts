@@ -380,7 +380,10 @@ export class AccessibilityService {
   /**
    * Check if contrast ratio meets WCAG AA standards
    */
-  checkContrastRatio(foreground: string, background: string): {
+  checkContrastRatio(
+    foreground: string,
+    background: string,
+  ): {
     ratio: number;
     meetsAA: boolean;
     meetsAAA: boolean;

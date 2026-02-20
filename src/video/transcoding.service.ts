@@ -63,22 +63,26 @@ export class TranscodingService {
         ])
         .output(path.join(tempOutputDir, 'stream_%v.m3u8'))
         .on('end', async () => {
-             this.logger.log('Transcoding finished successfully');
-             try {
-                // Upload all files in tempOutputDir to storage
-                const files = fs.readdirSync(tempOutputDir);
-                for (const file of files) {
-                    const buffer = fs.readFileSync(path.join(tempOutputDir, file));
-                    await this.storage.upload(buffer, `${outputDirName}/${file}`, file.endsWith('.m3u8') ? 'application/vnd.apple.mpegurl' : 'video/mp2t');
-                }
-                // Return path to master manifest in storage
-                resolve(`${outputDirName}/${manifestName}`);
-             } catch (err) {
-                 reject(err);
-             } finally {
-                 // Cleanup
-                 fs.rmSync(tempOutputDir, { recursive: true, force: true });
-             }
+          this.logger.log('Transcoding finished successfully');
+          try {
+            // Upload all files in tempOutputDir to storage
+            const files = fs.readdirSync(tempOutputDir);
+            for (const file of files) {
+              const buffer = fs.readFileSync(path.join(tempOutputDir, file));
+              await this.storage.upload(
+                buffer,
+                `${outputDirName}/${file}`,
+                file.endsWith('.m3u8') ? 'application/vnd.apple.mpegurl' : 'video/mp2t',
+              );
+            }
+            // Return path to master manifest in storage
+            resolve(`${outputDirName}/${manifestName}`);
+          } catch (err) {
+            reject(err);
+          } finally {
+            // Cleanup
+            fs.rmSync(tempOutputDir, { recursive: true, force: true });
+          }
         })
         .on('error', (err) => {
           this.logger.error('Transcoding error', err);

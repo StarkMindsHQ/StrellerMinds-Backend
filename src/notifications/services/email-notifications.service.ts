@@ -58,8 +58,13 @@ export class EmailNotificationsService {
         }
 
         emailJob.subject = this.replacePlaceholders(template.subject, sendEmailDto.templateData);
-        emailJob.htmlContent = this.replacePlaceholders(template.htmlContent, sendEmailDto.templateData);
-        emailJob.textContent = template.textContent ? this.replacePlaceholders(template.textContent, sendEmailDto.templateData) : undefined;
+        emailJob.htmlContent = this.replacePlaceholders(
+          template.htmlContent,
+          sendEmailDto.templateData,
+        );
+        emailJob.textContent = template.textContent
+          ? this.replacePlaceholders(template.textContent, sendEmailDto.templateData)
+          : undefined;
       } else if (sendEmailDto.templateType) {
         const template = await this.emailTemplateRepository.findOne({
           where: { type: sendEmailDto.templateType, isActive: true },
@@ -70,8 +75,13 @@ export class EmailNotificationsService {
         }
 
         emailJob.subject = this.replacePlaceholders(template.subject, sendEmailDto.templateData);
-        emailJob.htmlContent = this.replacePlaceholders(template.htmlContent, sendEmailDto.templateData);
-        emailJob.textContent = template.textContent ? this.replacePlaceholders(template.textContent, sendEmailDto.templateData) : undefined;
+        emailJob.htmlContent = this.replacePlaceholders(
+          template.htmlContent,
+          sendEmailDto.templateData,
+        );
+        emailJob.textContent = template.textContent
+          ? this.replacePlaceholders(template.textContent, sendEmailDto.templateData)
+          : undefined;
       }
 
       // Apply language-specific template if needed
@@ -82,9 +92,17 @@ export class EmailNotificationsService {
 
         if (template && template.languages && template.languages[sendEmailDto.language]) {
           const langTemplate = template.languages[sendEmailDto.language];
-          emailJob.subject = this.replacePlaceholders(langTemplate.subject, sendEmailDto.templateData);
-          emailJob.htmlContent = this.replacePlaceholders(langTemplate.htmlContent, sendEmailDto.templateData);
-          emailJob.textContent = langTemplate.textContent ? this.replacePlaceholders(langTemplate.textContent, sendEmailDto.templateData) : undefined;
+          emailJob.subject = this.replacePlaceholders(
+            langTemplate.subject,
+            sendEmailDto.templateData,
+          );
+          emailJob.htmlContent = this.replacePlaceholders(
+            langTemplate.htmlContent,
+            sendEmailDto.templateData,
+          );
+          emailJob.textContent = langTemplate.textContent
+            ? this.replacePlaceholders(langTemplate.textContent, sendEmailDto.templateData)
+            : undefined;
         }
       }
 
@@ -168,7 +186,10 @@ export class EmailNotificationsService {
     return await this.emailTemplateRepository.save(template);
   }
 
-  async updateTemplate(id: string, updateTemplateDto: UpdateEmailTemplateDto): Promise<EmailTemplate> {
+  async updateTemplate(
+    id: string,
+    updateTemplateDto: UpdateEmailTemplateDto,
+  ): Promise<EmailTemplate> {
     const template = await this.emailTemplateRepository.findOne({ where: { id } });
     if (!template) {
       throw new Error(`Template with ID ${id} not found`);
@@ -194,7 +215,10 @@ export class EmailNotificationsService {
     });
   }
 
-  async updateNotificationPreferences(userId: string, preferences: any): Promise<NotificationPreference> {
+  async updateNotificationPreferences(
+    userId: string,
+    preferences: any,
+  ): Promise<NotificationPreference> {
     let userPrefs = await this.notificationPreferenceRepository.findOne({
       where: { userId },
     });

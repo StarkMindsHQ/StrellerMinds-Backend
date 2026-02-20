@@ -1,10 +1,12 @@
 export const INTEGRATION_CONSTANTS = {
   LTI: {
     VERSION: '1.3',
-    SCOPE: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
-            'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly',
-            'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',
-            'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly'],
+    SCOPE: [
+      'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
+      'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly',
+      'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',
+      'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly',
+    ],
     REQUIRED_CLAIMS: ['iss', 'sub', 'aud', 'exp', 'iat', 'nonce'],
     TOKEN_EXPIRY: 3600, // 1 hour
   },
@@ -17,12 +19,7 @@ export const INTEGRATION_CONSTANTS = {
       RECURRING: 3,
       FIXED_RECURRING: 8,
     },
-    WEBHOOK_EVENTS: [
-      'meeting.started',
-      'meeting.ended',
-      'recording.completed',
-      'user.updated',
-    ],
+    WEBHOOK_EVENTS: ['meeting.started', 'meeting.ended', 'recording.completed', 'user.updated'],
   },
   GOOGLE: {
     SCOPES: [

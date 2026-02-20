@@ -73,10 +73,7 @@ export class MicrosoftService {
   /**
    * Get team channels
    */
-  async getTeamChannels(
-    accessToken: string,
-    teamId: string,
-  ): Promise<any[]> {
+  async getTeamChannels(accessToken: string, teamId: string): Promise<any[]> {
     try {
       // Placeholder
       return [];
@@ -122,10 +119,7 @@ export class MicrosoftService {
   /**
    * Get team members
    */
-  async getTeamMembers(
-    accessToken: string,
-    teamId: string,
-  ): Promise<any[]> {
+  async getTeamMembers(accessToken: string, teamId: string): Promise<any[]> {
     try {
       // Placeholder
       return [];
@@ -183,18 +177,16 @@ export class MicrosoftService {
   /**
    * Get authorization URL for OAuth flow
    */
-  getAuthorizationUrl(
-    clientId: string,
-    redirectUri: string,
-    tenantId: string,
-  ): string {
+  getAuthorizationUrl(clientId: string, redirectUri: string, tenantId: string): string {
     const scope = INTEGRATION_CONSTANTS.MICROSOFT.SCOPES.join(' ');
-    return `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?` +
+    return (
+      `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/authorize?` +
       `client_id=${clientId}&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `response_type=code&` +
       `scope=${encodeURIComponent(scope)}&` +
-      `access_type=offline`;
+      `access_type=offline`
+    );
   }
 
   /**

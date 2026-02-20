@@ -40,7 +40,7 @@ export class LearningPathNode {
   @Column({ type: 'uuid' })
   learningPathId: string;
 
-  @ManyToOne(() => LearningPath, path => path.nodes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => LearningPath, (path) => path.nodes, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'learningPathId' })
   learningPath: LearningPath;
 
@@ -83,10 +83,10 @@ export class LearningPathNode {
   prerequisites: LearningPathNode[];
 
   // Dependencies - nodes that depend on this node
-  @OneToMany(() => NodeDependency, dep => dep.sourceNode)
+  @OneToMany(() => NodeDependency, (dep) => dep.sourceNode)
   outgoingDependencies: NodeDependency[];
 
-  @OneToMany(() => NodeDependency, dep => dep.targetNode)
+  @OneToMany(() => NodeDependency, (dep) => dep.targetNode)
   incomingDependencies: NodeDependency[];
 
   // Learning objectives mapped to this node

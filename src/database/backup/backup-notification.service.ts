@@ -31,14 +31,8 @@ export class BackupNotificationService {
       .split(',')
       .filter((e) => e.trim());
     this.webhookUrl = this.configService.get('WEBHOOK_ALERT_URL', '');
-    this.alertOnSuccess = this.configService.get<boolean>(
-      'BACKUP_ALERT_ON_SUCCESS',
-      false,
-    );
-    this.alertOnFailure = this.configService.get<boolean>(
-      'BACKUP_ALERT_ON_FAILURE',
-      true,
-    );
+    this.alertOnSuccess = this.configService.get<boolean>('BACKUP_ALERT_ON_SUCCESS', false);
+    this.alertOnFailure = this.configService.get<boolean>('BACKUP_ALERT_ON_FAILURE', true);
     this.alertOnRecoveryTest = this.configService.get<boolean>(
       'BACKUP_ALERT_ON_RECOVERY_TEST',
       true,
@@ -54,7 +48,8 @@ export class BackupNotificationService {
     const alert: BackupAlertPayload = {
       severity: BackupAlertSeverity.INFO,
       title: 'Backup Completed Successfully',
-      message: `Database backup completed successfully.\n` +
+      message:
+        `Database backup completed successfully.\n` +
         `File: ${backup.filename}\n` +
         `Size: ${this.formatBytes(Number(backup.sizeBytes))}\n` +
         `Duration: ${(backup.durationMs / 1000).toFixed(1)}s\n` +
@@ -74,10 +69,7 @@ export class BackupNotificationService {
     await this.sendAlert(alert);
   }
 
-  async sendBackupFailureNotification(
-    backup: BackupRecord,
-    error: string,
-  ): Promise<void> {
+  async sendBackupFailureNotification(backup: BackupRecord, error: string): Promise<void> {
     if (!this.alertOnFailure) {
       this.logger.debug('Failure notifications disabled, skipping');
       return;
@@ -86,7 +78,8 @@ export class BackupNotificationService {
     const alert: BackupAlertPayload = {
       severity: BackupAlertSeverity.CRITICAL,
       title: 'Backup Failed',
-      message: `Database backup failed!\n` +
+      message:
+        `Database backup failed!\n` +
         `File: ${backup.filename}\n` +
         `Error: ${error}\n` +
         `Retry Count: ${backup.retryCount}`,
@@ -113,7 +106,8 @@ export class BackupNotificationService {
     const alert: BackupAlertPayload = {
       severity: passed ? BackupAlertSeverity.INFO : BackupAlertSeverity.CRITICAL,
       title: passed ? 'Recovery Test Passed' : 'Recovery Test Failed',
-      message: `Backup recovery test ${passed ? 'passed' : 'FAILED'}!\n` +
+      message:
+        `Backup recovery test ${passed ? 'passed' : 'FAILED'}!\n` +
         `Backup ID: ${result.backupId}\n` +
         `Duration: ${(result.durationMs / 1000).toFixed(1)}s\n` +
         `Tables Verified: ${result.tablesVerified}\n` +
@@ -134,16 +128,14 @@ export class BackupNotificationService {
     await this.sendAlert(alert);
   }
 
-  async sendRetentionCleanupNotification(
-    deletedCount: number,
-    freedBytes: number,
-  ): Promise<void> {
+  async sendRetentionCleanupNotification(deletedCount: number, freedBytes: number): Promise<void> {
     if (deletedCount === 0) return;
 
     const alert: BackupAlertPayload = {
       severity: BackupAlertSeverity.INFO,
       title: 'Backup Retention Cleanup Complete',
-      message: `Expired backups cleaned up.\n` +
+      message:
+        `Expired backups cleaned up.\n` +
         `Backups Deleted: ${deletedCount}\n` +
         `Space Freed: ${this.formatBytes(freedBytes)}`,
       timestamp: new Date(),
@@ -161,11 +153,10 @@ export class BackupNotificationService {
     totalSizeBytes: number,
   ): Promise<void> {
     const alert: BackupAlertPayload = {
-      severity: usagePercent > 95
-        ? BackupAlertSeverity.CRITICAL
-        : BackupAlertSeverity.WARNING,
+      severity: usagePercent > 95 ? BackupAlertSeverity.CRITICAL : BackupAlertSeverity.WARNING,
       title: 'Backup Storage Warning',
-      message: `Backup storage usage is high!\n` +
+      message:
+        `Backup storage usage is high!\n` +
         `Usage: ${usagePercent.toFixed(1)}%\n` +
         `Total Size: ${this.formatBytes(totalSizeBytes)}`,
       timestamp: new Date(),
@@ -178,14 +169,12 @@ export class BackupNotificationService {
     await this.sendAlert(alert);
   }
 
-  async sendReplicationFailureNotification(
-    backupId: string,
-    error: string,
-  ): Promise<void> {
+  async sendReplicationFailureNotification(backupId: string, error: string): Promise<void> {
     const alert: BackupAlertPayload = {
       severity: BackupAlertSeverity.ERROR,
       title: 'Cross-Region Replication Failed',
-      message: `Failed to replicate backup to secondary region.\n` +
+      message:
+        `Failed to replicate backup to secondary region.\n` +
         `Backup ID: ${backupId}\n` +
         `Error: ${error}`,
       backupId,

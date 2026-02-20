@@ -5,11 +5,6 @@ import { ErrorCode } from './error-code';
 
 export class ValidationException extends BaseException {
   constructor(errors: any) {
-    super(
-      HttpStatus.BAD_REQUEST,
-      ErrorCode.VALIDATION_ERROR,
-      'Validation failed',
-      errors,
-    );
+    super(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR, 'Validation failed', errors);
   }
 }

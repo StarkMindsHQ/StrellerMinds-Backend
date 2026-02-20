@@ -58,10 +58,7 @@ export class GoogleConfigService {
   /**
    * Sync courses from Google Classroom
    */
-  async syncCourses(
-    configId: string,
-    userId: string,
-  ): Promise<SyncLog> {
+  async syncCourses(configId: string, userId: string): Promise<SyncLog> {
     const startTime = Date.now();
     const syncLog = this.syncLogRepository.create({
       integrationConfigId: configId,
@@ -127,11 +124,7 @@ export class GoogleConfigService {
   /**
    * Sync assignments from Google Classroom
    */
-  async syncAssignments(
-    configId: string,
-    userId: string,
-    courseId: string,
-  ): Promise<SyncLog> {
+  async syncAssignments(configId: string, userId: string, courseId: string): Promise<SyncLog> {
     const startTime = Date.now();
     const syncLog = this.syncLogRepository.create({
       integrationConfigId: configId,

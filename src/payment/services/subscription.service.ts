@@ -1,27 +1,9 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Payment,
-} from '../entities';
-import {
-  SubscriptionStatus,
-  BillingCycle,
-  PaymentStatus,
-  InvoiceStatus,
-} from '../enums';
-import {
-  CreateSubscriptionDto,
-  UpdateSubscriptionDto,
-  CancelSubscriptionDto,
-} from '../dto';
+import { Subscription, PaymentPlan, Invoice, Payment } from '../entities';
+import { SubscriptionStatus, BillingCycle, PaymentStatus, InvoiceStatus } from '../enums';
+import { CreateSubscriptionDto, UpdateSubscriptionDto, CancelSubscriptionDto } from '../dto';
 import { StripeService } from './stripe.service';
 import { PayPalService } from './paypal.service';
 
@@ -40,10 +22,7 @@ export class SubscriptionService {
     private paypalService: PayPalService,
   ) {}
 
-  async createSubscription(
-    userId: string,
-    dto: CreateSubscriptionDto,
-  ): Promise<Subscription> {
+  async createSubscription(userId: string, dto: CreateSubscriptionDto): Promise<Subscription> {
     const plan = await this.paymentPlanRepository.findOneBy({
       id: dto.paymentPlanId,
     });
@@ -107,10 +86,7 @@ export class SubscriptionService {
 
     if (dto.billingCycle) {
       subscription.billingCycle = dto.billingCycle;
-      subscription.nextBillingDate = this.calculateNextBillingDate(
-        new Date(),
-        dto.billingCycle,
-      );
+      subscription.nextBillingDate = this.calculateNextBillingDate(new Date(), dto.billingCycle);
     }
 
     if (dto.metadata) {
@@ -167,10 +143,7 @@ export class SubscriptionService {
     });
 
     for (const subscription of subscriptions) {
-      if (
-        subscription.nextBillingDate &&
-        subscription.nextBillingDate <= today
-      ) {
+      if (subscription.nextBillingDate && subscription.nextBillingDate <= today) {
         await this.processBilling(subscription);
       }
     }
@@ -214,10 +187,7 @@ export class SubscriptionService {
     }
   }
 
-  private calculateNextBillingDate(
-    from: Date,
-    cycle: BillingCycle,
-  ): Date {
+  private calculateNextBillingDate(from: Date, cycle: BillingCycle): Date {
     const date = new Date(from);
 
     switch (cycle) {

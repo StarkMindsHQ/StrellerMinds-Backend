@@ -6,13 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { BackupService } from './backup.service';
 import { BackupNotificationService } from './backup-notification.service';
 import { BackupMetricsService } from './backup-metrics.service';
-import {
-  BackupSchedule,
-  BackupRecord,
-  BackupType,
-  BackupStatus,
-  RetentionTier,
-} from './entities';
+import { BackupSchedule, BackupRecord, BackupType, BackupStatus, RetentionTier } from './entities';
 import { EnhancedBackupResult } from './interfaces';
 
 @Injectable()
@@ -30,10 +24,7 @@ export class BackupSchedulerService implements OnModuleInit {
     @InjectRepository(BackupRecord)
     private readonly backupRecordRepository: Repository<BackupRecord>,
   ) {
-    this.schedulingEnabled = this.configService.get<boolean>(
-      'BACKUP_SCHEDULING_ENABLED',
-      true,
-    );
+    this.schedulingEnabled = this.configService.get<boolean>('BACKUP_SCHEDULING_ENABLED', true);
   }
 
   async onModuleInit(): Promise<void> {
@@ -175,13 +166,11 @@ export class BackupSchedulerService implements OnModuleInit {
     }
   }
 
-  async triggerManualBackup(
-    options?: {
-      type?: BackupType;
-      tier?: RetentionTier;
-      scheduleId?: string;
-    },
-  ): Promise<EnhancedBackupResult> {
+  async triggerManualBackup(options?: {
+    type?: BackupType;
+    tier?: RetentionTier;
+    scheduleId?: string;
+  }): Promise<EnhancedBackupResult> {
     this.logger.log('Triggering manual backup');
 
     return this.backupService.createEnhancedBackup({
@@ -206,17 +195,12 @@ export class BackupSchedulerService implements OnModuleInit {
     return this.scheduleRepository.findOne({ where: { id } });
   }
 
-  async createSchedule(
-    data: Partial<BackupSchedule>,
-  ): Promise<BackupSchedule> {
+  async createSchedule(data: Partial<BackupSchedule>): Promise<BackupSchedule> {
     const schedule = this.scheduleRepository.create(data);
     return this.scheduleRepository.save(schedule);
   }
 
-  async updateSchedule(
-    id: string,
-    data: Partial<BackupSchedule>,
-  ): Promise<BackupSchedule | null> {
+  async updateSchedule(id: string, data: Partial<BackupSchedule>): Promise<BackupSchedule | null> {
     const schedule = await this.scheduleRepository.findOne({ where: { id } });
     if (!schedule) {
       return null;
@@ -246,14 +230,10 @@ export class BackupSchedulerService implements OnModuleInit {
     if (!backup) return;
 
     if (result.success) {
-      this.logger.log(
-        `Scheduled ${scheduleName} backup completed: ${result.filename}`,
-      );
+      this.logger.log(`Scheduled ${scheduleName} backup completed: ${result.filename}`);
       await this.notificationService.sendBackupSuccessNotification(backup);
     } else {
-      this.logger.error(
-        `Scheduled ${scheduleName} backup failed: ${result.error}`,
-      );
+      this.logger.error(`Scheduled ${scheduleName} backup failed: ${result.error}`);
       await this.notificationService.sendBackupFailureNotification(
         backup,
         result.error || 'Unknown error',

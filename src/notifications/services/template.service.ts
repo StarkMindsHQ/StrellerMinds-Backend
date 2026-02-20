@@ -18,7 +18,10 @@ export class TemplateService {
     return await this.templateRepository.save(template);
   }
 
-  async updateTemplate(id: string, updateTemplateDto: UpdateEmailTemplateDto): Promise<EmailTemplate> {
+  async updateTemplate(
+    id: string,
+    updateTemplateDto: UpdateEmailTemplateDto,
+  ): Promise<EmailTemplate> {
     const template = await this.templateRepository.findOne({ where: { id } });
     if (!template) {
       throw new Error(`Template with ID ${id} not found`);
@@ -44,9 +47,12 @@ export class TemplateService {
     await this.templateRepository.delete(id);
   }
 
-  async getTemplateForLanguage(templateId: string, language: string): Promise<{ subject: string; htmlContent: string; textContent?: string }> {
+  async getTemplateForLanguage(
+    templateId: string,
+    language: string,
+  ): Promise<{ subject: string; htmlContent: string; textContent?: string }> {
     const template = await this.templateRepository.findOne({ where: { id: templateId } });
-    
+
     if (!template) {
       throw new Error(`Template with ID ${templateId} not found`);
     }
@@ -64,9 +70,13 @@ export class TemplateService {
     };
   }
 
-  async addLanguageToTemplate(templateId: string, language: string, content: { subject: string; htmlContent: string; textContent?: string }): Promise<EmailTemplate> {
+  async addLanguageToTemplate(
+    templateId: string,
+    language: string,
+    content: { subject: string; htmlContent: string; textContent?: string },
+  ): Promise<EmailTemplate> {
     const template = await this.templateRepository.findOne({ where: { id: templateId } });
-    
+
     if (!template) {
       throw new Error(`Template with ID ${templateId} not found`);
     }

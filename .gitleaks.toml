@@ -1,0 +1,171 @@
+# Gitleaks configuration for secret scanning
+
+title = "Gitleaks Config"
+
+# Extend the base (if this config is in a different location)
+# extend = path/to/base/config
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+    '''gitleaks.toml''',
+    '''test/''',
+    '''node_modules/''',
+    '''coverage/''',
+    '''dist/''',
+    '''*.log''',
+    '''package-lock.json''',
+    '''yarn.lock''',
+    '''pnpm-lock.yaml'''
+]
+
+# Regex patterns for secrets
+[[rules]]
+description = "GitHub Personal Access Token"
+id = "github-pat"
+regex = '''ghp_[a-zA-Z0-9]{36}'''
+keywords = ["ghp_"]
+
+[[rules]]
+description = "GitHub OAuth Token"
+id = "github-oauth"
+regex = '''gho_[a-zA-Z0-9]{36}'''
+keywords = ["gho_"]
+
+[[rules]]
+description = "GitHub App Token"
+id = "github-app"
+regex = '''ghu_[a-zA-Z0-9]{36}'''
+keywords = ["ghu_"]
+
+[[rules]]
+description = "GitHub Server Token"
+id = "github-server"
+regex = '''ghs_[a-zA-Z0-9]{36}'''
+keywords = ["ghs_"]
+
+[[rules]]
+description = "GitHub Refresh Token"
+id = "github-refresh"
+regex = '''ghr_[a-zA-Z0-9]{36}'''
+keywords = ["ghr_"]
+
+[[rules]]
+description = "Stripe API Key"
+id = "stripe-api-key"
+regex = '''sk_live_[a-zA-Z0-9]{24}'''
+keywords = ["sk_live_", "stripe"]
+
+[[rules]]
+description = "Stripe Test API Key"
+id = "stripe-test-key"
+regex = '''sk_test_[a-zA-Z0-9]{24}'''
+keywords = ["sk_test_", "stripe"]
+
+[[rules]]
+description = "AWS Access Key ID"
+id = "aws-access-key"
+regex = '''AKIA[0-9A-Z]{16}'''
+keywords = ["AKIA"]
+
+[[rules]]
+description = "AWS Secret Access Key"
+id = "aws-secret-key"
+regex = '''[0-9a-zA-Z/+]{40}'''
+keywords = ["aws"]
+
+[[rules]]
+description = "Generic API Key"
+id = "generic-api-key"
+regex = '''(?i)(api[_-]?key|apikey|api[_-]?secret|secret[_-]?key)[\s=:'"`]+[0-9a-zA-Z]{16,}'''
+keywords = ["api", "key", "secret"]
+
+[[rules]]
+description = "JWT Token"
+id = "jwt-token"
+regex = '''eyJ[a-zA-Z0-9_-]*\.eyJ[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*'''
+keywords = ["eyJ"]
+
+[[rules]]
+description = "Private Key"
+id = "private-key"
+regex = '''-----BEGIN (RSA |OPENSSH |DSA |EC |PGP )?PRIVATE KEY-----'''
+keywords = ["BEGIN PRIVATE KEY", "BEGIN RSA PRIVATE KEY"]
+
+[[rules]]
+description = "Database Connection String"
+id = "database-connection"
+regex = '''(?i)(mongodb|mysql|postgres|postgresql)://[^\s,;'"`]{20,}'''
+keywords = ["mongodb://", "mysql://", "postgres://", "postgresql://"]
+
+[[rules]]
+description = "Slack Token"
+id = "slack-token"
+regex = '''xox[baprs]-[0-9]{12}-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{32}'''
+keywords = ["xoxb-", "xoxp-", "xoxa-", "xoxr-", "xoxs-"]
+
+[[rules]]
+description = "SendGrid API Key"
+id = "sendgrid-key"
+regex = '''SG\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9_-]{43}'''
+keywords = ["SG."]
+
+[[rules]]
+description = "Twilio API Key"
+id = "twilio-key"
+regex = '''SK[0-9a-fA-F]{32}'''
+keywords = ["SK"]
+
+[[rules]]
+description = "NPM Token"
+id = "npm-token"
+regex = '''npm_[a-zA-Z0-9_-]{36}'''
+keywords = ["npm_"]
+
+[[rules]]
+description = "Docker Hub Token"
+id = "docker-hub-token"
+regex = '''dckr_pat_[a-zA-Z0-9_-]{32}'''
+keywords = ["dckr_pat_"]
+
+[[rules]]
+description = "Google API Key"
+id = "google-api-key"
+regex = '''AIza[0-9A-Za-z_-]{35}'''
+keywords = ["AIza"]
+
+[[rules]]
+description = "Heroku API Key"
+id = "heroku-key"
+regex = '''[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'''
+keywords = ["heroku"]
+
+[[rules]]
+description = "Mailgun API Key"
+id = "mailgun-key"
+regex = '''key-[0-9a-zA-Z]{32}'''
+keywords = ["key-", "mailgun"]
+
+[[rules]]
+description = "Slack Webhook"
+id = "slack-webhook"
+regex = '''https://hooks\.slack\.com/services/T[0-9A-Z]{8}/B[0-9A-Z]{8}/[a-zA-Z0-9]{24}'''
+keywords = ["hooks.slack.com"]
+
+[[rules]]
+description = "Email Address"
+id = "email-address"
+regex = '''[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'''
+keywords = ["@", ".com", ".org", ".net", ".edu"]
+
+[[rules]]
+description = "IP Address"
+id = "ip-address"
+regex = '''\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'''
+keywords = ["192.168.", "10.", "127."]
+
+[[rules]]
+description = "URL with credentials"
+id = "url-with-credentials"
+regex = '''https?://[^\s/$.?#].[^\s]*:[^\s@]+@[^\s/$.?#].[^\s]*'''
+keywords = ["http://", "https://", "@"]

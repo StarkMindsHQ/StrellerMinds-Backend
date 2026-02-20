@@ -1,4 +1,12 @@
-import { IsString, IsEnum, IsOptional, IsUUID, IsArray, ValidateNested, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  IsUUID,
+  IsArray,
+  ValidateNested,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { LearningPathType, LearningPathStatus } from '../entities/learning-path.entity';
 

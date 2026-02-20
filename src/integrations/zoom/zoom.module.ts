@@ -8,9 +8,7 @@ import { ZoomConfigService } from './services/zoom-config.service';
 import { ZoomController } from './controllers/zoom.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([IntegrationConfig, SyncLog, IntegrationMapping]),
-  ],
+  imports: [TypeOrmModule.forFeature([IntegrationConfig, SyncLog, IntegrationMapping])],
   controllers: [ZoomController],
   providers: [ZoomService, ZoomConfigService],
   exports: [ZoomService, ZoomConfigService],

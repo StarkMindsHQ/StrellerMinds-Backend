@@ -17,7 +17,7 @@ export class SecurityService {
     return {
       token,
       expires,
-      message: 'CSRF token generated successfully'
+      message: 'CSRF token generated successfully',
     };
   }
 
@@ -31,14 +31,15 @@ export class SecurityService {
         contentLength: this.checkContentLength(headers['content-length']),
         suspiciousPatterns: this.checkForSuspiciousPatterns(body),
         rateLimit: this.checkRateLimit(ip),
-        ipReputation: this.checkIpReputation(ip)
-      }
+        ipReputation: this.checkIpReputation(ip),
+      },
     };
 
     // Calculate overall security score
-    validation.securityScore = Object.values(validation.checks)
-      .filter(check => typeof check === 'object' && check.score !== undefined)
-      .reduce((sum: number, check: any) => sum + check.score, 0) / 4;
+    validation.securityScore =
+      Object.values(validation.checks)
+        .filter((check) => typeof check === 'object' && check.score !== undefined)
+        .reduce((sum: number, check: any) => sum + check.score, 0) / 4;
 
     validation.isValid = validation.securityScore >= 70;
 
@@ -47,13 +48,14 @@ export class SecurityService {
 
   getSecurityHeaders() {
     return {
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'",
+      'Content-Security-Policy':
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'",
       'X-Frame-Options': 'DENY',
       'X-Content-Type-Options': 'nosniff',
       'X-XSS-Protection': '1; mode=block',
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Permissions-Policy': 'geolocation=(), microphone=(), camera=()'
+      'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
     };
   }
 
@@ -67,7 +69,7 @@ export class SecurityService {
         limit: 1000,
         remaining: 1000,
         resetTime: now + 60000,
-        windowStart
+        windowStart,
       };
     }
 
@@ -75,7 +77,7 @@ export class SecurityService {
       limit: 1000,
       remaining: Math.max(0, 1000 - rateLimitData.count),
       resetTime: rateLimitData.resetTime,
-      windowStart
+      windowStart,
     };
   }
 
@@ -83,7 +85,7 @@ export class SecurityService {
     this.logger.warn(`Suspicious activity reported: ${reportData.type}`, {
       description: reportData.description,
       evidence: reportData.evidence,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Store for analysis
@@ -93,7 +95,7 @@ export class SecurityService {
     return {
       success: true,
       message: 'Suspicious activity reported and logged',
-      id: key
+      id: key,
     };
   }
 
@@ -102,18 +104,18 @@ export class SecurityService {
       'application/json',
       'application/x-www-form-urlencoded',
       'multipart/form-data',
-      'text/plain'
+      'text/plain',
     ];
 
     if (!contentType) {
       return { valid: true, score: 90, message: 'No content-type header' };
     }
 
-    const isValid = allowedTypes.some(type => contentType.includes(type));
+    const isValid = allowedTypes.some((type) => contentType.includes(type));
     return {
       valid: isValid,
       score: isValid ? 100 : 50,
-      message: isValid ? 'Content type is valid' : 'Suspicious content type'
+      message: isValid ? 'Content type is valid' : 'Suspicious content type',
     };
   }
 
@@ -131,7 +133,7 @@ export class SecurityService {
     return {
       valid: isValid,
       score,
-      message: isValid ? 'Content length is acceptable' : 'Content length too large'
+      message: isValid ? 'Content length is acceptable' : 'Content length too large',
     };
   }
 
@@ -146,7 +148,7 @@ export class SecurityService {
       /on\w+\s*=/gi,
       /eval\s*\(/gi,
       /document\.cookie/gi,
-      /window\.location/gi
+      /window\.location/gi,
     ];
 
     const bodyString = JSON.stringify(body);
@@ -159,15 +161,16 @@ export class SecurityService {
       }
     }
 
-    const score = Math.max(0, 100 - (suspiciousCount * 20));
+    const score = Math.max(0, 100 - suspiciousCount * 20);
 
     return {
       valid: suspiciousCount === 0,
       score,
-      message: suspiciousCount === 0 
-        ? 'No suspicious patterns detected' 
-        : `Found ${suspiciousCount} suspicious patterns`,
-      patterns: suspiciousCount
+      message:
+        suspiciousCount === 0
+          ? 'No suspicious patterns detected'
+          : `Found ${suspiciousCount} suspicious patterns`,
+      patterns: suspiciousCount,
     };
   }
 
@@ -185,10 +188,10 @@ export class SecurityService {
     return {
       valid: isValid,
       score,
-      message: isValid 
-        ? 'Rate limit acceptable' 
+      message: isValid
+        ? 'Rate limit acceptable'
         : `Rate limit exceeded: ${rateLimitData.count}/1000`,
-      count: rateLimitData.count
+      count: rateLimitData.count,
     };
   }
 
@@ -199,10 +202,10 @@ export class SecurityService {
       /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
       /^192\.168\./,
       /^127\./,
-      /^169\.254\./
+      /^169\.254\./,
     ];
 
-    const isPrivate = privateRanges.some(range => range.test(ip));
+    const isPrivate = privateRanges.some((range) => range.test(ip));
     const isLocalhost = ip === '::1' || ip === 'localhost';
 
     if (isPrivate || isLocalhost) {
@@ -216,7 +219,7 @@ export class SecurityService {
   // Cleanup old data
   cleanup() {
     const now = Date.now();
-    
+
     // Clean up suspicious activities older than 24 hours
     for (const [key, timestamp] of this.suspiciousActivities.entries()) {
       if (now - timestamp > 24 * 60 * 60 * 1000) {

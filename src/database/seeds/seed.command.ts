@@ -11,57 +11,57 @@ import { SeedRunner, SeedDataSet, SeedOptions } from './seed.runner';
  *   npm run seed -- --dataset=full  # Run full dataset
  */
 async function main() {
-    const args = process.argv.slice(2);
+  const args = process.argv.slice(2);
 
-    // Parse command line arguments
-    const options: SeedOptions = {
-        dataSet: SeedDataSet.STANDARD,
-        reset: false,
-    };
+  // Parse command line arguments
+  const options: SeedOptions = {
+    dataSet: SeedDataSet.STANDARD,
+    reset: false,
+  };
 
-    for (const arg of args) {
-        if (arg === '--reset') {
-            options.reset = true;
-        } else if (arg.startsWith('--dataset=')) {
-            const dataset = arg.split('=')[1] as SeedDataSet;
-            if (Object.values(SeedDataSet).includes(dataset)) {
-                options.dataSet = dataset;
-            } else {
-                console.error(`Invalid dataset: ${dataset}`);
-                console.error(`Valid options: ${Object.values(SeedDataSet).join(', ')}`);
-                process.exit(1);
-            }
-        } else if (arg === '--help' || arg === '-h') {
-            printHelp();
-            process.exit(0);
-        }
-    }
-
-    console.log('🚀 Initializing database connection...');
-
-    try {
-        // Initialize data source
-        await AppDataSource.initialize();
-        console.log('✅ Database connected successfully');
-
-        // Run seeds
-        const seedRunner = new SeedRunner(AppDataSource);
-        await seedRunner.run(options);
-
-        console.log('🎉 All done!');
-        process.exit(0);
-    } catch (error) {
-        console.error('💥 Error running seeds:', error);
+  for (const arg of args) {
+    if (arg === '--reset') {
+      options.reset = true;
+    } else if (arg.startsWith('--dataset=')) {
+      const dataset = arg.split('=')[1] as SeedDataSet;
+      if (Object.values(SeedDataSet).includes(dataset)) {
+        options.dataSet = dataset;
+      } else {
+        console.error(`Invalid dataset: ${dataset}`);
+        console.error(`Valid options: ${Object.values(SeedDataSet).join(', ')}`);
         process.exit(1);
-    } finally {
-        if (AppDataSource.isInitialized) {
-            await AppDataSource.destroy();
-        }
+      }
+    } else if (arg === '--help' || arg === '-h') {
+      printHelp();
+      process.exit(0);
     }
+  }
+
+  console.log('🚀 Initializing database connection...');
+
+  try {
+    // Initialize data source
+    await AppDataSource.initialize();
+    console.log('✅ Database connected successfully');
+
+    // Run seeds
+    const seedRunner = new SeedRunner(AppDataSource);
+    await seedRunner.run(options);
+
+    console.log('🎉 All done!');
+    process.exit(0);
+  } catch (error) {
+    console.error('💥 Error running seeds:', error);
+    process.exit(1);
+  } finally {
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.destroy();
+    }
+  }
 }
 
 function printHelp() {
-    console.log(`
+  console.log(`
 Database Seed Command
 =====================
 
