@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { SearchLog } from '../entities/search.entity';
 import {  IndexContentDto } from '../entities/search.dto';
 import { SearchQueryDto } from '../dto/search-query.dto';
+import { CreateSearchDto } from '../dto/create-search.dto';
 import { CONTENT_INDEX_MAPPING } from '../entities/content.entity';
 
 @Injectable()
@@ -49,7 +50,7 @@ export class SearchService implements OnModuleInit {
     });
   }
 
-  async search(dto: SearchQueryDto, userId?: string) {
+  async search(dto: SearchQueryDto, createsearchDto: CreateSearchDto, userId?: string) {
     const { query, page = 1, size = 10 } = dto;
     const from = (page - 1) * size;
     const startTime = Date.now();
