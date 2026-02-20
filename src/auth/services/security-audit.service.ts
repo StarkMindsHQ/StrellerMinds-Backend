@@ -7,12 +7,11 @@ import { ThreatDetectionService } from 'src/forum/threat-detection.service';
 
 @Injectable()
 export class SecurityAuditService {
-    constructor(
-        @InjectRepository(SecurityAudit)
-        private readonly auditRepository: Repository<SecurityAudit>,
-        private readonly geoIpService: GeoIpService,
-        private readonly threatDetectionService: ThreatDetectionService,
-    ) { }
+  constructor(
+    @InjectRepository(SecurityAudit)
+    private readonly auditRepository: Repository<SecurityAudit>,
+    private readonly geoIpService: GeoIpService,
+  ) {}
 
   async log(
     userId: string | null,
@@ -30,6 +29,7 @@ export class SecurityAuditService {
       userAgent,
       metadata: { ...metadata, location },
     });
+
 
     await this.auditRepository.save(audit);
   }
