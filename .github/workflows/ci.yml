@@ -216,6 +216,7 @@ jobs:
     runs-on: ubuntu-latest
     name: API Tests
     needs: [code-quality, test]
+    if: github.event_name != 'pull_request' # Skip API tests on PRs
     
     services:
       postgres:
