@@ -39,6 +39,10 @@ jobs:
       
     - name: TypeScript compilation check
       run: npx tsc --noEmit --project tsconfig.json
+      
+    - name: TypeScript compilation check (test files)
+      run: npx tsc --noEmit --project tsconfig.spec.json
+      continue-on-error: true
 
   # Unit and Integration Tests
   test:
