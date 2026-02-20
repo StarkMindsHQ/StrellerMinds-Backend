@@ -50,24 +50,25 @@ export class SearchService implements OnModuleInit {
   }
 
   async search(dto: SearchQueryDto, userId?: string) {
-    const { q, page = 1, limit = 10, filters } = dto;
-    const from = (page - 1) * limit;
+    const { query, page = 1, size = 10 } = dto;
+    const from = (page - 1) * size;
     const startTime = Date.now();
 
     const must: any[] = [
       {
         multi_match: {
-          query: q,
+          query: query,
           fields: ['title^3', 'description^2', 'content', 'tags^2'],
           fuzziness: 'AUTO',
         },
       },
     ];
 
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        must.push({ term: { [key]: value } });
-      });
+    if (dto.categories) {
+      must.push({ terms: { category: dto.categories } });
+    }
+    if (dto.difficulty) {
+      must.push({ terms: { difficulty: dto.difficulty } });
     }
 
     try {
@@ -75,7 +76,7 @@ export class SearchService implements OnModuleInit {
         index: this.indexName,
         ...{
           from,
-          size: limit,
+          size: size,
           query: {
             bool: { must },
           },
@@ -99,7 +100,7 @@ export class SearchService implements OnModuleInit {
       const executionTime = Date.now() - startTime;
 
       // Log search asynchronously
-      this.logSearch(q, userId, filters, Number(total), executionTime);
+      this.logSearch(query, userId, { categories: dto.categories, difficulty: dto.difficulty }, Number(total), executionTime);
 
       return {
         results: hits.map((hit) => ({
@@ -111,8 +112,8 @@ export class SearchService implements OnModuleInit {
         meta: {
           total,
           page,
-          limit,
-          pages: Math.ceil(Number(total) / limit),
+          limit: size,
+          pages: Math.ceil(Number(total) / size),
         },
         facets: response.aggregations,
       };
