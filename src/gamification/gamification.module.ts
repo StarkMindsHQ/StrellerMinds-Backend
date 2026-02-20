@@ -10,15 +10,7 @@ import { GamificationController } from './gamification.controller';
 import { GamificationSeeder } from './gamification-seeder.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      GamificationProfile,
-      Badge,
-      UserBadge,
-      Reward,
-      Challenge,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([GamificationProfile, Badge, UserBadge, Reward, Challenge])],
   controllers: [GamificationController],
   providers: [GamificationService, GamificationSeeder],
   exports: [GamificationService],

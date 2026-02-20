@@ -22,11 +22,13 @@ export class InAppChannel implements INotificationChannel {
       notification.status = NotificationStatus.SENT;
       notification.sentAt = new Date();
       await this.notificationRepository.save(notification);
-      
+
       this.logger.log(`In-app notification delivered to user ${notification.userId}`);
       return true;
     } catch (error) {
-      this.logger.error(`Failed to deliver in-app notification to ${notification.userId}: ${error.message}`);
+      this.logger.error(
+        `Failed to deliver in-app notification to ${notification.userId}: ${error.message}`,
+      );
       return false;
     }
   }

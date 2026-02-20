@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PrivacySettings } from '../entities/privacy-settings.entity';
 import { UserProfile } from '../entities/user-profile.entity';
-import {
-  UpdatePrivacySettingsDto,
-  PrivacySettingsResponseDto,
-} from '../dto/privacy.dto';
+import { UpdatePrivacySettingsDto, PrivacySettingsResponseDto } from '../dto/privacy.dto';
 
 @Injectable()
 export class PrivacyService {
@@ -87,10 +84,7 @@ export class PrivacyService {
     return this.mapToResponseDto(profile.privacySettings);
   }
 
-  async unblockUser(
-    userId: string,
-    blockedUserId: string,
-  ): Promise<PrivacySettingsResponseDto> {
+  async unblockUser(userId: string, blockedUserId: string): Promise<PrivacySettingsResponseDto> {
     const profile = await this.profileRepository.findOne({
       where: { userId },
       relations: ['privacySettings'],
@@ -101,8 +95,9 @@ export class PrivacyService {
     }
 
     if (profile.privacySettings.blockedUsers) {
-      profile.privacySettings.blockedUsers =
-        profile.privacySettings.blockedUsers.filter((id) => id !== blockedUserId);
+      profile.privacySettings.blockedUsers = profile.privacySettings.blockedUsers.filter(
+        (id) => id !== blockedUserId,
+      );
       await this.privacyRepository.save(profile.privacySettings);
     }
 
@@ -142,8 +137,9 @@ export class PrivacyService {
     }
 
     if (profile.privacySettings.mutedUsers) {
-      profile.privacySettings.mutedUsers =
-        profile.privacySettings.mutedUsers.filter((id) => id !== mutedUserId);
+      profile.privacySettings.mutedUsers = profile.privacySettings.mutedUsers.filter(
+        (id) => id !== mutedUserId,
+      );
       await this.privacyRepository.save(profile.privacySettings);
     }
 
@@ -215,14 +211,7 @@ export class PrivacyService {
   async exportUserData(userId: string): Promise<Record<string, unknown>> {
     const profile = await this.profileRepository.findOne({
       where: { userId },
-      relations: [
-        'user',
-        'portfolioItems',
-        'badges',
-        'followers',
-        'following',
-        'privacySettings',
-      ],
+      relations: ['user', 'portfolioItems', 'badges', 'followers', 'following', 'privacySettings'],
     });
 
     if (!profile) {

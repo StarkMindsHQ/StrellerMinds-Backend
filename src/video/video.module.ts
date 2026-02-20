@@ -10,10 +10,7 @@ import { VideoAnalytics } from './entities/video-analytics.entity';
 import { FilesModule } from '../files/files.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Video, Chapter, Quiz, VideoAnalytics]),
-    FilesModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Video, Chapter, Quiz, VideoAnalytics]), FilesModule],
   controllers: [VideoController],
   providers: [VideoService, TranscodingService],
   exports: [VideoService],

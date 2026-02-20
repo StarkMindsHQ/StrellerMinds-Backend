@@ -12,12 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/auth.guard';
 import { TaxCalculationService } from '../services';
-import {
-  CreateTaxRateDto,
-  UpdateTaxRateDto,
-  CalculateTaxDto,
-  TaxResponseDto,
-} from '../dto';
+import { CreateTaxRateDto, UpdateTaxRateDto, CalculateTaxDto, TaxResponseDto } from '../dto';
 
 @Controller('tax')
 export class TaxController {
@@ -40,10 +35,7 @@ export class TaxController {
   }
 
   @Post('rates/:id')
-  async updateTaxRate(
-    @Param('id') id: string,
-    @Body() dto: UpdateTaxRateDto,
-  ): Promise<any> {
+  async updateTaxRate(@Param('id') id: string, @Body() dto: UpdateTaxRateDto): Promise<any> {
     return this.taxCalculationService.updateTaxRate(id, dto);
   }
 
@@ -60,10 +52,6 @@ export class TaxController {
     @Request() req,
     @Body() body: { country: string; state?: string },
   ): Promise<any> {
-    return this.taxCalculationService.validateTaxCompliance(
-      req.user.id,
-      body.country,
-      body.state,
-    );
+    return this.taxCalculationService.validateTaxCompliance(req.user.id, body.country, body.state);
   }
 }

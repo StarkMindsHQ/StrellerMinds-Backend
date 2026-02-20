@@ -20,8 +20,7 @@ export class AccessibilityTestUtils {
     const hasSkipLinks = /skip\s+to|skip\s+link|skip\s+navigation/i.test(html);
 
     // Check for focus management
-    const hasFocusManagement =
-      /autofocus|tabindex=["']0["']|focus|:focus-visible/i.test(html);
+    const hasFocusManagement = /autofocus|tabindex=["']0["']|focus|:focus-visible/i.test(html);
 
     // Check for keyboard event handlers
     if (!/onkeydown|onkeyup|addEventListener.*key/i.test(html)) {
@@ -59,8 +58,7 @@ export class AccessibilityTestUtils {
     ).length;
 
     // Count ARIA labels
-    const ariaLabels = (html.match(/aria-label|aria-labelledby|aria-describedby/gi) || [])
-      .length;
+    const ariaLabels = (html.match(/aria-label|aria-labelledby|aria-describedby/gi) || []).length;
 
     // Count alt text
     const altText = (html.match(/alt=["'][^"']*["']/gi) || []).length;
@@ -136,8 +134,7 @@ export class AccessibilityTestUtils {
     const labels = (html.match(/<label/gi) || []).length;
 
     // Count aria descriptions
-    const ariaDescriptions = (html.match(/aria-describedby|aria-description/gi) || [])
-      .length;
+    const ariaDescriptions = (html.match(/aria-describedby|aria-description/gi) || []).length;
 
     // Check for label-input associations
     if (inputs > 0 && labels === 0) {
@@ -232,9 +229,7 @@ export class AccessibilityTestUtils {
       const previousLevel = headings[i - 1].level;
 
       if (currentLevel - previousLevel > 1) {
-        issues.push(
-          `Heading hierarchy broken: h${previousLevel} followed by h${currentLevel}`,
-        );
+        issues.push(`Heading hierarchy broken: h${previousLevel} followed by h${currentLevel}`);
       }
     }
 
@@ -306,16 +301,17 @@ export class AccessibilityTestUtils {
       summary: {
         totalIssues: allIssues.length,
         wcagCompliant: allIssues.length === 0,
-        score: Math.round(
-          ((100 * (keyboardNav.issues.length === 0 ? 1 : 0) +
-            (screenReader.issues.length === 0 ? 1 : 0) +
-            (formAccess.errors.length === 0 ? 1 : 0) +
-            (images.issues.length === 0 ? 1 : 0) +
-            (headings.issues.length === 0 ? 1 : 0) +
-            (focusVis?.issues.length === 0 ? 1 : 0)) /
-            6) *
-            100,
-        ) / 100,
+        score:
+          Math.round(
+            ((100 * (keyboardNav.issues.length === 0 ? 1 : 0) +
+              (screenReader.issues.length === 0 ? 1 : 0) +
+              (formAccess.errors.length === 0 ? 1 : 0) +
+              (images.issues.length === 0 ? 1 : 0) +
+              (headings.issues.length === 0 ? 1 : 0) +
+              (focusVis?.issues.length === 0 ? 1 : 0)) /
+              6) *
+              100,
+          ) / 100,
       },
       details: {
         keyboardNavigation: keyboardNav,

@@ -60,10 +60,7 @@ export class MicrosoftConfigService {
   /**
    * Sync teams from Microsoft Graph
    */
-  async syncTeams(
-    configId: string,
-    userId: string,
-  ): Promise<SyncLog> {
+  async syncTeams(configId: string, userId: string): Promise<SyncLog> {
     const startTime = Date.now();
     const syncLog = this.syncLogRepository.create({
       integrationConfigId: configId,

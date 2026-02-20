@@ -146,11 +146,7 @@ export class BackupMetricsService implements OnModuleInit {
     this.replicationStatus.set({ region }, success ? 1 : 0);
   }
 
-  updateStorageMetrics(
-    localBytes: number,
-    s3PrimaryBytes: number,
-    s3ReplicaBytes: number,
-  ): void {
+  updateStorageMetrics(localBytes: number, s3PrimaryBytes: number, s3ReplicaBytes: number): void {
     this.backupStorageUsed.set({ location: 'local' }, localBytes);
     this.backupStorageUsed.set({ location: 's3_primary' }, s3PrimaryBytes);
     this.backupStorageUsed.set({ location: 's3_replica' }, s3ReplicaBytes);

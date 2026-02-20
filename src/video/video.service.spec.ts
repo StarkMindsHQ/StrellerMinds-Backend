@@ -15,7 +15,7 @@ jest.mock('uuid', () => ({
 }));
 
 jest.mock('fluent-ffmpeg', () => {
-  return function() {
+  return function () {
     return {
       outputOptions: jest.fn().mockReturnThis(),
       output: jest.fn().mockReturnThis(),
@@ -25,8 +25,6 @@ jest.mock('fluent-ffmpeg', () => {
     };
   };
 });
-
-
 
 const mockVideoRepo = {
   create: jest.fn(),

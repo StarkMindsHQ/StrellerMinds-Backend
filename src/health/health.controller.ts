@@ -12,17 +12,17 @@ export class HealthController {
   @Get()
   @SkipRateLimit()
   @HealthCheck()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Comprehensive health check endpoint',
-    description: 'Returns full health status with system metrics'
+    description: 'Returns full health status with system metrics',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Service is healthy with detailed metrics' 
+  @ApiResponse({
+    status: 200,
+    description: 'Service is healthy with detailed metrics',
   })
-  @ApiResponse({ 
-    status: 503, 
-    description: 'Service is unhealthy' 
+  @ApiResponse({
+    status: 503,
+    description: 'Service is unhealthy',
   })
   async check() {
     return this.healthService.check();
@@ -30,9 +30,9 @@ export class HealthController {
 
   @Get('ready')
   @SkipRateLimit()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Readiness check endpoint',
-    description: 'Checks if service is ready to accept traffic'
+    description: 'Checks if service is ready to accept traffic',
   })
   @ApiResponse({ status: 200, description: 'Service is ready' })
   @ApiResponse({ status: 503, description: 'Service is not ready' })
@@ -42,9 +42,9 @@ export class HealthController {
 
   @Get('live')
   @SkipRateLimit()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Liveness check endpoint',
-    description: 'Checks if service is alive (basic check)'
+    description: 'Checks if service is alive (basic check)',
   })
   @ApiResponse({ status: 200, description: 'Service is alive' })
   @ApiResponse({ status: 503, description: 'Service is not alive' })
@@ -54,21 +54,22 @@ export class HealthController {
 
   @Get('metrics')
   @SkipRateLimit()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Prometheus metrics endpoint',
-    description: 'Returns metrics in Prometheus format'
+    description: 'Returns metrics in Prometheus format',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Metrics in Prometheus format',
     content: {
       'text/plain': {
         schema: {
           type: 'string',
-          example: '# HELP http_requests_total Total HTTP requests\n# TYPE http_requests_total counter'
-        }
-      }
-    }
+          example:
+            '# HELP http_requests_total Total HTTP requests\n# TYPE http_requests_total counter',
+        },
+      },
+    },
   })
   async getMetrics() {
     return this.healthService.getMetrics();
@@ -76,9 +77,9 @@ export class HealthController {
 
   @Get('detailed')
   @SkipRateLimit()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Detailed health metrics',
-    description: 'Returns comprehensive health and performance metrics'
+    description: 'Returns comprehensive health and performance metrics',
   })
   @ApiResponse({ status: 200, description: 'Detailed health metrics' })
   async detailed() {

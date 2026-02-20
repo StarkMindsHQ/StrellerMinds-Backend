@@ -14,7 +14,7 @@ export class EmailChannel implements INotificationChannel {
   async send(notification: Notification): Promise<boolean> {
     try {
       const recipient = notification.metadata?.email || notification.userId; // Fallback to userId if email not in metadata
-      
+
       await this.mailerService.sendMail({
         to: recipient,
         subject: notification.title,

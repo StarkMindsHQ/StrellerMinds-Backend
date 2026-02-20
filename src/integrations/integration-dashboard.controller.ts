@@ -42,7 +42,8 @@ export class IntegrationDashboardController {
     @Query('type') type?: string,
     @Query('status') status?: string,
   ) {
-    const query = this.configRepository.createQueryBuilder('ic')
+    const query = this.configRepository
+      .createQueryBuilder('ic')
       .where('ic.userId = :userId', { userId: user.id });
 
     if (type) {
@@ -53,13 +54,11 @@ export class IntegrationDashboardController {
       query.andWhere('ic.status = :status', { status });
     }
 
-    const integrations = await query
-      .orderBy('ic.createdAt', 'DESC')
-      .getMany();
+    const integrations = await query.orderBy('ic.createdAt', 'DESC').getMany();
 
     return {
       success: true,
-      data: integrations.map(i => this.sanitizeCredentials(i)),
+      data: integrations.map((i) => this.sanitizeCredentials(i)),
     };
   }
 
@@ -67,10 +66,7 @@ export class IntegrationDashboardController {
    * Get integration details
    */
   @Get(':configId')
-  async getIntegration(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async getIntegration(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
       where: { id: configId, userId: user.id },
     });
@@ -117,13 +113,14 @@ export class IntegrationDashboardController {
       }),
     ]);
 
-    const successCount = syncLogs.filter(l => l.status === 'success').length;
-    const failureCount = syncLogs.filter(l => l.status === 'failed').length;
+    const successCount = syncLogs.filter((l) => l.status === 'success').length;
+    const failureCount = syncLogs.filter((l) => l.status === 'failed').length;
     const totalItems = syncLogs.reduce((sum, l) => sum + l.itemsProcessed, 0);
     const totalErrors = syncLogs.reduce((sum, l) => sum + l.itemsFailed, 0);
-    const avgDuration = syncLogs.length > 0
-      ? syncLogs.reduce((sum, l) => sum + (l.durationMs || 0), 0) / syncLogs.length
-      : 0;
+    const avgDuration =
+      syncLogs.length > 0
+        ? syncLogs.reduce((sum, l) => sum + (l.durationMs || 0), 0) / syncLogs.length
+        : 0;
 
     return {
       success: true,
@@ -183,10 +180,7 @@ export class IntegrationDashboardController {
    * Activate integration
    */
   @Post(':configId/activate')
-  async activateIntegration(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async activateIntegration(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
       where: { id: configId, userId: user.id },
     });
@@ -210,10 +204,7 @@ export class IntegrationDashboardController {
    * Deactivate integration
    */
   @Post(':configId/deactivate')
-  async deactivateIntegration(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async deactivateIntegration(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
       where: { id: configId, userId: user.id },
     });
@@ -237,10 +228,7 @@ export class IntegrationDashboardController {
    * Delete integration
    */
   @Delete(':configId')
-  async deleteIntegration(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async deleteIntegration(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
       where: { id: configId, userId: user.id },
     });
@@ -261,10 +249,7 @@ export class IntegrationDashboardController {
    * Get integration health/status
    */
   @Get(':configId/health')
-  async getIntegrationHealth(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async getIntegrationHealth(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
       where: { id: configId, userId: user.id },
     });
@@ -285,27 +270,25 @@ export class IntegrationDashboardController {
    * Get dashboard overview
    */
   @Get('dashboard/overview')
-  async getDashboardOverview(
-    @CurrentUser() user: any,
-  ) {
+  async getDashboardOverview(@CurrentUser() user: any) {
     const configs = await this.configRepository.find({
       where: { userId: user.id },
     });
 
-    const activeCount = configs.filter(c => c.isActive).length;
-    const inactiveCount = configs.filter(c => !c.isActive).length;
-    const configIds = configs.map(c => c.id);
+    const activeCount = configs.filter((c) => c.isActive).length;
+    const inactiveCount = configs.filter((c) => !c.isActive).length;
+    const configIds = configs.map((c) => c.id);
     const totalMappings = await this.mappingRepository.count({
       where: {
-        integrationConfigId: configIds.length > 0 
-          ? { $in: configIds } as any
-          : '',
+        integrationConfigId: configIds.length > 0 ? ({ $in: configIds } as any) : '',
       },
     });
 
     const recentSyncs = await this.syncLogRepository
       .createQueryBuilder('sync')
-      .where('sync.integrationConfigId IN (:...configIds)', { configIds: configIds.length > 0 ? configIds : [''] })
+      .where('sync.integrationConfigId IN (:...configIds)', {
+        configIds: configIds.length > 0 ? configIds : [''],
+      })
       .orderBy('sync.startedAt', 'DESC')
       .take(10)
       .getMany();
@@ -336,7 +319,15 @@ export class IntegrationDashboardController {
   private sanitizeCredentials(config: IntegrationConfig): any {
     const sanitized = { ...config };
     if (sanitized.credentials) {
-      const sensitiveFields = ['password', 'secret', 'token', 'apiKey', 'refreshToken', 'clientSecret', 'webhookSecret'];
+      const sensitiveFields = [
+        'password',
+        'secret',
+        'token',
+        'apiKey',
+        'refreshToken',
+        'clientSecret',
+        'webhookSecret',
+      ];
       const creds = { ...sanitized.credentials };
       for (const field of sensitiveFields) {
         if (creds[field]) {

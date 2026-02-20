@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum NotificationChannel {
   EMAIL = 'email',
@@ -25,11 +31,16 @@ export class NotificationPreference {
   userId: string;
 
   @Column({ type: 'json', default: {} })
-  preferences: Partial<Record<NotificationType, {
-    channels: NotificationChannel[];
-    enabled: boolean;
-    frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
-  }>>;
+  preferences: Partial<
+    Record<
+      NotificationType,
+      {
+        channels: NotificationChannel[];
+        enabled: boolean;
+        frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
+      }
+    >
+  >;
 
   @Column({ default: true })
   emailEnabled: boolean;

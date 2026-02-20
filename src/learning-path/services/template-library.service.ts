@@ -55,7 +55,10 @@ export class TemplateLibraryService {
 
     // Update usage count if this is based on an existing learning path
     if (templateDto.basedOnLearningPathId) {
-      await this.updateTemplateFromLearningPath(savedTemplate.id, templateDto.basedOnLearningPathId);
+      await this.updateTemplateFromLearningPath(
+        savedTemplate.id,
+        templateDto.basedOnLearningPathId,
+      );
     }
 
     return savedTemplate;
@@ -71,13 +74,13 @@ export class TemplateLibraryService {
     if (search) {
       queryBuilder.andWhere(
         '(template.name ILIKE :search OR template.description ILIKE :search OR template.tags::text ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
     // Show public templates and user's own templates
-    queryBuilder.andWhere('(template.isPublic = true OR template.createdBy = :userId)', { 
-      userId: 'current_user_id' // This would be replaced with actual user ID in controller
+    queryBuilder.andWhere('(template.isPublic = true OR template.createdBy = :userId)', {
+      userId: 'current_user_id', // This would be replaced with actual user ID in controller
     });
 
     return queryBuilder
@@ -112,7 +115,11 @@ export class TemplateLibraryService {
     }
   }
 
-  async instantiateTemplate(templateId: string, userId: string, customizations?: any): Promise<LearningPath> {
+  async instantiateTemplate(
+    templateId: string,
+    userId: string,
+    customizations?: any,
+  ): Promise<LearningPath> {
     const template = await this.findOne(templateId);
 
     // Create new learning path based on template
@@ -137,7 +144,11 @@ export class TemplateLibraryService {
 
     // Create nodes based on template structure
     if (template.structure && template.structure.nodes) {
-      await this.createNodesFromTemplateStructure(savedPath.id, template.structure.nodes, customizations);
+      await this.createNodesFromTemplateStructure(
+        savedPath.id,
+        template.structure.nodes,
+        customizations,
+      );
     }
 
     // Increment usage count
@@ -154,7 +165,7 @@ export class TemplateLibraryService {
   private async createNodesFromTemplateStructure(
     learningPathId: string,
     templateNodes: any[],
-    customizations?: any
+    customizations?: any,
   ): Promise<void> {
     // Create all nodes first
     const createdNodes: LearningPathNode[] = [];
@@ -177,11 +188,11 @@ export class TemplateLibraryService {
     // Create dependencies between nodes
     for (const templateNode of templateNodes) {
       if (templateNode.dependencies && templateNode.dependencies.length > 0) {
-        const sourceNode = createdNodes.find(n => n.position === templateNode.position);
-        
+        const sourceNode = createdNodes.find((n) => n.position === templateNode.position);
+
         for (const dep of templateNode.dependencies) {
-          const targetNode = createdNodes.find(n => n.position === dep.targetPosition);
-          
+          const targetNode = createdNodes.find((n) => n.position === dep.targetPosition);
+
           if (sourceNode && targetNode) {
             // Create dependency record (this would require a dependency entity/repository)
             console.log(`Creating dependency from node ${sourceNode.id} to ${targetNode.id}`);
@@ -238,7 +249,7 @@ export class TemplateLibraryService {
       .where('template.isPublic = true')
       .andWhere(
         '(template.name ILIKE :query OR template.description ILIKE :query OR template.tags::text ILIKE :query)',
-        { query: `%${query}%` }
+        { query: `%${query}%` },
       )
       .orderBy('template.usageCount', 'DESC')
       .getMany();
@@ -280,11 +291,14 @@ export class TemplateLibraryService {
       total: totalTemplates,
       public: publicTemplates,
       private: privateTemplates,
-      byCategory: categoryStats.reduce((acc, stat) => {
-        acc[stat.category] = parseInt(stat.count);
-        return acc;
-      }, {} as Record<string, number>),
-      topTemplates: topTemplates.map(t => ({
+      byCategory: categoryStats.reduce(
+        (acc, stat) => {
+          acc[stat.category] = parseInt(stat.count);
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+      topTemplates: topTemplates.map((t) => ({
         id: t.id,
         name: t.name,
         usageCount: t.usageCount,
@@ -292,7 +306,10 @@ export class TemplateLibraryService {
     };
   }
 
-  private async updateTemplateFromLearningPath(templateId: string, learningPathId: string): Promise<void> {
+  private async updateTemplateFromLearningPath(
+    templateId: string,
+    learningPathId: string,
+  ): Promise<void> {
     const learningPath = await this.learningPathRepository.findOne({
       where: { id: learningPathId },
       relations: ['nodes'],
@@ -307,7 +324,7 @@ export class TemplateLibraryService {
       name: learningPath.title,
       description: learningPath.description || '',
       category: 'skill_path', // Default category
-      nodes: learningPath.nodes.map(node => ({
+      nodes: learningPath.nodes.map((node) => ({
         type: node.type,
         title: node.title,
         description: node.description || '',

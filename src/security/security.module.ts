@@ -14,13 +14,9 @@ import { SecurityService } from './services/security-validation.service';
 export class SecurityModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // Apply security middleware to all routes
-    consumer
-      .apply(SecurityMiddleware)
-      .forRoutes('*');
+    consumer.apply(SecurityMiddleware).forRoutes('*');
 
     // Apply CSRF middleware to state-changing routes
-    consumer
-      .apply(CsrfMiddleware)
-      .forRoutes('*');
+    consumer.apply(CsrfMiddleware).forRoutes('*');
   }
 }

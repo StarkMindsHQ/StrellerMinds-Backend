@@ -29,10 +29,7 @@ export class SSOController {
    */
   @Post('config')
   @UseGuards(JwtAuthGuard)
-  async createSSOConfig(
-    @CurrentUser() user: any,
-    @Body() dto: SSOConfigDto,
-  ) {
+  async createSSOConfig(@CurrentUser() user: any, @Body() dto: SSOConfigDto) {
     const config = await this.ssoConfigService.createSSOConfig(
       user.id,
       dto.provider,
@@ -52,10 +49,7 @@ export class SSOController {
    */
   @Get('config/:configId')
   @UseGuards(JwtAuthGuard)
-  async getSSOConfig(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async getSSOConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.ssoConfigService.getSSOConfig(configId, user.id);
     if (!config) {
       throw new NotFoundException('SSO configuration not found');
@@ -72,9 +66,7 @@ export class SSOController {
    */
   @Get('configs')
   @UseGuards(JwtAuthGuard)
-  async listSSOConfigs(
-    @CurrentUser() user: any,
-  ) {
+  async listSSOConfigs(@CurrentUser() user: any) {
     const configs = await this.ssoConfigService.listSSOConfigs(user.id);
 
     return {
@@ -109,10 +101,7 @@ export class SSOController {
    */
   @Post('config/:configId/activate')
   @UseGuards(JwtAuthGuard)
-  async activateSSOConfig(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async activateSSOConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.ssoConfigService.activateSSOConfig(configId, user.id);
 
     return {
@@ -126,9 +115,7 @@ export class SSOController {
    * OpenID Connect authorization endpoint
    */
   @Get('openid/auth/:configId')
-  async openIDAuth(
-    @Param('configId') configId: string,
-  ) {
+  async openIDAuth(@Param('configId') configId: string) {
     // In a real implementation, fetch config from DB
     const state = this.ssoService.generateState();
     const nonce = this.ssoService.generateNonce();
@@ -152,10 +139,7 @@ export class SSOController {
    * OpenID Connect callback endpoint
    */
   @Get('openid/callback')
-  async openIDCallback(
-    @Query('code') code: string,
-    @Query('state') state: string,
-  ) {
+  async openIDCallback(@Query('code') code: string, @Query('state') state: string) {
     if (!code) {
       throw new BadRequestException('Missing authorization code');
     }
@@ -190,9 +174,7 @@ export class SSOController {
    * SAML assertion consumer service (ACS)
    */
   @Post('saml/acs')
-  async samlAcs(
-    @Body() body: { SAMLResponse: string; RelayState?: string },
-  ) {
+  async samlAcs(@Body() body: { SAMLResponse: string; RelayState?: string }) {
     if (!body.SAMLResponse) {
       throw new BadRequestException('Missing SAML response');
     }
@@ -227,9 +209,7 @@ export class SSOController {
    * OAuth 2.0 authorization endpoint
    */
   @Get('oauth2/auth/:configId')
-  async oauth2Auth(
-    @Param('configId') configId: string,
-  ) {
+  async oauth2Auth(@Param('configId') configId: string) {
     const state = this.ssoService.generateState();
     const { codeVerifier, codeChallenge } = this.ssoService.generatePKCE();
 
@@ -252,10 +232,7 @@ export class SSOController {
    * OAuth 2.0 callback endpoint
    */
   @Get('oauth2/callback')
-  async oauth2Callback(
-    @Query('code') code: string,
-    @Query('state') state: string,
-  ) {
+  async oauth2Callback(@Query('code') code: string, @Query('state') state: string) {
     if (!code) {
       throw new BadRequestException('Missing authorization code');
     }

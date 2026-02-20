@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Submission } from './submission.entity';
 import { User } from '../../auth/entities/user.entity';
 
@@ -7,7 +14,7 @@ export class PeerReview {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Submission, submission => submission.peerReviews)
+  @ManyToOne(() => Submission, (submission) => submission.peerReviews)
   submission: Submission;
 
   @ManyToOne(() => User)

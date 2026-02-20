@@ -1,0 +1,76 @@
+# Artillery Performance Testing Configuration
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 50
+      name: "Load test"
+    - duration: 60
+      arrivalRate: 100
+      name: "Stress test"
+    - duration: 30
+      arrivalRate: 200
+      name: "Peak load"
+  payload:
+    path: "test-data/payload.csv"
+    fields:
+      - "email"
+      - "password"
+  processor: "test-functions.js"
+
+scenarios:
+  - name: "Health Check"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/health"
+          expect:
+            - statusCode: 200
+            - contentType: "application/json"
+
+  - name: "User Registration"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/auth/register"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+            firstName: "Test"
+            lastName: "User"
+          capture:
+            - json: "$.data.user.id"
+              as: "userId"
+          expect:
+            - statusCode: 201
+            - contentType: "application/json"
+
+  - name: "User Login"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.data.accessToken"
+              as: "accessToken"
+            - json: "$.data.refreshToken"
+              as: "refreshToken"
+          expect:
+            - statusCode: 200
+            - contentType: "application/json"
+
+  - name: "Get Courses"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/courses?page=1&limit=10"
+          expect:
+            - statusCode: 200
+            - contentType: "application/json"
+            - hasProperty: "data.items"

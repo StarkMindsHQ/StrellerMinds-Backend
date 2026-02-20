@@ -62,7 +62,12 @@ export class ExportImportService {
   async exportLearningPath(learningPathId: string): Promise<ExportFormat> {
     const learningPath = await this.learningPathRepository.findOne({
       where: { id: learningPathId },
-      relations: ['nodes', 'nodes.prerequisites', 'nodes.outgoingDependencies', 'nodes.learningObjectives'],
+      relations: [
+        'nodes',
+        'nodes.prerequisites',
+        'nodes.outgoingDependencies',
+        'nodes.learningObjectives',
+      ],
     });
 
     if (!learningPath) {
@@ -82,7 +87,7 @@ export class ExportImportService {
         estimatedDurationHours: learningPath.estimatedDurationHours,
         totalNodes: learningPath.totalNodes,
         metadata: learningPath.metadata,
-        nodes: learningPath.nodes.map(node => ({
+        nodes: learningPath.nodes.map((node) => ({
           id: node.id,
           type: node.type,
           title: node.title,
@@ -91,13 +96,13 @@ export class ExportImportService {
           estimatedDurationHours: node.estimatedDurationHours,
           courseId: node.courseId,
           metadata: node.metadata,
-          prerequisites: node.prerequisites.map(p => p.id),
-          dependencies: node.outgoingDependencies.map(dep => ({
+          prerequisites: node.prerequisites.map((p) => p.id),
+          dependencies: node.outgoingDependencies.map((dep) => ({
             targetNodeId: dep.targetNodeId,
             type: dep.type,
             conditions: dep.conditions,
           })),
-          objectives: node.learningObjectives.map(obj => ({
+          objectives: node.learningObjectives.map((obj) => ({
             id: obj.id,
             title: obj.title,
             description: obj.description,
@@ -138,7 +143,7 @@ export class ExportImportService {
 
     // Create nodes
     const nodeIdMap = new Map<string, string>(); // oldId -> newId mapping
-    
+
     // First pass: create all nodes
     for (const nodeData of importData.learningPath.nodes) {
       const node = this.nodeRepository.create({
@@ -159,9 +164,9 @@ export class ExportImportService {
     // Second pass: create dependencies and objectives
     for (const nodeData of importData.learningPath.nodes) {
       const newNodeId = nodeIdMap.get(nodeData.id)!;
-      const node = await this.nodeRepository.findOne({ 
+      const node = await this.nodeRepository.findOne({
         where: { id: newNodeId },
-        relations: ['prerequisites', 'outgoingDependencies', 'learningObjectives']
+        relations: ['prerequisites', 'outgoingDependencies', 'learningObjectives'],
       });
 
       if (!node) continue;
@@ -169,9 +174,9 @@ export class ExportImportService {
       // Handle prerequisites
       if (nodeData.prerequisites.length > 0) {
         const prerequisiteIds = nodeData.prerequisites
-          .map(oldId => nodeIdMap.get(oldId))
+          .map((oldId) => nodeIdMap.get(oldId))
           .filter(Boolean) as string[];
-        
+
         if (prerequisiteIds.length > 0) {
           const prerequisites = await this.nodeRepository.findByIds(prerequisiteIds);
           node.prerequisites = prerequisites;
@@ -195,10 +200,10 @@ export class ExportImportService {
       // Handle objectives - create or find existing ones
       for (const objData of nodeData.objectives) {
         let objective = await this.objectiveRepository.findOne({
-          where: { 
+          where: {
             title: objData.title,
-            domain: objData.domain 
-          }
+            domain: objData.domain,
+          },
         });
 
         if (!objective) {
@@ -229,7 +234,7 @@ export class ExportImportService {
 
   async exportTemplate(learningPathId: string): Promise<any> {
     const exportData = await this.exportLearningPath(learningPathId);
-    
+
     // Convert to template format
     const templateData = {
       name: `Template: ${exportData.learningPath.title}`,
@@ -237,17 +242,20 @@ export class ExportImportService {
       category: 'skill_path',
       isPublic: false,
       structure: {
-        nodes: exportData.learningPath.nodes.map(node => ({
+        nodes: exportData.learningPath.nodes.map((node) => ({
           type: node.type,
           title: node.title,
           description: node.description,
           position: node.position,
           estimatedDurationHours: node.estimatedDurationHours,
-          dependencies: node.dependencies.map(dep => ({
-            targetPosition: exportData.learningPath.nodes.find(n => n.id === dep.targetNodeId)?.position,
-            type: dep.type,
-            conditions: dep.conditions,
-          })).filter(dep => dep.targetPosition !== undefined),
+          dependencies: node.dependencies
+            .map((dep) => ({
+              targetPosition: exportData.learningPath.nodes.find((n) => n.id === dep.targetNodeId)
+                ?.position,
+              type: dep.type,
+              conditions: dep.conditions,
+            }))
+            .filter((dep) => dep.targetPosition !== undefined),
         })),
       },
       estimatedDurationHours: exportData.learningPath.estimatedDurationHours,

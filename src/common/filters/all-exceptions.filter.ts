@@ -19,16 +19,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const errorResponse = this.buildErrorResponse(exception, request);
-    
+
     this.logError(exception, request, errorResponse);
-    
+
     response.status(errorResponse.statusCode).json(errorResponse);
   }
 
-  private buildErrorResponse(
-    exception: unknown,
-    request: Request,
-  ): ErrorResponse {
+  private buildErrorResponse(exception: unknown, request: Request): ErrorResponse {
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
     let error = 'Internal Server Error';
@@ -104,14 +101,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         exception instanceof Error ? exception.stack : 'No stack trace',
         JSON.stringify(logContext),
       );
-      
+
       // Send to monitoring service (e.g., Sentry, DataDog)
       this.sendToMonitoring(exception, logContext);
     } else if (statusCode >= 400) {
-      this.logger.warn(
-        `${method} ${url} - ${statusCode} - ${message}`,
-        JSON.stringify(logContext),
-      );
+      this.logger.warn(`${method} ${url} - ${statusCode} - ${message}`, JSON.stringify(logContext));
     }
   }
 
@@ -119,7 +113,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Integrate with your monitoring service
     // Example: Sentry
     // Sentry.captureException(exception, { contexts: { custom: context } });
-    
+
     // Example: Custom alerting
     if (process.env.NODE_ENV === 'production') {
       // Send alert to Slack, PagerDuty, etc.

@@ -156,9 +156,7 @@ export class CreateUserProfilesTables1704800000000 implements MigrationInterface
             default: 'CURRENT_TIMESTAMP',
           },
         ],
-        indices: [
-          new TableIndex({ columnNames: ['user_id'], isUnique: true }),
-        ],
+        indices: [new TableIndex({ columnNames: ['user_id'], isUnique: true })],
       }),
     );
 
@@ -406,9 +404,7 @@ export class CreateUserProfilesTables1704800000000 implements MigrationInterface
             default: 'CURRENT_TIMESTAMP',
           },
         ],
-        indices: [
-          new TableIndex({ columnNames: ['profile_id', 'badge_id'], isUnique: true }),
-        ],
+        indices: [new TableIndex({ columnNames: ['profile_id', 'badge_id'], isUnique: true })],
       }),
     );
 
@@ -593,9 +589,7 @@ export class CreateUserProfilesTables1704800000000 implements MigrationInterface
             default: 'CURRENT_TIMESTAMP',
           },
         ],
-        indices: [
-          new TableIndex({ columnNames: ['profile_id'], isUnique: true }),
-        ],
+        indices: [new TableIndex({ columnNames: ['profile_id'], isUnique: true })],
       }),
     );
 
@@ -706,9 +700,7 @@ export class CreateUserProfilesTables1704800000000 implements MigrationInterface
             default: 'CURRENT_TIMESTAMP',
           },
         ],
-        indices: [
-          new TableIndex({ columnNames: ['profile_id'], isUnique: true }),
-        ],
+        indices: [new TableIndex({ columnNames: ['profile_id'], isUnique: true })],
       }),
     );
 

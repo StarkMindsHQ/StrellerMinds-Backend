@@ -192,10 +192,7 @@ export function determineRetentionTier(backupDate: Date): RetentionTier {
   return RetentionTier.DAILY;
 }
 
-export function calculateExpirationDate(
-  backupDate: Date,
-  tier: RetentionTier,
-): Date {
+export function calculateExpirationDate(backupDate: Date, tier: RetentionTier): Date {
   const policy = DEFAULT_RETENTION_POLICIES.find((p) => p.tier === tier);
   const retentionDays = policy?.retentionDays ?? 30;
 

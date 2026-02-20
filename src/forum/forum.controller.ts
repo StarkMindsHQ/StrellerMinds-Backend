@@ -1,6 +1,4 @@
-import {
-  Controller, Post, Get, Param, Body, Req
-} from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, Req } from '@nestjs/common';
 import { ForumService } from './forum.service';
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -21,20 +19,12 @@ export class ForumController {
   }
 
   @Post('threads/:id/comments')
-  addComment(
-    @Param('id') threadId: string,
-    @Body() dto: CreateCommentDto,
-    @Req() req,
-  ) {
+  addComment(@Param('id') threadId: string, @Body() dto: CreateCommentDto, @Req() req) {
     return this.forumService.addComment(threadId, dto, req.user.id);
   }
 
   @Post('vote/:userId')
-  vote(
-    @Param('userId') targetUserId: string,
-    @Body() dto: VoteDto,
-    @Req() req,
-  ) {
+  vote(@Param('userId') targetUserId: string, @Body() dto: VoteDto, @Req() req) {
     return this.forumService.vote(req.user.id, targetUserId, dto.vote);
   }
 }

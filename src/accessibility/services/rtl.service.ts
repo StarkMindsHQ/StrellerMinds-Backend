@@ -161,14 +161,18 @@ export class RTLService {
   /**
    * Get list formatting based on language
    */
-  formatList(language: string, items: string[], type: 'conjunction' | 'disjunction' = 'conjunction') {
+  formatList(
+    language: string,
+    items: string[],
+    type: 'conjunction' | 'disjunction' = 'conjunction',
+  ) {
     const locale = this.getLocaleFromLanguage(language);
-    
+
     // Use Intl.ListFormat if available (Node.js 12.0+)
     if (typeof (Intl as any).ListFormat !== 'undefined') {
       return new (Intl as any).ListFormat(locale, { type }).format(items);
     }
-    
+
     // Fallback: simple comma-separated list
     if (type === 'conjunction') {
       if (items.length === 0) return '';

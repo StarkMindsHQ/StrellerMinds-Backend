@@ -23,10 +23,7 @@ export class BackupEncryptionService {
   private readonly encryptionEnabled: boolean;
 
   constructor(private readonly configService: ConfigService) {
-    this.encryptionEnabled = this.configService.get<boolean>(
-      'BACKUP_ENCRYPTION_ENABLED',
-      true,
-    );
+    this.encryptionEnabled = this.configService.get<boolean>('BACKUP_ENCRYPTION_ENABLED', true);
 
     const keyBase64 = this.configService.get<string>('BACKUP_ENCRYPTION_KEY');
     if (keyBase64) {
@@ -35,10 +32,7 @@ export class BackupEncryptionService {
         this.logger.warn(
           `Encryption key should be ${KEY_LENGTH} bytes. Deriving key from provided value.`,
         );
-        this.masterKey = crypto
-          .createHash('sha256')
-          .update(keyBase64)
-          .digest();
+        this.masterKey = crypto.createHash('sha256').update(keyBase64).digest();
       }
     } else {
       this.masterKey = null;
@@ -54,18 +48,14 @@ export class BackupEncryptionService {
     return this.encryptionEnabled;
   }
 
-  async encryptFile(
-    inputPath: string,
-    outputPath?: string,
-  ): Promise<EncryptionResult> {
+  async encryptFile(inputPath: string, outputPath?: string): Promise<EncryptionResult> {
     const startTime = Date.now();
     const keyId = this.generateKeyId();
     const salt = crypto.randomBytes(SALT_LENGTH);
     const iv = crypto.randomBytes(IV_LENGTH);
     const key = this.deriveKey(salt);
 
-    const finalOutputPath =
-      outputPath || inputPath.replace(/(\.[^.]+)?$/, '.enc$1');
+    const finalOutputPath = outputPath || inputPath.replace(/(\.[^.]+)?$/, '.enc$1');
 
     this.logger.debug(`Encrypting file: ${inputPath} -> ${finalOutputPath}`);
 
@@ -89,9 +79,7 @@ export class BackupEncryptionService {
       await fs.appendFile(finalOutputPath, authTag);
 
       const duration = Date.now() - startTime;
-      this.logger.log(
-        `File encrypted successfully in ${duration}ms: ${finalOutputPath}`,
-      );
+      this.logger.log(`File encrypted successfully in ${duration}ms: ${finalOutputPath}`);
 
       return {
         encryptedPath: finalOutputPath,
@@ -118,8 +106,7 @@ export class BackupEncryptionService {
   ): Promise<string> {
     const startTime = Date.now();
 
-    const finalOutputPath =
-      outputPath || inputPath.replace(/\.enc(\.[^.]+)?$/, '$1');
+    const finalOutputPath = outputPath || inputPath.replace(/\.enc(\.[^.]+)?$/, '$1');
 
     this.logger.debug(`Decrypting file: ${inputPath} -> ${finalOutputPath}`);
 
@@ -140,12 +127,7 @@ export class BackupEncryptionService {
 
       // Read auth tag from end of file
       const authTagBuffer = Buffer.alloc(AUTH_TAG_LENGTH);
-      await fileHandle.read(
-        authTagBuffer,
-        0,
-        AUTH_TAG_LENGTH,
-        stats.size - AUTH_TAG_LENGTH,
-      );
+      await fileHandle.read(authTagBuffer, 0, AUTH_TAG_LENGTH, stats.size - AUTH_TAG_LENGTH);
 
       await fileHandle.close();
 
@@ -169,9 +151,7 @@ export class BackupEncryptionService {
       await pipeline(inputStream, decipher, outputStream);
 
       const duration = Date.now() - startTime;
-      this.logger.log(
-        `File decrypted successfully in ${duration}ms: ${finalOutputPath}`,
-      );
+      this.logger.log(`File decrypted successfully in ${duration}ms: ${finalOutputPath}`);
 
       return finalOutputPath;
     } catch (error) {
@@ -209,11 +189,7 @@ export class BackupEncryptionService {
     };
   }
 
-  createDecryptStream(
-    salt: Buffer,
-    iv: Buffer,
-    authTag: Buffer,
-  ): Transform {
+  createDecryptStream(salt: Buffer, iv: Buffer, authTag: Buffer): Transform {
     const key = this.deriveKey(salt);
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     decipher.setAuthTag(authTag);
@@ -238,21 +214,12 @@ export class BackupEncryptionService {
 
   private deriveKey(salt: Buffer): Buffer {
     const baseKey = this.masterKey || this.getDefaultKey();
-    return crypto.pbkdf2Sync(
-      baseKey,
-      salt,
-      PBKDF2_ITERATIONS,
-      KEY_LENGTH,
-      'sha256',
-    );
+    return crypto.pbkdf2Sync(baseKey, salt, PBKDF2_ITERATIONS, KEY_LENGTH, 'sha256');
   }
 
   private getDefaultKey(): Buffer {
     // Derive a key from JWT secret as fallback
-    const secret = this.configService.get<string>(
-      'JWT_SECRET',
-      'default-backup-key-change-me',
-    );
+    const secret = this.configService.get<string>('JWT_SECRET', 'default-backup-key-change-me');
     return crypto.createHash('sha256').update(secret).digest();
   }
 

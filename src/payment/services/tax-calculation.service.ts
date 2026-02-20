@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TaxRate } from '../entities';
@@ -25,9 +21,7 @@ export class TaxCalculationService {
     });
 
     if (existingRate) {
-      throw new BadRequestException(
-        'Tax rate already exists for this location',
-      );
+      throw new BadRequestException('Tax rate already exists for this location');
     }
 
     const rate = this.taxRateRepository.create(dto);
@@ -59,10 +53,7 @@ export class TaxCalculationService {
   }
 
   async calculateTax(dto: CalculateTaxDto): Promise<any> {
-    const rate = await this.findApplicableTaxRate(
-      dto.country,
-      dto.state,
-    );
+    const rate = await this.findApplicableTaxRate(dto.country, dto.state);
 
     if (!rate) {
       return {
@@ -102,10 +93,7 @@ export class TaxCalculationService {
     return query.getMany();
   }
 
-  private async findApplicableTaxRate(
-    country: string,
-    state?: string,
-  ): Promise<TaxRate | null> {
+  private async findApplicableTaxRate(country: string, state?: string): Promise<TaxRate | null> {
     // Try to find the most specific tax rate
     if (state) {
       const stateRate = await this.taxRateRepository.findOne({
@@ -131,11 +119,7 @@ export class TaxCalculationService {
     });
   }
 
-  async validateTaxCompliance(
-    userId: string,
-    country: string,
-    state?: string,
-  ): Promise<any> {
+  async validateTaxCompliance(userId: string, country: string, state?: string): Promise<any> {
     const rate = await this.findApplicableTaxRate(country, state);
 
     return {

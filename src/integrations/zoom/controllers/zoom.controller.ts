@@ -29,10 +29,7 @@ export class ZoomController {
    */
   @Post('config')
   @UseGuards(JwtAuthGuard)
-  async createZoomConfig(
-    @CurrentUser() user: any,
-    @Body() dto: ZoomConfigDto,
-  ) {
+  async createZoomConfig(@CurrentUser() user: any, @Body() dto: ZoomConfigDto) {
     const config = await this.zoomConfigService.createZoomConfig(
       user.id,
       dto.accountId,
@@ -54,10 +51,7 @@ export class ZoomController {
    */
   @Get('config/:configId')
   @UseGuards(JwtAuthGuard)
-  async getZoomConfig(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async getZoomConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.zoomConfigService.getZoomConfig(configId, user.id);
     if (!config) {
       throw new NotFoundException('Zoom configuration not found');
@@ -74,14 +68,11 @@ export class ZoomController {
    */
   @Post('meetings')
   @UseGuards(JwtAuthGuard)
-  async createMeeting(
-    @CurrentUser() user: any,
-    @Body() dto: CreateMeetingDto,
-  ) {
+  async createMeeting(@CurrentUser() user: any, @Body() dto: CreateMeetingDto) {
     try {
       // In a real implementation, fetch the config and access token
       const accessToken = 'placeholder-token';
-      
+
       const meeting = await this.zoomService.createMeeting(
         accessToken,
         user.id,
@@ -106,9 +97,7 @@ export class ZoomController {
    */
   @Get('meetings/:meetingId')
   @UseGuards(JwtAuthGuard)
-  async getMeetingDetails(
-    @Param('meetingId') meetingId: string,
-  ) {
+  async getMeetingDetails(@Param('meetingId') meetingId: string) {
     const meeting = await this.zoomService.getMeetingDetails('token', meetingId);
     return {
       success: true,
@@ -121,10 +110,7 @@ export class ZoomController {
    */
   @Put('meetings/:meetingId')
   @UseGuards(JwtAuthGuard)
-  async updateMeeting(
-    @Param('meetingId') meetingId: string,
-    @Body() updates: any,
-  ) {
+  async updateMeeting(@Param('meetingId') meetingId: string, @Body() updates: any) {
     const meeting = await this.zoomService.updateMeeting('token', meetingId, updates);
     return {
       success: true,
@@ -137,9 +123,7 @@ export class ZoomController {
    */
   @Delete('meetings/:meetingId')
   @UseGuards(JwtAuthGuard)
-  async deleteMeeting(
-    @Param('meetingId') meetingId: string,
-  ) {
+  async deleteMeeting(@Param('meetingId') meetingId: string) {
     await this.zoomService.deleteMeeting('token', meetingId);
     return {
       success: true,
@@ -152,9 +136,7 @@ export class ZoomController {
    */
   @Get('recordings')
   @UseGuards(JwtAuthGuard)
-  async getRecordings(
-    @CurrentUser() user: any,
-  ) {
+  async getRecordings(@CurrentUser() user: any) {
     const recordings = await this.zoomService.getRecordings('token', user.id);
     return {
       success: true,
@@ -194,11 +176,7 @@ export class ZoomController {
     @Headers('x-zm-signature') signature: string,
     @Body() event: WebhookEventDto,
   ) {
-    if (!this.zoomService.verifyWebhookSignature(
-      JSON.stringify(event),
-      timestamp,
-      signature,
-    )) {
+    if (!this.zoomService.verifyWebhookSignature(JSON.stringify(event), timestamp, signature)) {
       throw new BadRequestException('Invalid webhook signature');
     }
 
