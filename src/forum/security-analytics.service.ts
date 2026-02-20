@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SecurityIncident } from '../entities/security-incident.entity';
+import { SecurityIncident } from './security-incident.entity';
 
 @Injectable()
 export class SecurityAnalyticsService {
