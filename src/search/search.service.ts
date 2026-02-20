@@ -6,6 +6,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import * as natural from 'natural';
 import { SearchQueryDto, AutoSuggestDto } from './dto/search-query.dto';
 import { ContentDocument, SearchAnalytics, UserPreference } from './entities/content.entity';
+import { SearchQueryDto } from './entities/search.dto';
 
 @Injectable()
 export class SearchService implements OnModuleInit {
@@ -185,7 +186,7 @@ export class SearchService implements OnModuleInit {
   // ============================================
   // FULL-TEXT SEARCH WITH FACETED FILTERING
   // ============================================
-  async search(searchDto: SearchQueryDto): Promise<{
+  async search(query: SearchQueryDto, searchDto: SearchQueryDto): Promise<{
     total: number;
     page: number;
     size: number;

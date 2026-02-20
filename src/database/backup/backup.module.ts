@@ -10,6 +10,8 @@ import { BackupCloudStorageService } from './backup-cloud-storage.service';
 import { BackupRecoveryService } from './backup-recovery.service';
 import { BackupNotificationService } from './backup-notification.service';
 import { BackupMetricsService } from './backup-metrics.service';
+import { BackupMonitoringService } from './backup-monitoring.service';
+import { RecoveryVerificationService } from './recovery-verification.service';
 import { BackupController } from './backup.controller';
 
 import { BackupRecord, BackupSchedule, RecoveryTest } from './entities';
@@ -29,7 +31,16 @@ import { BackupRecord, BackupSchedule, RecoveryTest } from './entities';
     BackupService,
     BackupSchedulerService,
     BackupRecoveryService,
+    BackupMonitoringService,
+    RecoveryVerificationService,
   ],
-  exports: [BackupService, BackupSchedulerService, BackupRecoveryService, BackupMetricsService],
+  exports: [
+    BackupService,
+    BackupSchedulerService,
+    BackupRecoveryService,
+    BackupMetricsService,
+    BackupMonitoringService,
+    RecoveryVerificationService,
+  ],
 })
 export class BackupModule {}

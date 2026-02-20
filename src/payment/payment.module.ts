@@ -15,12 +15,14 @@ import {
   PaymentService,
   StripeService,
   PayPalService,
+  SquareService,
   SubscriptionService,
   InvoiceService,
   FinancialReportingService,
   TaxCalculationService,
   DisputeService,
   PaymentPlanService,
+  PaymentMethodManagementService,
 } from './services';
 import {
   PaymentController,
@@ -30,6 +32,7 @@ import {
   FinancialReportController,
   DisputeController,
   WebhookController,
+  PaymentMethodController,
 } from './controllers';
 
 @Module({
@@ -50,12 +53,14 @@ import {
     PaymentService,
     StripeService,
     PayPalService,
+    SquareService,
     SubscriptionService,
     InvoiceService,
     FinancialReportingService,
     TaxCalculationService,
     DisputeService,
     PaymentPlanService,
+    PaymentMethodManagementService,
   ],
   controllers: [
     PaymentController,
@@ -65,17 +70,20 @@ import {
     FinancialReportController,
     DisputeController,
     WebhookController,
+    PaymentMethodController,
   ],
   exports: [
     PaymentService,
     StripeService,
     PayPalService,
+    SquareService,
     SubscriptionService,
     InvoiceService,
     FinancialReportingService,
     TaxCalculationService,
     DisputeService,
     PaymentPlanService,
+    PaymentMethodManagementService,
   ],
 })
 export class PaymentModule {}

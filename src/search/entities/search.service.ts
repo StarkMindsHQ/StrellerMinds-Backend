@@ -26,19 +26,18 @@ export class SearchService implements OnModuleInit {
     if (!indexExists) {
       await this.esService.indices.create({
         index: this.indexName,
-        body: {
-          mappings: CONTENT_INDEX_MAPPING,
-        },
+        mappings: CONTENT_INDEX_MAPPING as any,
       });
       this.logger.log(`Created Elasticsearch index: ${this.indexName}`);
     }
   }
 
   async indexContent(content: IndexContentDto) {
+    const { id, ...document } = content;
     return this.esService.index({
       index: this.indexName,
-      id: content.id,
-      body: content,
+      id: id,
+      document: document,
     });
   }
 
@@ -73,7 +72,7 @@ export class SearchService implements OnModuleInit {
     try {
       const response = await this.esService.search({
         index: this.indexName,
-        body: {
+        ...{
           from,
           size: limit,
           query: {
@@ -91,7 +90,7 @@ export class SearchService implements OnModuleInit {
             difficulty: { terms: { field: 'difficulty' } },
             tags: { terms: { field: 'tags' } },
           },
-        },
+        } as any,
       });
 
       const hits = response.hits.hits;

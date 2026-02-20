@@ -19,17 +19,15 @@ export class RecommendationService {
     try {
       const response = await this.esService.search({
         index: this.indexName,
-        body: {
-          size: limit,
-          query: {
-            more_like_this: {
-              fields: ['title', 'description', 'tags'],
-              like: [{ _index: this.indexName, _id: contentId }],
-              min_term_freq: 1,
-              max_query_terms: 12,
-            },
+        size: limit,
+        query: {
+          more_like_this: {
+            fields: ['title', 'description', 'tags'],
+            like: [{ _index: this.indexName, _id: contentId }],
+            min_term_freq: 1,
+            max_query_terms: 12,
           },
-        },
+        } as any,
       });
 
       return response.hits.hits.map((hit) => ({
@@ -60,24 +58,22 @@ export class RecommendationService {
     // 2. Search for content matching recent interests
     const response = await this.esService.search({
       index: this.indexName,
-      body: {
-        size: limit,
-        query: {
-          function_score: {
-            query: {
-              multi_match: {
-                query: searchTerms,
-                fields: ['title^2', 'tags^3', 'description'],
-              },
+      size: limit,
+      query: {
+        function_score: {
+          query: {
+            multi_match: {
+              query: searchTerms,
+              fields: ['title^2', 'tags^3', 'description'],
             },
-            // Boost newer content or highly rated content
-            functions: [
-              { fieldValueFactor: { field: 'rating', factor: 1.2, missing: 1 } },
-              { gauss: { createdAt: { scale: '30d', decay: 0.5 } } }
-            ],
           },
+          // Boost newer content or highly rated content
+          functions: [
+            { field_value_factor: { field: 'rating', factor: 1.2, missing: 1 } },
+            { gauss: { createdAt: { scale: '30d', decay: 0.5 } } }
+          ],
         },
-      },
+      } as any,
     });
 
     return response.hits.hits.map((hit) => ({
@@ -89,10 +85,8 @@ export class RecommendationService {
   private async getPopularContent(limit: number) {
     const response = await this.esService.search({
       index: this.indexName,
-      body: {
-        size: limit,
-        sort: [{ viewCount: 'desc' }, { rating: 'desc' }],
-      },
+      size: limit,
+      sort: [{ viewCount: 'desc' }, { rating: 'desc' }] as any,
     });
 
     return response.hits.hits.map((hit) => ({

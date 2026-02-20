@@ -27,6 +27,8 @@ import { BackupService } from './backup.service';
 import { BackupSchedulerService } from './backup-scheduler.service';
 import { BackupRecoveryService } from './backup-recovery.service';
 import { BackupMetricsService } from './backup-metrics.service';
+import { BackupMonitoringService } from './backup-monitoring.service';
+import { RecoveryVerificationService } from './recovery-verification.service';
 import {
   CreateBackupDto,
   RestoreBackupDto,
@@ -46,6 +48,8 @@ export class BackupController {
     private readonly schedulerService: BackupSchedulerService,
     private readonly recoveryService: BackupRecoveryService,
     private readonly metricsService: BackupMetricsService,
+    private readonly monitoringService: BackupMonitoringService,
+    private readonly verificationService: RecoveryVerificationService,
   ) {}
 
   // === Backup Operations ===
@@ -264,5 +268,90 @@ export class BackupController {
   @ApiResponse({ status: 200, description: 'Cleanup result' })
   async triggerCleanup() {
     return this.backupService.cleanupExpiredBackups();
+  }
+
+  // === Monitoring & Health ===
+
+  @Get('health')
+  @ApiOperation({ summary: 'Get backup system health status' })
+  @ApiResponse({ status: 200, description: 'Health status retrieved' })
+  async getHealthStatus() {
+    return this.monitoringService.checkBackupHealth();
+  }
+
+  @Get('alerts')
+  @ApiOperation({ summary: 'Get active backup alerts' })
+  @ApiResponse({ status: 200, description: 'Active alerts retrieved' })
+  async getActiveAlerts() {
+    return this.monitoringService.getActiveAlerts();
+  }
+
+  @Post('alerts/:id/resolve')
+  @ApiOperation({ summary: 'Resolve a backup alert' })
+  @ApiParam({ name: 'id', description: 'Alert ID' })
+  @ApiResponse({ status: 200, description: 'Alert resolved' })
+  async resolveAlert(@Param('id') id: string) {
+    await this.monitoringService.resolveAlert(id);
+    return { message: 'Alert resolved successfully' };
+  }
+
+  @Get('metrics/system')
+  @ApiOperation({ summary: 'Get comprehensive system metrics' })
+  @ApiResponse({ status: 200, description: 'System metrics retrieved' })
+  async getSystemMetrics() {
+    return this.monitoringService.getSystemMetrics();
+  }
+
+  @Get('performance/history')
+  @ApiOperation({ summary: 'Get backup performance history' })
+  @ApiQuery({ name: 'hours', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Performance history retrieved' })
+  async getPerformanceHistory(@Query('hours') hours?: number) {
+    return this.monitoringService.getPerformanceHistory(
+      hours ? Number(hours) : 24,
+    );
+  }
+
+  // === Recovery Verification ===
+
+  @Post('verification/run')
+  @ApiOperation({ summary: 'Run comprehensive recovery verification' })
+  @ApiResponse({ status: 200, description: 'Verification result' })
+  async runRecoveryVerification() {
+    return this.verificationService.runRecoveryVerification();
+  }
+
+  @Get('verification/history')
+  @ApiOperation({ summary: 'Get recovery verification history' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Verification history retrieved' })
+  async getVerificationHistory(@Query('limit') limit?: number) {
+    return this.verificationService.getRecoveryTestHistory(
+      limit ? Number(limit) : 50,
+    );
+  }
+
+  @Get('verification/stats')
+  @ApiOperation({ summary: 'Get recovery verification statistics' })
+  @ApiResponse({ status: 200, description: 'Verification statistics retrieved' })
+  async getVerificationStats() {
+    return this.verificationService.getRecoveryTestStats();
+  }
+
+  @Post('verification/integrity/:id')
+  @ApiOperation({ summary: 'Verify backup integrity' })
+  @ApiParam({ name: 'id', description: 'Backup ID' })
+  @ApiResponse({ status: 200, description: 'Integrity verification result' })
+  async verifyBackupIntegrity(@Param('id', ParseUUIDPipe) id: string) {
+    const isValid = await this.verificationService.verifyBackupIntegrity(id);
+    return { valid: isValid, backupId: id };
+  }
+
+  @Post('verification/pitr')
+  @ApiOperation({ summary: 'Verify point-in-time recovery capability' })
+  @ApiResponse({ status: 200, description: 'PITR verification result' })
+  async verifyPointInTimeRecovery() {
+    const isValid = await this.verificationService.verifyPointInTimeRecovery();
+    return { valid: isValid };
   }
 }
