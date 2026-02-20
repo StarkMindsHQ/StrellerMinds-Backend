@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Assignment, AssignmentType, SubmissionStatus } from './assignment.entity';
 import { User } from '../../auth/entities/user.entity';
 import { Grade } from './grade.entity';
@@ -10,7 +20,7 @@ export class Submission {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Assignment, assignment => assignment.submissions)
+  @ManyToOne(() => Assignment, (assignment) => assignment.submissions)
   assignment: Assignment;
 
   @ManyToOne(() => User)
@@ -55,14 +65,14 @@ export class Submission {
   @Column({ nullable: true })
   plagiarismReportUrl?: string;
 
-  @OneToOne(() => Grade, grade => grade.submission)
+  @OneToOne(() => Grade, (grade) => grade.submission)
   @JoinColumn()
   grade: Grade;
 
-  @OneToMany(() => Annotation, annotation => annotation.submission)
+  @OneToMany(() => Annotation, (annotation) => annotation.submission)
   annotations: Annotation[];
 
-  @OneToMany(() => PeerReview, review => review.submission)
+  @OneToMany(() => PeerReview, (review) => review.submission)
   peerReviews: PeerReview[];
 
   @CreateDateColumn()

@@ -123,8 +123,8 @@ export class WebhookController {
       subscription.status === 'active'
         ? SubscriptionStatus.ACTIVE
         : subscription.status === 'paused'
-        ? SubscriptionStatus.PAUSED
-        : SubscriptionStatus.CANCELLED;
+          ? SubscriptionStatus.PAUSED
+          : SubscriptionStatus.CANCELLED;
 
     await this.subscriptionRepository.update(
       { externalSubscriptionId: subscription.id },

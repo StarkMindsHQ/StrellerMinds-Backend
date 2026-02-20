@@ -67,10 +67,7 @@ export class LtiConfigService {
     userId: string,
     updates: Partial<IntegrationConfig>,
   ): Promise<IntegrationConfig> {
-    await this.configRepository.update(
-      { id: configId, userId },
-      updates,
-    );
+    await this.configRepository.update({ id: configId, userId }, updates);
     return this.getLtiConfig(configId, userId);
   }
 
@@ -97,11 +94,7 @@ export class LtiConfigService {
   /**
    * Sync LTI memberships
    */
-  async syncMemberships(
-    configId: string,
-    contextId: string,
-    accessToken: string,
-  ): Promise<any> {
+  async syncMemberships(configId: string, contextId: string, accessToken: string): Promise<any> {
     const startTime = Date.now();
     const syncLog = this.syncLogRepository.create({
       integrationConfigId: configId,
@@ -112,7 +105,7 @@ export class LtiConfigService {
 
     try {
       const savedLog = await this.syncLogRepository.save(syncLog);
-      
+
       // Fetch members from LTI platform
       const members = await this.ltiService.getMembers(accessToken, contextId);
 
@@ -121,7 +114,7 @@ export class LtiConfigService {
       for (const member of members) {
         try {
           const mappedUser = this.ltiService.mapLtiUser(member.user_id);
-          
+
           // Create mapping
           await this.mappingRepository.upsert(
             {
@@ -158,11 +151,7 @@ export class LtiConfigService {
   /**
    * Sync grades from LTI platform
    */
-  async syncGrades(
-    configId: string,
-    lineItemId: string,
-    accessToken: string,
-  ): Promise<any> {
+  async syncGrades(configId: string, lineItemId: string, accessToken: string): Promise<any> {
     const startTime = Date.now();
     const syncLog = this.syncLogRepository.create({
       integrationConfigId: configId,
@@ -173,7 +162,7 @@ export class LtiConfigService {
 
     try {
       const savedLog = await this.syncLogRepository.save(syncLog);
-      
+
       // Fetch results from LTI
       const results = await this.ltiService.fetchResults(accessToken, lineItemId);
 

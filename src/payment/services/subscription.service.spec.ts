@@ -3,12 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SubscriptionService } from './subscription.service';
 import { PaymentPlanService } from './payment-plan.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Payment,
-} from '../entities';
+import { Subscription, PaymentPlan, Invoice, Payment } from '../entities';
 import { SubscriptionStatus, BillingCycle } from '../enums';
 import { CreateSubscriptionDto, CancelSubscriptionDto } from '../dto';
 
@@ -126,9 +121,7 @@ describe('SubscriptionService', () => {
 
       mockPaymentPlanRepository.findOneBy.mockResolvedValue(null);
 
-      expect(service.createSubscription(userId, dto)).rejects.toThrow(
-        'Payment plan not found',
-      );
+      expect(service.createSubscription(userId, dto)).rejects.toThrow('Payment plan not found');
     });
   });
 

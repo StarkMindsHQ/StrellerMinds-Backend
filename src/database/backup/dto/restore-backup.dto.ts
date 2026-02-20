@@ -1,11 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDateString,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsBoolean, IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class RestoreBackupDto {
   @ApiProperty({

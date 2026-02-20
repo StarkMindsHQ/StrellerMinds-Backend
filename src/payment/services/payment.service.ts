@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import {
@@ -65,10 +61,7 @@ export class PaymentService {
     return payment;
   }
 
-  async updatePaymentStatus(
-    paymentId: string,
-    status: PaymentStatus,
-  ): Promise<Payment> {
+  async updatePaymentStatus(paymentId: string, status: PaymentStatus): Promise<Payment> {
     const payment = await this.getPayment(paymentId);
     payment.status = status;
 
@@ -79,11 +72,7 @@ export class PaymentService {
     return this.paymentRepository.save(payment);
   }
 
-  async createRefundRequest(
-    paymentId: string,
-    amount?: number,
-    reason?: string,
-  ): Promise<Refund> {
+  async createRefundRequest(paymentId: string, amount?: number, reason?: string): Promise<Refund> {
     const payment = await this.getPayment(paymentId);
 
     if (payment.status !== PaymentStatus.COMPLETED) {

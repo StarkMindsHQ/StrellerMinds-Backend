@@ -18,7 +18,7 @@ COPY tsconfig*.json ./
 # Development stage
 FROM base AS development
 ENV NODE_ENV=development
-RUN npm ci --include=dev
+RUN npm ci --include=dev --legacy-peer-deps
 COPY . .
 EXPOSE 3000
 CMD ["dumb-init", "npm", "run", "start:dev"]
@@ -28,7 +28,7 @@ FROM base AS build
 ENV NODE_ENV=production
 
 # Install all dependencies (including dev for build)
-RUN npm ci --include=dev
+RUN npm ci --include=dev --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -37,7 +37,7 @@ COPY . .
 RUN npm run build
 
 # Remove dev dependencies
-RUN npm prune --production && npm cache clean --force
+RUN npm prune --production --legacy-peer-deps && npm cache clean --force
 
 # Production stage
 FROM node:18-alpine AS production

@@ -1,7 +1,4 @@
-import {
-  Entity, PrimaryGeneratedColumn, Column,
-  ManyToOne, CreateDateColumn
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
 import { Thread } from './thread.entity';
 
 @Entity()
@@ -9,7 +6,7 @@ export class Comment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Thread, thread => thread.comments)
+  @ManyToOne(() => Thread, (thread) => thread.comments)
   thread: Thread;
 
   @Column({ nullable: true })

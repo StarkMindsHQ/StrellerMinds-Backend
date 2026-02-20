@@ -28,10 +28,7 @@ export class GoogleController {
    */
   @Post('config')
   @UseGuards(JwtAuthGuard)
-  async createGoogleConfig(
-    @CurrentUser() user: any,
-    @Body() dto: GoogleConfigDto,
-  ) {
+  async createGoogleConfig(@CurrentUser() user: any, @Body() dto: GoogleConfigDto) {
     const config = await this.googleConfigService.createGoogleConfig(
       user.id,
       dto.clientId,
@@ -52,10 +49,7 @@ export class GoogleController {
    */
   @Get('auth/url')
   @UseGuards(JwtAuthGuard)
-  getAuthUrl(
-    @Query('clientId') clientId: string,
-    @Query('redirectUri') redirectUri: string,
-  ) {
+  getAuthUrl(@Query('clientId') clientId: string, @Query('redirectUri') redirectUri: string) {
     if (!clientId || !redirectUri) {
       throw new BadRequestException('Missing clientId or redirectUri');
     }
@@ -106,10 +100,7 @@ export class GoogleController {
    */
   @Get('config/:configId')
   @UseGuards(JwtAuthGuard)
-  async getGoogleConfig(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async getGoogleConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.googleConfigService.getGoogleConfig(configId, user.id);
     if (!config) {
       throw new NotFoundException('Google configuration not found');
@@ -140,10 +131,7 @@ export class GoogleController {
    */
   @Post('sync-courses')
   @UseGuards(JwtAuthGuard)
-  async syncCourses(
-    @CurrentUser() user: any,
-    @Body() body: { configId: string },
-  ) {
+  async syncCourses(@CurrentUser() user: any, @Body() body: { configId: string }) {
     const syncLog = await this.googleConfigService.syncCourses(body.configId, user.id);
 
     return {

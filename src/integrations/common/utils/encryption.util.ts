@@ -8,8 +8,7 @@ export class EncryptionUtil {
 
   static encrypt(plaintext: string, masterKey: string): string {
     try {
-      const key = crypto
-        .pbkdf2Sync(masterKey, 'integration-salt', 100000, 32, 'sha256');
+      const key = crypto.pbkdf2Sync(masterKey, 'integration-salt', 100000, 32, 'sha256');
       const iv = crypto.randomBytes(this.IV_SIZE);
       const cipher = crypto.createCipheriv(this.ALGORITHM, key, iv);
 
@@ -26,8 +25,7 @@ export class EncryptionUtil {
   static decrypt(ciphertext: string, masterKey: string): string {
     try {
       const [ivHex, tagHex, encrypted] = ciphertext.split(':');
-      const key = crypto
-        .pbkdf2Sync(masterKey, 'integration-salt', 100000, 32, 'sha256');
+      const key = crypto.pbkdf2Sync(masterKey, 'integration-salt', 100000, 32, 'sha256');
       const iv = Buffer.from(ivHex, 'hex');
       const tag = Buffer.from(tagHex, 'hex');
 
@@ -44,10 +42,7 @@ export class EncryptionUtil {
   }
 
   static hashToken(token: string): string {
-    return crypto
-      .createHash('sha256')
-      .update(token)
-      .digest('hex');
+    return crypto.createHash('sha256').update(token).digest('hex');
   }
 
   static generateRandomSecret(length: number = 32): string {

@@ -57,33 +57,25 @@ describe('Security (e2e)', () => {
 
   describe('Security Headers', () => {
     it('should set X-Frame-Options to DENY', async () => {
-      const response = await supertest(app.getHttpServer())
-        .get('/api/health')
-        .expect(200);
+      const response = await supertest(app.getHttpServer()).get('/api/health').expect(200);
 
       expect(response.headers['x-frame-options']).toBe('DENY');
     });
 
     it('should set X-Content-Type-Options to nosniff', async () => {
-      const response = await supertest(app.getHttpServer())
-        .get('/api/health')
-        .expect(200);
+      const response = await supertest(app.getHttpServer()).get('/api/health').expect(200);
 
       expect(response.headers['x-content-type-options']).toBe('nosniff');
     });
 
     it('should set X-XSS-Protection', async () => {
-      const response = await supertest(app.getHttpServer())
-        .get('/api/health')
-        .expect(200);
+      const response = await supertest(app.getHttpServer()).get('/api/health').expect(200);
 
       expect(response.headers['x-xss-protection']).toBe('1; mode=block');
     });
 
     it('should set Strict-Transport-Security in production', async () => {
-      const response = await supertest(app.getHttpServer())
-        .get('/api/health')
-        .expect(200);
+      const response = await supertest(app.getHttpServer()).get('/api/health').expect(200);
 
       // In development, this might not be set, but in production it should be
       if (process.env.NODE_ENV === 'production') {
@@ -93,9 +85,7 @@ describe('Security (e2e)', () => {
     });
 
     it('should set Content-Security-Policy', async () => {
-      const response = await supertest(app.getHttpServer())
-        .get('/api/health')
-        .expect(200);
+      const response = await supertest(app.getHttpServer()).get('/api/health').expect(200);
 
       const csp = response.headers['content-security-policy'];
       expect(csp).toBeDefined();
@@ -104,9 +94,7 @@ describe('Security (e2e)', () => {
     });
 
     it('should set Referrer-Policy', async () => {
-      const response = await supertest(app.getHttpServer())
-        .get('/api/health')
-        .expect(200);
+      const response = await supertest(app.getHttpServer()).get('/api/health').expect(200);
 
       expect(response.headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
     });
@@ -152,24 +140,18 @@ describe('Security (e2e)', () => {
       const maliciousPayload = {
         name: '<script>alert("xss")</script>',
         description: 'javascript:alert("xss")',
-        data: '<img src=x onerror=alert("xss")>'
+        data: '<img src=x onerror=alert("xss")>',
       };
 
-      await supertest(app.getHttpServer())
-        .post('/api/test')
-        .send(maliciousPayload)
-        .expect(400); // Bad request due to malicious content
+      await supertest(app.getHttpServer()).post('/api/test').send(maliciousPayload).expect(400); // Bad request due to malicious content
     });
 
     it('should reject oversized requests', async () => {
       const largePayload = {
-        data: 'x'.repeat(11 * 1024 * 1024) // 11MB
+        data: 'x'.repeat(11 * 1024 * 1024), // 11MB
       };
 
-      await supertest(app.getHttpServer())
-        .post('/api/test')
-        .send(largePayload)
-        .expect(413); // Request Entity Too Large
+      await supertest(app.getHttpServer()).post('/api/test').send(largePayload).expect(413); // Request Entity Too Large
     });
 
     it('should reject unsupported content types', async () => {
@@ -183,9 +165,7 @@ describe('Security (e2e)', () => {
 
   describe('Rate Limiting', () => {
     it('should include rate limit headers', async () => {
-      const response = await supertest(app.getHttpServer())
-        .get('/api/health')
-        .expect(200);
+      const response = await supertest(app.getHttpServer()).get('/api/health').expect(200);
 
       expect(response.headers['x-ratelimit-limit']).toBeDefined();
       expect(response.headers['x-ratelimit-remaining']).toBeDefined();
@@ -194,14 +174,14 @@ describe('Security (e2e)', () => {
 
     it('should enforce rate limits', async () => {
       // Make many requests quickly
-      const promises = Array(100).fill(null).map(() =>
-        request(app.getHttpServer()).get('/api/health')
-      );
+      const promises = Array(100)
+        .fill(null)
+        .map(() => request(app.getHttpServer()).get('/api/health'));
 
       const responses = await Promise.all(promises);
-      
+
       // At least some requests should be rate limited
-      const rateLimitedResponses = responses.filter(res => res.status === 429);
+      const rateLimitedResponses = responses.filter((res) => res.status === 429);
       expect(rateLimitedResponses.length).toBeGreaterThan(0);
     });
   });
@@ -231,7 +211,7 @@ describe('Security (e2e)', () => {
       const reportData = {
         type: 'xss_attempt',
         description: 'User submitted malicious script',
-        evidence: { payload: '<script>alert(1)</script>' }
+        evidence: { payload: '<script>alert(1)</script>' },
       };
 
       const response = await supertest(app.getHttpServer())

@@ -7,13 +7,13 @@ export class SecurityMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     // Apply custom security headers
     this.applySecurityHeaders(res);
-    
+
     // Rate limiting headers
     this.applyRateLimitHeaders(res);
-    
+
     // Request validation
     this.validateRequest(req, res);
-    
+
     next();
   }
 
@@ -70,15 +70,15 @@ export class SecurityMiddleware implements NestMiddleware {
       'autoplay=(self)',
       'encrypted-media=(self)',
       'fullscreen=(self)',
-      'picture-in-picture=(self)'
+      'picture-in-picture=(self)',
     ].join(', ');
     res.setHeader('Permissions-Policy', permissionsPolicy);
 
     // Additional security headers
     res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
     res.setHeader('X-Download-Options', 'noopen');
-    res.setHeader('X-Content-Security-Policy', 'default-src \'self\'');
-    
+    res.setHeader('X-Content-Security-Policy', "default-src 'self'");
+
     // API specific headers
     res.setHeader('X-API-Version', '1.0.0');
     res.setHeader('X-Response-Time', Date.now().toString());
@@ -95,12 +95,12 @@ export class SecurityMiddleware implements NestMiddleware {
     // Validate request size
     const contentLength = parseInt(req.headers['content-length'] || '0');
     const maxSize = 10 * 1024 * 1024; // 10MB
-    
+
     if (contentLength > maxSize) {
       res.status(413).json({
         error: 'Request Entity Too Large',
         message: `Maximum request size is ${maxSize / 1024 / 1024}MB`,
-        code: 'REQUEST_TOO_LARGE'
+        code: 'REQUEST_TOO_LARGE',
       });
       return;
     }
@@ -112,14 +112,14 @@ export class SecurityMiddleware implements NestMiddleware {
         'application/json',
         'application/x-www-form-urlencoded',
         'multipart/form-data',
-        'text/plain'
+        'text/plain',
       ];
 
-      if (contentType && !allowedTypes.some(type => contentType.includes(type))) {
+      if (contentType && !allowedTypes.some((type) => contentType.includes(type))) {
         res.status(415).json({
           error: 'Unsupported Media Type',
           message: 'Content-Type not supported',
-          code: 'UNSUPPORTED_MEDIA_TYPE'
+          code: 'UNSUPPORTED_MEDIA_TYPE',
         });
         return;
       }
@@ -129,7 +129,7 @@ export class SecurityMiddleware implements NestMiddleware {
     const suspiciousPatterns = [
       /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
       /javascript:/gi,
-      /on\w+\s*=/gi
+      /on\w+\s*=/gi,
     ];
 
     const body = (req as any).body;
@@ -140,7 +140,7 @@ export class SecurityMiddleware implements NestMiddleware {
           res.status(400).json({
             error: 'Bad Request',
             message: 'Request contains potentially malicious content',
-            code: 'MALICIOUS_CONTENT'
+            code: 'MALICIOUS_CONTENT',
           });
           return;
         }

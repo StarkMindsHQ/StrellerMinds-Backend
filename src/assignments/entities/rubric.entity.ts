@@ -6,7 +6,7 @@ export class Rubric {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Assignment, assignment => assignment.rubrics)
+  @ManyToOne(() => Assignment, (assignment) => assignment.rubrics)
   assignment: Assignment;
 
   @Column()

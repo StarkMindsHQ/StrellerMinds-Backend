@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Between } from 'typeorm';
-import { LearningPathEnrollment, EnrollmentStatus } from '../entities/learning-path-enrollment.entity';
+import {
+  LearningPathEnrollment,
+  EnrollmentStatus,
+} from '../entities/learning-path-enrollment.entity';
 import { NodeProgress, ProgressStatus } from '../entities/node-progress.entity';
 import { LearningPathNode } from '../entities/learning-path-node.entity';
 import { LearningPath } from '../entities/learning-path.entity';
@@ -78,13 +81,13 @@ export class ProgressTrackingService {
 
     // Initialize progress records for all nodes
     const nodes = await this.nodeRepository.find({ where: { learningPathId } });
-    
-    const progressRecords = nodes.map(node =>
+
+    const progressRecords = nodes.map((node) =>
       this.progressRepository.create({
         enrollmentId: savedEnrollment.id,
         nodeId: node.id,
         status: ProgressStatus.NOT_STARTED,
-      })
+      }),
     );
 
     await this.progressRepository.save(progressRecords);
@@ -149,16 +152,14 @@ export class ProgressTrackingService {
     if (progressRecords.length === 0) return;
 
     const completedCount = progressRecords.filter(
-      p => p.status === ProgressStatus.COMPLETED
+      (p) => p.status === ProgressStatus.COMPLETED,
     ).length;
 
     const overallProgress = (completedCount / progressRecords.length) * 100;
 
     await this.enrollmentRepository.update(enrollmentId, {
       overallProgress,
-      status: overallProgress === 100 
-        ? EnrollmentStatus.COMPLETED 
-        : EnrollmentStatus.IN_PROGRESS,
+      status: overallProgress === 100 ? EnrollmentStatus.COMPLETED : EnrollmentStatus.IN_PROGRESS,
     });
   }
 
@@ -171,7 +172,7 @@ export class ProgressTrackingService {
     if (!enrollment) return;
 
     const allCompleted = enrollment.nodeProgress.every(
-      p => p.status === ProgressStatus.COMPLETED
+      (p) => p.status === ProgressStatus.COMPLETED,
     );
 
     if (allCompleted && enrollment.status !== EnrollmentStatus.COMPLETED) {
@@ -198,11 +199,9 @@ export class ProgressTrackingService {
       order: { position: 'ASC' },
     });
 
-    const nodeProgressMap = new Map(
-      enrollment.nodeProgress.map(p => [p.nodeId, p])
-    );
+    const nodeProgressMap = new Map(enrollment.nodeProgress.map((p) => [p.nodeId, p]));
 
-    const progressDetails = nodes.map(node => ({
+    const progressDetails = nodes.map((node) => ({
       nodeId: node.id,
       title: node.title,
       type: node.type,
@@ -225,7 +224,10 @@ export class ProgressTrackingService {
     };
   }
 
-  async getEnrollmentAnalytics(learningPathId: string, timeframe: 'week' | 'month' | 'year' = 'month'): Promise<AnalyticsReport> {
+  async getEnrollmentAnalytics(
+    learningPathId: string,
+    timeframe: 'week' | 'month' | 'year' = 'month',
+  ): Promise<AnalyticsReport> {
     const endDate = new Date();
     const startDate = new Date();
 
@@ -242,7 +244,7 @@ export class ProgressTrackingService {
     }
 
     const enrollments = await this.enrollmentRepository.find({
-      where: { 
+      where: {
         learningPathId,
         createdAt: Between(startDate, endDate),
       },
@@ -250,42 +252,40 @@ export class ProgressTrackingService {
     });
 
     const totalEnrollments = enrollments.length;
-    const activeEnrollments = enrollments.filter(e => 
-      e.status === EnrollmentStatus.IN_PROGRESS || e.status === EnrollmentStatus.ENROLLED
+    const activeEnrollments = enrollments.filter(
+      (e) => e.status === EnrollmentStatus.IN_PROGRESS || e.status === EnrollmentStatus.ENROLLED,
     ).length;
 
-    const completedEnrollments = enrollments.filter(e => 
-      e.status === EnrollmentStatus.COMPLETED
-    );
+    const completedEnrollments = enrollments.filter((e) => e.status === EnrollmentStatus.COMPLETED);
 
-    const completionRate = totalEnrollments > 0 
-      ? (completedEnrollments.length / totalEnrollments) * 100 
-      : 0;
+    const completionRate =
+      totalEnrollments > 0 ? (completedEnrollments.length / totalEnrollments) * 100 : 0;
 
-    const averageProgress = totalEnrollments > 0
-      ? enrollments.reduce((sum, e) => sum + e.overallProgress, 0) / totalEnrollments
-      : 0;
+    const averageProgress =
+      totalEnrollments > 0
+        ? enrollments.reduce((sum, e) => sum + e.overallProgress, 0) / totalEnrollments
+        : 0;
 
     // Engagement metrics
-    const allProgress = enrollments.flatMap(e => e.nodeProgress);
+    const allProgress = enrollments.flatMap((e) => e.nodeProgress);
     const totalTimeSpent = allProgress.reduce((sum, p) => sum + p.timeSpentMinutes, 0);
-    
+
     const dailyActiveUsers = await this.getDailyActiveUsers(learningPathId, startDate, endDate);
-    
+
     // Performance metrics
-    const assessments = allProgress.filter(p => p.score !== null);
-    const averageScore = assessments.length > 0
-      ? assessments.reduce((sum, p) => sum + (p.score || 0), 0) / assessments.length
-      : 0;
+    const assessments = allProgress.filter((p) => p.score !== null);
+    const averageScore =
+      assessments.length > 0
+        ? assessments.reduce((sum, p) => sum + (p.score || 0), 0) / assessments.length
+        : 0;
 
     const scoreDistribution = this.calculateScoreDistribution(assessments);
     const completionTrends = await this.getCompletionTrends(learningPathId, startDate, endDate);
 
     // Retention metrics
-    const dropoutEnrollments = enrollments.filter(e => e.status === EnrollmentStatus.DROPPED);
-    const dropoutRate = totalEnrollments > 0 
-      ? (dropoutEnrollments.length / totalEnrollments) * 100 
-      : 0;
+    const dropoutEnrollments = enrollments.filter((e) => e.status === EnrollmentStatus.DROPPED);
+    const dropoutRate =
+      totalEnrollments > 0 ? (dropoutEnrollments.length / totalEnrollments) * 100 : 0;
 
     const completionTimeline = await this.getCompletionTimeline(learningPathId, startDate, endDate);
 
@@ -316,11 +316,17 @@ export class ProgressTrackingService {
     };
   }
 
-  private async getDailyActiveUsers(learningPathId: string, startDate: Date, endDate: Date): Promise<number[]> {
+  private async getDailyActiveUsers(
+    learningPathId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<number[]> {
     // This would typically involve querying a more granular activity log
     // For now, returning placeholder data
     const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    return Array(days).fill(0).map(() => Math.floor(Math.random() * 50) + 10);
+    return Array(days)
+      .fill(0)
+      .map(() => Math.floor(Math.random() * 50) + 10);
   }
 
   private calculateScoreDistribution(assessments: NodeProgress[]): Record<string, number> {
@@ -332,7 +338,7 @@ export class ProgressTrackingService {
       '90-100': 0,
     };
 
-    assessments.forEach(assessment => {
+    assessments.forEach((assessment) => {
       const score = assessment.score || 0;
       if (score < 60) distribution['0-59']++;
       else if (score < 70) distribution['60-69']++;
@@ -344,7 +350,11 @@ export class ProgressTrackingService {
     return distribution;
   }
 
-  private async getCompletionTrends(learningPathId: string, startDate: Date, endDate: Date): Promise<any[]> {
+  private async getCompletionTrends(
+    learningPathId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<any[]> {
     // Placeholder implementation
     return [
       { week: 'Week 1', completions: 5 },
@@ -354,7 +364,11 @@ export class ProgressTrackingService {
     ];
   }
 
-  private async getCompletionTimeline(learningPathId: string, startDate: Date, endDate: Date): Promise<any[]> {
+  private async getCompletionTimeline(
+    learningPathId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<any[]> {
     // Placeholder implementation
     return [
       { date: '2024-01-01', cumulativeCompletions: 5 },
@@ -381,12 +395,13 @@ export class ProgressTrackingService {
       completionTimes: [] as number[],
     };
 
-    enrollments.forEach(enrollment => {
+    enrollments.forEach((enrollment) => {
       switch (enrollment.status) {
         case EnrollmentStatus.COMPLETED:
           stats.completed++;
           if (enrollment.startDate && enrollment.completionDate) {
-            const timeToComplete = enrollment.completionDate.getTime() - enrollment.startDate.getTime();
+            const timeToComplete =
+              enrollment.completionDate.getTime() - enrollment.startDate.getTime();
             stats.completionTimes.push(timeToComplete);
           }
           break;
@@ -402,12 +417,12 @@ export class ProgressTrackingService {
       }
     });
 
-    stats.completionRate = stats.totalEnrollments > 0 
-      ? (stats.completed / stats.totalEnrollments) * 100 
-      : 0;
+    stats.completionRate =
+      stats.totalEnrollments > 0 ? (stats.completed / stats.totalEnrollments) * 100 : 0;
 
     if (stats.completionTimes.length > 0) {
-      const avgTime = stats.completionTimes.reduce((sum, time) => sum + time, 0) / stats.completionTimes.length;
+      const avgTime =
+        stats.completionTimes.reduce((sum, time) => sum + time, 0) / stats.completionTimes.length;
       stats.averageTimeToComplete = avgTime / (1000 * 60 * 60 * 24); // Convert to days
     }
 
@@ -420,7 +435,7 @@ export class ProgressTrackingService {
       relations: ['learningPath', 'nodeProgress'],
     });
 
-    return enrollments.map(enrollment => ({
+    return enrollments.map((enrollment) => ({
       enrollmentId: enrollment.id,
       learningPath: {
         id: enrollment.learningPath.id,
@@ -431,14 +446,15 @@ export class ProgressTrackingService {
       overallProgress: enrollment.overallProgress,
       startDate: enrollment.startDate,
       completionDate: enrollment.completionDate,
-      nodesCompleted: enrollment.nodeProgress.filter(p => p.status === ProgressStatus.COMPLETED).length,
+      nodesCompleted: enrollment.nodeProgress.filter((p) => p.status === ProgressStatus.COMPLETED)
+        .length,
       totalNodes: enrollment.nodeProgress.length,
     }));
   }
 
   async getTimeSpentReport(userId: string, startDate?: Date, endDate?: Date): Promise<any> {
     const whereClause: any = { userId };
-    
+
     if (startDate && endDate) {
       whereClause.createdAt = Between(startDate, endDate);
     }
@@ -448,7 +464,8 @@ export class ProgressTrackingService {
       relations: ['nodeProgress'],
     });
 
-    const totalTime = enrollments.flatMap(e => e.nodeProgress)
+    const totalTime = enrollments
+      .flatMap((e) => e.nodeProgress)
       .reduce((sum, p) => sum + p.timeSpentMinutes, 0);
 
     const dailyBreakdown = this.generateDailyBreakdown(enrollments, startDate, endDate);
@@ -456,14 +473,16 @@ export class ProgressTrackingService {
     return {
       totalTimeMinutes: totalTime,
       totalTimeHours: Math.round(totalTime / 60),
-      dailyAverage: dailyBreakdown.length > 0 
-        ? totalTime / dailyBreakdown.length 
-        : 0,
+      dailyAverage: dailyBreakdown.length > 0 ? totalTime / dailyBreakdown.length : 0,
       dailyBreakdown,
     };
   }
 
-  private generateDailyBreakdown(enrollments: LearningPathEnrollment[], startDate?: Date, endDate?: Date): any[] {
+  private generateDailyBreakdown(
+    enrollments: LearningPathEnrollment[],
+    startDate?: Date,
+    endDate?: Date,
+  ): any[] {
     // Placeholder implementation
     const breakdown = [];
     const currentDate = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);

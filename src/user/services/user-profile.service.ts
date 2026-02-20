@@ -126,27 +126,29 @@ export class UserProfileService {
         level: ub.level,
         awardedAt: ub.awardedAt,
       })),
-      analytics: analytics ? {
-        id: analytics.id,
-        profileId: analytics.profileId,
-        totalViews: analytics.totalViews,
-        viewsToday: analytics.viewsToday,
-        viewsThisWeek: analytics.viewsThisWeek,
-        viewsThisMonth: analytics.viewsThisMonth,
-        totalFollowsGained: analytics.totalFollowsGained,
-        totalFollowsLost: analytics.totalFollowsLost,
-        portfolioItemsViews: analytics.portfolioItemsViews,
-        portfolioItemsClicks: analytics.portfolioItemsClicks,
-        badgesDisplays: analytics.badgesDisplays,
-        trafficSources: analytics.trafficSources,
-        deviceTypes: analytics.deviceTypes,
-        topCountries: analytics.topCountries,
-        averageSessionDuration: analytics.averageSessionDuration,
-        lastViewedAt: analytics.lastViewedAt,
-        recentViewers: analytics.recentViewers,
-        createdAt: analytics.createdAt,
-        updatedAt: analytics.updatedAt,
-      } : undefined,
+      analytics: analytics
+        ? {
+            id: analytics.id,
+            profileId: analytics.profileId,
+            totalViews: analytics.totalViews,
+            viewsToday: analytics.viewsToday,
+            viewsThisWeek: analytics.viewsThisWeek,
+            viewsThisMonth: analytics.viewsThisMonth,
+            totalFollowsGained: analytics.totalFollowsGained,
+            totalFollowsLost: analytics.totalFollowsLost,
+            portfolioItemsViews: analytics.portfolioItemsViews,
+            portfolioItemsClicks: analytics.portfolioItemsClicks,
+            badgesDisplays: analytics.badgesDisplays,
+            trafficSources: analytics.trafficSources,
+            deviceTypes: analytics.deviceTypes,
+            topCountries: analytics.topCountries,
+            averageSessionDuration: analytics.averageSessionDuration,
+            lastViewedAt: analytics.lastViewedAt,
+            recentViewers: analytics.recentViewers,
+            createdAt: analytics.createdAt,
+            updatedAt: analytics.updatedAt,
+          }
+        : undefined,
     };
   }
 
@@ -227,15 +229,12 @@ export class UserProfileService {
     if (profile.website) completedFields++;
     if (profile.yearsOfExperience) completedFields++;
     if (profile.education) completedFields++;
-    if (profile.socialLinks && Object.keys(profile.socialLinks).length > 0)
-      completedFields++;
+    if (profile.socialLinks && Object.keys(profile.socialLinks).length > 0) completedFields++;
 
     return Math.round((completedFields / totalFields) * 100);
   }
 
-  private getCompletionStatus(
-    percentage: number,
-  ): 'incomplete' | 'partial' | 'complete' {
+  private getCompletionStatus(percentage: number): 'incomplete' | 'partial' | 'complete' {
     if (percentage === 0) return 'incomplete';
     if (percentage === 100) return 'complete';
     return 'partial';

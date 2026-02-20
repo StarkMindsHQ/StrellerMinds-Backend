@@ -83,10 +83,7 @@ export class GoogleService {
   /**
    * Get course details
    */
-  async getCourseDetails(
-    accessToken: string,
-    courseId: string,
-  ): Promise<any> {
+  async getCourseDetails(accessToken: string, courseId: string): Promise<any> {
     try {
       // Placeholder
       return {
@@ -103,10 +100,7 @@ export class GoogleService {
   /**
    * Get course students
    */
-  async getStudents(
-    accessToken: string,
-    courseId: string,
-  ): Promise<any[]> {
+  async getStudents(accessToken: string, courseId: string): Promise<any[]> {
     try {
       // Placeholder
       return [];
@@ -119,10 +113,7 @@ export class GoogleService {
   /**
    * Get course work (assignments)
    */
-  async getCourseWork(
-    accessToken: string,
-    courseId: string,
-  ): Promise<any[]> {
+  async getCourseWork(accessToken: string, courseId: string): Promise<any[]> {
     try {
       // In production:
       // const response = await axios.get(
@@ -242,17 +233,16 @@ export class GoogleService {
   /**
    * Get authorization URL
    */
-  getAuthorizationUrl(
-    clientId: string,
-    redirectUri: string,
-  ): string {
+  getAuthorizationUrl(clientId: string, redirectUri: string): string {
     const scope = INTEGRATION_CONSTANTS.GOOGLE.SCOPES.join(' ');
-    return `https://accounts.google.com/o/oauth2/v2/auth?` +
+    return (
+      `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${clientId}&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `response_type=code&` +
       `scope=${encodeURIComponent(scope)}&` +
-      `access_type=offline`;
+      `access_type=offline`
+    );
   }
 
   /**

@@ -6,7 +6,7 @@ export enum AnnotationType {
   COMMENT = 'comment',
   HIGHLIGHT = 'highlight',
   CORRECTION = 'correction',
-  SUGGESTION = 'suggestion'
+  SUGGESTION = 'suggestion',
 }
 
 @Entity('annotations')
@@ -14,7 +14,7 @@ export class Annotation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Submission, submission => submission.annotations)
+  @ManyToOne(() => Submission, (submission) => submission.annotations)
   submission: Submission;
 
   @ManyToOne(() => User)

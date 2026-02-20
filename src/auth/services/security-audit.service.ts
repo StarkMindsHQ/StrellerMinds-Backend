@@ -6,41 +6,42 @@ import { GeoIpService } from './geo-ip.service';
 
 @Injectable()
 export class SecurityAuditService {
-    constructor(
-        @InjectRepository(SecurityAudit)
-        private readonly auditRepository: Repository<SecurityAudit>,
-        private readonly geoIpService: GeoIpService,
-    ) { }
+  constructor(
+    @InjectRepository(SecurityAudit)
+    private readonly auditRepository: Repository<SecurityAudit>,
+    private readonly geoIpService: GeoIpService,
+  ) {}
 
-    async log(
-        userId: string | null,
-        event: SecurityEvent,
-        ipAddress?: string,
-        userAgent?: string,
-        metadata?: any,
-    ): Promise<void> {
-        const location = ipAddress ? this.geoIpService.lookup(ipAddress) : null;
+  async log(
+    userId: string | null,
+    event: SecurityEvent,
+    ipAddress?: string,
+    userAgent?: string,
+    metadata?: any,
+  ): Promise<void> {
+    const location = ipAddress ? this.geoIpService.lookup(ipAddress) : null;
 
-        const audit = this.auditRepository.create({
-            userId,
-            event,
-            ipAddress,
-            userAgent,
-            metadata: { ...metadata, location },
-        });
+    const audit = this.auditRepository.create({
+      userId,
+      event,
+      ipAddress,
+      userAgent,
+      metadata: { ...metadata, location },
+    });
 
-        await this.auditRepository.save(audit);
+    await this.auditRepository.save(audit);
+  }
+
+  async getRecentEvents(userId: string | null, limit: number = 10): Promise<SecurityAudit[]> {
+    const query = this.auditRepository
+      .createQueryBuilder('audit')
+      .orderBy('audit.createdAt', 'DESC')
+      .take(limit);
+
+    if (userId) {
+      query.where('audit.userId = :userId', { userId });
     }
 
-    async getRecentEvents(userId: string | null, limit: number = 10): Promise<SecurityAudit[]> {
-        const query = this.auditRepository.createQueryBuilder('audit')
-            .orderBy('audit.createdAt', 'DESC')
-            .take(limit);
-
-        if (userId) {
-            query.where('audit.userId = :userId', { userId });
-        }
-
-        return query.getMany();
-    }
+    return query.getMany();
+  }
 }

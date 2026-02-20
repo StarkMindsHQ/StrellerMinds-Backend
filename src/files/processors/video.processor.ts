@@ -44,9 +44,9 @@ export class VideoProcessor {
 
       const thumbnailBuffer = await fs.promises.readFile(tempOutputPath);
       const thumbnailPath = `${ownerId}/thumbnails/${uuid()}.png`;
-      
+
       await this.storage.upload(thumbnailBuffer, thumbnailPath, 'image/png');
-      
+
       return thumbnailPath;
     } catch (error) {
       this.logger.error('Video processing failed', error);
@@ -64,6 +64,6 @@ export class VideoProcessor {
 
   // Keep old method for backward compatibility or future queue implementation
   async queueTranscoding(path: string) {
-     this.logger.log(`Queued video for transcoding: ${path}`);
+    this.logger.log(`Queued video for transcoding: ${path}`);
   }
 }

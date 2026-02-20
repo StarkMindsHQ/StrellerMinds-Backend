@@ -44,9 +44,7 @@ export class SyncController {
    * Get sync log detail
    */
   @Get('log/:logId')
-  async getSyncLogDetail(
-    @Param('logId') logId: string,
-  ) {
+  async getSyncLogDetail(@Param('logId') logId: string) {
     // Implementation would fetch from database
     return {
       success: true,
@@ -97,9 +95,7 @@ export class SyncController {
    * Check sync health
    */
   @Get('health/:configId')
-  async checkSyncHealth(
-    @Param('configId') configId: string,
-  ) {
+  async checkSyncHealth(@Param('configId') configId: string) {
     const health = await this.syncEngineService.checkSyncHealth(configId);
 
     return {
@@ -112,10 +108,7 @@ export class SyncController {
    * Trigger manual sync
    */
   @Post('trigger/:configId')
-  async triggerSync(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async triggerSync(@CurrentUser() user: any, @Param('configId') configId: string) {
     try {
       const result = await this.syncEngineService.triggerScheduledSync(configId);
 
@@ -133,10 +126,7 @@ export class SyncController {
    * Get sync statistics
    */
   @Get('stats/:configId')
-  async getSyncStats(
-    @Param('configId') configId: string,
-    @Query('days') days: number = 7,
-  ) {
+  async getSyncStats(@Param('configId') configId: string, @Query('days') days: number = 7) {
     // Would fetch sync logs and calculate statistics
     const health = await this.syncEngineService.checkSyncHealth(configId);
 

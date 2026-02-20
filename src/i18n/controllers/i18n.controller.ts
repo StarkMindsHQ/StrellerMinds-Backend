@@ -20,10 +20,7 @@ export class I18nController {
    * Get translations for a specific language
    */
   @Get('translations')
-  getTranslations(
-    @Query('lang') language: string = 'en',
-    @Query('keys') keys?: string,
-  ) {
+  getTranslations(@Query('lang') language: string = 'en', @Query('keys') keys?: string) {
     if (keys) {
       const keyArray = keys.split(',');
       return this.i18nService.translateMultiple(keyArray, language);
@@ -55,10 +52,7 @@ export class I18nController {
    * Translate a single key
    */
   @Get('translate')
-  translate(
-    @Query('key') key: string,
-    @Query('lang') language: string = 'en',
-  ) {
+  translate(@Query('key') key: string, @Query('lang') language: string = 'en') {
     if (!key) {
       return { error: 'Translation key is required' };
     }

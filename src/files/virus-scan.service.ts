@@ -16,12 +16,15 @@ export class VirusScanService {
     // 1. Write buffer to temp file
     // 2. Run clamscan on it
     // 3. Delete temp file
-    
-    const tempFilePath = path.join(os.tmpdir(), `scan-${Date.now()}-${Math.random().toString(36).substring(7)}`);
-    
+
+    const tempFilePath = path.join(
+      os.tmpdir(),
+      `scan-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+    );
+
     try {
       await fs.promises.writeFile(tempFilePath, buffer);
-      
+
       // Try to run clamscan
       try {
         const { stdout } = await execAsync(`clamscan "${tempFilePath}"`);
@@ -33,9 +36,9 @@ export class VirusScanService {
       } catch (error) {
         // If clamscan fails (e.g. not installed, or returns exit code 1 for infected), check output
         if (error.stdout && error.stdout.includes('FOUND')) {
-           return 'infected';
+          return 'infected';
         }
-        
+
         this.logger.warn('ClamAV not found or failed. defaulting to CLEAN for development.');
         // For development/demo without ClamAV, we assume clean
         return 'clean';
@@ -46,7 +49,9 @@ export class VirusScanService {
     } finally {
       try {
         await fs.promises.unlink(tempFilePath);
-      } catch (e) {}
+      } catch (e) {
+        // Ignore file deletion errors
+      }
     }
   }
 }
