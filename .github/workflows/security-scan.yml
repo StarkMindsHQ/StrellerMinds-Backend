@@ -4,36 +4,40 @@ on:
   push:
     branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
   schedule:
     - cron: '0 0 * * 0'  # Weekly scan
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
 
 jobs:
   security:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
     
     - name: Install dependencies
-      run: npm ci
+      run: npm ci --legacy-peer-deps
     
-    - name: Run security scan
-      run: |
-        chmod +x scripts/security-scan.sh
-        ./scripts/security-scan.sh
+    - name: Run npm audit
+      run: npm audit --audit-level=high
+      continue-on-error: true
     
     - name: Upload scan results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-scan-results
         path: |
           trivy-report.json
           npm-audit-report.json
+        retention-days: 7

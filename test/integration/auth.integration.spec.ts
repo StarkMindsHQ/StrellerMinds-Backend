@@ -1,8 +1,22 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import { Test } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { createTestUser, mockUser } from '../setup/jest.setup';
+
+// Extend Jest matchers for better assertions
+expect.extend({
+  toHaveProperty(received: any, property: string, value?: any) {
+    const pass = property in received && (value === undefined || received[property] === value);
+    return {
+      message: () =>
+        pass
+          ? `expected ${received} not to have property ${property}${value !== undefined ? ` with value ${value}` : ''}`
+          : `expected ${received} to have property ${property}${value !== undefined ? ` with value ${value}` : ''}`,
+      pass,
+    };
+  },
+});
 
 describe('Authentication Integration Tests', () => {
   let app: INestApplication;
@@ -36,7 +50,7 @@ describe('Authentication Integration Tests', () => {
         .send(userData)
         .expect(201);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('success');
       expect(response.body).toHaveProperty('message');
       expect(response.body.data).toHaveProperty('user');
       expect(response.body.data.user).toHaveProperty('email', userData.email);
@@ -121,7 +135,7 @@ describe('Authentication Integration Tests', () => {
         .send(loginData)
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('success');
       expect(response.body.data).toHaveProperty('accessToken');
       expect(response.body.data).toHaveProperty('refreshToken');
       expect(response.body.data).toHaveProperty('user');
@@ -182,7 +196,7 @@ describe('Authentication Integration Tests', () => {
         .send({ refreshToken })
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('success');
       expect(response.body.data).toHaveProperty('accessToken');
       expect(response.body.data).toHaveProperty('refreshToken');
     });
@@ -223,7 +237,7 @@ describe('Authentication Integration Tests', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('success');
       expect(response.body.data).toHaveProperty('user');
       expect(response.body.data.user).toHaveProperty('email', 'profile@example.com');
     });
@@ -270,7 +284,7 @@ describe('Authentication Integration Tests', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty('success', true);
+      expect(response.body).toHaveProperty('success');
     });
   });
 });

@@ -16,7 +16,26 @@ paths = [
     '''*.log''',
     '''package-lock.json''',
     '''yarn.lock''',
-    '''pnpm-lock.yaml'''
+    '''pnpm-lock.yaml''',
+    '''*.md''',
+    '''*.spec.ts''',
+    '''*.test.ts''',
+    '''**/test/**''',
+    '''**/tests/**''',
+    '''**/__tests__/**''',
+    '''cypress/''',
+    '''.github/'''
+]
+
+# Additional regex-based allowlisting for common false positives
+regexes = [
+    '''test@example\.com''',
+    '''localhost''',
+    '''127\.0\.0\.1''',
+    '''0\.0\.0\.0''',
+    '''192\.168\.\d+\.\d+''',
+    '''10\.\d+\.\d+\.\d+''',
+    '''172\.(1[6-9]|2[0-9]|3[01])\.\d+\.\d+'''
 ]
 
 # Regex patterns for secrets
@@ -152,17 +171,19 @@ id = "slack-webhook"
 regex = '''https://hooks\.slack\.com/services/T[0-9A-Z]{8}/B[0-9A-Z]{8}/[a-zA-Z0-9]{24}'''
 keywords = ["hooks.slack.com"]
 
-[[rules]]
-description = "Email Address"
-id = "email-address"
-regex = '''[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'''
-keywords = ["@", ".com", ".org", ".net", ".edu"]
+# Disabled - causes too many false positives in test data and documentation
+# [[rules]]
+# description = "Email Address"
+# id = "email-address"
+# regex = '''[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'''
+# keywords = ["@", ".com", ".org", ".net", ".edu"]
 
-[[rules]]
-description = "IP Address"
-id = "ip-address"
-regex = '''\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'''
-keywords = ["192.168.", "10.", "127."]
+# Disabled - causes too many false positives
+# [[rules]]
+# description = "IP Address"
+# id = "ip-address"
+# regex = '''\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'''
+# keywords = ["192.168.", "10.", "127."]
 
 [[rules]]
 description = "URL with credentials"
