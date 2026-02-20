@@ -1,6 +1,10 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
-  CreateDateColumn, UpdateDateColumn, OneToMany
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Comment } from './comment.entity';
 
@@ -24,7 +28,7 @@ export class Thread {
   @Column({ default: false })
   isDeleted: boolean;
 
-  @OneToMany(() => Comment, comment => comment.thread)
+  @OneToMany(() => Comment, (comment) => comment.thread)
   comments: Comment[];
 
   @CreateDateColumn()

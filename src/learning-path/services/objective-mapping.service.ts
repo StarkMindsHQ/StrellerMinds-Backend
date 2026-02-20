@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { LearningObjective, ObjectiveType, DifficultyLevel } from '../entities/learning-objective.entity';
+import {
+  LearningObjective,
+  ObjectiveType,
+  DifficultyLevel,
+} from '../entities/learning-objective.entity';
 import { LearningPathNode } from '../entities/learning-path-node.entity';
 import { Course } from '../../course/entities/course.entity';
 
@@ -84,7 +88,9 @@ export class ObjectiveMappingService {
     }
 
     if (filters?.difficulty) {
-      queryBuilder.andWhere('objective.difficulty = :difficulty', { difficulty: filters.difficulty });
+      queryBuilder.andWhere('objective.difficulty = :difficulty', {
+        difficulty: filters.difficulty,
+      });
     }
 
     if (filters?.domain) {
@@ -94,7 +100,7 @@ export class ObjectiveMappingService {
     if (filters?.search) {
       queryBuilder.andWhere(
         '(objective.title ILIKE :search OR objective.description ILIKE :search OR objective.keywords::text ILIKE :search)',
-        { search: `%${filters.search}%` }
+        { search: `%${filters.search}%` },
       );
     }
 
@@ -131,7 +137,7 @@ export class ObjectiveMappingService {
     }
 
     node.learningObjectives = node.learningObjectives.filter(
-      obj => !objectiveIds.includes(obj.id)
+      (obj) => !objectiveIds.includes(obj.id),
     );
 
     await this.nodeRepository.save(node);
@@ -163,7 +169,7 @@ export class ObjectiveMappingService {
     for (const node of nodes) {
       for (const objective of node.learningObjectives) {
         allObjectives.set(objective.id, objective);
-        
+
         if (!objectiveNodeMap.has(objective.id)) {
           objectiveNodeMap.set(objective.id, []);
         }
@@ -178,15 +184,13 @@ export class ObjectiveMappingService {
     for (const [objId, objective] of allObjectives) {
       const mappedNodes = objectiveNodeMap.get(objId) || [];
       const coverage = totalNodes > 0 ? mappedNodes.length / totalNodes : 0;
-      
+
       reports.push({
         objectiveId: objId,
         title: objective.title,
         coverage,
         mappedNodes,
-        gaps: nodes
-          .filter(node => !mappedNodes.includes(node.id))
-          .map(node => node.id),
+        gaps: nodes.filter((node) => !mappedNodes.includes(node.id)).map((node) => node.id),
       });
     }
 
@@ -194,9 +198,9 @@ export class ObjectiveMappingService {
   }
 
   async analyzeCourseAlignment(courseId: string): Promise<AlignmentAnalysis> {
-    const course = await this.courseRepository.findOne({ 
+    const course = await this.courseRepository.findOne({
       where: { id: courseId },
-      relations: ['modules', 'modules.lessons'] 
+      relations: ['modules', 'modules.lessons'],
     });
 
     if (!course) {
@@ -205,7 +209,7 @@ export class ObjectiveMappingService {
 
     // Get objectives from course metadata or associated learning paths
     const courseObjectives = await this.extractCourseObjectives(course);
-    
+
     // Find learning paths that include this course
     const nodesWithCourse = await this.nodeRepository.find({
       where: { courseId },
@@ -213,16 +217,15 @@ export class ObjectiveMappingService {
     });
 
     const pathObjectives = new Set<string>();
-    nodesWithCourse.forEach(node => {
-      node.learningObjectives.forEach(obj => pathObjectives.add(obj.id));
+    nodesWithCourse.forEach((node) => {
+      node.learningObjectives.forEach((obj) => pathObjectives.add(obj.id));
     });
 
-    const coveredObjectives = courseObjectives.filter(objId => pathObjectives.has(objId));
-    const missingObjectives = courseObjectives.filter(objId => !pathObjectives.has(objId));
+    const coveredObjectives = courseObjectives.filter((objId) => pathObjectives.has(objId));
+    const missingObjectives = courseObjectives.filter((objId) => !pathObjectives.has(objId));
 
-    const alignmentScore = courseObjectives.length > 0 
-      ? coveredObjectives.length / courseObjectives.length 
-      : 1;
+    const alignmentScore =
+      courseObjectives.length > 0 ? coveredObjectives.length / courseObjectives.length : 1;
 
     return {
       courseId: course.id,
@@ -244,26 +247,40 @@ export class ObjectiveMappingService {
       .where('objective.keywords && :keywords', { keywords: descriptionKeywords })
       .getMany();
 
-    objectives.push(...matchingObjectives.map(obj => obj.id));
+    objectives.push(...matchingObjectives.map((obj) => obj.id));
 
     return [...new Set(objectives)]; // Remove duplicates
   }
 
   private extractKeywordsFromText(text: string): string[] {
     // Simple keyword extraction - in production, use proper NLP library
-    const stopWords = new Set(['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by']);
-    const words = text.toLowerCase()
+    const stopWords = new Set([
+      'the',
+      'and',
+      'or',
+      'but',
+      'in',
+      'on',
+      'at',
+      'to',
+      'for',
+      'of',
+      'with',
+      'by',
+    ]);
+    const words = text
+      .toLowerCase()
       .replace(/[^\w\s]/g, '')
       .split(/\s+/)
-      .filter(word => word.length > 3 && !stopWords.has(word));
+      .filter((word) => word.length > 3 && !stopWords.has(word));
 
     return [...new Set(words)];
   }
 
   async suggestObjectivesForNode(nodeId: string): Promise<LearningObjective[]> {
-    const node = await this.nodeRepository.findOne({ 
+    const node = await this.nodeRepository.findOne({
       where: { id: nodeId },
-      relations: ['learningPath', 'learningObjectives'] 
+      relations: ['learningPath', 'learningObjectives'],
     });
 
     if (!node) {
@@ -271,9 +288,7 @@ export class ObjectiveMappingService {
     }
 
     // Get existing objectives to avoid duplicates
-    const existingObjectiveIds = new Set(
-      node.learningObjectives.map(obj => obj.id)
-    );
+    const existingObjectiveIds = new Set(node.learningObjectives.map((obj) => obj.id));
 
     // Suggest based on:
     // 1. Node title and description
@@ -289,7 +304,9 @@ export class ObjectiveMappingService {
     const contentSuggestions = await this.objectiveRepository
       .createQueryBuilder('objective')
       .where('objective.keywords && :keywords', { keywords: contentKeywords })
-      .andWhere('objective.id NOT IN (:...existing)', { existing: Array.from(existingObjectiveIds) })
+      .andWhere('objective.id NOT IN (:...existing)', {
+        existing: Array.from(existingObjectiveIds),
+      })
       .limit(5)
       .getMany();
 
@@ -302,7 +319,9 @@ export class ObjectiveMappingService {
         const domainSuggestions = await this.objectiveRepository
           .createQueryBuilder('objective')
           .where('objective.domain = :domain', { domain: course.level })
-          .andWhere('objective.id NOT IN (:...existing)', { existing: Array.from(existingObjectiveIds) })
+          .andWhere('objective.id NOT IN (:...existing)', {
+            existing: Array.from(existingObjectiveIds),
+          })
           .limit(3)
           .getMany();
 
@@ -317,28 +336,28 @@ export class ObjectiveMappingService {
     });
 
     const pathObjectives = new Map<string, number>();
-    pathNodes.forEach(pathNode => {
+    pathNodes.forEach((pathNode) => {
       if (pathNode.id !== node.id) {
-        pathNode.learningObjectives.forEach(obj => {
+        pathNode.learningObjectives.forEach((obj) => {
           pathObjectives.set(obj.id, (pathObjectives.get(obj.id) || 0) + 1);
         });
       }
     });
 
     const frequentObjectives = Array.from(pathObjectives.entries())
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
       .map(([objId]) => objId);
 
     const pathSuggestions = await this.objectiveRepository.findByIds(
-      frequentObjectives.filter(id => !existingObjectiveIds.has(id))
+      frequentObjectives.filter((id) => !existingObjectiveIds.has(id)),
     );
 
     suggestions.push(...pathSuggestions);
 
     // Remove duplicates and limit results
     const uniqueSuggestions = suggestions.filter(
-      (obj, index, self) => index === self.findIndex(o => o.id === obj.id)
+      (obj, index, self) => index === self.findIndex((o) => o.id === obj.id),
     );
 
     return uniqueSuggestions.slice(0, 10);
@@ -359,15 +378,15 @@ export class ObjectiveMappingService {
     // Build hierarchy by domain and difficulty
     const hierarchy: any = {};
 
-    objectives.forEach(obj => {
+    objectives.forEach((obj) => {
       if (!hierarchy[obj.domain]) {
         hierarchy[obj.domain] = {};
       }
-      
+
       if (!hierarchy[obj.domain][obj.difficulty]) {
         hierarchy[obj.domain][obj.difficulty] = [];
       }
-      
+
       hierarchy[obj.domain][obj.difficulty].push(obj);
     });
 

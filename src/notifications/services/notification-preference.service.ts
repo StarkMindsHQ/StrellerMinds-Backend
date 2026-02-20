@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotificationPreference } from '../entities/notification-preference.entity';
-import { CreateNotificationPreferenceDto, UpdateNotificationPreferenceDto } from '../dto/notification-preference.dto';
+import {
+  CreateNotificationPreferenceDto,
+  UpdateNotificationPreferenceDto,
+} from '../dto/notification-preference.dto';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -12,7 +15,9 @@ export class NotificationPreferenceService {
     private notificationPreferenceRepository: Repository<NotificationPreference>,
   ) {}
 
-  async createPreferences(createPrefDto: CreateNotificationPreferenceDto): Promise<NotificationPreference> {
+  async createPreferences(
+    createPrefDto: CreateNotificationPreferenceDto,
+  ): Promise<NotificationPreference> {
     // Check if preferences already exist for this user
     let preferences = await this.notificationPreferenceRepository.findOne({
       where: { userId: createPrefDto.userId },
@@ -45,7 +50,10 @@ export class NotificationPreferenceService {
     });
   }
 
-  async updatePreferences(userId: string, updatePrefDto: UpdateNotificationPreferenceDto): Promise<NotificationPreference> {
+  async updatePreferences(
+    userId: string,
+    updatePrefDto: UpdateNotificationPreferenceDto,
+  ): Promise<NotificationPreference> {
     const preferences = await this.notificationPreferenceRepository.findOne({
       where: { userId },
     });
@@ -124,22 +132,30 @@ export class NotificationPreferenceService {
 
       const [startHour, startMinute] = start.split(':').map(Number);
       const [endHour, endMinute] = end.split(':').map(Number);
-      
+
       const startTimeInMinutes = startHour * 60 + startMinute;
       const endTimeInMinutes = endHour * 60 + endMinute;
 
       if (startTimeInMinutes < endTimeInMinutes) {
-        return currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes;
+        return (
+          currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes < endTimeInMinutes
+        );
       } else {
         // Overnights (e.g., 22:00 to 07:00)
-        return currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes < endTimeInMinutes;
+        return (
+          currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes < endTimeInMinutes
+        );
       }
     } catch (error) {
       return false; // Default to not in quiet hours if error
     }
   }
 
-  async toggleChannel(userId: string, channel: 'email' | 'sms' | 'push' | 'inApp', enabled: boolean): Promise<NotificationPreference> {
+  async toggleChannel(
+    userId: string,
+    channel: 'email' | 'sms' | 'push' | 'inApp',
+    enabled: boolean,
+  ): Promise<NotificationPreference> {
     const preferences = await this.notificationPreferenceRepository.findOne({
       where: { userId },
     });
@@ -198,7 +214,9 @@ export class NotificationPreferenceService {
 
     if (categories && categories.length > 0) {
       // Add specific categories to unsubscribed list
-      preferences.unsubscribedCategories = [...new Set([...preferences.unsubscribedCategories, ...categories])];
+      preferences.unsubscribedCategories = [
+        ...new Set([...preferences.unsubscribedCategories, ...categories]),
+      ];
     } else {
       // Unsubscribe from all emails
       preferences.emailEnabled = false;

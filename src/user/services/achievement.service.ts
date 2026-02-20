@@ -51,10 +51,7 @@ export class AchievementService {
     return this.mapBadgeToResponseDto(badge);
   }
 
-  async awardBadgeToUser(
-    profileId: string,
-    awardDto: AwardBadgeDto,
-  ): Promise<UserBadge> {
+  async awardBadgeToUser(profileId: string, awardDto: AwardBadgeDto): Promise<UserBadge> {
     const profile = await this.profileRepository.findOne({
       where: { id: profileId },
     });
@@ -95,10 +92,7 @@ export class AchievementService {
     profile.badgesCount++;
     badge.totalAwarded++;
 
-    await Promise.all([
-      this.profileRepository.save(profile),
-      this.badgeRepository.save(badge),
-    ]);
+    await Promise.all([this.profileRepository.save(profile), this.badgeRepository.save(badge)]);
 
     return saved;
   }
@@ -175,9 +169,7 @@ export class AchievementService {
       }
     });
 
-    const recentBadges = badges
-      .slice(0, 5)
-      .map((ub) => this.mapBadgeToResponseDto(ub.badge));
+    const recentBadges = badges.slice(0, 5).map((ub) => this.mapBadgeToResponseDto(ub.badge));
 
     return {
       totalBadgesEarned: badges.length,
@@ -193,16 +185,10 @@ export class AchievementService {
     };
   }
 
-  async getLeaderboard(
-    limit: number = 10,
-    offset: number = 0,
-  ): Promise<LeaderboardDto[]> {
+  async getLeaderboard(limit: number = 10, offset: number = 0): Promise<LeaderboardDto[]> {
     const profiles = await this.profileRepository
       .createQueryBuilder('profile')
-      .leftJoinAndSelect(
-        'profile.badges',
-        'badge',
-      )
+      .leftJoinAndSelect('profile.badges', 'badge')
       .orderBy('profile.badgesCount', 'DESC')
       .addOrderBy('profile.followersCount', 'DESC')
       .skip(offset)
@@ -218,9 +204,7 @@ export class AchievementService {
       totalBadges: profile.badgesCount,
       score: profile.badgesCount * 10 + profile.followersCount,
       recentAchievements: profile.badges.filter(
-        (b) =>
-          new Date(b.awardedAt).getTime() >
-          Date.now() - 30 * 24 * 60 * 60 * 1000,
+        (b) => new Date(b.awardedAt).getTime() > Date.now() - 30 * 24 * 60 * 60 * 1000,
       ).length,
     }));
   }
@@ -229,10 +213,9 @@ export class AchievementService {
     const badges = await this.badgeRepository
       .createQueryBuilder('badge')
       .where('badge.isActive = true')
-      .andWhere(
-        '(badge.name ILIKE :query OR badge.description ILIKE :query)',
-        { query: `%${query}%` },
-      )
+      .andWhere('(badge.name ILIKE :query OR badge.description ILIKE :query)', {
+        query: `%${query}%`,
+      })
       .orderBy('badge.rarity', 'DESC')
       .getMany();
 

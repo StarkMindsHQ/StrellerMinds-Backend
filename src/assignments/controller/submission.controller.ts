@@ -1,4 +1,16 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, Query, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import * as Express from 'express';
@@ -19,7 +31,7 @@ export class SubmissionController {
   async submitAssignment(
     @Param('assignmentId') assignmentId: string,
     @Body() submitDto: SubmitAssignmentDto,
-    @UploadedFile() file?: Express.MediaType
+    @UploadedFile() file?: Express.MediaType,
   ) {
     return this.submissionService.submitAssignment(assignmentId, submitDto, file);
   }
@@ -28,7 +40,7 @@ export class SubmissionController {
   async getSubmissions(
     @Param('assignmentId') assignmentId: string,
     @Query('studentId') studentId?: string,
-    @Query('status') status?: string
+    @Query('status') status?: string,
   ) {
     return this.submissionService.getSubmissions(assignmentId, { studentId, status });
   }
@@ -36,7 +48,7 @@ export class SubmissionController {
   @Get(':submissionId')
   async getSubmission(
     @Param('assignmentId') assignmentId: string,
-    @Param('submissionId') submissionId: string
+    @Param('submissionId') submissionId: string,
   ) {
     return this.submissionService.getSubmission(submissionId);
   }
@@ -45,16 +57,13 @@ export class SubmissionController {
   @Roles(UserRole.INSTRUCTOR, UserRole.ADMIN)
   async gradeSubmission(
     @Param('submissionId') submissionId: string,
-    @Body() gradeDto: GradeSubmissionDto
+    @Body() gradeDto: GradeSubmissionDto,
   ) {
     return this.submissionService.gradeSubmission(submissionId, gradeDto);
   }
 
   @Post(':submissionId/annotations')
-  async addAnnotation(
-    @Param('submissionId') submissionId: string,
-    @Body() annotationDto: any
-  ) {
+  async addAnnotation(@Param('submissionId') submissionId: string, @Body() annotationDto: any) {
     return this.submissionService.addAnnotation(submissionId, annotationDto);
   }
 

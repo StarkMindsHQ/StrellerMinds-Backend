@@ -13,12 +13,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/auth.guard';
 import { InvoiceService } from '../services';
-import {
-  CreateInvoiceDto,
-  UpdateInvoiceDto,
-  SendInvoiceDto,
-  InvoiceResponseDto,
-} from '../dto';
+import { CreateInvoiceDto, UpdateInvoiceDto, SendInvoiceDto, InvoiceResponseDto } from '../dto';
 
 @Controller('invoices')
 export class InvoiceController {
@@ -27,10 +22,7 @@ export class InvoiceController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  async createInvoice(
-    @Request() req,
-    @Body() dto: CreateInvoiceDto,
-  ): Promise<InvoiceResponseDto> {
+  async createInvoice(@Request() req, @Body() dto: CreateInvoiceDto): Promise<InvoiceResponseDto> {
     return this.invoiceService.createInvoice(req.user.id, dto);
   }
 

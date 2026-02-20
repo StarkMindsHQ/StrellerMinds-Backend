@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "StrellerMinds Development",
+      "Group": "Development",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "strellerminds_dev",
+      "Username": "strellerminds",
+      "Password": "strellerminds_dev_password",
+      "SSLMode": "prefer",
+      "ConnectionTimeout": 30
+    }
+  }
+}

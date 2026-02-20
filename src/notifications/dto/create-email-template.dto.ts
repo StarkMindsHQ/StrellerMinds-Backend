@@ -24,11 +24,14 @@ export class CreateEmailTemplateDto {
 
   @IsObject()
   @IsOptional()
-  languages?: Record<string, {
-    subject: string;
-    htmlContent: string;
-    textContent?: string;
-  }>;
+  languages?: Record<
+    string,
+    {
+      subject: string;
+      htmlContent: string;
+      textContent?: string;
+    }
+  >;
 
   @IsBoolean()
   @IsOptional()

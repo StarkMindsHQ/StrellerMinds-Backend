@@ -12,7 +12,7 @@ export class CsrfMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: NextFunction) {
     const csrfConfig = this.configService.get('csrf');
-    
+
     // Skip CSRF for GET, HEAD, OPTIONS requests
     if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
       this.generateCsrfToken(req, res);
@@ -31,7 +31,7 @@ export class CsrfMiddleware implements NestMiddleware {
 
   private generateCsrfToken(req: Request, res: Response) {
     const sessionId = this.getSessionId(req);
-    
+
     // Check if existing token is still valid
     const existing = this.tokens.get(sessionId);
     if (existing && existing.expires > Date.now()) {
@@ -42,16 +42,16 @@ export class CsrfMiddleware implements NestMiddleware {
     // Generate new token
     const token = crypto.randomBytes(32).toString('hex');
     const expires = Date.now() + this.tokenExpiry;
-    
+
     this.tokens.set(sessionId, { token, expires });
-    
+
     // Set token in header and cookie
     res.setHeader('X-CSRF-Token', token);
     res.cookie('X-CSRF-Token', token, {
       httpOnly: false, // Must be readable by JavaScript
       secure: this.configService.get('NODE_ENV') === 'production',
       sameSite: 'strict',
-      maxAge: this.tokenExpiry / 1000
+      maxAge: this.tokenExpiry / 1000,
     });
   }
 
@@ -77,7 +77,8 @@ export class CsrfMiddleware implements NestMiddleware {
     }
 
     // Token is valid, optionally rotate it
-    if (Math.random() < 0.1) { // 10% chance to rotate
+    if (Math.random() < 0.1) {
+      // 10% chance to rotate
       this.generateCsrfToken(req, {} as Response);
     }
   }
@@ -87,7 +88,7 @@ export class CsrfMiddleware implements NestMiddleware {
     return (
       (req as any).sessionID ||
       (req as any).session?.id ||
-      req.headers['x-session-id'] as string ||
+      (req.headers['x-session-id'] as string) ||
       req.ip ||
       'anonymous'
     );
@@ -102,10 +103,10 @@ export class CsrfMiddleware implements NestMiddleware {
       '/api/docs',
       '/api/webhooks',
       '/api/integrations',
-      '/api/payments/stripe/webhook'
+      '/api/payments/stripe/webhook',
     ];
 
-    return skipPaths.some(skipPath => path.startsWith(skipPath));
+    return skipPaths.some((skipPath) => path.startsWith(skipPath));
   }
 
   // Cleanup expired tokens

@@ -1,4 +1,15 @@
-import { Controller, Post, Get, Put, Delete, Body, Param, Query, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { EmailNotificationsService } from '../services/email-notifications.service';
 import { TemplateService } from '../services/template.service';
@@ -8,7 +19,11 @@ import { EmailTemplateType } from '../entities/email-template.entity';
 import { SendEmailDto } from '../dto/send-email.dto';
 import { CreateEmailTemplateDto } from '../dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from '../dto/update-email-template.dto';
-import { CreateNotificationPreferenceDto, UpdateNotificationPreferenceDto, UnsubscribeDto } from '../dto/notification-preference.dto';
+import {
+  CreateNotificationPreferenceDto,
+  UpdateNotificationPreferenceDto,
+  UnsubscribeDto,
+} from '../dto/notification-preference.dto';
 
 @ApiTags('notifications')
 @Controller('notifications')
@@ -80,8 +95,14 @@ export class NotificationsController {
   @Put('preferences/:userId')
   @ApiOperation({ summary: 'Update notification preferences for a user' })
   @ApiResponse({ status: 200, description: 'Preferences updated successfully' })
-  async updatePreferences(@Param('userId') userId: string, @Body() updatePrefDto: UpdateNotificationPreferenceDto) {
-    const preferences = await this.notificationPreferenceService.updatePreferences(userId, updatePrefDto);
+  async updatePreferences(
+    @Param('userId') userId: string,
+    @Body() updatePrefDto: UpdateNotificationPreferenceDto,
+  ) {
+    const preferences = await this.notificationPreferenceService.updatePreferences(
+      userId,
+      updatePrefDto,
+    );
     return { success: true, data: preferences };
   }
 
@@ -91,8 +112,8 @@ export class NotificationsController {
   @HttpCode(HttpStatus.OK)
   async unsubscribe(@Body() unsubscribeDto: UnsubscribeDto) {
     await this.notificationPreferenceService.unsubscribeByToken(
-      unsubscribeDto.token, 
-      unsubscribeDto.categories
+      unsubscribeDto.token,
+      unsubscribeDto.categories,
     );
     return { success: true, message: 'Successfully unsubscribed' };
   }

@@ -20,7 +20,7 @@ export class EmailQueueService {
 
   async addToQueue(sendEmailDto: SendEmailDto): Promise<EmailQueue> {
     const emailQueue = new EmailQueue();
-    
+
     // Set basic email properties
     emailQueue.recipientEmail = sendEmailDto.to;
     emailQueue.recipientName = sendEmailDto.name;
@@ -39,8 +39,13 @@ export class EmailQueueService {
 
       if (template) {
         emailQueue.subject = this.replacePlaceholders(template.subject, sendEmailDto.templateData);
-        emailQueue.htmlContent = this.replacePlaceholders(template.htmlContent, sendEmailDto.templateData);
-        emailQueue.textContent = template.textContent ? this.replacePlaceholders(template.textContent, sendEmailDto.templateData) : undefined;
+        emailQueue.htmlContent = this.replacePlaceholders(
+          template.htmlContent,
+          sendEmailDto.templateData,
+        );
+        emailQueue.textContent = template.textContent
+          ? this.replacePlaceholders(template.textContent, sendEmailDto.templateData)
+          : undefined;
       }
     }
 
@@ -52,8 +57,13 @@ export class EmailQueueService {
 
       if (template) {
         emailQueue.subject = this.replacePlaceholders(template.subject, sendEmailDto.templateData);
-        emailQueue.htmlContent = this.replacePlaceholders(template.htmlContent, sendEmailDto.templateData);
-        emailQueue.textContent = template.textContent ? this.replacePlaceholders(template.textContent, sendEmailDto.templateData) : undefined;
+        emailQueue.htmlContent = this.replacePlaceholders(
+          template.htmlContent,
+          sendEmailDto.templateData,
+        );
+        emailQueue.textContent = template.textContent
+          ? this.replacePlaceholders(template.textContent, sendEmailDto.templateData)
+          : undefined;
       }
     }
 
@@ -65,9 +75,17 @@ export class EmailQueueService {
 
       if (template && template.languages && template.languages[sendEmailDto.language]) {
         const langTemplate = template.languages[sendEmailDto.language];
-        emailQueue.subject = this.replacePlaceholders(langTemplate.subject, sendEmailDto.templateData);
-        emailQueue.htmlContent = this.replacePlaceholders(langTemplate.htmlContent, sendEmailDto.templateData);
-        emailQueue.textContent = langTemplate.textContent ? this.replacePlaceholders(langTemplate.textContent, sendEmailDto.templateData) : undefined;
+        emailQueue.subject = this.replacePlaceholders(
+          langTemplate.subject,
+          sendEmailDto.templateData,
+        );
+        emailQueue.htmlContent = this.replacePlaceholders(
+          langTemplate.htmlContent,
+          sendEmailDto.templateData,
+        );
+        emailQueue.textContent = langTemplate.textContent
+          ? this.replacePlaceholders(langTemplate.textContent, sendEmailDto.templateData)
+          : undefined;
       }
     }
 
@@ -79,7 +97,7 @@ export class EmailQueueService {
 
   private replacePlaceholders(text: string, data: Record<string, any>): string {
     if (!data) return text;
-    
+
     let result = text;
     for (const [key, value] of Object.entries(data)) {
       const placeholder = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
@@ -121,7 +139,7 @@ export class EmailQueueService {
       return true;
     } catch (error) {
       this.logger.error(`Failed to send email: ${error.message}`);
-      
+
       // Update status to failed and increment retry count
       const emailJob = await this.emailQueueRepository.findOne({
         where: { id: jobId },

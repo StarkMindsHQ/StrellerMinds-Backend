@@ -1,15 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CourseModule } from "./entities/module.entity";
-import { CreateCourseDto } from "./dto/create-course.dto";
-import { CreateLessonDto } from "./dto/create-lesson.dto";
-import { CreateModuleDto } from "./dto/create-module.dto";
-import { CourseVersion } from "./entities/course-version.entity";
-import { Course } from "./entities/course.entity";
-import { Enrollment } from "./entities/enrollment.entity";
-import { Lesson } from "./entities/lesson.entity";
-import { CourseStatus } from "./enums/course-status.enum";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CourseModule } from './entities/module.entity';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { CreateLessonDto } from './dto/create-lesson.dto';
+import { CreateModuleDto } from './dto/create-module.dto';
+import { CourseVersion } from './entities/course-version.entity';
+import { Course } from './entities/course.entity';
+import { Enrollment } from './entities/enrollment.entity';
+import { Lesson } from './entities/lesson.entity';
+import { CourseStatus } from './enums/course-status.enum';
 
 @Injectable()
 export class CourseService {
@@ -45,9 +45,7 @@ export class CourseService {
 
   async enroll(studentId: string, courseId: string) {
     const course = await this.courseRepo.findOneBy({ id: courseId });
-    return this.enrollmentRepo.save(
-      this.enrollmentRepo.create({ studentId, course }),
-    );
+    return this.enrollmentRepo.save(this.enrollmentRepo.create({ studentId, course }));
   }
 
   async publishCourse(courseId: string) {

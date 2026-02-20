@@ -26,9 +26,7 @@ export class ForumService {
     const thread = await this.threadRepo.findOne({ where: { id: threadId } });
     if (!thread) throw new NotFoundException('Thread not found');
 
-    const path = dto.parentId
-      ? `${dto.parentId}.${Date.now()}`
-      : `${Date.now()}`;
+    const path = dto.parentId ? `${dto.parentId}.${Date.now()}` : `${Date.now()}`;
 
     const comment = this.commentRepo.create({
       contentMarkdown: dto.contentMarkdown,

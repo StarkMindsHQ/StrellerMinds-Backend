@@ -2,13 +2,7 @@ import { Injectable, BadRequestException, NotFoundException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Stripe from 'stripe';
-import {
-  Payment,
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Refund,
-} from '../entities';
+import { Payment, Subscription, PaymentPlan, Invoice, Refund } from '../entities';
 import { PaymentStatus, PaymentMethod, SubscriptionStatus } from '../enums';
 import { CreatePaymentDto, ProcessPaymentDto } from '../dto';
 
@@ -31,10 +25,7 @@ export class StripeService {
     });
   }
 
-  async createPaymentIntent(
-    userId: string,
-    dto: ProcessPaymentDto,
-  ): Promise<string> {
+  async createPaymentIntent(userId: string, dto: ProcessPaymentDto): Promise<string> {
     try {
       const idempotencyKey = dto.idempotencyKey || `payment-${userId}-${Date.now()}`;
 
@@ -64,9 +55,7 @@ export class StripeService {
     dto: CreatePaymentDto,
   ): Promise<Payment> {
     try {
-      const paymentIntent = await this.stripe.paymentIntents.retrieve(
-        paymentIntentId,
-      );
+      const paymentIntent = await this.stripe.paymentIntents.retrieve(paymentIntentId);
 
       if (paymentIntent.status !== 'succeeded') {
         throw new BadRequestException('Payment intent not successful');
@@ -92,10 +81,7 @@ export class StripeService {
     }
   }
 
-  async createSubscription(
-    userId: string,
-    subscriptionData: any,
-  ): Promise<any> {
+  async createSubscription(userId: string, subscriptionData: any): Promise<any> {
     try {
       const customer = await this.ensureStripeCustomer(userId);
 
@@ -110,9 +96,7 @@ export class StripeService {
 
       return subscription;
     } catch (error) {
-      throw new BadRequestException(
-        `Failed to create Stripe subscription: ${error.message}`,
-      );
+      throw new BadRequestException(`Failed to create Stripe subscription: ${error.message}`);
     }
   }
 
@@ -120,16 +104,11 @@ export class StripeService {
     try {
       await this.stripe.subscriptions.cancel(stripeSubscriptionId);
     } catch (error) {
-      throw new BadRequestException(
-        `Failed to cancel Stripe subscription: ${error.message}`,
-      );
+      throw new BadRequestException(`Failed to cancel Stripe subscription: ${error.message}`);
     }
   }
 
-  async refundPayment(
-    paymentIntentId: string,
-    amount?: number,
-  ): Promise<any> {
+  async refundPayment(paymentIntentId: string, amount?: number): Promise<any> {
     try {
       const refund = await this.stripe.refunds.create({
         payment_intent: paymentIntentId,

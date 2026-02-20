@@ -18,7 +18,7 @@ export class DigestEmailService {
   async generateCourseUpdatesDigest(userId: string, period: 'daily' | 'weekly'): Promise<any> {
     // In a real implementation, this would fetch recent course updates for the user
     // For now, we'll return sample data
-    
+
     const updates = [
       {
         courseName: 'Introduction to Blockchain',
@@ -48,7 +48,7 @@ export class DigestEmailService {
   async generateDeadlinesDigest(userId: string, period: 'daily' | 'weekly'): Promise<any> {
     // In a real implementation, this would fetch upcoming deadlines for the user
     // For now, we'll return sample data
-    
+
     const deadlines = [
       {
         courseName: 'Blockchain Project',
@@ -78,7 +78,7 @@ export class DigestEmailService {
   async generateAnnouncementsDigest(userId: string, period: 'daily' | 'weekly'): Promise<any> {
     // In a real implementation, this would fetch recent announcements for the user
     // For now, we'll return sample data
-    
+
     const announcements = [
       {
         title: 'Platform Maintenance Scheduled',
@@ -150,7 +150,7 @@ export class DigestEmailService {
           <h2>${courseUpdates.title}</h2>
           <ul>
         `;
-        courseUpdates.updates.forEach(update => {
+        courseUpdates.updates.forEach((update) => {
           htmlContent += `
             <li>
               <strong>${update.courseName}:</strong> 
@@ -167,7 +167,7 @@ export class DigestEmailService {
           <h2>${deadlines.title}</h2>
           <ul>
         `;
-        deadlines.deadlines.forEach(deadline => {
+        deadlines.deadlines.forEach((deadline) => {
           htmlContent += `
             <li>
               <strong>${deadline.courseName}:</strong> 
@@ -184,7 +184,7 @@ export class DigestEmailService {
           <h2>${announcements.title}</h2>
           <ul>
         `;
-        announcements.announcements.forEach(announcement => {
+        announcements.announcements.forEach((announcement) => {
           htmlContent += `
             <li>
               <strong>${announcement.title}</strong> 
@@ -196,7 +196,8 @@ export class DigestEmailService {
         htmlContent += '</ul>';
       }
 
-      htmlContent += '<hr><p>Manage your email preferences <a href="/settings/notifications">here</a>.</p>';
+      htmlContent +=
+        '<hr><p>Manage your email preferences <a href="/settings/notifications">here</a>.</p>';
 
       // Send the digest email
       const sendEmailDto: SendEmailDto = {
@@ -224,7 +225,7 @@ export class DigestEmailService {
     // This method would typically be called by a cron job or scheduled task
     // It would iterate through all users who have digest emails enabled
     // and send them their appropriate digest based on their preferences
-    
+
     // For now, we'll just log that the function exists
     console.log('Scheduling digest emails...');
   }
@@ -234,7 +235,9 @@ export class DigestEmailService {
     const usersWithDigestEnabled = await this.notificationPreferenceRepository
       .createQueryBuilder('preferences')
       .where('preferences."emailEnabled" = :enabled', { enabled: true })
-      .andWhere('preferences.preferences->\'DIGEST\'->>\'enabled\' = :digestEnabled', { digestEnabled: 'true' })
+      .andWhere("preferences.preferences->'DIGEST'->>'enabled' = :digestEnabled", {
+        digestEnabled: 'true',
+      })
       .select('preferences.userId')
       .getRawMany();
 

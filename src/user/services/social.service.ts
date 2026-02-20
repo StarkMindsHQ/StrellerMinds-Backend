@@ -259,10 +259,7 @@ export class SocialService {
       .map((p) => this.mapProfileToSocialGraphDto(p, p.user));
   }
 
-  async getUserNetwork(
-    profileId: string,
-    limit: number = 10,
-  ): Promise<UserNetworkDto> {
+  async getUserNetwork(profileId: string, limit: number = 10): Promise<UserNetworkDto> {
     const profile = await this.profileRepository.findOne({
       where: { id: profileId },
       relations: ['user'],
@@ -280,9 +277,7 @@ export class SocialService {
     const suggestedUsers = await this.getSuggestedUsers(profileId, limit);
 
     const followingIds = following.map((f) => f.id);
-    const mutualConnections = followers.filter((f) =>
-      followingIds.includes(f.id),
-    );
+    const mutualConnections = followers.filter((f) => followingIds.includes(f.id));
 
     return {
       followers: followers.slice(0, limit),
@@ -368,10 +363,7 @@ export class SocialService {
     };
   }
 
-  private mapProfileToSocialGraphDto(
-    profile: UserProfile,
-    user: User,
-  ): SocialGraphResponseDto {
+  private mapProfileToSocialGraphDto(profile: UserProfile, user: User): SocialGraphResponseDto {
     return {
       id: profile.id,
       userId: profile.userId,

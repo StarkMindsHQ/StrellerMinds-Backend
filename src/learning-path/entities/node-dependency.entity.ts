@@ -11,9 +11,9 @@ import { LearningPathNode } from './learning-path-node.entity';
 
 export enum DependencyType {
   PREREQUISITE = 'prerequisite', // Source must be completed before target
-  COREQUISITE = 'corequisite',   // Source and target can be taken together
-  RECOMMENDED = 'recommended',   // Source is recommended but not required
-  UNLOCKS = 'unlocks',          // Source unlocks target (conditional access)
+  COREQUISITE = 'corequisite', // Source and target can be taken together
+  RECOMMENDED = 'recommended', // Source is recommended but not required
+  UNLOCKS = 'unlocks', // Source unlocks target (conditional access)
 }
 
 @Entity('node_dependencies')

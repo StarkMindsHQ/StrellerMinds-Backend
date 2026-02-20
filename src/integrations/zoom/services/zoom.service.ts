@@ -12,11 +12,7 @@ export class ZoomService {
   /**
    * Get Zoom API access token
    */
-  async getAccessToken(
-    accountId: string,
-    clientId: string,
-    clientSecret: string,
-  ): Promise<string> {
+  async getAccessToken(accountId: string, clientId: string, clientSecret: string): Promise<string> {
     try {
       // Check if token is still valid
       if (this.accessToken && this.tokenExpiry > Date.now()) {
@@ -41,7 +37,7 @@ export class ZoomService {
 
       // this.accessToken = response.data.access_token;
       // this.tokenExpiry = Date.now() + (response.data.expires_in * 1000);
-      
+
       // Placeholder for demo
       this.accessToken = `zoom_token_${Date.now()}`;
       this.tokenExpiry = Date.now() + 3600000;
@@ -114,10 +110,7 @@ export class ZoomService {
   /**
    * Get Zoom meeting details
    */
-  async getMeetingDetails(
-    accessToken: string,
-    meetingId: string,
-  ): Promise<any> {
+  async getMeetingDetails(accessToken: string, meetingId: string): Promise<any> {
     try {
       // In production:
       // const response = await axios.get(
@@ -147,11 +140,7 @@ export class ZoomService {
   /**
    * Update Zoom meeting
    */
-  async updateMeeting(
-    accessToken: string,
-    meetingId: string,
-    updates: any,
-  ): Promise<any> {
+  async updateMeeting(accessToken: string, meetingId: string, updates: any): Promise<any> {
     try {
       // In production, call Zoom API with PUT request
       return {
@@ -168,10 +157,7 @@ export class ZoomService {
   /**
    * Delete Zoom meeting
    */
-  async deleteMeeting(
-    accessToken: string,
-    meetingId: string,
-  ): Promise<void> {
+  async deleteMeeting(accessToken: string, meetingId: string): Promise<void> {
     try {
       // In production, call Zoom API with DELETE request
       this.logger.log(`Meeting ${meetingId} deleted`);
@@ -253,10 +239,7 @@ export class ZoomService {
   /**
    * Get meeting participants
    */
-  async getParticipants(
-    accessToken: string,
-    meetingId: string,
-  ): Promise<any[]> {
+  async getParticipants(accessToken: string, meetingId: string): Promise<any[]> {
     try {
       // Placeholder
       return [];
@@ -269,18 +252,14 @@ export class ZoomService {
   /**
    * Verify webhook signature
    */
-  verifyWebhookSignature(
-    token: string,
-    timestamp: string,
-    signature: string,
-  ): boolean {
+  verifyWebhookSignature(token: string, timestamp: string, signature: string): boolean {
     try {
       const message = `v0:${timestamp}:${token}`;
       const hash = crypto
         .createHmac('sha256', process.env.ZOOM_WEBHOOK_SECRET || '')
         .update(message)
         .digest('hex');
-      
+
       const expectedSignature = `v0=${hash}`;
       return signature === expectedSignature;
     } catch (error) {

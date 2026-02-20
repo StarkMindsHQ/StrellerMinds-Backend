@@ -16,9 +16,11 @@ export class PushChannel implements INotificationChannel {
         return false;
       }
 
-      this.logger.log(`[Push Simulation] Sending Push to ${notification.userId}: ${notification.title}`);
+      this.logger.log(
+        `[Push Simulation] Sending Push to ${notification.userId}: ${notification.title}`,
+      );
       // Integrate with FCM or OneSignal here
-      
+
       return true;
     } catch (error) {
       this.logger.error(`Failed to send Push to ${notification.userId}: ${error.message}`);
