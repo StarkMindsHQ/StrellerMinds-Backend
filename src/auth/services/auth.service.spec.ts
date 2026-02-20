@@ -177,7 +177,7 @@ describe('AuthService', () => {
         passwordResetToken: 'reset-token',
         passwordResetExpires: new Date(Date.now() + 3600000),
       };
-      
+
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(userWithResetToken as User);
       jest.spyOn(bcryptService, 'hash').mockResolvedValue('newHashedPassword');
       jest.spyOn(userRepository, 'update').mockResolvedValue(undefined);
@@ -192,7 +192,9 @@ describe('AuthService', () => {
     it('should throw error for invalid reset token', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
 
-      await expect(service.resetPassword('invalid-token', 'NewPassword123!')).rejects.toThrow(NotFoundException);
+      await expect(service.resetPassword('invalid-token', 'NewPassword123!')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -202,7 +204,7 @@ describe('AuthService', () => {
         ...mockUser,
         emailVerificationToken: 'verification-token',
       };
-      
+
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(userWithVerificationToken as User);
       jest.spyOn(userRepository, 'update').mockResolvedValue(undefined);
 

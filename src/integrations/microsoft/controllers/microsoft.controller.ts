@@ -27,10 +27,7 @@ export class MicrosoftController {
    */
   @Post('config')
   @UseGuards(JwtAuthGuard)
-  async createMicrosoftConfig(
-    @CurrentUser() user: any,
-    @Body() dto: MicrosoftConfigDto,
-  ) {
+  async createMicrosoftConfig(@CurrentUser() user: any, @Body() dto: MicrosoftConfigDto) {
     const config = await this.microsoftConfigService.createMicrosoftConfig(
       user.id,
       dto.clientId,
@@ -61,11 +58,7 @@ export class MicrosoftController {
       throw new BadRequestException('Missing required parameters');
     }
 
-    const authUrl = this.microsoftService.getAuthorizationUrl(
-      clientId,
-      redirectUri,
-      tenantId,
-    );
+    const authUrl = this.microsoftService.getAuthorizationUrl(clientId, redirectUri, tenantId);
     return {
       success: true,
       data: { authUrl },
@@ -113,10 +106,7 @@ export class MicrosoftController {
    */
   @Get('config/:configId')
   @UseGuards(JwtAuthGuard)
-  async getMicrosoftConfig(
-    @CurrentUser() user: any,
-    @Param('configId') configId: string,
-  ) {
+  async getMicrosoftConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
     const config = await this.microsoftConfigService.getMicrosoftConfig(configId, user.id);
     if (!config) {
       throw new NotFoundException('Microsoft configuration not found');
@@ -146,9 +136,7 @@ export class MicrosoftController {
    */
   @Post('assignments')
   @UseGuards(JwtAuthGuard)
-  async createAssignment(
-    @Body() dto: TeamsAssignmentDto,
-  ) {
+  async createAssignment(@Body() dto: TeamsAssignmentDto) {
     try {
       const assignment = await this.microsoftService.createAssignment(
         'token',
@@ -175,10 +163,7 @@ export class MicrosoftController {
    */
   @Post('sync-teams')
   @UseGuards(JwtAuthGuard)
-  async syncTeams(
-    @CurrentUser() user: any,
-    @Body() body: { configId: string },
-  ) {
+  async syncTeams(@CurrentUser() user: any, @Body() body: { configId: string }) {
     const syncLog = await this.microsoftConfigService.syncTeams(body.configId, user.id);
 
     return {

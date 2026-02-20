@@ -49,7 +49,7 @@ export const SECURITY_CONFIG = {
       'http://localhost:3001',
       'https://strellerminds.com',
       'https://www.strellerminds.com',
-      'https://app.strellerminds.com'
+      'https://app.strellerminds.com',
     ],
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
@@ -60,30 +60,30 @@ export const SECURITY_CONFIG = {
       'X-CSRF-Token',
       'X-API-Key',
       'Accept',
-      'Origin'
+      'Origin',
     ],
     exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
     maxAge: 86400, // 24 hours
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 204,
   } as CorsConfig,
 
   securityHeaders: {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https:", "blob:"],
-        connectSrc: ["'self'", "https://api.stripe.com", "https://soroban-testnet.stellar.org"],
-        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+        connectSrc: ["'self'", 'https://api.stripe.com', 'https://soroban-testnet.stellar.org'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
         objectSrc: ["'none'"],
-        mediaSrc: ["'self'", "blob:"],
+        mediaSrc: ["'self'", 'blob:'],
         frameSrc: ["'none'"],
         childSrc: ["'none'"],
-        workerSrc: ["'self'", "blob:"],
+        workerSrc: ["'self'", 'blob:'],
         manifestSrc: ["'self'"],
-        upgradeInsecureRequests: []
-      }
+        upgradeInsecureRequests: [],
+      },
     },
     crossOriginEmbedderPolicy: false, // Disabled for compatibility
     crossOriginOpenerPolicy: false, // Disabled for compatibility
@@ -94,23 +94,23 @@ export const SECURITY_CONFIG = {
     hsts: {
       maxAge: 31536000, // 1 year
       includeSubDomains: true,
-      preload: true
+      preload: true,
     },
     ieNoOpen: true,
     noSniff: true,
     originAgentCluster: true,
     permittedCrossDomainPolicies: false,
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' as any },
-    xssFilter: true
+    xssFilter: true,
   } as SecurityHeadersConfig,
 
   csrf: {
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      sameSite: 'strict',
     },
     ignoreMethods: ['GET', 'HEAD', 'OPTIONS'],
-    value: (req: any) => req.csrfToken()
-  } as CsrfConfig
+    value: (req: any) => req.csrfToken(),
+  } as CsrfConfig,
 };

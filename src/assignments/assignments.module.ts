@@ -15,21 +15,10 @@ import { SubmissionController } from './controller/submission.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Assignment,
-      Submission,
-      Grade,
-      Rubric,
-      Annotation,
-      PeerReview
-    ])
+    TypeOrmModule.forFeature([Assignment, Submission, Grade, Rubric, Annotation, PeerReview]),
   ],
-  controllers: [ SubmissionController],
-  providers: [
-    GradingService,
-    PlagiarismService,
-    PeerReviewService
-  ],
-  exports: [GradingService]
+  controllers: [SubmissionController],
+  providers: [GradingService, PlagiarismService, PeerReviewService],
+  exports: [GradingService],
 })
 export class AssignmentModule {}

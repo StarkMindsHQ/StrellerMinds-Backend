@@ -7,7 +7,7 @@ export class Grade {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToOne(() => Submission, submission => submission.grade)
+  @OneToOne(() => Submission, (submission) => submission.grade)
   submission: Submission;
 
   @Column('decimal', { precision: 5, scale: 2 })

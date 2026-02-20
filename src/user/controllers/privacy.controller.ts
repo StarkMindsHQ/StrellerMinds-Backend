@@ -35,9 +35,7 @@ export class PrivacyController {
   @Get('me/settings')
   @ApiOperation({ summary: 'Get my privacy settings' })
   @ApiResponse({ status: 200, description: 'Privacy settings retrieved' })
-  async getMyPrivacySettings(
-    @Request() req,
-  ): Promise<PrivacySettingsResponseDto> {
+  async getMyPrivacySettings(@Request() req): Promise<PrivacySettingsResponseDto> {
     return this.privacyService.getPrivacySettings(req.user.id);
   }
 

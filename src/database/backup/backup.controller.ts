@@ -33,12 +33,7 @@ import {
   CreateBackupScheduleDto,
   UpdateBackupScheduleDto,
 } from './dto';
-import {
-  BackupRecord,
-  BackupType,
-  BackupStatus,
-  RetentionTier,
-} from './entities';
+import { BackupRecord, BackupType, BackupStatus, RetentionTier } from './entities';
 
 @ApiTags('Backup & Recovery')
 @Controller('api/backups')
@@ -181,9 +176,7 @@ export class BackupController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Test history retrieved' })
   async getRecoveryTestHistory(@Query('limit') limit?: number) {
-    return this.recoveryService.getRecoveryTestHistory(
-      limit ? Number(limit) : undefined,
-    );
+    return this.recoveryService.getRecoveryTestHistory(limit ? Number(limit) : undefined);
   }
 
   // === Schedules ===
@@ -243,10 +236,7 @@ export class BackupController {
   @ApiParam({ name: 'id', description: 'Schedule ID' })
   @ApiQuery({ name: 'enabled', required: true, type: Boolean })
   @ApiResponse({ status: 200, description: 'Schedule toggled' })
-  async toggleSchedule(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Query('enabled') enabled: boolean,
-  ) {
+  async toggleSchedule(@Param('id', ParseUUIDPipe) id: string, @Query('enabled') enabled: boolean) {
     return this.schedulerService.toggleSchedule(
       id,
       enabled === true || enabled === ('true' as any),

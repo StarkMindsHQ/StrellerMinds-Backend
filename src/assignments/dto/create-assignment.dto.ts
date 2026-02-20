@@ -1,4 +1,13 @@
-import { IsEnum, IsString, IsNumber, IsOptional, IsDateString, IsBoolean, IsArray, ValidateNested } from 'class-validator';
+import {
+  IsEnum,
+  IsString,
+  IsNumber,
+  IsOptional,
+  IsDateString,
+  IsBoolean,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { AssignmentType } from '../entities/assignment.entity';
 

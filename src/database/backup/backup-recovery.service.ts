@@ -6,17 +6,8 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import {
-  BackupRecord,
-  BackupStatus,
-  RecoveryTest,
-  RecoveryTestStatus,
-} from './entities';
-import {
-  RecoveryOptions,
-  RecoveryResult,
-  RecoveryTestResult,
-} from './interfaces';
+import { BackupRecord, BackupStatus, RecoveryTest, RecoveryTestStatus } from './entities';
+import { RecoveryOptions, RecoveryResult, RecoveryTestResult } from './interfaces';
 import { BackupCloudStorageService } from './backup-cloud-storage.service';
 import { BackupEncryptionService } from './backup-encryption.service';
 import { BackupNotificationService } from './backup-notification.service';
@@ -118,9 +109,7 @@ export class BackupRecoveryService {
       // Count restored tables
       const tablesRestored = await this.countTables(targetDb);
 
-      this.logger.log(
-        `Restore completed in ${durationMs}ms: ${tablesRestored} tables`,
-      );
+      this.logger.log(`Restore completed in ${durationMs}ms: ${tablesRestored} tables`);
 
       return {
         success: true,
@@ -320,10 +309,7 @@ export class BackupRecoveryService {
     this.logger.debug(`Dropped test database: ${this.testDatabaseName}`);
   }
 
-  private async executeRestore(
-    backupPath: string,
-    targetDatabase: string,
-  ): Promise<void> {
+  private async executeRestore(backupPath: string, targetDatabase: string): Promise<void> {
     const dbConfig = this.getDatabaseConfig();
 
     let command: string;

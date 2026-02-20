@@ -12,7 +12,7 @@ export class EmailService {
 
   async sendEmailVerification(user: User, token: string): Promise<void> {
     const verificationUrl = `${this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000')}/auth/verify-email?token=${token}`;
-    
+
     await this.mailerService.sendMail({
       to: user.email,
       subject: 'Verify Your StrellerMinds Email Address',
@@ -26,7 +26,7 @@ export class EmailService {
 
   async sendPasswordReset(user: User, token: string): Promise<void> {
     const resetUrl = `${this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000')}/auth/reset-password?token=${token}`;
-    
+
     await this.mailerService.sendMail({
       to: user.email,
       subject: 'Reset Your StrellerMinds Password',

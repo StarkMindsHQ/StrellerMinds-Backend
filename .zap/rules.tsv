@@ -1,0 +1,58 @@
+# OWASP ZAP Rules Configuration
+# Format: rule_id	description	enabled
+
+# Disable rules that may cause false positives in testing environment
+10021	X-Content-Type-Options header missing	false
+10055	Cookie without SameSite Attribute	false
+10056	CSP Scanner Rule Report	false
+10017	X-Debug-Token Information Leak	false
+10020	X-AspNet-Version Response Header	false
+10054	Cookie without Secure Attribute	false
+
+# Enable important security rules
+10003	Cross Domain Script Inclusion	true
+10004	Content-Type Header Missing	true
+10005	X-Frame-Options Header	true
+10006	Information Disclosure - Debug Error Messages	true
+10009	Information Disclosure - Sensitive Information in URL	true
+10010	Information Disclosure - Sensitive Information in HTTP Referrer Header	true
+10011	Information Disclosure - Sensitive Information in HTTP Response Header	true
+10012	Information Disclosure - Sensitive Information in JavaScript Files	true
+10013	Information Disclosure - Sensitive Information in HTML Comments	true
+10014	Information Disclosure - Sensitive Information in CSS Files	true
+10015	Information Disclosure - Sensitive Information in HTML Forms	true
+10016	Information Disclosure - Sensitive Information in HTML Meta Tags	true
+10018	Information Disclosure - Sensitive Information in JavaScript Variables	true
+10019	Information Disclosure - Sensitive Information in HTML Attributes	true
+10022	Directory Browsing	true
+10023	Heartbleed OpenSSL Vulnerability	true
+10024	SSL Certificate - Expired	true
+10025	SSL Certificate - Self-Signed	true
+10026	SSL Certificate - Invalid Hostname	true
+10027	SSL Certificate - Weak Signature Algorithm	true
+10028	SSL Certificate - Weak Key	true
+10029	SSL Certificate - Incomplete Chain	true
+10030	SSL Certificate - Revoked	true
+10031	SSL Certificate - Mismatched	true
+10032	SSL Certificate - Weak Cipher Suites	true
+10033	SSL Certificate - Weak Protocol	true
+10034	SSL Certificate - Weak DH Parameters	true
+10035	SSL Certificate - Weak Ephemeral Key	true
+10036	SSL Certificate - Weak MAC Algorithm	true
+10037	SSL Certificate - Weak Hash Algorithm	true
+10038	SSL Certificate - Weak Compression	true
+10039	SSL Certificate - Weak Random Number Generator	true
+10040	SSL Certificate - Weak Session Resumption	true
+10041	SSL Certificate - Weak Session Ticket	true
+10042	SSL Certificate - Weak Session ID	true
+10043	SSL Certificate - Weak Session Cache	true
+10044	SSL Certificate - Weak Session Timeout	true
+10045	SSL Certificate - Weak Session Size	true
+10046	SSL Certificate - Weak Session Lifetime	true
+10047	SSL Certificate - Weak Session Reuse	true
+10048	SSL Certificate - Weak Session Forward Secrecy	true
+10049	SSL Certificate - Weak Session Compression	true
+10050	SSL Certificate - Weak Session Encryption	true
+10051	SSL Certificate - Weak Session Authentication	true
+10052	SSL Certificate - Weak Session Integrity	true
+10053	SSL Certificate - Weak Session Perfect Forward Secrecy	true

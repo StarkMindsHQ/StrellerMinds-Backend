@@ -72,12 +72,12 @@ export class LearningPath {
   @Column({ default: 0 })
   totalNodes: number;
 
-  @OneToMany(() => LearningPathNode, node => node.learningPath, {
+  @OneToMany(() => LearningPathNode, (node) => node.learningPath, {
     cascade: true,
   })
   nodes: LearningPathNode[];
 
-  @OneToMany(() => LearningPathEnrollment, enrollment => enrollment.learningPath)
+  @OneToMany(() => LearningPathEnrollment, (enrollment) => enrollment.learningPath)
   enrollments: LearningPathEnrollment[];
 
   @CreateDateColumn()

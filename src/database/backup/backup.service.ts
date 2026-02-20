@@ -8,13 +8,7 @@ import * as fs from 'fs/promises';
 import * as fsSync from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import {
-  BackupRecord,
-  BackupType,
-  BackupStatus,
-  StorageLocation,
-  RetentionTier,
-} from './entities';
+import { BackupRecord, BackupType, BackupStatus, StorageLocation, RetentionTier } from './entities';
 import {
   BackupOptions,
   BackupResult,
@@ -46,19 +40,14 @@ export class BackupService {
     private readonly metricsService: BackupMetricsService,
   ) {
     this.backupDir = this.configService.get('BACKUP_DIR', './backups');
-    this.retentionDays = this.configService.get<number>(
-      'BACKUP_RETENTION_DAYS',
-      30,
-    );
+    this.retentionDays = this.configService.get<number>('BACKUP_RETENTION_DAYS', 30);
     this.monthlyRetentionMonths = this.configService.get<number>(
       'BACKUP_MONTHLY_RETENTION_MONTHS',
       12,
     );
   }
 
-  async createEnhancedBackup(
-    options: EnhancedBackupOptions = {},
-  ): Promise<EnhancedBackupResult> {
+  async createEnhancedBackup(options: EnhancedBackupOptions = {}): Promise<EnhancedBackupResult> {
     const startTime = Date.now();
     const backupType = options.backupType || BackupType.FULL;
 
@@ -80,8 +69,10 @@ export class BackupService {
     let filename = `backup-${backupRecord.id}-${timestamp}.sql`;
     const compress = options.compress !== false;
     const encrypt = options.encrypt !== false && this.encryptionService.isEncryptionEnabled();
-    const uploadToS3 = options.uploadToS3 !== false && this.cloudStorageService.isCloudUploadEnabled();
-    const replicate = options.replicateCrossRegion !== false && this.cloudStorageService.isCrossRegionEnabled();
+    const uploadToS3 =
+      options.uploadToS3 !== false && this.cloudStorageService.isCloudUploadEnabled();
+    const replicate =
+      options.replicateCrossRegion !== false && this.cloudStorageService.isCrossRegionEnabled();
 
     if (compress) filename += '.gz';
     if (encrypt) filename += '.enc';
@@ -113,10 +104,7 @@ export class BackupService {
       // Step 3: Encrypt if enabled
       let finalPath = rawBackupPath;
       if (encrypt) {
-        const encryptResult = await this.encryptionService.encryptFile(
-          rawBackupPath,
-          localPath,
-        );
+        const encryptResult = await this.encryptionService.encryptFile(rawBackupPath, localPath);
         backupRecord.encryptionKeyId = encryptResult.keyId;
         finalPath = encryptResult.encryptedPath;
 
@@ -183,10 +171,7 @@ export class BackupService {
       }
 
       // Calculate expiration
-      backupRecord.expiresAt = calculateExpirationDate(
-        new Date(),
-        backupRecord.retentionTier,
-      );
+      backupRecord.expiresAt = calculateExpirationDate(new Date(), backupRecord.retentionTier);
 
       // Get PostgreSQL version
       try {
@@ -272,10 +257,7 @@ export class BackupService {
     };
   }
 
-  private async createRawBackup(
-    backupId: string,
-    compress: boolean,
-  ): Promise<string> {
+  private async createRawBackup(backupId: string, compress: boolean): Promise<string> {
     const tempFilename = `backup-${backupId}-temp.sql${compress ? '.gz' : ''}`;
     const tempPath = path.join(this.backupDir, tempFilename);
 
@@ -374,9 +356,7 @@ export class BackupService {
     return { records, total };
   }
 
-  async listBackups(): Promise<
-    Array<{ filename: string; size: number; created: Date }>
-  > {
+  async listBackups(): Promise<Array<{ filename: string; size: number; created: Date }>> {
     try {
       const files = await fs.readdir(this.backupDir);
       const backups = [];
@@ -384,9 +364,7 @@ export class BackupService {
       for (const file of files) {
         if (
           file.startsWith('backup-') &&
-          (file.endsWith('.sql') ||
-            file.endsWith('.sql.gz') ||
-            file.endsWith('.enc'))
+          (file.endsWith('.sql') || file.endsWith('.sql.gz') || file.endsWith('.enc'))
         ) {
           const filepath = path.join(this.backupDir, file);
           const stats = await fs.stat(filepath);
@@ -423,10 +401,7 @@ export class BackupService {
 
       // Delete from S3
       if (backup.s3PrimaryKey) {
-        await this.cloudStorageService.deleteBackup(
-          backup.s3PrimaryKey,
-          !!backup.s3ReplicaKey,
-        );
+        await this.cloudStorageService.deleteBackup(backup.s3PrimaryKey, !!backup.s3ReplicaKey);
       }
 
       backup.status = BackupStatus.DELETED;
@@ -498,7 +473,9 @@ export class BackupService {
       }
 
       if (
-        [BackupStatus.COMPLETED, BackupStatus.VERIFIED, BackupStatus.REPLICATED].includes(record.status) &&
+        [BackupStatus.COMPLETED, BackupStatus.VERIFIED, BackupStatus.REPLICATED].includes(
+          record.status,
+        ) &&
         (!stats.lastSuccessfulBackupAt || record.createdAt > stats.lastSuccessfulBackupAt)
       ) {
         stats.lastSuccessfulBackupAt = record.createdAt;

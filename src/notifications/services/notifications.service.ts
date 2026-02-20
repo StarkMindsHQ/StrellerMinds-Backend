@@ -36,10 +36,10 @@ export class NotificationsService implements OnModuleInit {
 
     // 1. Get user preferences
     const preferences = await this.preferenceService.getPreferences(userId);
-    
+
     // 2. Determine which channels to use
     let channelsToUse: NotificationChannel[] = [];
-    
+
     if (preferredChannels && preferredChannels.length > 0) {
       channelsToUse = preferredChannels;
     } else if (preferences && preferences.preferences[type]) {
@@ -54,7 +54,7 @@ export class NotificationsService implements OnModuleInit {
 
     // Filter out disabled channels globally for the user
     if (preferences) {
-      channelsToUse = channelsToUse.filter(channel => {
+      channelsToUse = channelsToUse.filter((channel) => {
         if (channel === NotificationChannel.EMAIL) return preferences.emailEnabled;
         if (channel === NotificationChannel.SMS) return preferences.smsEnabled;
         if (channel === NotificationChannel.PUSH) return preferences.pushEnabled;
@@ -65,9 +65,10 @@ export class NotificationsService implements OnModuleInit {
 
     // 3. Check for delivery optimization (e.g. DND, Quiet Hours)
     const canDeliverNow = await this.preferenceService.shouldDeliverNow(userId);
-    
+
     // If it's a high priority notification, we might bypass quiet hours (logic could be added)
-    const effectiveScheduledAt = scheduledAt || (!canDeliverNow ? this.calculateNextAvailableTime(preferences) : null);
+    const effectiveScheduledAt =
+      scheduledAt || (!canDeliverNow ? this.calculateNextAvailableTime(preferences) : null);
 
     // 4. Create and send/queue notifications for each channel
     const results: Notification[] = [];
@@ -84,12 +85,12 @@ export class NotificationsService implements OnModuleInit {
       });
 
       const savedNotification = await this.notificationRepository.save(notification);
-      
+
       if (!effectiveScheduledAt) {
         // Process immediately (in real app, this would be pushed to a queue)
         await this.processNotification(savedNotification);
       }
-      
+
       results.push(savedNotification);
     }
 
@@ -110,7 +111,7 @@ export class NotificationsService implements OnModuleInit {
     await this.notificationRepository.save(notification);
 
     const success = await channel.send(notification);
-    
+
     if (success) {
       notification.status = NotificationStatus.SENT;
       notification.sentAt = new Date();
@@ -133,12 +134,12 @@ export class NotificationsService implements OnModuleInit {
     const [hours, minutes] = preferences.quietHoursEnd.split(':').map(Number);
     const nextTime = new Date();
     nextTime.setHours(hours, minutes, 0, 0);
-    
+
     // If that time is in the past for today, set it for tomorrow
     if (nextTime <= new Date()) {
       nextTime.setDate(nextTime.getDate() + 1);
     }
-    
+
     return nextTime;
   }
 }

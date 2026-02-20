@@ -34,17 +34,17 @@ export class UnsubscribeService {
 
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const token = preferences.unsubscribeToken;
-    
+
     if (category) {
       return `${baseUrl}/unsubscribe?token=${token}&category=${category}`;
     }
-    
+
     return `${baseUrl}/unsubscribe?token=${token}`;
   }
 
   async unsubscribeByToken(unsubscribeDto: UnsubscribeDto): Promise<void> {
     const { token, categories } = unsubscribeDto;
-    
+
     const preferences = await this.notificationPreferenceRepository.findOne({
       where: { unsubscribeToken: token },
     });
@@ -55,17 +55,16 @@ export class UnsubscribeService {
 
     if (categories && categories.length > 0) {
       // Add specific categories to unsubscribed list
-      preferences.unsubscribedCategories = [...new Set([
-        ...preferences.unsubscribedCategories, 
-        ...categories
-      ])];
+      preferences.unsubscribedCategories = [
+        ...new Set([...preferences.unsubscribedCategories, ...categories]),
+      ];
     } else {
       // Unsubscribe from all emails
       preferences.emailEnabled = false;
     }
 
     await this.notificationPreferenceRepository.save(preferences);
-    
+
     // Record the unsubscribe event in analytics
     await this.recordUnsubscribeEvent(preferences.userId, categories);
   }
@@ -116,7 +115,7 @@ export class UnsubscribeService {
     if (categories && categories.length > 0) {
       // Remove specific categories from unsubscribed list
       preferences.unsubscribedCategories = preferences.unsubscribedCategories.filter(
-        cat => !categories.includes(cat)
+        (cat) => !categories.includes(cat),
       );
     } else {
       // Resubscribe to all emails

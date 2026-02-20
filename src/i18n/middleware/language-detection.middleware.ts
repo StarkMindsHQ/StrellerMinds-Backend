@@ -25,9 +25,7 @@ export class LanguageDetectionMiddleware implements NestMiddleware {
     }
     // Priority 3: Accept-Language header
     else if (req.headers['accept-language']) {
-      req['language'] = this.i18nService.detectLanguageFromHeader(
-        req.headers['accept-language'],
-      );
+      req['language'] = this.i18nService.detectLanguageFromHeader(req.headers['accept-language']);
     }
     // Priority 4: Default
     else {
@@ -38,7 +36,8 @@ export class LanguageDetectionMiddleware implements NestMiddleware {
     req['isRTL'] = this.i18nService.isRTL(req['language']);
 
     // Set locale string for dates/numbers formatting
-    req['locale'] = `${req['language']}-${this.i18nService.getLanguageMetadata(req['language']).region}`;
+    req['locale'] =
+      `${req['language']}-${this.i18nService.getLanguageMetadata(req['language']).region}`;
 
     next();
   }

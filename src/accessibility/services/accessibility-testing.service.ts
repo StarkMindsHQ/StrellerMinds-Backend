@@ -224,8 +224,7 @@ export class AccessibilityTestingService {
           severity: ViolationSeverity.SERIOUS,
           description: 'Dynamic content updates may not be announced to screen readers',
           wcagCriteria: '4.1.3',
-          recommendation:
-            'Use aria-live="polite" or aria-live="assertive" for dynamic updates',
+          recommendation: 'Use aria-live="polite" or aria-live="assertive" for dynamic updates',
         });
       }
     }
@@ -320,8 +319,7 @@ export class AccessibilityTestingService {
   meetsWCAG21AA(auditResults: AccessibilityAuditResult[]): boolean {
     // No critical or serious issues should exist for AA compliance
     return !auditResults.some(
-      (r) =>
-        r.severity === ViolationSeverity.CRITICAL || r.severity === ViolationSeverity.SERIOUS,
+      (r) => r.severity === ViolationSeverity.CRITICAL || r.severity === ViolationSeverity.SERIOUS,
     );
   }
 }

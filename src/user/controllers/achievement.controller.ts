@@ -14,11 +14,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { JwtAuthGuard } from '../../auth/guards/auth.guard';
 import { AchievementService } from '../services/achievement.service';
 import { UserProfileService } from '../services/user-profile.service';
-import {
-  AchievementStatsDto,
-  LeaderboardDto,
-  AwardBadgeDto,
-} from '../dto/achievement.dto';
+import { AchievementStatsDto, LeaderboardDto, AwardBadgeDto } from '../dto/achievement.dto';
 
 @ApiTags('Achievements & Badges')
 @Controller('achievements')
@@ -40,9 +36,7 @@ export class AchievementController {
   @Get('badges/:badgeId')
   @ApiOperation({ summary: 'Get badge details' })
   @ApiResponse({ status: 200, description: 'Badge retrieved' })
-  async getBadge(
-    @Param('badgeId', new ParseUUIDPipe()) badgeId: string,
-  ): Promise<any> {
+  async getBadge(@Param('badgeId', new ParseUUIDPipe()) badgeId: string): Promise<any> {
     return this.achievementService.getBadgeById(badgeId);
   }
 
@@ -50,10 +44,7 @@ export class AchievementController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Award badge to current user (admin only)' })
   @ApiResponse({ status: 201, description: 'Badge awarded' })
-  async awardBadge(
-    @Request() req,
-    @Body() awardDto: AwardBadgeDto,
-  ): Promise<any> {
+  async awardBadge(@Request() req, @Body() awardDto: AwardBadgeDto): Promise<any> {
     const profile = await this.userProfileService.getProfileByUserId(req.user.id);
     return this.achievementService.awardBadgeToUser(profile.id, awardDto);
   }
@@ -79,8 +70,7 @@ export class AchievementController {
   @Get('leaderboard')
   @ApiOperation({ summary: 'Get achievement leaderboard' })
   @ApiResponse({ status: 200, description: 'Leaderboard retrieved' })
-  async getLeaderboard(
-  ): Promise<LeaderboardDto[]> {
+  async getLeaderboard(): Promise<LeaderboardDto[]> {
     return this.achievementService.getLeaderboard(50, 0);
   }
 
