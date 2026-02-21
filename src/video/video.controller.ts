@@ -12,7 +12,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { VideoService } from './video.service';
 import { JwtAuthGuard } from '../auth/guards/auth.guard';
-import type { File } from 'multer';
 
 @Controller('videos')
 export class VideoController {
@@ -22,7 +21,7 @@ export class VideoController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async upload(
-    @UploadedFile() file: File,
+    @UploadedFile() file: Express.Multer.File,
     @Body() body: { title: string; description?: string },
     @Request() req,
   ) {

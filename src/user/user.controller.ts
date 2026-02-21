@@ -15,7 +15,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { Multer } from 'multer';
+
 import {
   ApiTags,
   ApiOperation,
@@ -168,7 +168,7 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async uploadAvatar(
     @Param('id') id: string,
-    @UploadedFile() file: Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<UserResponseDto> {
     return this.userService.uploadAvatar(id, file.path);
   }

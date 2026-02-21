@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
-import type { File } from 'multer';
 
 @Controller('files')
 export class FilesController {
@@ -24,14 +23,14 @@ export class FilesController {
       limits: { fileSize: 500 * 1024 * 1024 },
     }),
   )
-  uploadFile(@UploadedFile() file: File, @Req() req) {
+  uploadFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
     return this.filesService.upload(file, req.user.id);
   }
 
   @Post('upload-chunk')
   @UseInterceptors(FileInterceptor('file'))
   uploadChunk(
-    @UploadedFile() file: File,
+    @UploadedFile() file: Express.Multer.File,
     @Body('uploadId') uploadId: string,
     @Body('chunkIndex') chunkIndex: number,
   ) {

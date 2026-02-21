@@ -14,7 +14,6 @@ import { VideoProcessor } from './processors/video.processor';
 import { VirusScanService } from './virus-scan.service';
 import { StorageProvider } from './storage/storage.interface';
 import { v4 as uuid } from 'uuid';
-import type { File } from 'multer';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -33,7 +32,7 @@ export class FilesService {
     private readonly storage: StorageProvider,
   ) {}
 
-  async upload(file: File, ownerId: string) {
+  async upload(file: Express.Multer.File, ownerId: string) {
     // 1. Virus Scan
     const scanResult = await this.virusScanService.scanBuffer(file.buffer);
     if (scanResult === 'infected') {
@@ -137,7 +136,7 @@ export class FilesService {
     return this.repo.save(file);
   }
 
-  async uploadChunk(file: File, uploadId: string, chunkIndex: number) {
+  async uploadChunk(file: Express.Multer.File, uploadId: string, chunkIndex: number) {
     const tempDir = path.join(os.tmpdir(), 'uploads', uploadId);
     await fs.promises.mkdir(tempDir, { recursive: true });
 
@@ -172,7 +171,7 @@ export class FilesService {
     // Clean up
     await fs.promises.rm(tempDir, { recursive: true, force: true });
 
-    const fakeFile: File = {
+    const fakeFile: Express.Multer.File = {
       fieldname: 'file',
       originalname,
       encoding: '7bit',

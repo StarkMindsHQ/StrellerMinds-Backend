@@ -11,7 +11,6 @@ import { v4 as uuid } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
-import type { File } from 'multer';
 
 @Injectable()
 export class VideoService {
@@ -30,7 +29,7 @@ export class VideoService {
     private readonly filesService: FilesService,
   ) {}
 
-  async create(file: File, ownerId: string, title: string, description?: string) {
+  async create(file: Express.Multer.File, ownerId: string, title: string, description?: string) {
     // 1. Upload original file via FilesService (optional, or just save temporarily)
     // For now, we upload it to ensure we have a backup and can access it.
     // However, for transcoding we need a local path usually, or a signed URL if ffmpeg supports it.
