@@ -68,7 +68,7 @@ import { ForumModule } from './forum/forum.module';
 import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
-import { EmailModule } from './email/email.module';
+import { EmailTemplate } from './notifications/entities/email-template.entity';
 
 @Module({
   imports: [
@@ -109,6 +109,7 @@ import { EmailModule } from './email/email.module';
     AuthModule,
     CourseModule,
     UserModule,
+    EmailTemplate,
     PaymentModule, // <-- from feature branch
     I18nModule.register(), // <-- from main
     AccessibilityModule,
@@ -130,7 +131,6 @@ import { EmailModule } from './email/email.module';
     LearningPathModule,
     CalendarModule,
     AnalyticsModule,
-    EmailModule,
   ],
   providers: [
     {
