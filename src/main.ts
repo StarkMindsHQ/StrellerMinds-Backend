@@ -154,9 +154,15 @@ async function bootstrap() {
     .addTag('Video', 'Video processing and streaming')
     .addTag('Integrations', 'Third-party integrations')
     .addTag('Accessibility', 'Accessibility features and i18n')
+    .addTag('Developer Portal', 'API keys, SDKs, analytics, and developer tools')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+    deepScanRoutes: true,
+  });
+
+  // Enhanced Swagger UI setup
   SwaggerModule.setup('api/docs', app, document, {
     customCss: `
       .swagger-ui .topbar { display: none }
@@ -167,8 +173,10 @@ async function bootstrap() {
       .swagger-ui .opblock.opblock-put { border-color: #fca130 }
       .swagger-ui .opblock.opblock-delete { border-color: #f93e3e }
       .swagger-ui .opblock.opblock-patch { border-color: #50e3c2 }
+      .swagger-ui .btn.authorize { background-color: #4CAF50; border-color: #4CAF50; }
+      .swagger-ui .info .title { color: #3b82f6; }
     `,
-    customSiteTitle: 'StrellerMinds API Documentation',
+    customSiteTitle: 'StrellerMinds API Documentation & Developer Portal',
     customfavIcon: '/favicon.ico',
     swaggerOptions: {
       persistAuthorization: true,
@@ -176,13 +184,52 @@ async function bootstrap() {
       filter: true,
       showExtensions: true,
       showCommonExtensions: true,
-      docExpansion: 'none',
-      defaultModelsExpandDepth: 2,
-      defaultModelExpandDepth: 2,
-      displayOperationId: false,
+      docExpansion: 'list',
+      defaultModelsExpandDepth: 3,
+      defaultModelExpandDepth: 3,
+      displayOperationId: true,
       tryItOutEnabled: true,
+      requestSnippetsEnabled: true,
+      requestSnippets: {
+        generators: {
+          'curl_bash': {
+            title: 'cURL (bash)',
+          },
+          'curl_powershell': {
+            title: 'cURL (PowerShell)',
+          },
+          'javascript': {
+            title: 'JavaScript',
+          },
+          'python': {
+            title: 'Python',
+          },
+        },
+      },
     },
+    customJs: [
+      'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js',
+    ],
   });
+
+  // Additional OpenAPI JSON endpoint with versioning
+  app.getHttpAdapter().get('/api/docs-json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(document);
+  });
+
+  // OpenAPI YAML endpoint (optional - requires js-yaml package)
+  try {
+    const yaml = require('js-yaml');
+    app.getHttpAdapter().get('/api/docs-yaml', (req, res) => {
+      res.setHeader('Content-Type', 'text/yaml');
+      res.send(yaml.dump(document));
+    });
+  } catch (error) {
+    // YAML endpoint not available if js-yaml is not installed
+    const logger = app.get(Logger);
+    logger.warn('YAML endpoint not available - install js-yaml package to enable');
+  }
 
   // Enable graceful shutdown
   app.enableShutdownHooks();

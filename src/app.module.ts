@@ -69,6 +69,7 @@ import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
+import { DocumentationModule } from './documentation/documentation.module';
 
 @Module({
   imports: [
@@ -131,6 +132,7 @@ import { EmailTemplate } from './notifications/entities/email-template.entity';
     LearningPathModule,
     CalendarModule,
     AnalyticsModule,
+    DocumentationModule,
   ],
   providers: [
     {
