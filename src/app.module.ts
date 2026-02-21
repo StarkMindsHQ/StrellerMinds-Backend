@@ -69,6 +69,8 @@ import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
+import { MonitoringModule } from './monitoring/monitoring.module';
+import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
 
 @Module({
   imports: [
@@ -131,6 +133,7 @@ import { EmailTemplate } from './notifications/entities/email-template.entity';
     LearningPathModule,
     CalendarModule,
     AnalyticsModule,
+    MonitoringModule,
   ],
   providers: [
     {
@@ -148,6 +151,10 @@ import { EmailTemplate } from './notifications/entities/email-template.entity';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: PerformanceInterceptor,
     },
   ],
 })

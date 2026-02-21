@@ -1,4 +1,4 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { Injectable, Logger, Inject, Optional } from '@nestjs/common';
 import {
   HealthCheckService,
   HealthIndicatorResult,
@@ -8,6 +8,9 @@ import {
   HttpHealthIndicator,
 } from '@nestjs/terminus';
 import { Gauge, Counter, Registry, collectDefaultMetrics } from 'prom-client';
+import { ApmService } from '../monitoring/services/apm.service';
+import { CacheOptimizationService } from '../monitoring/services/cache-optimization.service';
+import { DatabaseOptimizationService } from '../monitoring/services/database-optimization.service';
 
 @Injectable()
 export class HealthService {
@@ -25,6 +28,9 @@ export class HealthService {
     private readonly memoryHealthIndicator: MemoryHealthIndicator,
     private readonly diskHealthIndicator: DiskHealthIndicator,
     private readonly httpHealthIndicator: HttpHealthIndicator,
+    @Optional() private readonly apmService?: ApmService,
+    @Optional() private readonly cacheOptimization?: CacheOptimizationService,
+    @Optional() private readonly databaseOptimization?: DatabaseOptimizationService,
   ) {
     collectDefaultMetrics({ register: this.registry });
 
@@ -231,10 +237,11 @@ export class HealthService {
   }
 
   async getDetailedHealth() {
-    const [fullCheck, readiness, liveness] = await Promise.allSettled([
+    const [fullCheck, readiness, liveness, performanceMetrics] = await Promise.allSettled([
       this.check(),
       this.readiness().catch((err) => ({ status: 'error', message: err.message })),
       this.liveness(),
+      this.getPerformanceMetrics(),
     ]);
 
     return {
@@ -258,11 +265,61 @@ export class HealthService {
         cwd: process.cwd(),
         env: process.env.NODE_ENV,
       },
+      performance: this.getSettledResult(performanceMetrics),
       metrics: {
         hasMetrics: true,
         endpoint: '/health/metrics',
       },
     };
+  }
+
+  /**
+   * Get performance metrics if monitoring module is available
+   */
+  private async getPerformanceMetrics(): Promise<any> {
+    if (!this.apmService || !this.cacheOptimization || !this.databaseOptimization) {
+      return {
+        available: false,
+        message: 'Performance monitoring not available',
+      };
+    }
+
+    try {
+      const [currentMetrics, cacheMetrics, dbStats] = await Promise.all([
+        this.apmService.getCurrentMetrics(),
+        this.cacheOptimization.getCacheMetrics(),
+        this.databaseOptimization.getOptimizationStats(),
+      ]);
+
+      return {
+        available: true,
+        apm: {
+          activeTransactions: currentMetrics.activeTransactions,
+          averageResponseTime: Math.round(currentMetrics.averageResponseTime),
+          errorRate: Math.round(currentMetrics.errorRate * 100) / 100,
+          throughput: Math.round(currentMetrics.throughput * 100) / 100,
+          memoryUsage: Math.round(currentMetrics.memoryUsage * 100) / 100,
+          cpuUsage: Math.round(currentMetrics.cpuUsage * 100) / 100,
+        },
+        cache: {
+          hitRate: Math.round(cacheMetrics.overall.hitRate * 100) / 100,
+          totalHits: cacheMetrics.overall.hits,
+          totalMisses: cacheMetrics.overall.misses,
+          layers: this.cacheOptimization.getCacheLayers(),
+        },
+        database: {
+          pendingOptimizations: dbStats.pending,
+          appliedOptimizations: dbStats.applied,
+          averageImprovement: Math.round(dbStats.averageImprovement * 100) / 100,
+        },
+      };
+    } catch (error) {
+      this.logger.warn(`Failed to get performance metrics: ${error.message}`);
+      return {
+        available: false,
+        error: error.message,
+      };
+    }
   }
 
   private getSettledResult(result: PromiseSettledResult<any>) {
