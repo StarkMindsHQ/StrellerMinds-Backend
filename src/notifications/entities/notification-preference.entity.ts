@@ -23,6 +23,22 @@ export enum NotificationType {
   PROMOTIONAL = 'promotional',
 }
 
+export enum DigestFrequency {
+  REALTIME = 'realtime',
+  HOURLY = 'hourly',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  NEVER = 'never',
+}
+
+export interface PushToken {
+  token: string;
+  platform: 'ios' | 'android' | 'web';
+  deviceId: string;
+  createdAt: Date;
+  lastUsedAt?: Date;
+}
+
 @Entity('notification_preferences')
 export class NotificationPreference {
   @PrimaryGeneratedColumn('uuid')
@@ -75,6 +91,29 @@ export class NotificationPreference {
 
   @Column({ name: 'do_not_disturb', default: false })
   doNotDisturb: boolean;
+
+  // ─── Digest settings ──────────────────────────────────────────────────────
+
+  @Column({ type: 'enum', enum: DigestFrequency, default: DigestFrequency.REALTIME })
+  digestFrequency: DigestFrequency;
+
+  @Column({ type: 'time', nullable: true })
+  digestTime: string; // 'HH:MM'
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  digestTimezone: string;
+
+  // ─── Push tokens ──────────────────────────────────────────────────────────
+
+  @Column({ type: 'jsonb', default: [] })
+  pushTokens: PushToken[];
+
+  // ─── Locale ───────────────────────────────────────────────────────────────
+
+  @Column({ name: 'preferred_locale', type: 'varchar', length: 10, default: 'en' })
+  preferredLocale: string;
+
+  // ─── Audit ────────────────────────────────────────────────────────────────
 
   @Column({ name: 'created_by', nullable: true })
   createdBy?: string;
