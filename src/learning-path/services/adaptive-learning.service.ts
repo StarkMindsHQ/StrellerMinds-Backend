@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { LearningPathEnrollment } from '../entities/learning-path-enrollment.entity';
 import { NodeProgress, ProgressStatus } from '../entities/node-progress.entity';
 import { LearningPathNode } from '../entities/learning-path-node.entity';
-import { NodeDependency, DependencyType } from '../entities/node-dependency.entity';
+import { NodeDependency } from '../entities/node-dependency.entity';
 import { LearningObjective } from '../entities/learning-objective.entity';
 
 export interface AdaptiveRecommendation {
@@ -26,6 +26,7 @@ export interface PerformanceMetrics {
 
 @Injectable()
 export class AdaptiveLearningService {
+  private readonly logger = new Logger(AdaptiveLearningService.name);
   constructor(
     @InjectRepository(LearningPathEnrollment)
     private readonly enrollmentRepository: Repository<LearningPathEnrollment>,
@@ -315,12 +316,12 @@ export class AdaptiveLearningService {
 
   private async addRemedialContent(learningPathId: string): Promise<void> {
     // Implementation would add supplementary materials for struggling students
-    console.log(`Adding remedial content for learning path ${learningPathId}`);
+    this.logger.log(`Adding remedial content for learning path ${learningPathId}`);
   }
 
   private async addAdvancedContent(learningPathId: string): Promise<void> {
     // Implementation would add challenging extensions for high performers
-    console.log(`Adding advanced content for learning path ${learningPathId}`);
+    this.logger.log(`Adding advanced content for learning path ${learningPathId}`);
   }
 
   async getPathCompletionPrediction(enrollmentId: string): Promise<{

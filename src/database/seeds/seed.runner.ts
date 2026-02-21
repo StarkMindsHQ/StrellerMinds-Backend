@@ -7,6 +7,7 @@ import { Course } from '../../course/entities/course.entity';
 import { Payment } from '../../payment/entities/payment.entity';
 import { Enrollment, EnrollmentStatus } from '../../course/entities/enrollment.entity';
 import { GamificationProfile } from '../../gamification/entities/gamification-profile.entity';
+import { Logger } from '@nestjs/common';
 
 export enum SeedDataSet {
   MINIMAL = 'minimal',
@@ -23,6 +24,7 @@ export interface SeedOptions {
  * Main seed runner for populating database with test data
  */
 export class SeedRunner {
+  private readonly logger = new Logger(SeedRunner.name);
   constructor(private dataSource: DataSource) {}
 
   /**
@@ -31,7 +33,7 @@ export class SeedRunner {
   async run(options: SeedOptions = {}): Promise<void> {
     const { dataSet = SeedDataSet.STANDARD, reset = false } = options;
 
-    console.log(`🌱 Starting seed process with ${dataSet} dataset...`);
+    this.logger.log(`🌱 Starting seed process with ${dataSet} dataset...`);
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -40,7 +42,7 @@ export class SeedRunner {
     try {
       // Reset database if requested
       if (reset) {
-        console.log('🗑️  Clearing existing data...');
+        this.logger.log('🗑️  Clearing existing data...');
         await this.clearData(queryRunner);
       }
 
@@ -58,10 +60,10 @@ export class SeedRunner {
       }
 
       await queryRunner.commitTransaction();
-      console.log('✅ Seed process completed successfully!');
+      this.logger.log('✅ Seed process completed successfully!');
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error('❌ Seed process failed:', error);
+      this.logger.error('❌ Seed process failed:', error);
       throw error;
     } finally {
       await queryRunner.release();
@@ -84,7 +86,7 @@ export class SeedRunner {
    * Seed minimal dataset (1 admin, 2 instructors, 5 students, 3 courses)
    */
   private async seedMinimal(queryRunner: any): Promise<void> {
-    console.log('📦 Seeding minimal dataset...');
+    this.logger.log('📦 Seeding minimal dataset...');
 
     // Create users
     const admin = await this.createUser(queryRunner, await UserFactory.generateAdmin());
@@ -103,15 +105,15 @@ export class SeedRunner {
     // Create gamification profiles
     await this.createGamificationProfiles(queryRunner, [...students, ...instructors, admin]);
 
-    console.log(`✓ Created ${1 + instructors.length + students.length} users`);
-    console.log(`✓ Created ${courses.length} courses`);
+    this.logger.log(`✓ Created ${1 + instructors.length + students.length} users`);
+    this.logger.log(`✓ Created ${courses.length} courses`);
   }
 
   /**
    * Seed standard dataset (1 admin, 5 instructors, 20 students, 15 courses)
    */
   private async seedStandard(queryRunner: any): Promise<void> {
-    console.log('📦 Seeding standard dataset...');
+    this.logger.log('📦 Seeding standard dataset...');
 
     const admin = await this.createUser(queryRunner, await UserFactory.generateAdmin());
     const instructors = await this.createUsers(
@@ -125,16 +127,16 @@ export class SeedRunner {
     await this.createGamificationProfiles(queryRunner, [...students, ...instructors, admin]);
     await this.createPayments(queryRunner, students, 30);
 
-    console.log(`✓ Created ${1 + instructors.length + students.length} users`);
-    console.log(`✓ Created ${courses.length} courses`);
-    console.log(`✓ Created enrollments and payments`);
+    this.logger.log(`✓ Created ${1 + instructors.length + students.length} users`);
+    this.logger.log(`✓ Created ${courses.length} courses`);
+    this.logger.log(`✓ Created enrollments and payments`);
   }
 
   /**
    * Seed full dataset (1 admin, 10 instructors, 50 students, 30 courses)
    */
   private async seedFull(queryRunner: any): Promise<void> {
-    console.log('📦 Seeding full dataset...');
+    this.logger.log('📦 Seeding full dataset...');
 
     const admin = await this.createUser(queryRunner, await UserFactory.generateAdmin());
     const instructors = await this.createUsers(
@@ -148,9 +150,9 @@ export class SeedRunner {
     await this.createGamificationProfiles(queryRunner, [...students, ...instructors, admin]);
     await this.createPayments(queryRunner, students, 100);
 
-    console.log(`✓ Created ${1 + instructors.length + students.length} users`);
-    console.log(`✓ Created ${courses.length} courses`);
-    console.log(`✓ Created enrollments and payments`);
+    this.logger.log(`✓ Created ${1 + instructors.length + students.length} users`);
+    this.logger.log(`✓ Created ${courses.length} courses`);
+    this.logger.log(`✓ Created enrollments and payments`);
   }
 
   /**

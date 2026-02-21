@@ -27,8 +27,8 @@ async function main() {
       if (Object.values(SeedDataSet).includes(dataset)) {
         options.dataSet = dataset;
       } else {
-        console.error(`Invalid dataset: ${dataset}`);
-        console.error(`Valid options: ${Object.values(SeedDataSet).join(', ')}`);
+        this.logger.error(`Invalid dataset: ${dataset}`);
+        this.logger.error(`Valid options: ${Object.values(SeedDataSet).join(', ')}`);
         process.exit(1);
       }
     } else if (arg === '--help' || arg === '-h') {
@@ -37,21 +37,21 @@ async function main() {
     }
   }
 
-  console.log('🚀 Initializing database connection...');
+  this.logger.log('🚀 Initializing database connection...');
 
   try {
     // Initialize data source
     await AppDataSource.initialize();
-    console.log('✅ Database connected successfully');
+    this.logger.log('✅ Database connected successfully');
 
     // Run seeds
     const seedRunner = new SeedRunner(AppDataSource);
     await seedRunner.run(options);
 
-    console.log('🎉 All done!');
+    this.logger.log('🎉 All done!');
     process.exit(0);
   } catch (error) {
-    console.error('💥 Error running seeds:', error);
+    this.logger.error('💥 Error running seeds:', error);
     process.exit(1);
   } finally {
     if (AppDataSource.isInitialized) {
@@ -61,7 +61,7 @@ async function main() {
 }
 
 function printHelp() {
-  console.log(`
+  this.logger.log(`
 Database Seed Command
 =====================
 

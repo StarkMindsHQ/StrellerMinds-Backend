@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,6 +21,7 @@ export type UserResponse = Omit<User, 'password'> & {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -368,7 +369,7 @@ export class AuthService {
     });
 
     // TODO: Send email with reset token
-    console.log(`Password reset token for ${email}: ${resetToken}`);
+    this.logger.log(`Password reset token for ${email}: ${resetToken}`);
   }
 
   async resetPassword(resetToken: string, newPassword: string): Promise<void> {

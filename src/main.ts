@@ -2,14 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
-import { ValidationException } from './common/decorators/errors/validation-exception';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { applyGlobalSecurity } from './common/security/bootstrap';
 import { WinstonModule } from 'nest-winston';
 import { winstonConfig } from './logging/winston.config';
 import { SECURITY_CONFIG } from './security/security.config';
 import * as Sentry from '@sentry/node';
+import { Logger } from 'winston';
 
 async function bootstrap() {
   // Sentry should initialize as early as possible.
@@ -191,8 +190,9 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
-  console.log(`🚀 Server running on http://localhost:${port}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
-  console.log(`🔒 Security Endpoints: http://localhost:${port}/api/security`);
+  const logger = app.get(Logger);
+  logger.info(`🚀 Server running on http://localhost:${port}`, 'Bootstrap');
+  logger.info(`📚 API Documentation: http://localhost:${port}/api/docs`, 'Bootstrap');
+  logger.info(`🔒 Security Endpoints: http://localhost:${port}/api/security`, 'Bootstrap');
 }
 bootstrap();

@@ -1,13 +1,13 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
-import { Invoice, Subscription, PaymentPlan, Payment } from '../entities';
+import { Invoice, Subscription, Payment } from '../entities';
 import { InvoiceStatus, SubscriptionStatus } from '../enums';
-import { CreateInvoiceDto, UpdateInvoiceDto, SendInvoiceDto } from '../dto';
 import { TaxCalculationService } from './tax-calculation.service';
 
 @Injectable()
 export class EnhancedInvoiceService {
+  private readonly logger = new Logger(EnhancedInvoiceService.name);
   constructor(
     @InjectRepository(Invoice)
     private invoiceRepository: Repository<Invoice>,
@@ -59,7 +59,7 @@ export class EnhancedInvoiceService {
     });
 
     const invoiceNumber = this.generateInvoiceNumber();
-    
+
     const invoice = this.invoiceRepository.create({
       invoiceNumber,
       userId,
@@ -93,7 +93,7 @@ export class EnhancedInvoiceService {
 
   async processRecurringInvoices(): Promise<void> {
     const today = new Date();
-    
+
     // Find active subscriptions that need billing
     const subscriptions = await this.subscriptionRepository.find({
       where: {
@@ -103,23 +103,20 @@ export class EnhancedInvoiceService {
     });
 
     for (const subscription of subscriptions) {
-      if (
-        subscription.nextBillingDate &&
-        subscription.nextBillingDate <= today
-      ) {
+      if (subscription.nextBillingDate && subscription.nextBillingDate <= today) {
         try {
           await this.createRecurringInvoice(
             subscription.id,
             subscription.userId,
             `Recurring payment for ${subscription.paymentPlan.name}`,
           );
-          
+
           // Update next billing date
           subscription.nextBillingDate = this.calculateNextBillingDate(
             subscription.nextBillingDate,
             subscription.billingCycle,
           );
-          
+
           await this.subscriptionRepository.save(subscription);
         } catch (error) {
           console.error(`Failed to create invoice for subscription ${subscription.id}:`, error);
@@ -136,7 +133,8 @@ export class EnhancedInvoiceService {
     startDate?: Date,
     endDate?: Date,
   ): Promise<Invoice[]> {
-    const query = this.subscriptionRepository.createQueryBuilder('subscription')
+    const query = this.subscriptionRepository
+      .createQueryBuilder('subscription')
       .where('subscription.status = :status', { status: SubscriptionStatus.ACTIVE })
       .andWhere('subscription.nextBillingDate <= :today', { today: new Date() });
 
@@ -156,10 +154,7 @@ export class EnhancedInvoiceService {
 
     for (const subscription of subscriptions) {
       try {
-        const invoice = await this.createRecurringInvoice(
-          subscription.id,
-          subscription.userId,
-        );
+        const invoice = await this.createRecurringInvoice(subscription.id, subscription.userId);
         invoices.push(invoice);
       } catch (error) {
         console.error(`Failed to create invoice for subscription ${subscription.id}:`, error);
@@ -188,24 +183,19 @@ export class EnhancedInvoiceService {
 
     for (const invoice of overdueInvoices) {
       // TODO: Implement email sending logic
-      console.log(`Sending overdue reminder for invoice ${invoice.invoiceNumber}`);
-      
+      this.logger.log(`Sending overdue reminder for invoice ${invoice.invoiceNumber}`);
       // Update invoice status to indicate reminder sent
       invoice.metadata = {
         ...invoice.metadata,
         reminderSent: true,
         reminderSentAt: new Date(),
       };
-      
+
       await this.invoiceRepository.save(invoice);
     }
   }
 
-  async applyDiscount(
-    invoiceId: string,
-    discountAmount: number,
-    reason: string,
-  ): Promise<Invoice> {
+  async applyDiscount(invoiceId: string, discountAmount: number, reason: string): Promise<Invoice> {
     const invoice = await this.invoiceRepository.findOneBy({ id: invoiceId });
 
     if (!invoice) {
@@ -217,7 +207,7 @@ export class EnhancedInvoiceService {
     }
 
     const newTotal = Math.max(0, invoice.total - discountAmount);
-    
+
     invoice.discount = (invoice.discount || 0) + discountAmount;
     invoice.total = newTotal;
     invoice.metadata = {
@@ -235,11 +225,7 @@ export class EnhancedInvoiceService {
     return this.invoiceRepository.save(invoice);
   }
 
-  async getInvoiceAnalytics(
-    userId?: string,
-    startDate?: Date,
-    endDate?: Date,
-  ): Promise<any> {
+  async getInvoiceAnalytics(userId?: string, startDate?: Date, endDate?: Date): Promise<any> {
     const query = this.invoiceRepository.createQueryBuilder('invoice');
 
     if (userId) {
@@ -254,19 +240,22 @@ export class EnhancedInvoiceService {
     }
 
     const invoices = await query.getMany();
-    
+
     const totalInvoiced = invoices.reduce((sum, inv) => sum + Number(inv.total), 0);
     const totalPaid = invoices
-      .filter(inv => inv.status === InvoiceStatus.PAID)
+      .filter((inv) => inv.status === InvoiceStatus.PAID)
       .reduce((sum, inv) => sum + Number(inv.total), 0);
-    
-    const statusCounts = invoices.reduce((counts, inv) => {
-      counts[inv.status] = (counts[inv.status] || 0) + 1;
-      return counts;
-    }, {} as Record<string, number>);
+
+    const statusCounts = invoices.reduce(
+      (counts, inv) => {
+        counts[inv.status] = (counts[inv.status] || 0) + 1;
+        return counts;
+      },
+      {} as Record<string, number>,
+    );
 
     const overdueCount = invoices.filter(
-      inv => inv.status !== InvoiceStatus.PAID && inv.dueDate < new Date(),
+      (inv) => inv.status !== InvoiceStatus.PAID && inv.dueDate < new Date(),
     ).length;
 
     return {
@@ -331,10 +320,7 @@ export class EnhancedInvoiceService {
     return `INV-${Date.now()}-${Math.random().toString(36).substring(7)}`;
   }
 
-  private calculateNextBillingDate(
-    from: Date,
-    cycle: string,
-  ): Date {
+  private calculateNextBillingDate(from: Date, cycle: string): Date {
     const date = new Date(from);
 
     switch (cycle) {
