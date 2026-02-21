@@ -70,6 +70,8 @@ import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
 import { DocumentationModule } from './documentation/documentation.module';
+import { MonitoringModule } from './monitoring/monitoring.module';
+import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
 
 @Module({
   imports: [
@@ -133,6 +135,7 @@ import { DocumentationModule } from './documentation/documentation.module';
     CalendarModule,
     AnalyticsModule,
     DocumentationModule,
+    MonitoringModule,
   ],
   providers: [
     {
@@ -150,6 +153,10 @@ import { DocumentationModule } from './documentation/documentation.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: PerformanceInterceptor,
     },
   ],
 })
