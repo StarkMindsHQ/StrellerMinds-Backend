@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { CourseModule } from './module.entity';
+import { CourseContent } from './course-content.entity';
 
 @Entity()
 export class Lesson {
@@ -22,4 +23,9 @@ export class Lesson {
     onDelete: 'CASCADE',
   })
   module: CourseModule;
+
+  @OneToMany(() => CourseContent, (content) => content.lesson, {
+    cascade: true,
+  })
+  contents: CourseContent[];
 }
