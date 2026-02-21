@@ -7,11 +7,16 @@ import { ThreatDetectionService } from 'src/forum/threat-detection.service';
 
 @Injectable()
 export class SecurityAuditService {
-  constructor(
-    @InjectRepository(SecurityAudit)
-    private readonly auditRepository: Repository<SecurityAudit>,
-    private readonly geoIpService: GeoIpService,
-  ) {}
+
+    constructor(
+        @InjectRepository(SecurityAudit)
+        private readonly auditRepository: Repository<SecurityAudit>,
+        private readonly geoIpService: GeoIpService,
+        private readonly threatDetectionService: ThreatDetectionService,
+    ) { }
+
+
+
 
   async log(
     userId: string | null,
@@ -31,6 +36,13 @@ export class SecurityAuditService {
     });
 
 
+        const savedAudit = await this.auditRepository.save(audit);
+
+        // Analyze event for threats asynchronously
+        this.threatDetectionService.analyzeEvent(savedAudit).catch(err => {
+            console.error('Threat detection analysis failed:', err);
+        });
+
     await this.auditRepository.save(audit);
   }
 
@@ -42,6 +54,7 @@ export class SecurityAuditService {
 
     if (userId) {
       query.where('audit.userId = :userId', { userId });
+
     }
 
     return query.getMany();

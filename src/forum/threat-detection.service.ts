@@ -62,12 +62,12 @@ export class ThreatDetectionService {
       where: { 
         userId: audit.userId,
         event: 'LOGIN_SUCCESS' as SecurityEvent
-      },
+      } as any,
       order: { createdAt: 'DESC' },
-      take: 2,
+      skip: 1, // Skip the current event
     });
 
-    const lastLogin = previousLogins[1]; // The second most recent is the previous login
+    const lastLogin = previousLogins[0];
 
     if (lastLogin && lastLogin.metadata?.location) {
       const currentLoc = audit.metadata.location;

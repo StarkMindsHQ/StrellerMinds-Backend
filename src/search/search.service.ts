@@ -185,7 +185,7 @@ export class SearchService implements OnModuleInit {
   // ============================================
   // FULL-TEXT SEARCH WITH FACETED FILTERING
   // ============================================
-  async search(searchDto: SearchQueryDto): Promise<{
+  async search(searchDto: SearchQueryDto, userId?: string): Promise<{
     total: number;
     page: number;
     size: number;
@@ -214,7 +214,7 @@ export class SearchService implements OnModuleInit {
       };
     }
 
-    const { query, categories, difficulty, minDuration, maxDuration, page, size, sortBy, userId } =
+    const { query, categories, difficulty, minDuration, maxDuration, page, size, sortBy } =
       searchDto;
     const from = (page - 1) * size;
 
@@ -336,7 +336,7 @@ export class SearchService implements OnModuleInit {
       if (userId) {
         await this.trackSearch({
           userId,
-          query,
+          query: query,
           filters: { categories, difficulty, minDuration, maxDuration },
           resultsCount:
             typeof result.hits.total === 'number' ? result.hits.total : result.hits.total.value,
