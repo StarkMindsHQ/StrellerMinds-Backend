@@ -5,6 +5,7 @@ import { AnalyticsReport, ReportStatus } from '../entities/analytics-report.enti
 import { DataAggregationService } from './data-aggregation.service';
 import { VisualizationService } from './visualization.service';
 import { PredictiveAnalyticsService } from './predictive-analytics.service';
+import { CourseAnalyticsService } from './course-analytics.service';
 
 @Injectable()
 export class AnalyticsService {
@@ -14,6 +15,8 @@ export class AnalyticsService {
     private dataAggregationService: DataAggregationService,
     private visualizationService: VisualizationService,
     private predictiveAnalyticsService: PredictiveAnalyticsService,
+    private readonly analyticsService: AnalyticsService,
+    private readonly courseAnalyticsService: CourseAnalyticsService,
   ) {}
 
   async getReportById(reportId: string, userId: string): Promise<AnalyticsReport> {
@@ -94,7 +97,7 @@ export class AnalyticsService {
 
   async getDashboardOverview(userId: string, dateRange?: { start: Date; end: Date }) {
     const where: any = { createdById: userId };
-    
+
     if (dateRange) {
       where.createdAt = Between(dateRange.start, dateRange.end);
     }

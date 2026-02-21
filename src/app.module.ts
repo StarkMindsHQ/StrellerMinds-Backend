@@ -68,6 +68,7 @@ import { ForumModule } from './forum/forum.module';
 import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -129,6 +130,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     LearningPathModule,
     CalendarModule,
     AnalyticsModule,
+    EmailModule,
   ],
   providers: [
     {

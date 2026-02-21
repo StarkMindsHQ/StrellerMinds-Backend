@@ -1,60 +1,65 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CacheModule } from '@nestjs/cache-manager';
+import { BullModule } from '@nestjs/bull';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { EngagementEvent } from './entities/engagement-event.entity';
+import { AnalyticsAggregation } from './entities/analytics-aggregation.entity';
+import { AtRiskPrediction } from './entities/at-risk-prediction.entity';
+
+// Your existing report-based service — NOT replaced, just co-existing
+// import { AnalyticsService } from './services/analytics.service';  ← keep registering this in your existing module
+
+// New course/student analytics service with a distinct name
+import { CourseAnalyticsService } from './services/course-analytics.service';
+import { AnalyticsExportService } from './services/analytics-export.service';
+import { ProgressTrackingService } from '../learning-path/services/progress-tracking.service';
+
 import { AnalyticsController } from './controllers/analytics.controller';
-import { ReportBuilderController } from './controllers/report-builder.controller';
-import { DashboardController } from './controllers/dashboard.controller';
-import { ScheduleController } from './controllers/schedule.controller';
-import { AnalyticsService } from './services/analytics.service';
-import { ReportBuilderService } from './services/report-builder.service';
-import { DataAggregationService } from './services/data-aggregation.service';
-import { ReportGenerationService } from './services/report-generation.service';
-import { PredictiveAnalyticsService } from './services/predictive-analytics.service';
-import { DataExportService } from './services/data-export.service';
-import { VisualizationService } from './services/visualization.service';
-import { AnalyticsReport } from './entities/analytics-report.entity';
-import { ReportSchedule } from './entities/report-schedule.entity';
-import { DataSnapshot } from './entities/data-snapshot.entity';
-import { AnalyticsCache } from './entities/analytics-cache.entity';
-import { ProfileAnalytics } from '../user/entities/profile-analytics.entity';
-import { FinancialReport } from '../payment/entities/financial-report.entity';
-import { UserActivity } from '../user/entities/user-activity.entity';
-import { Payment } from '../payment/entities/payment.entity';
-import { User } from '../auth/entities/user.entity';
+import { StudentProgress } from './entities/student.progress.entity';
+import { AnalyticsProcessor } from './analytics.processor';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      AnalyticsReport,
-      ReportSchedule,
-      DataSnapshot,
-      AnalyticsCache,
-      ProfileAnalytics,
-      FinancialReport,
-      UserActivity,
-      Payment,
-      User,
+      StudentProgress,
+      EngagementEvent,
+      AnalyticsAggregation,
+      AtRiskPrediction,
     ]),
-    CacheModule.register({
-      ttl: 300, // 5 minutes default
-      max: 100,
+
+    BullModule.registerQueueAsync({
+      name: 'analytics',
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => ({
+        redis: {
+          host: config.get('REDIS_HOST', 'localhost'),
+          port: config.get<number>('REDIS_PORT', 6379),
+          password: config.get('REDIS_PASSWORD'),
+        },
+        defaultJobOptions: {
+          attempts: 3,
+          backoff: { type: 'exponential', delay: 1000 },
+          removeOnComplete: 100,
+          removeOnFail: 50,
+        },
+      }),
+      inject: [ConfigService],
     }),
+
+    ScheduleModule.forRoot(),
   ],
-  controllers: [
-    AnalyticsController,
-    ReportBuilderController,
-    DashboardController,
-    ScheduleController,
-  ],
+
   providers: [
-    AnalyticsService,
-    ReportBuilderService,
-    DataAggregationService,
-    ReportGenerationService,
-    PredictiveAnalyticsService,
-    DataExportService,
-    VisualizationService,
+    CourseAnalyticsService,
+    AnalyticsExportService,
+    AnalyticsProcessor,
+    ProgressTrackingService,
   ],
-  exports: [AnalyticsService, DataAggregationService],
+
+  controllers: [AnalyticsController],
+
+  exports: [CourseAnalyticsService, ProgressTrackingService, AnalyticsExportService],
 })
 export class AnalyticsModule {}
