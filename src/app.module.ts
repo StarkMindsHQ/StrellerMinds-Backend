@@ -67,6 +67,7 @@ import { AssignmentModule } from './assignments/assignments.module';
 import { ForumModule } from './forum/forum.module';
 import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -127,6 +128,7 @@ import { CalendarModule } from './calendar/calendar.module';
     VideoModule,
     LearningPathModule,
     CalendarModule,
+    AnalyticsModule,
   ],
   providers: [
     {
