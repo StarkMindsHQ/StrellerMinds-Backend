@@ -13,6 +13,7 @@ import { PortfolioItem } from './portfolio-item.entity';
 import { UserBadge } from './user-badge.entity';
 import { Follow } from './follow.entity';
 import { PrivacySettings } from './privacy-settings.entity';
+import { UserSkill } from './user-skill.entity';
 
 @Entity('user_profiles')
 export class UserProfile {
@@ -106,7 +107,7 @@ export class UserProfile {
   isVerified: boolean;
 
   @Column({ type: 'varchar', length: 50, default: 'complete' })
-  completionStatus: 'incomplete' | 'partial' | 'complete'; // Profile completeness
+  completionStatus: 'incomplete' | 'partial' | 'complete';
 
   @Column({ type: 'int', default: 0 })
   completionPercentage: number;
@@ -136,6 +137,11 @@ export class UserProfile {
     cascade: true,
   })
   privacySettings: PrivacySettings;
+
+  @OneToMany(() => UserSkill, (skill) => skill.profile, {
+    cascade: true,
+  })
+  userSkills: UserSkill[];
 
   @CreateDateColumn()
   createdAt: Date;
