@@ -17,6 +17,7 @@ export enum NotificationType {
   COURSE_UPDATES = 'course_updates',
   DEADLINES = 'deadlines',
   ANNOUNCEMENTS = 'announcements',
+  CALENDAR_BOOKING = 'calendar_booking',
   DIGEST = 'digest',
   SECURITY = 'security',
   PROMOTIONAL = 'promotional',

@@ -8,6 +8,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { BookOfficeHourDto } from './dto/book-office-hour.dto';
 import { DateTime } from 'luxon';
 import { NotificationsService } from '../notifications/services/notifications.service';
+import { NotificationType } from '../notifications/entities/notification-preference.entity';
 
 @Injectable()
 export class CalendarService {
@@ -75,7 +76,7 @@ export class CalendarService {
     try {
       await this.notifications.send({
         userId: dto.userId,
-        type: 'calendar.booking',
+        type: NotificationType.CALENDAR_BOOKING,
         title: `Booked: ${ev.title}`,
         content: `You have a booking for ${ev.title} on ${DateTime.fromJSDate(ev.start).toISO()} (${ev.timezone})`,
         metadata: { eventId: ev.id },
