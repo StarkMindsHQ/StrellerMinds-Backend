@@ -12,6 +12,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const exceptionResponse = exception.getResponse();
 
+    const responseBody =
+      typeof exceptionResponse === 'object' && exceptionResponse !== null
+        ? (exceptionResponse as { message?: string; error?: string })
+        : null;
     const errorResponse = {
       statusCode: status,
       timestamp: new Date().toISOString(),
@@ -20,9 +24,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message:
         typeof exceptionResponse === 'string'
           ? exceptionResponse
-          : (exceptionResponse as any).message,
-      error:
-        typeof exceptionResponse === 'object' ? (exceptionResponse as any).error : exception.name,
+          : responseBody?.message ?? 'Error',
+      error: responseBody?.error ?? exception.name,
     };
 
     this.logger.warn(`${request.method} ${request.url} - ${status}`, JSON.stringify(errorResponse));

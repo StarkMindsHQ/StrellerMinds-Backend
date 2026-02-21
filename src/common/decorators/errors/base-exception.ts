@@ -3,7 +3,7 @@ export abstract class BaseException extends Error {
     public readonly statusCode: number,
     public readonly errorCode: string,
     public readonly message: string,
-    public readonly details?: any,
+    public readonly details?: unknown,
   ) {
     super(message);
   }

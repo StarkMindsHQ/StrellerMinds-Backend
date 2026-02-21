@@ -3,7 +3,7 @@ export interface ErrorResponse {
   statusCode: number;
   errorCode: string;
   message: string;
-  details?: any;
+  details?: unknown;
   timestamp: string;
   path: string;
 }

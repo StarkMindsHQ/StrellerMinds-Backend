@@ -7,21 +7,26 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { RecommendationService } from '../services/recommendation.service';
+import { UserProfileService } from '../services/user-profile.service';
 import { JwtAuthGuard } from '../../auth/guards/auth.guard';
+import { RequestWithUser } from '../../common/types/request.types';
 
 @ApiTags('Recommendations')
 @Controller('recommendations')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class RecommendationController {
-  constructor(private readonly recommendationService: RecommendationService) {}
+  constructor(
+    private readonly recommendationService: RecommendationService,
+    private readonly userProfileService: UserProfileService,
+  ) {}
 
   @Get('profiles')
   @ApiOperation({ summary: 'Get profile recommendations' })
   @ApiResponse({ status: 200, description: 'Recommendations retrieved successfully' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getProfileRecommendations(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Query('limit') limit?: number,
   ) {
     const profile = await this.getProfileFromRequest(req);
@@ -33,7 +38,7 @@ export class RecommendationController {
   @ApiResponse({ status: 200, description: 'Content recommendations retrieved' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getContentRecommendations(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Query('limit') limit?: number,
   ) {
     const profile = await this.getProfileFromRequest(req);
@@ -45,7 +50,7 @@ export class RecommendationController {
   @ApiResponse({ status: 200, description: 'People recommendations retrieved' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getPeopleYouMayKnow(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Query('limit') limit?: number,
   ) {
     const profile = await this.getProfileFromRequest(req);
@@ -60,7 +65,9 @@ export class RecommendationController {
     return this.recommendationService.getTrendingProfiles(limit || 10);
   }
 
-  private async getProfileFromRequest(req: any) {
-    return req.user.profile || req.user;
+  private async getProfileFromRequest(req: RequestWithUser): Promise<{ id: string }> {
+    const user = req.user;
+    if (!user) throw new Error('Unauthorized');
+    return this.userProfileService.getProfileByUserId(user.sub);
   }
 }

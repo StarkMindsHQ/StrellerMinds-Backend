@@ -248,7 +248,10 @@ export class AuthService {
     await this.securityAuditService.log(userId, SecurityEvent.TWO_FACTOR_ENABLE);
   }
 
-  async generateQrCodeStream(stream: any, otpauthUrl: string) {
+  async generateQrCodeStream(
+    _stream: NodeJS.WritableStream,
+    otpauthUrl: string,
+  ): Promise<string> {
     return this.twoFactorAuthService.generateQrCodeDataURL(otpauthUrl);
   }
 

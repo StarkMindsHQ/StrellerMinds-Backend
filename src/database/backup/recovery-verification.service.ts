@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan, LessThan } from 'typeorm';
@@ -46,8 +46,8 @@ export class RecoveryVerificationService {
     private readonly configService: ConfigService,
     private readonly recoveryService: BackupRecoveryService,
     private readonly notificationService: BackupNotificationService,
-    private readonly disasterRecoveryService: DisasterRecoveryTestingService,
-    private readonly enhancedBackupService: EnhancedBackupService,
+    @Optional() private readonly disasterRecoveryService: DisasterRecoveryTestingService | null,
+    @Optional() private readonly enhancedBackupService: EnhancedBackupService | null,
   ) {
     this.config = this.loadConfiguration();
   }
@@ -151,8 +151,10 @@ export class RecoveryVerificationService {
         await this.runScenarioTest(scenario);
       }
 
-      // Run disaster recovery test
-      await this.disasterRecoveryService.runComprehensiveRecoveryTest();
+      // Run disaster recovery test when service is available
+      if (this.disasterRecoveryService) {
+        await this.disasterRecoveryService.runComprehensiveRecoveryTest();
+      }
     } catch (error) {
       this.logger.error('Scheduled recovery tests failed', error);
     }
@@ -244,6 +246,11 @@ export class RecoveryVerificationService {
    */
   async verifyPointInTimeRecovery(): Promise<boolean> {
     this.logger.log('Running point-in-time recovery verification');
+
+    if (!this.enhancedBackupService) {
+      this.logger.warn('EnhancedBackupService not available; skipping PITR verification');
+      return false;
+    }
 
     try {
       // Find WAL backup for testing

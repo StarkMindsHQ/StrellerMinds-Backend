@@ -14,7 +14,14 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { JwtAuthGuard } from '../../auth/guards/auth.guard';
 import { AchievementService } from '../services/achievement.service';
 import { UserProfileService } from '../services/user-profile.service';
-import { AchievementStatsDto, LeaderboardDto, AwardBadgeDto } from '../dto/achievement.dto';
+import {
+  AchievementStatsDto,
+  LeaderboardDto,
+  AwardBadgeDto,
+  BadgeResponseDto,
+} from '../dto/achievement.dto';
+import { RequestWithUser } from '../../common/types/request.types';
+import { UserBadge } from '../entities/user-badge.entity';
 
 @ApiTags('Achievements & Badges')
 @Controller('achievements')
@@ -29,14 +36,16 @@ export class AchievementController {
   @Get('badges/all')
   @ApiOperation({ summary: 'Get all badges' })
   @ApiResponse({ status: 200, description: 'Badges retrieved' })
-  async getAllBadges(): Promise<any[]> {
+  async getAllBadges(): Promise<BadgeResponseDto[]> {
     return this.achievementService.getAllBadges();
   }
 
   @Get('badges/:badgeId')
   @ApiOperation({ summary: 'Get badge details' })
   @ApiResponse({ status: 200, description: 'Badge retrieved' })
-  async getBadge(@Param('badgeId', new ParseUUIDPipe()) badgeId: string): Promise<any> {
+  async getBadge(
+    @Param('badgeId', new ParseUUIDPipe()) badgeId: string,
+  ): Promise<BadgeResponseDto> {
     return this.achievementService.getBadgeById(badgeId);
   }
 
@@ -44,16 +53,19 @@ export class AchievementController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Award badge to current user (admin only)' })
   @ApiResponse({ status: 201, description: 'Badge awarded' })
-  async awardBadge(@Request() req, @Body() awardDto: AwardBadgeDto): Promise<any> {
-    const profile = await this.userProfileService.getProfileByUserId(req.user.id);
+  async awardBadge(
+    @Request() req: RequestWithUser,
+    @Body() awardDto: AwardBadgeDto,
+  ): Promise<UserBadge> {
+    const profile = await this.userProfileService.getProfileByUserId(req.user!.sub);
     return this.achievementService.awardBadgeToUser(profile.id, awardDto);
   }
 
   @Get('me/stats')
   @ApiOperation({ summary: 'Get my achievement stats' })
   @ApiResponse({ status: 200, description: 'Stats retrieved' })
-  async getMyStats(@Request() req): Promise<AchievementStatsDto> {
-    const profile = await this.userProfileService.getProfileByUserId(req.user.id);
+  async getMyStats(@Request() req: RequestWithUser): Promise<AchievementStatsDto> {
+    const profile = await this.userProfileService.getProfileByUserId(req.user!.sub);
     return this.achievementService.getAchievementStats(profile.id);
   }
 
@@ -77,7 +89,7 @@ export class AchievementController {
   @Get('badges/search')
   @ApiOperation({ summary: 'Search badges' })
   @ApiResponse({ status: 200, description: 'Search results' })
-  async searchBadges(): Promise<any[]> {
+  async searchBadges(): Promise<BadgeResponseDto[]> {
     return this.achievementService.getAllBadges();
   }
 }

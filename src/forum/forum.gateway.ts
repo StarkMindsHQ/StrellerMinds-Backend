@@ -6,7 +6,7 @@ export class ForumGateway {
   @WebSocketServer()
   server: Server;
 
-  emitNewComment(threadId: string, comment: any) {
+  emitNewComment(threadId: string, comment: Record<string, unknown>) {
     this.server.to(`thread-${threadId}`).emit('comment:new', comment);
   }
 }

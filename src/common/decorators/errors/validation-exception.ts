@@ -4,7 +4,7 @@ import { BaseException } from './base-exception';
 import { ErrorCode } from './error-code';
 
 export class ValidationException extends BaseException {
-  constructor(errors: any) {
+  constructor(errors: unknown) {
     super(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR, 'Validation failed', errors);
   }
 }
