@@ -4,6 +4,7 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { HealthController } from './health.controller';
 import { HealthService } from './health.service';
 import { HttpModule } from '@nestjs/axios';
+import { MonitoringModule } from '../monitoring/monitoring.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { HttpModule } from '@nestjs/axios';
       timeout: 5000,
       maxRedirects: 5,
     }),
+    MonitoringModule,
   ],
   controllers: [HealthController],
   providers: [HealthService],

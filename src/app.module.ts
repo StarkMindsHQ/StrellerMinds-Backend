@@ -68,6 +68,9 @@ import { ForumModule } from './forum/forum.module';
 import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { EmailTemplate } from './notifications/entities/email-template.entity';
+import { MonitoringModule } from './monitoring/monitoring.module';
+import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
 
 @Module({
   imports: [
@@ -125,7 +128,10 @@ import { AnalyticsModule } from './analytics/analytics.module';
     SecurityModule,
     UserModule,
     VideoModule,
-    HealthModule,
+    LearningPathModule,
+    CalendarModule,
+    AnalyticsModule,
+    MonitoringModule,
   ],
   providers: [
     {
@@ -143,6 +149,10 @@ import { AnalyticsModule } from './analytics/analytics.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: PerformanceInterceptor,
     },
   ],
 })
