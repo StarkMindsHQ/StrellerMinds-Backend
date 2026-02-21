@@ -104,9 +104,9 @@ export class CacheOptimizationService {
     try {
       const value = await this.cacheManager.get<T>(key);
       if (value) {
-        // Promote to L2 and L1
+        // Promote to L2 and L1 (use default TTL of 1 hour)
         await this.setL2(key, value);
-        this.setL1(key, value);
+        this.setL1(key, value, 3600000); // 1 hour default
         this.stats.l3.hits++;
         return value;
       }

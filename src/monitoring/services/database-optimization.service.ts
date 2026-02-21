@@ -101,7 +101,7 @@ export class DatabaseOptimizationService {
       indexScans: false,
       sequentialScans: false,
       joinOptimizations: [] as string[],
-      cost: plan?.Total Cost || 0,
+      cost: plan?.['Total Cost'] || 0,
     };
 
     if (!plan) return analysis;
