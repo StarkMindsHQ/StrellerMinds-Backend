@@ -24,7 +24,7 @@ export class ReportConfigurationDto {
   @IsString({ each: true })
   dimensions: string[];
 
-  @ApiProperty({ type: 'object' })
+  @ApiProperty({ type: 'object', additionalProperties: true })
   @IsObject()
   @IsOptional()
   filters?: Record<string, any>;
@@ -40,7 +40,7 @@ export class ReportConfigurationDto {
   @IsOptional()
   groupBy?: string[];
 
-  @ApiProperty({ type: 'object', required: false })
+  @ApiProperty({ type: 'array', isArray: true })
   @IsArray()
   @IsOptional()
   orderBy?: { field: string; direction: 'ASC' | 'DESC' }[];
