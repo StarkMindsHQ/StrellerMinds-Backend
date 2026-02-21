@@ -3,11 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
 import { UserProfile } from './user-profile.entity';
+import { PortfolioMedia } from './portfolio-media.entity';
 
 @Entity('portfolio_items')
 export class PortfolioItem {
@@ -74,6 +76,11 @@ export class PortfolioItem {
 
   @Column({ type: 'int', default: 0 })
   displayOrder: number;
+
+  @OneToMany(() => PortfolioMedia, (media) => media.portfolioItem, {
+    cascade: true,
+  })
+  media: PortfolioMedia[];
 
   @CreateDateColumn()
   createdAt: Date;
