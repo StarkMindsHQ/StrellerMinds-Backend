@@ -5,7 +5,6 @@ import * as fs from 'fs';
 import * as os from 'os';
 import { v4 as uuid } from 'uuid';
 import { StorageProvider } from '../storage/storage.interface';
-import { File } from 'multer';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ffmpegPath = require('ffmpeg-static');
@@ -23,7 +22,7 @@ export class VideoProcessor {
     }
   }
 
-  async process(file: File, ownerId: string): Promise<string> {
+  async process(file: Express.Multer.File, ownerId: string): Promise<string> {
     const tempInputPath = path.join(os.tmpdir(), `input-${uuid()}-${file.originalname}`);
     const tempOutputPath = path.join(os.tmpdir(), `thumb-${uuid()}.png`);
 

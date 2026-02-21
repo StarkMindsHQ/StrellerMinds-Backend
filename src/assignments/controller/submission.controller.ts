@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
-import * as Express from 'express';
+import type { Express } from 'express';
 import { SubmissionService } from '../services/submission.service';
 import { SubmitAssignmentDto } from '../dto/submit-assignment.dto';
 import { GradeSubmissionDto } from '../dto/grade-submission.dto';
@@ -31,7 +31,7 @@ export class SubmissionController {
   async submitAssignment(
     @Param('assignmentId') assignmentId: string,
     @Body() submitDto: SubmitAssignmentDto,
-    @UploadedFile() file?: Express.MediaType,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.submissionService.submitAssignment(assignmentId, submitDto, file);
   }

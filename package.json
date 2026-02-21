@@ -118,6 +118,7 @@
     "@types/express-fileupload": "^1.5.1",
     "@types/geoip-lite": "^1.4.4",
     "@types/jest": "^29.5.14",
+    "@types/multer": "^2.0.0",
     "@types/newman": "^5.3.6",
     "@types/node": "^20.17.32",
     "@types/passport-jwt": "^4.0.1",
