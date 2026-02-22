@@ -9,6 +9,7 @@ import { winstonConfig } from './logging/winston.config';
 import { SECURITY_CONFIG } from './security/security.config';
 import * as Sentry from '@sentry/node';
 import { Logger } from 'winston';
+import * as compression from 'compression';
 import { PerformanceInterceptor } from './common/interceptors/performance.interceptor';
 
 async function bootstrap() {
@@ -21,6 +22,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(winstonConfig),
   });
+
+  app.use(compression());
 
   // Enhanced security headers with custom configuration
   app.use(helmet(SECURITY_CONFIG.securityHeaders as any));
