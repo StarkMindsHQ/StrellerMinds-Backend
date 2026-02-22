@@ -153,7 +153,7 @@ async function bootstrap() {
     .addTag('Forum', 'Discussion forums and community')
     .addTag('Video', 'Video processing and streaming')
     .addTag('Integrations', 'Third-party integrations')
-    .addTag('Accessibility', 'Accessibility features and i18n')
+    .addTag('Accessibility', 'WCAG 2.1 AA compliance, screen reader optimization, keyboard navigation, and accessibility monitoring')
     .addTag('Developer Portal', 'API keys, SDKs, analytics, and developer tools')
     .build();
 
