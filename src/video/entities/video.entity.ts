@@ -1,20 +1,19 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-} from 'typeorm';
-import { Chapter } from './chapter.entity';
-import { Quiz } from './quiz.entity';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { VideoVariant } from './video-variant.entity';
 import { VideoAnalytics } from './video-analytics.entity';
 
 export enum VideoStatus {
   PENDING = 'PENDING',
+  UPLOADING = 'UPLOADING',
   PROCESSING = 'PROCESSING',
   READY = 'READY',
   FAILED = 'FAILED',
+}
+
+export enum VideoVisibility {
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE',
+  UNLISTED = 'UNLISTED',
 }
 
 @Entity('videos')
@@ -28,38 +27,31 @@ export class Video {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ nullable: true })
-  originalFileId: string; // Reference to the original raw video in Files module
-
-  @Column({ nullable: true })
-  hlsManifestPath: string; // Path to .m3u8 file
-
-  @Column({ nullable: true })
-  thumbnailPath: string;
-
-  @Column('decimal', { precision: 10, scale: 2, default: 0 })
-  duration: number; // Duration in seconds
-
-  @Column({
-    type: 'enum',
-    enum: VideoStatus,
-    default: VideoStatus.PENDING,
-  })
-  status: VideoStatus;
-
   @Column()
-  ownerId: string;
+  originalFileName: string;
+
+  @Column({ nullable: true })
+  thumbnailUrl: string;
+
+  @Column({ nullable: true })
+  previewUrl: string;
 
   @Column({ default: 0 })
-  views: number;
+  duration: number; // in seconds
 
-  @OneToMany(() => Chapter, (chapter) => chapter.video)
-  chapters: Chapter[];
+  @Column({ type: 'enum', enum: VideoStatus, default: VideoStatus.PENDING })
+  status: VideoStatus;
 
-  @OneToMany(() => Quiz, (quiz) => quiz.video)
-  quizzes: Quiz[];
+  @Column({ type: 'enum', enum: VideoVisibility, default: VideoVisibility.PRIVATE })
+  visibility: VideoVisibility;
 
-  @OneToMany(() => VideoAnalytics, (analytics) => analytics.video)
+  @Column({ nullable: true })
+  uploaderId: string;
+
+  @OneToMany(() => VideoVariant, (variant) => variant.video, { cascade: true })
+  variants: VideoVariant[];
+
+  @OneToMany(() => VideoAnalytics, (analytics) => analytics.video, { cascade: true })
   analytics: VideoAnalytics[];
 
   @CreateDateColumn()

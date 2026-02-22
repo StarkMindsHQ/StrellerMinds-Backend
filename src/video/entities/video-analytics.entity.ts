@@ -1,12 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, UpdateDateColumn } from 'typeorm';
 import { Video } from './video.entity';
 
 @Entity('video_analytics')
@@ -14,28 +6,24 @@ export class VideoAnalytics {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  videoId: string;
-
   @ManyToOne(() => Video, (video) => video.analytics, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'videoId' })
   video: Video;
 
-  @Column()
-  userId: string; // Keeping it loosely coupled for now or can relate to User entity if User module is accessible
+  @Column({ default: 0 })
+  views: number;
 
-  @Column('decimal', { precision: 10, scale: 2, default: 0 })
-  watchTime: number; // Time watched in seconds
+  @Column({ default: 0 })
+  uniqueViewers: number;
 
-  @Column({ default: false })
-  completed: boolean;
+  @Column({ type: 'float', default: 0 })
+  averageWatchTime: number; // in seconds
 
-  @Column('decimal', { precision: 10, scale: 2, default: 0 })
-  lastPosition: number; // Last playback position
+  @Column({ type: 'float', default: 0 })
+  completionRate: number; // percentage 0-100
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Column({ type: 'jsonb', nullable: true })
+  engagementGraph: any; // Time-based retention data points
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  lastUpdated: Date;
 }
