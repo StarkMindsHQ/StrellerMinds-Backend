@@ -42,7 +42,7 @@ import {
   TokenBlacklistMiddleware,
   SecurityHeadersMiddleware,
 } from './auth/middleware/auth.middleware';
-// import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware'; // <-- make sure to import
+// duplicate/commented imports removed
 import { CourseModule } from './course/course.module';
 import { PaymentModule } from './payment/payment.module';
 import {
@@ -110,27 +110,25 @@ import { CoreModule } from './core/core.module';
       }),
     }),
     ScheduleModule.forRoot(),
-    AuthModule,
-    CourseModule,
-    UserModule,
-    EmailTemplate,
-    PaymentModule, // <-- from feature branch
-    I18nModule.register(), // <-- from main
+
+    // Feature modules (alphabetical)
     AccessibilityModule,
-    SearchModule, // <-- from main
-    PaymentModule,
-    FilesModule,
-    GamificationModule,
-    I18nModule.register(),
-    AccessibilityModule,
-    IntegrationsModule,
-    SecurityModule,
-    HealthModule,
-    ForumModule,
-    ConfigModule,
-    DatabaseModule,
-    IntegrationsModule,
+    AnalyticsModule,
     AssignmentModule,
+    AuthModule,
+    CalendarModule,
+    CourseModule,
+    DatabaseModule,
+    FilesModule,
+    ForumModule,
+    GamificationModule,
+    IntegrationsModule,
+    I18nModule.register(),
+    LearningPathModule,
+    PaymentModule,
+    SearchModule,
+    SecurityModule,
+    UserModule,
     VideoModule,
     LearningPathModule,
     CalendarModule,
