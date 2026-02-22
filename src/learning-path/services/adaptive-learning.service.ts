@@ -165,6 +165,13 @@ export class AdaptiveLearningService {
       reasons.push('Strong foundation prepared');
     }
 
+    // Factor 6: AI Predictive Score (Simulated)
+    const predictiveScore = this.calculatePredictiveScore(node, metrics);
+    if (predictiveScore > 0.8) {
+      score += 0.15;
+      reasons.push('AI predicts high success probability');
+    }
+
     return {
       confidence: Math.min(score, 1),
       reason: reasons.length > 0 ? reasons.join('; ') : 'Good next step in learning path',
@@ -197,6 +204,22 @@ export class AdaptiveLearningService {
     }, 0);
 
     return totalScore / node.prerequisites.length;
+  }
+
+  /**
+   * Simulates an ML model prediction for user success on a specific node
+   */
+  private calculatePredictiveScore(node: LearningPathNode, metrics: PerformanceMetrics): number {
+    // In a real implementation, this would call the AI module or an external ML service
+    let probability = 0.5;
+    
+    // Adjust based on past performance
+    probability += (metrics.avgScore - 50) / 200; // +/- adjustment
+    
+    // Adjust based on attempts (resilience)
+    if (metrics.attempts > 1.2) probability += 0.1;
+    
+    return Math.min(Math.max(probability, 0), 1);
   }
 
   async getPerformanceMetrics(userId: string, learningPathId: string): Promise<PerformanceMetrics> {
