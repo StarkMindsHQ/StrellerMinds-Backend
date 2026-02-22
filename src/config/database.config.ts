@@ -2,6 +2,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { Injectable } from '@nestjs/common';
+import { CustomTypeOrmLogger } from 'src/database/typeorm-logger';
 
 /**
  * Database configuration factory for TypeORM
@@ -143,8 +144,9 @@ export const createDataSourceOptions = (): DataSourceOptions => {
     migrationsTableName: 'migrations',
 
     synchronize: false, // Never use synchronize in CLI
-
+  logger: new CustomTypeOrmLogger(),
     logging: isDevelopment ? ['query', 'error', 'warn', 'migration'] : ['error', 'migration'],
+    maxQueryExecutionTime: 200, // ms threshold for slow query logging
   };
 };
 

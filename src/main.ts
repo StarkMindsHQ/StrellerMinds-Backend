@@ -9,6 +9,7 @@ import { winstonConfig } from './logging/winston.config';
 import { SECURITY_CONFIG } from './security/security.config';
 import * as Sentry from '@sentry/node';
 import { Logger } from 'winston';
+import { PerformanceInterceptor } from './common/interceptors/performance.interceptor';
 
 async function bootstrap() {
   // Sentry should initialize as early as possible.
@@ -29,6 +30,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  app.useGlobalInterceptors(new PerformanceInterceptor());
   // CORS configuration
   // app.enableCors({
   //   origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
