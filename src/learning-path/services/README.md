@@ -1,51 +1,53 @@
-# AI & Recommendation Module
+# Advanced Reporting Module
 
 ## Overview
-The AI module provides intelligent features to the StrellerMinds platform, including personalized content recommendations, learning pattern analysis, and an intelligent tutoring system.
+The Reports module provides a flexible system for defining, generating, visualizing, and scheduling reports. It allows users to create custom report templates based on various metrics and dimensions.
 
-## Components
+## Features
 
-### 1. Content Recommendation Engine
-Uses a hybrid approach (Collaborative Filtering + Content-Based) to suggest the most relevant learning materials.
-- **Service**: `ContentRecommendationService`
-- **Features**:
-  - Personalized course suggestions
-  - A/B testing support for algorithms
-  - Engagement tracking for RLHF (Reinforcement Learning from Human Feedback)
+### 1. Custom Report Builder
+- **Templates**: Define reports with specific metrics, dimensions, and filters.
+- **Types**: Support for User Engagement, Financial, Course Performance, and System Health reports.
+- **Visualization**: Configure how data should be displayed (Table, Bar Chart, Line Chart, Pie Chart).
 
-### 2. Learning Pattern Analysis
-Analyzes user behavior to categorize learning styles and detect at-risk students.
-- **Service**: `LearningPatternAnalysisService`
-- **Patterns Detected**:
-  - `binge_learner`: Consumes large amounts of content in short bursts.
-  - `consistent`: Regular, steady progress.
-  - `struggling`: Low scores or high time-on-task.
-  - `weekend_warrior`: Active primarily on weekends.
+### 2. Data Generation & Visualization
+- **Data Fetching**: Aggregates data based on template configuration.
+- **Visualization Ready**: Returns data formatted for frontend charting libraries (e.g., Chart.js).
+- **Mock Data**: Currently simulates data sources for demonstration.
 
-### 3. Intelligent Tutor
-Provides context-aware answers to student queries about course material.
-- **Service**: `IntelligentTutoringService`
-- **Capabilities**:
-  - Intent detection (Explanation vs Example vs Assessment)
-  - Context-aware responses
-  - Follow-up suggestions
+### 3. Export Capabilities
+- **Formats**: Support for CSV and JSON exports.
+- **Download**: Direct file download endpoints.
+
+### 4. Scheduling
+- **Frequency**: Schedule reports to run Daily, Weekly, or Monthly.
+- **Recipients**: Define email recipients for generated reports.
 
 ## API Endpoints
 
-- `GET /api/ai/recommendations/:userId` - Get content suggestions
-- `GET /api/ai/patterns/:userId` - Get user learning analysis
-- `POST /api/ai/tutor/query` - Ask the AI tutor a question
-- `POST /api/ai/recommendations/track` - Log interaction for model training
+- `POST /reports/templates` - Create a report template
+- `GET /reports/templates` - List templates
+- `POST /reports/templates/:id/generate` - Get JSON data for visualization
+- `GET /reports/templates/:id/export?format=CSV` - Download report file
+- `POST /reports/schedule` - Schedule a report
+
+## Data Model
+
+### ReportTemplate
+Stores the definition of a report, including the configuration JSON blob that defines metrics and dimensions.
+
+### ReportSchedule
+Manages when reports should run and who receives them.
 
 ## Integration
 
-Import `AiModule` in `AppModule`:
+Import `ReportsModule` in `AppModule`:
 
 ```typescript
-import { AiModule } from './ai/ai.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
-  imports: [AiModule, ...],
+  imports: [ReportsModule, ...],
 })
 export class AppModule {}
 ```
