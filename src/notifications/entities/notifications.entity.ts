@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 import { NotificationChannel } from './notification-preference.entity';
 
@@ -12,16 +13,29 @@ export enum NotificationStatus {
   QUEUED = 'QUEUED',
   SENDING = 'SENDING',
   SENT = 'SENT',
+  DELIVERED = 'DELIVERED',
+  READ = 'READ',
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED',
+  DISMISSED = 'DISMISSED',
+}
+
+export enum NotificationPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent',
 }
 
 @Entity('notifications')
+@Index(['userId', 'status'])
+@Index(['userId', 'createdAt'])
 export class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'uuid' })
+  @Index()
   userId: string;
 
   @Column({
@@ -40,7 +54,7 @@ export class Notification {
   title: string;
 
   @Column('text')
-  content: string;
+  content: string; // NB: this is `content`, not `body`
 
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>;
@@ -50,6 +64,7 @@ export class Notification {
     enum: NotificationStatus,
     default: NotificationStatus.PENDING,
   })
+  @Index()
   status: NotificationStatus;
 
   @Column({ nullable: true })
@@ -58,11 +73,24 @@ export class Notification {
   @Column({ nullable: true })
   sentAt: Date;
 
+  @Column({ nullable: true })
+  deliveredAt: Date;
+
+  @Column({ nullable: true })
+  readAt: Date;
+
   @Column({ default: 0 })
   retryCount: number;
 
   @Column({ nullable: true })
   errorMessage: string;
+
+  // Digest tracking
+  @Column({ default: false })
+  isDigest: boolean;
+
+  @Column({ type: 'uuid', nullable: true })
+  digestBatchId: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

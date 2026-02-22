@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { LearningPathEnrollment } from '../entities/learning-path-enrollment.entity';
 import { NodeProgress, ProgressStatus } from '../entities/node-progress.entity';
 import { LearningPathNode } from '../entities/learning-path-node.entity';
-import { NodeDependency, DependencyType } from '../entities/node-dependency.entity';
+import { NodeDependency } from '../entities/node-dependency.entity';
 import { LearningObjective } from '../entities/learning-objective.entity';
 
 export interface AdaptiveRecommendation {
@@ -26,6 +26,7 @@ export interface PerformanceMetrics {
 
 @Injectable()
 export class AdaptiveLearningService {
+  private readonly logger = new Logger(AdaptiveLearningService.name);
   constructor(
     @InjectRepository(LearningPathEnrollment)
     private readonly enrollmentRepository: Repository<LearningPathEnrollment>,
@@ -164,6 +165,13 @@ export class AdaptiveLearningService {
       reasons.push('Strong foundation prepared');
     }
 
+    // Factor 6: AI Predictive Score (Simulated)
+    const predictiveScore = this.calculatePredictiveScore(node, metrics);
+    if (predictiveScore > 0.8) {
+      score += 0.15;
+      reasons.push('AI predicts high success probability');
+    }
+
     return {
       confidence: Math.min(score, 1),
       reason: reasons.length > 0 ? reasons.join('; ') : 'Good next step in learning path',
@@ -196,6 +204,22 @@ export class AdaptiveLearningService {
     }, 0);
 
     return totalScore / node.prerequisites.length;
+  }
+
+  /**
+   * Simulates an ML model prediction for user success on a specific node
+   */
+  private calculatePredictiveScore(node: LearningPathNode, metrics: PerformanceMetrics): number {
+    // In a real implementation, this would call the AI module or an external ML service
+    let probability = 0.5;
+    
+    // Adjust based on past performance
+    probability += (metrics.avgScore - 50) / 200; // +/- adjustment
+    
+    // Adjust based on attempts (resilience)
+    if (metrics.attempts > 1.2) probability += 0.1;
+    
+    return Math.min(Math.max(probability, 0), 1);
   }
 
   async getPerformanceMetrics(userId: string, learningPathId: string): Promise<PerformanceMetrics> {
@@ -315,12 +339,12 @@ export class AdaptiveLearningService {
 
   private async addRemedialContent(learningPathId: string): Promise<void> {
     // Implementation would add supplementary materials for struggling students
-    console.log(`Adding remedial content for learning path ${learningPathId}`);
+    this.logger.log(`Adding remedial content for learning path ${learningPathId}`);
   }
 
   private async addAdvancedContent(learningPathId: string): Promise<void> {
     // Implementation would add challenging extensions for high performers
-    console.log(`Adding advanced content for learning path ${learningPathId}`);
+    this.logger.log(`Adding advanced content for learning path ${learningPathId}`);
   }
 
   async getPathCompletionPrediction(enrollmentId: string): Promise<{

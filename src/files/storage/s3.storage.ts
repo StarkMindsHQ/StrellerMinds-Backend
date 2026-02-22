@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { StorageProvider } from './storage.interface';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class S3StorageService implements StorageProvider {
   });
 
   async upload(buffer: Buffer, path: string, mimeType: string) {
-    await this.s3.send(
+    const response = await this.s3.send(
       new PutObjectCommand({
         Bucket: process.env.AWS_BUCKET,
         Key: path,
@@ -21,18 +21,42 @@ export class S3StorageService implements StorageProvider {
         ContentType: mimeType,
       }),
     );
+    return { path, versionId: response.VersionId };
   }
 
-  async delete(path: string) {
+  async delete(path: string, versionId?: string) {
     await this.s3.send(
       new DeleteObjectCommand({
         Bucket: process.env.AWS_BUCKET,
         Key: path,
+        VersionId: versionId,
       }),
     );
   }
 
-  getPublicUrl(path: string) {
-    return `${process.env.CDN_URL}/${path}`;
+  getPublicUrl(path: string, versionId?: string) {
+    let url = `${process.env.CDN_URL}/${path}`;
+    if (versionId) {
+      url += `?versionId=${versionId}`;
+    }
+    return url;
+  }
+
+  async download(path: string, versionId?: string): Promise<Buffer> {
+    const response = await this.s3.send(
+      new GetObjectCommand({
+        Bucket: process.env.AWS_BUCKET,
+        Key: path,
+        VersionId: versionId,
+      }),
+    );
+    const streamToBuffer = (stream: any): Promise<Buffer> =>
+      new Promise((resolve, reject) => {
+        const chunks: any[] = [];
+        stream.on('data', (chunk: any) => chunks.push(chunk));
+        stream.on('error', reject);
+        stream.on('end', () => resolve(Buffer.concat(chunks)));
+      });
+    return streamToBuffer(response.Body);
   }
 }

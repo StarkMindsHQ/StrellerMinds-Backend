@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { LearningPathTemplate, TemplateCategory } from '../entities/learning-path-template.entity';
@@ -26,6 +26,7 @@ export interface TemplateStructure {
 
 @Injectable()
 export class TemplateLibraryService {
+  private readonly logger = new Logger(TemplateLibraryService.name);
   constructor(
     @InjectRepository(LearningPathTemplate)
     private readonly templateRepository: Repository<LearningPathTemplate>,
@@ -195,7 +196,7 @@ export class TemplateLibraryService {
 
           if (sourceNode && targetNode) {
             // Create dependency record (this would require a dependency entity/repository)
-            console.log(`Creating dependency from node ${sourceNode.id} to ${targetNode.id}`);
+            this.logger.log(`Creating dependency from node ${sourceNode.id} to ${targetNode.id}`);
           }
         }
       }

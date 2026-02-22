@@ -42,7 +42,7 @@ import {
   TokenBlacklistMiddleware,
   SecurityHeadersMiddleware,
 } from './auth/middleware/auth.middleware';
-// import { LanguageDetectionMiddleware } from './common/middleware/language-detection.middleware'; // <-- make sure to import
+// duplicate/commented imports removed
 import { CourseModule } from './course/course.module';
 import { PaymentModule } from './payment/payment.module';
 import {
@@ -68,6 +68,11 @@ import { ForumModule } from './forum/forum.module';
 import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { EmailTemplate } from './notifications/entities/email-template.entity';
+import { DocumentationModule } from './documentation/documentation.module';
+import { MonitoringModule } from './monitoring/monitoring.module';
+import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
+import { CoreModule } from './core/core.module';
 
 @Module({
   imports: [
@@ -105,30 +110,32 @@ import { AnalyticsModule } from './analytics/analytics.module';
       }),
     }),
     ScheduleModule.forRoot(),
-    AuthModule,
-    CourseModule,
-    UserModule,
-    PaymentModule, // <-- from feature branch
-    I18nModule.register(), // <-- from main
+
+    // Feature modules (alphabetical)
     AccessibilityModule,
-    SearchModule, // <-- from main
-    PaymentModule,
-    FilesModule,
-    GamificationModule,
-    I18nModule.register(),
-    AccessibilityModule,
-    IntegrationsModule,
-    SecurityModule,
-    HealthModule,
-    ForumModule,
-    ConfigModule,
-    DatabaseModule,
-    IntegrationsModule,
+    AnalyticsModule,
     AssignmentModule,
+    AuthModule,
+    CalendarModule,
+    CourseModule,
+    DatabaseModule,
+    FilesModule,
+    ForumModule,
+    GamificationModule,
+    IntegrationsModule,
+    I18nModule.register(),
+    LearningPathModule,
+    PaymentModule,
+    SearchModule,
+    SecurityModule,
+    UserModule,
     VideoModule,
     LearningPathModule,
     CalendarModule,
     AnalyticsModule,
+    DocumentationModule,
+    MonitoringModule,
+    CoreModule,
   ],
   providers: [
     {
@@ -146,6 +153,10 @@ import { AnalyticsModule } from './analytics/analytics.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: PerformanceInterceptor,
     },
   ],
 })

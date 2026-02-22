@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EmailQueue } from '../entities/email-queue.entity';
@@ -9,6 +9,7 @@ import { SendEmailDto } from '../dto/send-email.dto';
 
 @Injectable()
 export class DigestEmailService {
+  private readonly logger = new Logger(DigestEmailService.name);
   constructor(
     @InjectRepository(NotificationPreference)
     private notificationPreferenceRepository: Repository<NotificationPreference>,
@@ -216,7 +217,7 @@ export class DigestEmailService {
       // For now, we'll just return true to indicate success
       return true;
     } catch (error) {
-      console.error('Error sending digest email:', error);
+      this.logger.error('Error sending digest email:', error);
       return false;
     }
   }
@@ -227,7 +228,7 @@ export class DigestEmailService {
     // and send them their appropriate digest based on their preferences
 
     // For now, we'll just log that the function exists
-    console.log('Scheduling digest emails...');
+    this.logger.log('Scheduling digest emails...');
   }
 
   async sendBulkDigestEmails(period: 'daily' | 'weekly'): Promise<number> {
@@ -250,7 +251,7 @@ export class DigestEmailService {
           sentCount++;
         }
       } catch (error) {
-        console.error(`Error sending digest to user ${userData.userId}:`, error);
+        this.logger.error(`Error sending digest to user ${userData.userId}:`, error);
       }
     }
 
