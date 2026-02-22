@@ -72,6 +72,7 @@ import { EmailTemplate } from './notifications/entities/email-template.entity';
 import { DocumentationModule } from './documentation/documentation.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
+import { CoreModule } from './core/core.module';
 
 @Module({
   imports: [
@@ -134,6 +135,7 @@ import { PerformanceInterceptor } from './monitoring/interceptors/performance.in
     AnalyticsModule,
     DocumentationModule,
     MonitoringModule,
+    CoreModule,
   ],
   providers: [
     {
