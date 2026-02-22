@@ -9,6 +9,13 @@ import {
 import { Request, Response } from 'express';
 import { ErrorResponse } from '../interfaces/error-response.interface';
 
+/** Shape of HttpException.getResponse() when it returns an object */
+interface HttpExceptionResponseObject {
+  message?: string | string[];
+  error?: string;
+  details?: unknown;
+}
+
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
@@ -29,7 +36,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
     let error = 'Internal Server Error';
-    let details: any = undefined;
+    let details: unknown = undefined;
 
     if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
@@ -37,10 +44,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object') {
-        message = (exceptionResponse as any).message || message;
-        error = (exceptionResponse as any).error || exception.name;
-        details = (exceptionResponse as any).details;
+      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+        const body = exceptionResponse as HttpExceptionResponseObject;
+        message = Array.isArray(body.message) ? body.message[0] : body.message ?? message;
+        error = body.error ?? exception.name;
+        details = body.details;
       }
     } else if (exception instanceof Error) {
       message = exception.message;
@@ -54,7 +62,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       requestId: request.headers['x-request-id'] as string,
-      ...(process.env.NODE_ENV === 'development' && details ? { details } : {}),
+      ...(process.env.NODE_ENV === 'development' && details !== undefined ? { details } : {}),
     };
   }
 
@@ -109,7 +117,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
   }
 
-  private sendToMonitoring(exception: unknown, context: any) {
+  private sendToMonitoring(
+    exception: unknown,
+    context: Record<string, unknown>,
+  ): void {
     // Integrate with your monitoring service
     // Example: Sentry
     // Sentry.captureException(exception, { contexts: { custom: context } });

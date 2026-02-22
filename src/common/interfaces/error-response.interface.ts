@@ -5,5 +5,5 @@ export interface ErrorResponse {
   timestamp: string;
   path: string;
   requestId?: string;
-  details?: any;
+  details?: unknown;
 }

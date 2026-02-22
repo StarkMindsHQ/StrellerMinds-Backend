@@ -20,9 +20,9 @@ import {
   FollowResponseDto,
   UserNetworkDto,
   SocialStatsDto,
-  BlockUserDto,
-  MuteUserDto,
+  SocialGraphResponseDto,
 } from '../dto/social.dto';
+import { RequestWithUser } from '../../common/types/request.types';
 
 @ApiTags('Social Features')
 @Controller('social')
@@ -41,7 +41,7 @@ export class SocialController {
   @ApiOperation({ summary: 'Follow a user' })
   @ApiResponse({ status: 201, description: 'User followed' })
   async followUser(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<FollowResponseDto> {
     const followerProfile = await this.userProfileService.getProfileByUserId(req.user.id);
@@ -54,7 +54,7 @@ export class SocialController {
   @ApiOperation({ summary: 'Unfollow a user' })
   @ApiResponse({ status: 200, description: 'User unfollowed' })
   async unfollowUser(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<void> {
     const followerProfile = await this.userProfileService.getProfileByUserId(req.user.id);
@@ -65,7 +65,7 @@ export class SocialController {
   @Get('me/followers')
   @ApiOperation({ summary: 'Get my followers' })
   @ApiResponse({ status: 200, description: 'Followers retrieved' })
-  async getMyFollowers(@Request() req): Promise<any[]> {
+  async getMyFollowers(@Request() req: RequestWithUser): Promise<SocialGraphResponseDto[]> {
     const profile = await this.userProfileService.getProfileByUserId(req.user.id);
     return this.socialService.getFollowers(profile.id);
   }
@@ -73,7 +73,7 @@ export class SocialController {
   @Get('me/following')
   @ApiOperation({ summary: 'Get users I follow' })
   @ApiResponse({ status: 200, description: 'Following retrieved' })
-  async getMyFollowing(@Request() req): Promise<any[]> {
+  async getMyFollowing(@Request() req: RequestWithUser): Promise<SocialGraphResponseDto[]> {
     const profile = await this.userProfileService.getProfileByUserId(req.user.id);
     return this.socialService.getFollowing(profile.id);
   }
@@ -81,7 +81,9 @@ export class SocialController {
   @Get(':userId/followers')
   @ApiOperation({ summary: 'Get user followers' })
   @ApiResponse({ status: 200, description: 'Followers retrieved' })
-  async getUserFollowers(@Param('userId', new ParseUUIDPipe()) userId: string): Promise<any[]> {
+  async getUserFollowers(
+    @Param('userId', new ParseUUIDPipe()) userId: string,
+  ): Promise<SocialGraphResponseDto[]> {
     const profile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.getFollowers(profile.id);
   }
@@ -89,7 +91,9 @@ export class SocialController {
   @Get(':userId/following')
   @ApiOperation({ summary: 'Get users followed by user' })
   @ApiResponse({ status: 200, description: 'Following retrieved' })
-  async getUserFollowing(@Param('userId', new ParseUUIDPipe()) userId: string): Promise<any[]> {
+  async getUserFollowing(
+    @Param('userId', new ParseUUIDPipe()) userId: string,
+  ): Promise<SocialGraphResponseDto[]> {
     const profile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.getFollowing(profile.id);
   }
@@ -97,7 +101,7 @@ export class SocialController {
   @Get('me/network')
   @ApiOperation({ summary: 'Get my network' })
   @ApiResponse({ status: 200, description: 'Network retrieved' })
-  async getMyNetwork(@Request() req): Promise<UserNetworkDto> {
+  async getMyNetwork(@Request() req: RequestWithUser): Promise<UserNetworkDto> {
     const profile = await this.userProfileService.getProfileByUserId(req.user.id);
     return this.socialService.getUserNetwork(profile.id);
   }
@@ -105,7 +109,7 @@ export class SocialController {
   @Get('me/suggested')
   @ApiOperation({ summary: 'Get suggested users to follow' })
   @ApiResponse({ status: 200, description: 'Suggestions retrieved' })
-  async getSuggestedUsers(@Request() req): Promise<any[]> {
+  async getSuggestedUsers(@Request() req: RequestWithUser): Promise<SocialGraphResponseDto[]> {
     const profile = await this.userProfileService.getProfileByUserId(req.user.id);
     return this.socialService.getSuggestedUsers(profile.id);
   }
@@ -113,7 +117,7 @@ export class SocialController {
   @Get('me/stats')
   @ApiOperation({ summary: 'Get my social stats' })
   @ApiResponse({ status: 200, description: 'Stats retrieved' })
-  async getMySocialStats(@Request() req): Promise<SocialStatsDto> {
+  async getMySocialStats(@Request() req: RequestWithUser): Promise<SocialStatsDto> {
     const profile = await this.userProfileService.getProfileByUserId(req.user.id);
     return this.socialService.getSocialStats(profile.id);
   }
@@ -135,7 +139,7 @@ export class SocialController {
   @ApiOperation({ summary: 'Block a user' })
   @ApiResponse({ status: 201, description: 'User blocked' })
   async blockUser(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<FollowResponseDto> {
     const blockerProfile = await this.userProfileService.getProfileByUserId(req.user.id);
@@ -148,7 +152,7 @@ export class SocialController {
   @ApiOperation({ summary: 'Unblock a user' })
   @ApiResponse({ status: 200, description: 'User unblocked' })
   async unblockUser(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<void> {
     const unblockerProfile = await this.userProfileService.getProfileByUserId(req.user.id);
@@ -163,7 +167,7 @@ export class SocialController {
   @ApiOperation({ summary: 'Mute a user' })
   @ApiResponse({ status: 201, description: 'User muted' })
   async muteUser(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<FollowResponseDto> {
     const muterProfile = await this.userProfileService.getProfileByUserId(req.user.id);
@@ -176,7 +180,7 @@ export class SocialController {
   @ApiOperation({ summary: 'Unmute a user' })
   @ApiResponse({ status: 200, description: 'User unmuted' })
   async unmuteUser(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Param('userId', new ParseUUIDPipe()) userId: string,
   ): Promise<void> {
     const unmutterProfile = await this.userProfileService.getProfileByUserId(req.user.id);
@@ -190,9 +194,9 @@ export class SocialController {
   @ApiOperation({ summary: 'Get mutual connections with a user' })
   @ApiResponse({ status: 200, description: 'Mutual connections retrieved' })
   async getMutualConnections(
-    @Request() req,
+    @Request() req: RequestWithUser,
     @Param('userId', new ParseUUIDPipe()) userId: string,
-  ): Promise<any[]> {
+  ): Promise<SocialGraphResponseDto[]> {
     const userProfile = await this.userProfileService.getProfileByUserId(req.user.id);
     const otherProfile = await this.userProfileService.getProfileByUserId(userId);
     return this.socialService.getMutualConnections(userProfile.id, otherProfile.id);

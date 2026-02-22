@@ -16,6 +16,7 @@ import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { ZoomService } from '../services/zoom.service';
 import { ZoomConfigService } from '../services/zoom-config.service';
 import { ZoomConfigDto, CreateMeetingDto, WebhookEventDto } from '../dto/zoom.dto';
+import { RequestUser } from '../../../common/types/request.types';
 
 @Controller('integrations/zoom')
 export class ZoomController {
@@ -29,9 +30,9 @@ export class ZoomController {
    */
   @Post('config')
   @UseGuards(JwtAuthGuard)
-  async createZoomConfig(@CurrentUser() user: any, @Body() dto: ZoomConfigDto) {
+  async createZoomConfig(@CurrentUser() user: RequestUser, @Body() dto: ZoomConfigDto) {
     const config = await this.zoomConfigService.createZoomConfig(
-      user.id,
+      user.sub,
       dto.accountId,
       dto.clientId,
       dto.clientSecret,
@@ -51,8 +52,8 @@ export class ZoomController {
    */
   @Get('config/:configId')
   @UseGuards(JwtAuthGuard)
-  async getZoomConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
-    const config = await this.zoomConfigService.getZoomConfig(configId, user.id);
+  async getZoomConfig(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+    const config = await this.zoomConfigService.getZoomConfig(configId, user.sub);
     if (!config) {
       throw new NotFoundException('Zoom configuration not found');
     }
@@ -68,14 +69,14 @@ export class ZoomController {
    */
   @Post('meetings')
   @UseGuards(JwtAuthGuard)
-  async createMeeting(@CurrentUser() user: any, @Body() dto: CreateMeetingDto) {
+  async createMeeting(@CurrentUser() user: RequestUser, @Body() dto: CreateMeetingDto) {
     try {
       // In a real implementation, fetch the config and access token
       const accessToken = 'placeholder-token';
 
       const meeting = await this.zoomService.createMeeting(
         accessToken,
-        user.id,
+        user.sub,
         dto.topic,
         dto.startTime,
         dto.duration,
@@ -136,8 +137,8 @@ export class ZoomController {
    */
   @Get('recordings')
   @UseGuards(JwtAuthGuard)
-  async getRecordings(@CurrentUser() user: any) {
-    const recordings = await this.zoomService.getRecordings('token', user.id);
+  async getRecordings(@CurrentUser() user: RequestUser) {
+    const recordings = await this.zoomService.getRecordings('token', user.sub);
     return {
       success: true,
       data: recordings,
@@ -150,12 +151,12 @@ export class ZoomController {
   @Post('sync-recordings')
   @UseGuards(JwtAuthGuard)
   async syncRecordings(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Body() body: { configId: string; fromDate?: string; toDate?: string },
   ) {
     const syncLog = await this.zoomConfigService.syncRecordings(
       body.configId,
-      user.id,
+      user.sub,
       body.fromDate,
       body.toDate,
     );

@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/node';
 
 @Catch()
 export class SentryExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+  catch(exception: unknown, host: ArgumentsHost) {
     if (!(exception instanceof HttpException)) {
       Sentry.captureException(exception);
     }

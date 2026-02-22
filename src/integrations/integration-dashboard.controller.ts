@@ -19,6 +19,7 @@ import { IntegrationConfig } from './common/entities/integration-config.entity';
 import { SyncLog } from './common/entities/sync-log.entity';
 import { IntegrationMapping } from './common/entities/integration-mapping.entity';
 import { SyncEngineService } from './sync/services/sync-engine.service';
+import { RequestUser } from '../common/types/request.types';
 
 @Controller('integrations')
 @UseGuards(JwtAuthGuard)
@@ -38,13 +39,13 @@ export class IntegrationDashboardController {
    */
   @Get()
   async listIntegrations(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Query('type') type?: string,
     @Query('status') status?: string,
   ) {
     const query = this.configRepository
       .createQueryBuilder('ic')
-      .where('ic.userId = :userId', { userId: user.id });
+      .where('ic.userId = :userId', { userId: user.sub });
 
     if (type) {
       query.andWhere('ic.integrationType = :type', { type });
@@ -66,9 +67,9 @@ export class IntegrationDashboardController {
    * Get integration details
    */
   @Get(':configId')
-  async getIntegration(@CurrentUser() user: any, @Param('configId') configId: string) {
+  async getIntegration(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
-      where: { id: configId, userId: user.id },
+      where: { id: configId, userId: user.sub },
     });
 
     if (!config) {
@@ -86,12 +87,12 @@ export class IntegrationDashboardController {
    */
   @Get(':configId/stats')
   async getIntegrationStats(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Param('configId') configId: string,
     @Query('days') days: number = 30,
   ) {
     const config = await this.configRepository.findOne({
-      where: { id: configId, userId: user.id },
+      where: { id: configId, userId: user.sub },
     });
 
     if (!config) {
@@ -150,12 +151,12 @@ export class IntegrationDashboardController {
    */
   @Put(':configId')
   async updateIntegration(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Param('configId') configId: string,
     @Body() updates: any,
   ) {
     const config = await this.configRepository.findOne({
-      where: { id: configId, userId: user.id },
+      where: { id: configId, userId: user.sub },
     });
 
     if (!config) {
@@ -180,9 +181,9 @@ export class IntegrationDashboardController {
    * Activate integration
    */
   @Post(':configId/activate')
-  async activateIntegration(@CurrentUser() user: any, @Param('configId') configId: string) {
+  async activateIntegration(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
-      where: { id: configId, userId: user.id },
+      where: { id: configId, userId: user.sub },
     });
 
     if (!config) {
@@ -204,9 +205,9 @@ export class IntegrationDashboardController {
    * Deactivate integration
    */
   @Post(':configId/deactivate')
-  async deactivateIntegration(@CurrentUser() user: any, @Param('configId') configId: string) {
+  async deactivateIntegration(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
-      where: { id: configId, userId: user.id },
+      where: { id: configId, userId: user.sub },
     });
 
     if (!config) {
@@ -228,9 +229,9 @@ export class IntegrationDashboardController {
    * Delete integration
    */
   @Delete(':configId')
-  async deleteIntegration(@CurrentUser() user: any, @Param('configId') configId: string) {
+  async deleteIntegration(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
-      where: { id: configId, userId: user.id },
+      where: { id: configId, userId: user.sub },
     });
 
     if (!config) {
@@ -249,9 +250,9 @@ export class IntegrationDashboardController {
    * Get integration health/status
    */
   @Get(':configId/health')
-  async getIntegrationHealth(@CurrentUser() user: any, @Param('configId') configId: string) {
+  async getIntegrationHealth(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
     const config = await this.configRepository.findOne({
-      where: { id: configId, userId: user.id },
+      where: { id: configId, userId: user.sub },
     });
 
     if (!config) {
@@ -270,9 +271,9 @@ export class IntegrationDashboardController {
    * Get dashboard overview
    */
   @Get('dashboard/overview')
-  async getDashboardOverview(@CurrentUser() user: any) {
+  async getDashboardOverview(@CurrentUser() user: RequestUser) {
     const configs = await this.configRepository.find({
-      where: { userId: user.id },
+      where: { userId: user.sub },
     });
 
     const activeCount = configs.filter((c) => c.isActive).length;

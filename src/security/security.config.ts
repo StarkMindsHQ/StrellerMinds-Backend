@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 export interface CorsConfig {
   origin: string | string[] | boolean;
   credentials: boolean;
@@ -39,7 +41,7 @@ export interface CsrfConfig {
     sameSite?: 'strict' | 'lax' | 'none';
   };
   ignoreMethods?: string[];
-  value?: (req: any) => string;
+  value?: (req: Request & { csrfToken?: () => string }) => string;
 }
 
 export const SECURITY_CONFIG = {
@@ -100,7 +102,7 @@ export const SECURITY_CONFIG = {
     noSniff: true,
     originAgentCluster: true,
     permittedCrossDomainPolicies: false,
-    referrerPolicy: { policy: 'strict-origin-when-cross-origin' as any },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' as const },
     xssFilter: true,
   } as SecurityHeadersConfig,
 
@@ -111,6 +113,6 @@ export const SECURITY_CONFIG = {
       sameSite: 'strict',
     },
     ignoreMethods: ['GET', 'HEAD', 'OPTIONS'],
-    value: (req: any) => req.csrfToken(),
+    value: (req: Request & { csrfToken?: () => string }) => req.csrfToken?.() ?? '',
   } as CsrfConfig,
 };

@@ -13,11 +13,14 @@ import * as compression from 'compression';
 import { PerformanceInterceptor } from './common/interceptors/performance.interceptor';
 
 async function bootstrap() {
-  // Sentry should initialize as early as possible.
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    tracesSampleRate: 1.0,
-  });
+  // Sentry: only init when a valid DSN is set (skip placeholder or empty)
+  const sentryDsn = process.env.SENTRY_DSN;
+  if (sentryDsn && !sentryDsn.includes('your-sentry-dsn') && !sentryDsn.includes('project-id')) {
+    Sentry.init({
+      dsn: sentryDsn,
+      tracesSampleRate: 1.0,
+    });
+  }
 
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(winstonConfig),
@@ -26,7 +29,7 @@ async function bootstrap() {
   app.use(compression());
 
   // Enhanced security headers with custom configuration
-  app.use(helmet(SECURITY_CONFIG.securityHeaders as any));
+  app.use(helmet(SECURITY_CONFIG.securityHeaders as Parameters<typeof helmet>[0]));
 
   // Global input security + validation (centralized)
   applyGlobalSecurity(app);
@@ -44,8 +47,11 @@ async function bootstrap() {
   // Enhanced CORS configuration
   app.enableCors(SECURITY_CONFIG.cors);
 
-  // Trust proxy for rate limiting and IP detection
-  (app as any).set('trust proxy', 1);
+  // Trust proxy for rate limiting and IP detection (Express app.set)
+  (app.getHttpAdapter().getInstance() as { set(key: string, value: number): void }).set(
+    'trust proxy',
+    1,
+  );
 
   // API prefix
   app.setGlobalPrefix('api');

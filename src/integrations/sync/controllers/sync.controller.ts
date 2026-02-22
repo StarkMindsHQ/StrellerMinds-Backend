@@ -12,6 +12,7 @@ import {
 import { JwtAuthGuard } from '../../../auth/guards/auth.guard';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { SyncEngineService } from '../services/sync-engine.service';
+import { RequestUser } from '../../../common/types/request.types';
 
 @Controller('integrations/sync')
 @UseGuards(JwtAuthGuard)
@@ -108,7 +109,7 @@ export class SyncController {
    * Trigger manual sync
    */
   @Post('trigger/:configId')
-  async triggerSync(@CurrentUser() user: any, @Param('configId') configId: string) {
+  async triggerSync(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
     try {
       const result = await this.syncEngineService.triggerScheduledSync(configId);
 
