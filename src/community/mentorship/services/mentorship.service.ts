@@ -101,7 +101,8 @@ export class MentorshipService {
       status: MentorshipStatus.PENDING,
     });
 
-    return await this.mentorshipRepo.save(mentorship);
+    const saved = await this.mentorshipRepo.save(mentorship);
+    return saved as unknown as Mentorship;
   }
 
   async approveMentorship(mentorshipId: string, mentorId: string): Promise<Mentorship> {
@@ -120,7 +121,7 @@ export class MentorshipService {
     mentorship.status = MentorshipStatus.ACTIVE;
     mentorship.startDate = new Date();
 
-    const saved = await this.mentorshipRepo.save(mentorship);
+    const saved = await this.mentorshipRepo.save(mentorship) as unknown as Mentorship;
 
     // Update mentor's current mentees count
     await this.mentorProfileRepo.increment(
@@ -171,7 +172,7 @@ export class MentorshipService {
       mentorship.feedback = feedback.comment;
     }
 
-    const saved = await this.mentorshipRepo.save(mentorship);
+    const saved = await this.mentorshipRepo.save(mentorship) as unknown as Mentorship;
 
     // Update mentor stats
     await this.mentorProfileRepo.decrement(

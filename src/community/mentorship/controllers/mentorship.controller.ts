@@ -89,7 +89,15 @@ export class MentorshipController {
   @Post(':id/sessions')
   @ApiOperation({ summary: 'Log mentorship session' })
   async logSession(@Param('id') id: string, @Body() dto: LogSessionDto) {
-    const session = await this.mentorshipService.logSession(id, dto);
+    // Convert DTO to proper format with Date object
+    const sessionData: Partial<MentorshipSession> = {
+      scheduledAt: new Date(dto.scheduledAt),
+      durationMinutes: dto.durationMinutes,
+      agenda: dto.agenda,
+      notes: dto.notes,
+      topics: dto.topics,
+    };
+    const session = await this.mentorshipService.logSession(id, sessionData);
     return { success: true, data: session };
   }
 
