@@ -101,6 +101,7 @@
     "natural": "^8.1.0",
     "nest-winston": "^1.10.2",
     "nestjs-throttler-storage-redis": "^0.5.1",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",
     "npm": "^11.10.1",
     "passport": "^0.7.0",
