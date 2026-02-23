@@ -11,6 +11,16 @@ export class CreateAuditDto {
   @IsString()
   html: string;
 
+  @ApiPropertyOptional({ description: 'Optional CSS content for focus/visibility checks' })
+  @IsOptional()
+  @IsString()
+  css?: string;
+
+  @ApiPropertyOptional({ description: 'Expected language code for localization checks', default: 'en' })
+  @IsOptional()
+  @IsString()
+  language?: string;
+
   @ApiPropertyOptional({ enum: AuditType, default: AuditType.FULL_AUDIT })
   @IsOptional()
   @IsEnum(AuditType)

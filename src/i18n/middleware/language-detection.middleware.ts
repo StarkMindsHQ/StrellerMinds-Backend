@@ -34,10 +34,11 @@ export class LanguageDetectionMiddleware implements NestMiddleware {
 
     // Set RTL flag
     req['isRTL'] = this.i18nService.isRTL(req['language']);
+    req['direction'] = this.i18nService.getDirection(req['language']);
+    req['locale'] = `${req['language']}-${this.i18nService.getLanguageMetadata(req['language']).region}`;
 
-    // Set locale string for dates/numbers formatting
-    req['locale'] =
-      `${req['language']}-${this.i18nService.getLanguageMetadata(req['language']).region}`;
+    res.setHeader('Content-Language', req['language']);
+    res.setHeader('X-Text-Direction', req['direction']);
 
     next();
   }
