@@ -68,7 +68,6 @@ import { ForumModule } from './forum/forum.module';
 import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
-import { CommunityModule } from './community/community.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
 import { DocumentationModule } from './documentation/documentation.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
@@ -118,7 +117,6 @@ import { CoreModule } from './core/core.module';
     AssignmentModule,
     AuthModule,
     CalendarModule,
-    CommunityModule,
     CourseModule,
     DatabaseModule,
     FilesModule,
