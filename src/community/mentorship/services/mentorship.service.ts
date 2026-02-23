@@ -202,9 +202,17 @@ export class MentorshipService {
       throw new NotFoundException('Mentorship not found');
     }
 
+    // Convert string date to Date object if needed
+    const sessionDataWithDate = {
+      ...sessionData,
+      scheduledAt: typeof sessionData.scheduledAt === 'string' 
+        ? new Date(sessionData.scheduledAt) 
+        : sessionData.scheduledAt,
+    };
+
     const session = this.sessionRepo.create({
       mentorshipId,
-      ...sessionData,
+      ...sessionDataWithDate,
     });
 
     const saved = await this.sessionRepo.save(session);
