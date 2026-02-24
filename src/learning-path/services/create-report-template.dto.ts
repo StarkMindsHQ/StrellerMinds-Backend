@@ -1,6 +1,6 @@
 import { IsString, IsEnum, IsObject, IsArray, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ReportType, VisualizationType } from '../entities/report-template.entity';
+import { ReportType, VisualizationType } from './report-template.entity';
 
 export class ReportConfigurationDto {
   @ApiProperty()

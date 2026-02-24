@@ -13,7 +13,7 @@ export class QuestionsService {
 
   async create(dto: CreateQuestionDto): Promise<Question> {
     const q = this.questionRepo.create(dto as any);
-    return this.questionRepo.save(q);
+    return this.questionRepo.save(q as any);
   }
 
   async findOne(id: string): Promise<Question> {

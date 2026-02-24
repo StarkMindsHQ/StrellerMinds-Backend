@@ -28,6 +28,22 @@ async function bootstrap() {
 
   app.use(compression());
 
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:"],
+      },
+    },
+  })
+);
+
+app.use(helmet.hsts({ maxAge: 31536000 }));
+app.use(helmet.frameguard({ action: "deny" }));
   // Enhanced security headers with custom configuration
   app.use(helmet(SECURITY_CONFIG.securityHeaders as Parameters<typeof helmet>[0]));
 

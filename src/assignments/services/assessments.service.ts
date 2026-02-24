@@ -27,7 +27,8 @@ export class AssessmentsService {
     });
 
     if (dto.questions && dto.questions.length) {
-      assessment.questions = dto.questions.map((q) => this.questionRepo.create(q as any));
+      const questions = dto.questions.map((q) => this.questionRepo.create(q as any));
+      assessment.questions = questions as any;
     }
 
     const saved = await this.assessmentRepo.save(assessment);

@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Param, Delete, Res, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ReportBuilderService } from '../services/report-builder.service';
-import { ReportGeneratorService } from '../services/report-generator.service';
-import { ReportSchedulerService } from '../services/report-scheduler.service';
-import { CreateReportTemplateDto } from '../dto/create-report-template.dto';
-import { ScheduleReportDto } from '../dto/schedule-report.dto';
-import { ExportFormat } from '../entities/report-schedule.entity';
+import { ReportBuilderService } from './report-builder.service';
+import { ReportGeneratorService } from './report-generator.service';
+import { ReportSchedulerService } from './report-scheduler.service';
+import { CreateReportTemplateDto } from './create-report-template.dto';
+import { ScheduleReportDto } from './schedule-report.dto';
+import { ExportFormat } from './report-schedule.entity';
 
 @ApiTags('Reports & Analytics')
 @ApiBearerAuth()

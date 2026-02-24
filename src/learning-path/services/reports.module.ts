@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ReportsController } from './controllers/reports.controller';
-import { ReportBuilderService } from './services/report-builder.service';
-import { ReportGeneratorService } from './services/report-generator.service';
-import { ReportSchedulerService } from './services/report-scheduler.service';
-import { ReportTemplate } from './entities/report-template.entity';
-import { ReportSchedule } from './entities/report-schedule.entity';
-import { GeneratedReport } from './entities/generated-report.entity';
+import { ReportsController } from './reports.controller';
+import { ReportBuilderService } from './report-builder.service';
+import { ReportGeneratorService } from './report-generator.service';
+import { ReportSchedulerService } from './report-scheduler.service';
+import { ReportTemplate } from './report-template.entity';
+import { ReportSchedule } from './report-schedule.entity';
+import { GeneratedReport } from './generated-report.entity';
 
 @Module({
   imports: [
