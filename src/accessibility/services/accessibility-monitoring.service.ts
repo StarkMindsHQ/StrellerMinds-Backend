@@ -195,6 +195,53 @@ export class AccessibilityMonitoringService {
   }
 
   /**
+   * Build a report payload consumable by dashboards/BI tools.
+   */
+  async getComplianceReport(
+    userId?: string,
+    days: number = 30,
+  ): Promise<{
+    periodDays: number;
+    generatedAt: string;
+    summary: Awaited<ReturnType<AccessibilityMonitoringService['getAuditStatistics']>>;
+    topViolations: Array<{ type: string; severity: string; count: number }>;
+  }> {
+    const summary = await this.getAuditStatistics(userId, days);
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const qb = this.violationRepository
+      .createQueryBuilder('v')
+      .leftJoin('v.audit', 'a')
+      .select('v.type', 'type')
+      .addSelect('v.severity', 'severity')
+      .addSelect('COUNT(*)', 'count')
+      .where('a.createdAt >= :startDate', { startDate });
+
+    if (userId) {
+      qb.andWhere('a.userId = :userId', { userId });
+    }
+
+    const topViolations = await qb
+      .groupBy('v.type')
+      .addGroupBy('v.severity')
+      .orderBy('COUNT(*)', 'DESC')
+      .limit(10)
+      .getRawMany<{ type: string; severity: string; count: string }>();
+
+    return {
+      periodDays: days,
+      generatedAt: new Date().toISOString(),
+      summary,
+      topViolations: topViolations.map((row) => ({
+        type: row.type,
+        severity: row.severity,
+        count: parseInt(row.count, 10),
+      })),
+    };
+  }
+
+  /**
    * Calculate accessibility score (0-100)
    */
   private calculateAccessibilityScore(results: AccessibilityAuditResult[]): number {

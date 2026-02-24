@@ -1,0 +1,5 @@
+describe.skip('Balance (e2e)', () => {
+  it('pending implementation', () => {
+    expect(true).toBe(true);
+  });
+});

@@ -156,6 +156,28 @@ export class I18nService {
   }
 
   /**
+   * Return text direction for language.
+   */
+  getDirection(language: string): 'ltr' | 'rtl' {
+    return this.isRTL(language) ? 'rtl' : 'ltr';
+  }
+
+  /**
+   * Build language context used by APIs/clients.
+   */
+  getLanguageContext(language: string) {
+    const normalized = this.normalizeLanguageCode(language);
+    const metadata = this.getLanguageMetadata(normalized);
+    return {
+      language: normalized,
+      locale: `${normalized}-${metadata.region}`,
+      direction: this.getDirection(normalized),
+      rtl: metadata.rtl,
+      metadata,
+    };
+  }
+
+  /**
    * Set default language
    */
   setDefaultLanguage(language: string): void {
@@ -192,6 +214,19 @@ export class I18nService {
       }
     }
 
+    return this.defaultLanguage;
+  }
+
+  /**
+   * Resolve best language from optional explicit input and Accept-Language fallback.
+   */
+  resolveLanguage(language?: string, acceptLanguageHeader?: string): string {
+    if (language) {
+      return this.normalizeLanguageCode(language);
+    }
+    if (acceptLanguageHeader) {
+      return this.detectLanguageFromHeader(acceptLanguageHeader);
+    }
     return this.defaultLanguage;
   }
 }

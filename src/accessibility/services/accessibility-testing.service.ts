@@ -24,6 +24,11 @@ export interface AccessibilityAuditResult {
   selector?: string;
 }
 
+export interface ComprehensiveAuditOptions {
+  expectedLanguage?: string;
+  css?: string;
+}
+
 /**
  * Service for testing and validating accessibility compliance
  */
@@ -32,7 +37,10 @@ export class AccessibilityTestingService {
   /**
    * Validate WCAG 2.1 compliance for response content
    */
-  validateWCAGCompliance(html: string): AccessibilityAuditResult[] {
+  validateWCAGCompliance(
+    html: string,
+    options?: ComprehensiveAuditOptions,
+  ): AccessibilityAuditResult[] {
     const results: AccessibilityAuditResult[] = [];
 
     // Check 1: All images have alt text
@@ -137,6 +145,18 @@ export class AccessibilityTestingService {
       });
     }
 
+    if (options?.expectedLanguage && !new RegExp(`lang=["']${options.expectedLanguage}`, 'i').test(html)) {
+      results.push({
+        id: 'language-mismatch',
+        type: 'Declared language mismatch',
+        severity: ViolationSeverity.MODERATE,
+        description: `Expected lang="${options.expectedLanguage}" but did not find matching html lang attribute`,
+        wcagCriteria: '3.1.1',
+        recommendation: `Set <html lang="${options.expectedLanguage}"> for localized pages`,
+        selector: 'html',
+      });
+    }
+
     // Check 7: Ensure interactive elements are keyboard accessible
     const buttonRegex = /<button|<a href|<input type="button"/g;
     if (buttonRegex.test(html)) {
@@ -155,13 +175,59 @@ export class AccessibilityTestingService {
       }
     }
 
+    // Check 8: Buttons/links have an accessible name
+    const unlabeledButtonRegex =
+      /<button(?![^>]*(aria-label|aria-labelledby))[^>]*>\s*(?:<\/button>|<\s*\/button>)/gi;
+    if (unlabeledButtonRegex.test(html)) {
+      results.push({
+        id: 'button-name-missing',
+        type: 'Interactive control without accessible name',
+        severity: ViolationSeverity.SERIOUS,
+        description: 'One or more buttons are missing visible text or ARIA label',
+        wcagCriteria: '4.1.2',
+        recommendation: 'Ensure every button has text, aria-label, or aria-labelledby',
+        selector: 'button',
+      });
+    }
+
+    // Check 9: Video captions
+    const hasVideo = /<video[\s>]/i.test(html);
+    const hasCaptions = /<track[^>]*kind=["']captions["']/i.test(html);
+    if (hasVideo && !hasCaptions) {
+      results.push({
+        id: 'video-captions-missing',
+        type: 'Video content without captions',
+        severity: ViolationSeverity.SERIOUS,
+        description: 'Video content appears to be missing captions track',
+        wcagCriteria: '1.2.2',
+        recommendation: 'Add <track kind="captions"> for prerecorded videos',
+        selector: 'video',
+      });
+    }
+
+    // Check 10: Focus styles
+    const styleBlock = `${html} ${options?.css || ''}`;
+    if (!/:focus|:focus-visible/.test(styleBlock)) {
+      results.push({
+        id: 'focus-visible-missing',
+        type: 'Focus indicator styles missing',
+        severity: ViolationSeverity.SERIOUS,
+        description: 'No visible keyboard focus styles were detected',
+        wcagCriteria: '2.4.7',
+        recommendation: 'Define :focus or :focus-visible styles for interactive controls',
+      });
+    }
+
     return results;
   }
 
   /**
    * Check keyboard navigation support
    */
-  validateKeyboardNavigation(html: string): AccessibilityAuditResult[] {
+  validateKeyboardNavigation(
+    html: string,
+    options?: ComprehensiveAuditOptions,
+  ): AccessibilityAuditResult[] {
     const results: AccessibilityAuditResult[] = [];
 
     // Check for tabindex attribute (good for accessibility if used correctly)
@@ -192,13 +258,41 @@ export class AccessibilityTestingService {
       }
     }
 
+    // Ensure skip links are available for keyboard users
+    if (!/href=["']#main-content["']|skip to main/i.test(html)) {
+      results.push({
+        id: 'skip-link-missing',
+        type: 'Skip link missing',
+        severity: ViolationSeverity.MODERATE,
+        description: 'No skip-to-main link detected',
+        wcagCriteria: '2.4.1',
+        recommendation: 'Add a visible-on-focus skip link to #main-content',
+        selector: 'a[href="#main-content"]',
+      });
+    }
+
+    // Avoid keyboard traps
+    if (/tabindex=["']-1["']/.test(html) && /onkeydown|onkeypress/.test(html) && !/Escape|Esc/.test(html)) {
+      results.push({
+        id: 'keyboard-trap-risk',
+        type: 'Potential keyboard trap',
+        severity: ViolationSeverity.SERIOUS,
+        description: 'Detected manual key handlers and programmatic focus without a visible escape route',
+        wcagCriteria: '2.1.2',
+        recommendation: 'Ensure focus can always leave components using Tab/Shift+Tab or Escape',
+      });
+    }
+
     return results;
   }
 
   /**
    * Validate screen reader compatibility
    */
-  validateScreenReaderCompat(html: string): AccessibilityAuditResult[] {
+  validateScreenReaderCompat(
+    html: string,
+    options?: ComprehensiveAuditOptions,
+  ): AccessibilityAuditResult[] {
     const results: AccessibilityAuditResult[] = [];
 
     // Check for ARIA landmarks
@@ -253,25 +347,58 @@ export class AccessibilityTestingService {
       });
     }
 
+    // Detect icon-only controls without an accessible name
+    const iconOnlyControlRegex =
+      /<(button|a)(?![^>]*(aria-label|aria-labelledby))[^>]*>\s*(<svg|<i\b|<span[^>]*class=["'][^"']*icon)/gi;
+    if (iconOnlyControlRegex.test(html)) {
+      results.push({
+        id: 'icon-control-name-missing',
+        type: 'Icon-only control lacks accessible name',
+        severity: ViolationSeverity.SERIOUS,
+        description: 'Found icon-only control without aria-label/aria-labelledby',
+        wcagCriteria: '4.1.2',
+        recommendation: 'Add an accessible name to icon-only interactive controls',
+      });
+    }
+
+    if (options?.expectedLanguage && !new RegExp(`lang=["']${options.expectedLanguage}`, 'i').test(html)) {
+      results.push({
+        id: 'screen-reader-lang-mismatch',
+        type: 'Language metadata mismatch for screen readers',
+        severity: ViolationSeverity.MODERATE,
+        description: 'Screen readers rely on correct page language to use the right pronunciation rules',
+        wcagCriteria: '3.1.1',
+        recommendation: `Set html lang="${options.expectedLanguage}"`,
+        selector: 'html',
+      });
+    }
+
     return results;
   }
 
   /**
    * Run comprehensive accessibility audit
    */
-  runComprehensiveAudit(html: string) {
+  runComprehensiveAudit(html: string, options?: ComprehensiveAuditOptions) {
+    const wcagCompliance = this.validateWCAGCompliance(html, options);
+    const keyboardNavigation = this.validateKeyboardNavigation(html, options);
+    const screenReaderCompatibility = this.validateScreenReaderCompat(html, options);
+    const combined = [...wcagCompliance, ...keyboardNavigation, ...screenReaderCompatibility];
+
+    const summary = {
+      totalIssues: combined.length,
+      criticalCount: combined.filter((r) => r.severity === ViolationSeverity.CRITICAL).length,
+      seriousCount: combined.filter((r) => r.severity === ViolationSeverity.SERIOUS).length,
+      moderateCount: combined.filter((r) => r.severity === ViolationSeverity.MODERATE).length,
+      minorCount: combined.filter((r) => r.severity === ViolationSeverity.MINOR).length,
+    };
+
     return {
       timestamp: new Date().toISOString(),
-      wcagCompliance: this.validateWCAGCompliance(html),
-      keyboardNavigation: this.validateKeyboardNavigation(html),
-      screenReaderCompatibility: this.validateScreenReaderCompat(html),
-      summary: {
-        totalIssues: 0,
-        criticalCount: 0,
-        seriousCount: 0,
-        moderateCount: 0,
-        minorCount: 0,
-      },
+      wcagCompliance,
+      keyboardNavigation,
+      screenReaderCompatibility,
+      summary,
     };
   }
 

@@ -7,7 +7,9 @@ import {
   ViolationSeverity,
 } from '../services/accessibility-testing.service';
 import { AccessibilityMonitoringService } from '../services/accessibility-monitoring.service';
+import { RTLService } from '../services/rtl.service';
 import { CreateAuditDto, AuditHistoryQueryDto } from '../dto/audit.dto';
+import { I18nService } from '../../i18n/services/i18n.service';
 
 @ApiTags('Accessibility')
 @Controller('accessibility')
@@ -16,6 +18,8 @@ export class AccessibilityController {
     private readonly accessibilityService: AccessibilityService,
     private readonly testingService: AccessibilityTestingService,
     private readonly monitoringService: AccessibilityMonitoringService,
+    private readonly rtlService: RTLService,
+    private readonly i18nService: I18nService,
   ) {}
 
   /**
@@ -101,7 +105,11 @@ export class AccessibilityController {
       return { error: 'HTML content required' };
     }
 
-    const auditResult = this.testingService.runComprehensiveAudit(dto.html);
+    const language = this.i18nService.normalizeLanguageCode(dto.language || req?.language || 'en');
+    const auditResult = this.testingService.runComprehensiveAudit(dto.html, {
+      expectedLanguage: language,
+      css: dto.css,
+    });
     const allResults = [
       ...auditResult.wcagCompliance,
       ...auditResult.keyboardNavigation,
@@ -130,6 +138,11 @@ export class AccessibilityController {
         wcag: auditResult.wcagCompliance,
         keyboard: auditResult.keyboardNavigation,
         screenReader: auditResult.screenReaderCompatibility,
+      },
+      i18n: {
+        language,
+        rtl: this.rtlService.isRTL(language),
+        direction: this.rtlService.getDirection(language),
       },
     };
   }
@@ -166,6 +179,14 @@ export class AccessibilityController {
     return this.monitoringService.getAuditStatistics(req?.user?.id, days ? parseInt(days) : 30);
   }
 
+  @Get('reports/compliance')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get accessibility compliance report with top violations' })
+  async getComplianceReport(@Query('days') days?: string, @Req() req?: any) {
+    return this.monitoringService.getComplianceReport(req?.user?.id, days ? parseInt(days) : 30);
+  }
+
   /**
    * Get audit by ID
    */
@@ -194,7 +215,9 @@ export class AccessibilityController {
         languageSupport: '15+ languages supported',
         rtlSupport: 'RTL language support (Arabic, Hebrew, Persian, Urdu)',
         focusManagement: 'Focus trap management and keyboard shortcuts',
+        localizationAwareness: 'Language-specific accessibility and RTL-aware auditing',
       },
+      keyboardSystem: this.accessibilityService.getKeyboardShortcuts(),
       keyboardShortcuts: {
         escape: 'Close modals or cancel operations',
         tab: 'Navigate to next focusable element',
@@ -215,6 +238,24 @@ export class AccessibilityController {
         'Use ARIA labels appropriately',
         'Ensure proper heading hierarchy',
       ],
+    };
+  }
+
+  @Get('keyboard-shortcuts')
+  getKeyboardShortcuts() {
+    return {
+      shortcuts: this.accessibilityService.getKeyboardShortcuts(),
+    };
+  }
+
+  @Get('language-support')
+  getLanguageSupport(@Query('lang') language: string = 'en') {
+    const normalized = this.i18nService.normalizeLanguageCode(language);
+    return {
+      language: normalized,
+      metadata: this.i18nService.getLanguageMetadata(normalized),
+      direction: this.rtlService.getDirection(normalized),
+      htmlAttributes: this.rtlService.getFullHTMLAttributes(normalized),
     };
   }
 }
