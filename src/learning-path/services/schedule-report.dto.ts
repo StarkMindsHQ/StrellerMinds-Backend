@@ -1,6 +1,6 @@
 import { IsEnum, IsArray, IsEmail, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ScheduleFrequency, ExportFormat } from '../entities/report-schedule.entity';
+import { ScheduleFrequency, ExportFormat } from './report-schedule.entity';
 
 export class ScheduleReportDto {
   @ApiProperty()

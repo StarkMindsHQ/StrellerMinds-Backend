@@ -13,6 +13,18 @@ export class TranscodingService {
   ) {}
 
   /**
+   * Transcodes video to HLS format.
+   * In production, this would use ffmpeg to create HLS segments.
+   */
+  async transcodeToHls(inputPath: string, outputDir: string): Promise<string> {
+    this.logger.log(`Transcoding ${inputPath} to HLS in ${outputDir}`);
+    // Simulate transcoding delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Return mock manifest path
+    return `${outputDir}/master.m3u8`;
+  }
+
+  /**
    * Simulates the video transcoding process.
    * In a production environment, this would interface with ffmpeg or a cloud media service (AWS MediaConvert).
    */

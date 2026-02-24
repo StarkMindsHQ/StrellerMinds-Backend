@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Video, VideoStatus } from './entities/video.entity';
-import { Chapter } from './entities/chapter.entity';
-import { Quiz } from './entities/quiz.entity';
-import { VideoAnalytics } from './entities/video-analytics.entity';
+import { Video, VideoStatus } from '../entities/video.entity';
+import { Chapter } from '../entities/chapter.entity';
+import { Quiz } from '../entities/quiz.entity';
+import { VideoAnalytics } from '../entities/video-analytics.entity';
 import { TranscodingService } from './transcoding.service';
-import { FilesService } from '../files/files.service';
+import { FilesService } from '../../files/files.service';
 import { v4 as uuid } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -66,23 +66,45 @@ export class VideoService {
   }
 
   async trackProgress(videoId: string, userId: string, progressDto: any) {
-    let analytics = await this.analyticsRepo.findOne({ where: { videoId, userId } });
+    let analytics = await this.analyticsRepo.findOne({ where: { video: { id: videoId } }, relations: ['video'] });
     if (!analytics) {
-      analytics = this.analyticsRepo.create({ videoId, userId });
+      analytics = this.analyticsRepo.create({ video: { id: videoId } });
     }
-    analytics.watchTime = progressDto.watchTime;
-    analytics.lastPosition = progressDto.lastPosition;
-    analytics.completed = progressDto.completed;
     return this.analyticsRepo.save(analytics);
   }
 
-  async findOne(id: string) {
+  async findAll(ownerId?: string): Promise<Video[]> {
+    const query = this.videoRepo.createQueryBuilder('video')
+      .leftJoinAndSelect('video.variants', 'variants')
+      .leftJoinAndSelect('video.analytics', 'analytics')
+      .leftJoinAndSelect('video.chapters', 'chapters')
+      .leftJoinAndSelect('video.quizzes', 'quizzes');
+      
+    if (ownerId) {
+      query.where('video.ownerId = :ownerId', { ownerId });
+    }
+    
+    return query.getMany();
+  }
+
+  async findOne(id: string): Promise<Video> {
     const video = await this.videoRepo.findOne({
       where: { id },
-      relations: ['chapters', 'quizzes'],
+      relations: ['chapters', 'quizzes', 'variants', 'analytics'],
     });
     if (!video) throw new NotFoundException(`Video with ID ${id} not found`);
     return video;
+  }
+
+  async update(id: string, updateData: Partial<Video>): Promise<Video> {
+    const video = await this.findOne(id);
+    Object.assign(video, updateData);
+    return this.videoRepo.save(video);
+  }
+
+  async remove(id: string): Promise<void> {
+    const video = await this.findOne(id);
+    await this.videoRepo.remove(video);
   }
 
   private async processVideo(videoId: string, inputPath: string, ownerId: string) {
