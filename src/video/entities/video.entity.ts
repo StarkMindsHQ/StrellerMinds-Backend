@@ -1,6 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { VideoVariant } from './video-variant.entity';
 import { VideoAnalytics } from './video-analytics.entity';
+import { Chapter } from './chapter.entity';
+import { Quiz } from './quiz.entity';
 
 export enum VideoStatus {
   PENDING = 'PENDING',
@@ -48,11 +50,23 @@ export class Video {
   @Column({ nullable: true })
   uploaderId: string;
 
+  @Column({ nullable: true })
+  ownerId: string;
+
+  @Column({ nullable: true })
+  hlsManifestPath: string;
+
   @OneToMany(() => VideoVariant, (variant) => variant.video, { cascade: true })
   variants: VideoVariant[];
 
   @OneToMany(() => VideoAnalytics, (analytics) => analytics.video, { cascade: true })
   analytics: VideoAnalytics[];
+
+  @OneToMany(() => Chapter, (chapter) => chapter.video, { cascade: true })
+  chapters: Chapter[];
+
+  @OneToMany(() => Quiz, (quiz) => quiz.video, { cascade: true })
+  quizzes: Quiz[];
 
   @CreateDateColumn()
   createdAt: Date;

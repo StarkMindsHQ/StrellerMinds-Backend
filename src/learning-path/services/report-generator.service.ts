@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ReportTemplate, VisualizationType } from '../entities/report-template.entity';
-import { ExportFormat } from '../entities/report-schedule.entity';
+import { ReportTemplate, VisualizationType } from './report-template.entity';
+import { ExportFormat } from './report-schedule.entity';
 
 @Injectable()
 export class ReportGeneratorService {
