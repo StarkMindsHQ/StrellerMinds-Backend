@@ -73,6 +73,8 @@ import { DocumentationModule } from './documentation/documentation.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
 import { CoreModule } from './core/core.module';
+import { StorageModule } from './storage/storage.module';
+import { Service } from './redundant-storage-service/service/service';
 
 @Module({
   imports: [
@@ -136,6 +138,7 @@ import { CoreModule } from './core/core.module';
     DocumentationModule,
     MonitoringModule,
     CoreModule,
+    StorageModule,
   ],
   providers: [
     {
@@ -158,6 +161,7 @@ import { CoreModule } from './core/core.module';
       provide: APP_INTERCEPTOR,
       useClass: PerformanceInterceptor,
     },
+    Service,
   ],
 })
 export class AppModule {
