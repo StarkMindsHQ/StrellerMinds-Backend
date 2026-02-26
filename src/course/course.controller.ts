@@ -3,6 +3,8 @@ import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { CreateModuleDto } from './dto/create-module.dto';
+import { ApiResponse } from '@nestjs/swagger/dist/decorators/api-response.decorator';
+import { ApiOperation } from '@nestjs/swagger';
 
 // Controller for handling course-related API requests
 @Controller('courses')
@@ -16,6 +18,9 @@ export class CourseController {
    * @returns The newly created course.
    */
   @Post()
+   @ApiOperation({ summary: 'Create a new course' })
+  @ApiResponse({ status: 201, description: 'Course created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
   create(@Body() dto: CreateCourseDto) {
     return this.courseService.createCourse(dto);
   }
@@ -27,6 +32,9 @@ export class CourseController {
    * @returns The newly created module.
    */
   @Post(':id/modules')
+   @ApiOperation({ summary: 'Add a new module to a course' })
+  @ApiResponse({ status: 201, description: 'Module created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
   addModule(@Param('id') id: string, @Body() dto: CreateModuleDto) {
     return this.courseService.addModule(id, dto);
   }
@@ -53,4 +61,5 @@ export class CourseController {
   publish(@Param('id') id: string) {
     return this.courseService.publishCourse(id);
   }
+
 }
