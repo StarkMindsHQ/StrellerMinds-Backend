@@ -18,7 +18,7 @@ export class CourseController {
    * @returns The newly created course.
    */
   @Post()
-   @ApiOperation({ summary: 'Create a new course' })
+  @ApiOperation({ summary: 'Create a new course' })
   @ApiResponse({ status: 201, description: 'Course created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input' })
   create(@Body() dto: CreateCourseDto) {
@@ -32,7 +32,7 @@ export class CourseController {
    * @returns The newly created module.
    */
   @Post(':id/modules')
-   @ApiOperation({ summary: 'Add a new module to a course' })
+  @ApiOperation({ summary: 'Add a new module to a course' })
   @ApiResponse({ status: 201, description: 'Module created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input' })
   addModule(@Param('id') id: string, @Body() dto: CreateModuleDto) {
@@ -61,5 +61,4 @@ export class CourseController {
   publish(@Param('id') id: string) {
     return this.courseService.publishCourse(id);
   }
-
 }

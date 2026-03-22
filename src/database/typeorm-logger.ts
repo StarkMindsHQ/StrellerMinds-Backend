@@ -16,9 +16,7 @@ export class CustomTypeOrmLogger implements TypeOrmLogger {
 
   logQuerySlow(time: number, query: string, parameters?: any[]) {
     if (time > this.slowQueryThreshold) {
-      this.logger.warn(
-        `Slow Query (${time}ms): ${query}`,
-      );
+      this.logger.warn(`Slow Query (${time}ms): ${query}`);
     }
   }
 

@@ -66,7 +66,10 @@ export class VideoService {
   }
 
   async trackProgress(videoId: string, userId: string, progressDto: any) {
-    let analytics = await this.analyticsRepo.findOne({ where: { video: { id: videoId } }, relations: ['video'] });
+    let analytics = await this.analyticsRepo.findOne({
+      where: { video: { id: videoId } },
+      relations: ['video'],
+    });
     if (!analytics) {
       analytics = this.analyticsRepo.create({ video: { id: videoId } });
     }
@@ -74,16 +77,17 @@ export class VideoService {
   }
 
   async findAll(ownerId?: string): Promise<Video[]> {
-    const query = this.videoRepo.createQueryBuilder('video')
+    const query = this.videoRepo
+      .createQueryBuilder('video')
       .leftJoinAndSelect('video.variants', 'variants')
       .leftJoinAndSelect('video.analytics', 'analytics')
       .leftJoinAndSelect('video.chapters', 'chapters')
       .leftJoinAndSelect('video.quizzes', 'quizzes');
-      
+
     if (ownerId) {
       query.where('video.ownerId = :ownerId', { ownerId });
     }
-    
+
     return query.getMany();
   }
 

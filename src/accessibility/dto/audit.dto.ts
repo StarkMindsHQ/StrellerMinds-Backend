@@ -16,7 +16,10 @@ export class CreateAuditDto {
   @IsString()
   css?: string;
 
-  @ApiPropertyOptional({ description: 'Expected language code for localization checks', default: 'en' })
+  @ApiPropertyOptional({
+    description: 'Expected language code for localization checks',
+    default: 'en',
+  })
   @IsOptional()
   @IsString()
   language?: string;

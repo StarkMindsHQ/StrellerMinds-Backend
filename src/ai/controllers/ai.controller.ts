@@ -16,10 +16,7 @@ export class AiController {
 
   @Get('recommendations/:userId')
   @ApiOperation({ summary: 'Get personalized content recommendations' })
-  async getRecommendations(
-    @Param('userId') userId: string,
-    @Query('limit') limit?: number,
-  ) {
+  async getRecommendations(@Param('userId') userId: string, @Query('limit') limit?: number) {
     return this.recommendationService.getPersonalizedRecommendations(userId, limit);
   }
 
@@ -37,7 +34,9 @@ export class AiController {
 
   @Post('recommendations/track')
   @ApiOperation({ summary: 'Track interaction with recommendations for RLHF' })
-  async trackInteraction(@Body() body: { userId: string, recId: string, action: 'click' | 'view' | 'dismiss' }) {
+  async trackInteraction(
+    @Body() body: { userId: string; recId: string; action: 'click' | 'view' | 'dismiss' },
+  ) {
     return this.recommendationService.trackEngagement(body.userId, body.recId, body.action);
   }
 }

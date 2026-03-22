@@ -1,4 +1,12 @@
-import { IsString, IsOptional, IsEnum, IsDateString, IsNumber, ValidateNested, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+  IsNumber,
+  ValidateNested,
+  IsArray,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { AssessmentMode } from '../entities/assessment.entity';
 import { CreateQuestionDto } from './create-question.dto';

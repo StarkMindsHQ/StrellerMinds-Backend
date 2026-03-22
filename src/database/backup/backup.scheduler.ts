@@ -1,6 +1,6 @@
-import { Cron } from "@nestjs/schedule";
+import { Cron } from '@nestjs/schedule';
 
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class BackupScheduler {

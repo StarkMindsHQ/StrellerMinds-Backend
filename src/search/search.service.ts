@@ -185,7 +185,10 @@ export class SearchService implements OnModuleInit {
   // ============================================
   // FULL-TEXT SEARCH WITH FACETED FILTERING
   // ============================================
-  async search(searchDto: SearchQueryDto, userId?: string): Promise<{
+  async search(
+    searchDto: SearchQueryDto,
+    userId?: string,
+  ): Promise<{
     total: number;
     page: number;
     size: number;

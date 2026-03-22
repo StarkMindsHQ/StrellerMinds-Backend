@@ -3,11 +3,10 @@ import { TutoringQueryDto } from '../dto/ai-interaction.dto';
 
 @Injectable()
 export class IntelligentTutoringService {
-  
   async processQuery(dto: TutoringQueryDto) {
     // Simulate NLP processing and context-aware answering
     // This would integrate with OpenAI/LLM APIs in production
-    
+
     const context = this.analyzeContext(dto.contextId);
     const intent = this.detectIntent(dto.query);
 
@@ -16,7 +15,7 @@ export class IntelligentTutoringService {
       intent,
       response: this.generateResponse(intent, context),
       suggestedFollowUp: ['Can you give me an example?', 'Quiz me on this topic'],
-      confidence: 0.92
+      confidence: 0.92,
     };
   }
 

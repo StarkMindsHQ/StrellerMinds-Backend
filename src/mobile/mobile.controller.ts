@@ -8,9 +8,6 @@ export class MobileController {
 
   @Get('feed')
   async getMobileFeed(@Req() req, @Query('updatedSince') updatedSince?: string) {
-    return this.mobileService.getOptimizedFeed(
-      req.user?.id,
-      updatedSince,
-    );
+    return this.mobileService.getOptimizedFeed(req.user?.id, updatedSince);
   }
 }

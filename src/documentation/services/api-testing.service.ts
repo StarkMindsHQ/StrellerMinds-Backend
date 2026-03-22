@@ -111,7 +111,10 @@ export class ApiTestingService {
         assertions.push({
           assertion: `Status code should be ${test.expectedStatus}`,
           passed: response.status === test.expectedStatus,
-          error: response.status !== test.expectedStatus ? `Expected ${test.expectedStatus}, got ${response.status}` : undefined,
+          error:
+            response.status !== test.expectedStatus
+              ? `Expected ${test.expectedStatus}, got ${response.status}`
+              : undefined,
         });
       }
 
@@ -141,7 +144,10 @@ export class ApiTestingService {
   /**
    * Run assertion
    */
-  private runAssertion(assertion: TestCase['assertions'][0], response: any): {
+  private runAssertion(
+    assertion: TestCase['assertions'][0],
+    response: any,
+  ): {
     assertion: string;
     passed: boolean;
     error?: string;
@@ -182,7 +188,9 @@ export class ApiTestingService {
       return {
         assertion: `${assertion.type} ${assertion.field || ''} ${assertion.operator} ${JSON.stringify(assertion.value)}`,
         passed,
-        error: passed ? undefined : `Expected ${assertion.operator} ${JSON.stringify(assertion.value)}, got ${JSON.stringify(actualValue)}`,
+        error: passed
+          ? undefined
+          : `Expected ${assertion.operator} ${JSON.stringify(assertion.value)}, got ${JSON.stringify(actualValue)}`,
       };
     } catch (error: any) {
       return {

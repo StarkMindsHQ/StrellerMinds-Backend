@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { RecommendationService } from '../services/recommendation.service';
 import { UserProfileService } from '../services/user-profile.service';
@@ -25,10 +19,7 @@ export class RecommendationController {
   @ApiOperation({ summary: 'Get profile recommendations' })
   @ApiResponse({ status: 200, description: 'Recommendations retrieved successfully' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getProfileRecommendations(
-    @Request() req: RequestWithUser,
-    @Query('limit') limit?: number,
-  ) {
+  async getProfileRecommendations(@Request() req: RequestWithUser, @Query('limit') limit?: number) {
     const profile = await this.getProfileFromRequest(req);
     return this.recommendationService.getProfileRecommendations(profile.id, limit || 10);
   }
@@ -37,10 +28,7 @@ export class RecommendationController {
   @ApiOperation({ summary: 'Get content recommendations' })
   @ApiResponse({ status: 200, description: 'Content recommendations retrieved' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getContentRecommendations(
-    @Request() req: RequestWithUser,
-    @Query('limit') limit?: number,
-  ) {
+  async getContentRecommendations(@Request() req: RequestWithUser, @Query('limit') limit?: number) {
     const profile = await this.getProfileFromRequest(req);
     return this.recommendationService.getContentRecommendations(profile.id, limit || 10);
   }
@@ -49,10 +37,7 @@ export class RecommendationController {
   @ApiOperation({ summary: 'Get "People You May Know" recommendations' })
   @ApiResponse({ status: 200, description: 'People recommendations retrieved' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getPeopleYouMayKnow(
-    @Request() req: RequestWithUser,
-    @Query('limit') limit?: number,
-  ) {
+  async getPeopleYouMayKnow(@Request() req: RequestWithUser, @Query('limit') limit?: number) {
     const profile = await this.getProfileFromRequest(req);
     return this.recommendationService.getPeopleYouMayKnow(profile.id, limit || 10);
   }

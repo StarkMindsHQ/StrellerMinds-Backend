@@ -145,7 +145,10 @@ export class AccessibilityTestingService {
       });
     }
 
-    if (options?.expectedLanguage && !new RegExp(`lang=["']${options.expectedLanguage}`, 'i').test(html)) {
+    if (
+      options?.expectedLanguage &&
+      !new RegExp(`lang=["']${options.expectedLanguage}`, 'i').test(html)
+    ) {
       results.push({
         id: 'language-mismatch',
         type: 'Declared language mismatch',
@@ -272,12 +275,17 @@ export class AccessibilityTestingService {
     }
 
     // Avoid keyboard traps
-    if (/tabindex=["']-1["']/.test(html) && /onkeydown|onkeypress/.test(html) && !/Escape|Esc/.test(html)) {
+    if (
+      /tabindex=["']-1["']/.test(html) &&
+      /onkeydown|onkeypress/.test(html) &&
+      !/Escape|Esc/.test(html)
+    ) {
       results.push({
         id: 'keyboard-trap-risk',
         type: 'Potential keyboard trap',
         severity: ViolationSeverity.SERIOUS,
-        description: 'Detected manual key handlers and programmatic focus without a visible escape route',
+        description:
+          'Detected manual key handlers and programmatic focus without a visible escape route',
         wcagCriteria: '2.1.2',
         recommendation: 'Ensure focus can always leave components using Tab/Shift+Tab or Escape',
       });
@@ -361,12 +369,16 @@ export class AccessibilityTestingService {
       });
     }
 
-    if (options?.expectedLanguage && !new RegExp(`lang=["']${options.expectedLanguage}`, 'i').test(html)) {
+    if (
+      options?.expectedLanguage &&
+      !new RegExp(`lang=["']${options.expectedLanguage}`, 'i').test(html)
+    ) {
       results.push({
         id: 'screen-reader-lang-mismatch',
         type: 'Language metadata mismatch for screen readers',
         severity: ViolationSeverity.MODERATE,
-        description: 'Screen readers rely on correct page language to use the right pronunciation rules',
+        description:
+          'Screen readers rely on correct page language to use the right pronunciation rules',
         wcagCriteria: '3.1.1',
         recommendation: `Set html lang="${options.expectedLanguage}"`,
         selector: 'html',

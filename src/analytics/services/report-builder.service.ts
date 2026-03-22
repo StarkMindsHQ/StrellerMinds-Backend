@@ -100,32 +100,10 @@ export class ReportBuilderService {
 
   getAvailableDimensions(reportType: ReportType): string[] {
     const dimensionsMap: Record<ReportType, string[]> = {
-      [ReportType.USER_ENGAGEMENT]: [
-        'date',
-        'activityType',
-        'userRole',
-        'deviceType',
-        'location',
-      ],
-      [ReportType.FINANCIAL]: [
-        'date',
-        'paymentGateway',
-        'paymentStatus',
-        'currency',
-        'plan',
-      ],
-      [ReportType.COURSE_PERFORMANCE]: [
-        'date',
-        'courseCategory',
-        'instructor',
-        'difficulty',
-      ],
-      [ReportType.SYSTEM_HEALTH]: [
-        'date',
-        'endpoint',
-        'errorType',
-        'statusCode',
-      ],
+      [ReportType.USER_ENGAGEMENT]: ['date', 'activityType', 'userRole', 'deviceType', 'location'],
+      [ReportType.FINANCIAL]: ['date', 'paymentGateway', 'paymentStatus', 'currency', 'plan'],
+      [ReportType.COURSE_PERFORMANCE]: ['date', 'courseCategory', 'instructor', 'difficulty'],
+      [ReportType.SYSTEM_HEALTH]: ['date', 'endpoint', 'errorType', 'statusCode'],
       [ReportType.CUSTOM]: [],
     };
 

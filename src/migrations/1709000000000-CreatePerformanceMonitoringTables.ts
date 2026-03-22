@@ -17,7 +17,14 @@ export class CreatePerformanceMonitoringTables1709000000000 implements Migration
           {
             name: 'type',
             type: 'enum',
-            enum: ['http_request', 'database_query', 'cache_operation', 'external_api', 'background_job', 'custom'],
+            enum: [
+              'http_request',
+              'database_query',
+              'cache_operation',
+              'external_api',
+              'background_job',
+              'custom',
+            ],
           },
           {
             name: 'endpoint',

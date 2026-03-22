@@ -205,7 +205,10 @@ export class IntegrationDashboardController {
    * Deactivate integration
    */
   @Post(':configId/deactivate')
-  async deactivateIntegration(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+  async deactivateIntegration(
+    @CurrentUser() user: RequestUser,
+    @Param('configId') configId: string,
+  ) {
     const config = await this.configRepository.findOne({
       where: { id: configId, userId: user.sub },
     });
@@ -250,7 +253,10 @@ export class IntegrationDashboardController {
    * Get integration health/status
    */
   @Get(':configId/health')
-  async getIntegrationHealth(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+  async getIntegrationHealth(
+    @CurrentUser() user: RequestUser,
+    @Param('configId') configId: string,
+  ) {
     const config = await this.configRepository.findOne({
       where: { id: configId, userId: user.sub },
     });

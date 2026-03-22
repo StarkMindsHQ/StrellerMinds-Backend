@@ -35,9 +35,7 @@ export class ReportGenerationService {
       try {
         await this.generateScheduledReport(schedule);
       } catch (error) {
-        this.logger.error(
-          `Failed to generate scheduled report ${schedule.id}: ${error.message}`,
-        );
+        this.logger.error(`Failed to generate scheduled report ${schedule.id}: ${error.message}`);
       }
     }
   }
@@ -45,24 +43,18 @@ export class ReportGenerationService {
   async generateScheduledReport(schedule: ReportSchedule): Promise<void> {
     this.logger.log(`Generating scheduled report: ${schedule.name}`);
 
-    const report = await this.reportBuilderService.createReport(
-      schedule.createdById,
-      {
-        name: `${schedule.name} - ${new Date().toISOString()}`,
-        description: schedule.description,
-        reportType: schedule.reportConfiguration.reportType,
-        configuration: schedule.reportConfiguration,
-      },
-    );
+    const report = await this.reportBuilderService.createReport(schedule.createdById, {
+      name: `${schedule.name} - ${new Date().toISOString()}`,
+      description: schedule.description,
+      reportType: schedule.reportConfiguration.reportType,
+      configuration: schedule.reportConfiguration,
+    });
 
     const generatedReport = await this.analyticsService.generateReport(report.id);
 
     if (schedule.exportFormats && schedule.exportFormats.length > 0) {
       for (const format of schedule.exportFormats) {
-        await this.dataExportService.exportReport(
-          generatedReport.data,
-          format as any,
-        );
+        await this.dataExportService.exportReport(generatedReport.data, format as any);
       }
     }
 

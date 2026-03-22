@@ -133,7 +133,10 @@ export class OptimizationRecommendationsService {
 
     return recommendations.sort((a, b) => {
       const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-      return priorityOrder[b.priority as keyof typeof priorityOrder] - priorityOrder[a.priority as keyof typeof priorityOrder];
+      return (
+        priorityOrder[b.priority as keyof typeof priorityOrder] -
+        priorityOrder[a.priority as keyof typeof priorityOrder]
+      );
     });
   }
 

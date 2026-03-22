@@ -112,7 +112,10 @@ export class SdkGeneratorService {
   /**
    * Generate TypeScript SDK
    */
-  private generateTypeScriptSdk(openApiSpec: string, version: string): { code: string; packageName: string } {
+  private generateTypeScriptSdk(
+    openApiSpec: string,
+    version: string,
+  ): { code: string; packageName: string } {
     const packageName = `@strellerminds/api-client`;
     const spec = JSON.parse(openApiSpec);
 
@@ -148,7 +151,10 @@ export class SdkGeneratorService {
             code += `  async ${methodName}(`;
             if (op.parameters) {
               code += op.parameters
-                .map((p: any) => `${p.name}${p.required ? '' : '?'}: ${this.getTypeScriptType(p.schema)}`)
+                .map(
+                  (p: any) =>
+                    `${p.name}${p.required ? '' : '?'}: ${this.getTypeScriptType(p.schema)}`,
+                )
                 .join(', ');
             }
             code += `): Promise<ApiResponse<any>> {\n`;
@@ -174,7 +180,10 @@ export class SdkGeneratorService {
   /**
    * Generate JavaScript SDK
    */
-  private generateJavaScriptSdk(openApiSpec: string, version: string): { code: string; packageName: string } {
+  private generateJavaScriptSdk(
+    openApiSpec: string,
+    version: string,
+  ): { code: string; packageName: string } {
     const packageName = `@strellerminds/api-client-js`;
     // Similar to TypeScript but without types
     const tsSdk = this.generateTypeScriptSdk(openApiSpec, version);
@@ -185,7 +194,10 @@ export class SdkGeneratorService {
   /**
    * Generate Python SDK
    */
-  private generatePythonSdk(openApiSpec: string, version: string): { code: string; packageName: string } {
+  private generatePythonSdk(
+    openApiSpec: string,
+    version: string,
+  ): { code: string; packageName: string } {
     const packageName = `strellerminds-api-client`;
     const spec = JSON.parse(openApiSpec);
 
@@ -209,7 +221,9 @@ export class SdkGeneratorService {
         for (const [method, operation] of Object.entries(methods as any)) {
           if (['get', 'post', 'put', 'patch', 'delete'].includes(method.toLowerCase())) {
             const op = operation as any;
-            const methodName = this.toSnakeCase(op.operationId || this.generateOperationId(path, method));
+            const methodName = this.toSnakeCase(
+              op.operationId || this.generateOperationId(path, method),
+            );
 
             code += `    def ${methodName}(self`;
             if (op.parameters) {
@@ -233,7 +247,10 @@ export class SdkGeneratorService {
   /**
    * Generate Java SDK
    */
-  private generateJavaSdk(openApiSpec: string, version: string): { code: string; packageName: string } {
+  private generateJavaSdk(
+    openApiSpec: string,
+    version: string,
+  ): { code: string; packageName: string } {
     const packageName = `com.strellerminds.api.client`;
     // Java SDK generation would be more complex
     let code = `package com.strellerminds.api.client;\n\n`;
@@ -303,10 +320,7 @@ export class SdkGeneratorService {
         );
         break;
       case SdkLanguage.PYTHON:
-        await fs.writeFile(
-          path.join(sdkDir, 'requirements.txt'),
-          'requests>=2.31.0\n',
-        );
+        await fs.writeFile(path.join(sdkDir, 'requirements.txt'), 'requests>=2.31.0\n');
         await fs.writeFile(
           path.join(sdkDir, 'setup.py'),
           `from setuptools import setup\nsetup(name="${packageName}", version="${version}", install_requires=["requests>=2.31.0"])\n`,
@@ -331,10 +345,12 @@ export class SdkGeneratorService {
         files: await this.getDirectoryFiles(sourceDir),
       };
       await fs.writeFile(path.join(sourceDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
-      
+
       // For now, we'll use the directory itself
       // In production, install 'archiver' package: npm install archiver @types/archiver
-      this.logger.warn('ZIP compression requires archiver package. Using directory structure for now.');
+      this.logger.warn(
+        'ZIP compression requires archiver package. Using directory structure for now.',
+      );
     } catch (error) {
       this.logger.error(`Failed to create archive: ${error.message}`);
       throw error;
@@ -347,17 +363,17 @@ export class SdkGeneratorService {
   private async getDirectoryFiles(dir: string): Promise<string[]> {
     const files: string[] = [];
     const entries = await fs.readdir(dir, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
         const subFiles = await this.getDirectoryFiles(fullPath);
-        files.push(...subFiles.map(f => `${entry.name}/${f}`));
+        files.push(...subFiles.map((f) => `${entry.name}/${f}`));
       } else {
         files.push(entry.name);
       }
     }
-    
+
     return files;
   }
 

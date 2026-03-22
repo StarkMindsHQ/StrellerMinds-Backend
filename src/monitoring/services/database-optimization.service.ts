@@ -25,7 +25,11 @@ export class DatabaseOptimizationService {
   /**
    * Analyze a slow query and provide optimization recommendations
    */
-  async analyzeQuery(query: string, duration: number, rowsAffected?: number): Promise<QueryAnalysis> {
+  async analyzeQuery(
+    query: string,
+    duration: number,
+    rowsAffected?: number,
+  ): Promise<QueryAnalysis> {
     if (duration < this.slowQueryThreshold) {
       return {
         query,
@@ -68,7 +72,14 @@ export class DatabaseOptimizationService {
       this.queryCache.set(cacheKey, queryAnalysis);
 
       // Save optimization record
-      await this.saveOptimizationRecord(query, duration, analysis, missingIndexes, unusedIndexes, plan);
+      await this.saveOptimizationRecord(
+        query,
+        duration,
+        analysis,
+        missingIndexes,
+        unusedIndexes,
+        plan,
+      );
 
       return queryAnalysis;
     } catch (error) {
@@ -151,7 +162,9 @@ export class DatabaseOptimizationService {
         if (columnMatches) {
           columnMatches.forEach((match) => {
             const column = match.split(/\s/)[0];
-            missingIndexes.push(`CREATE INDEX idx_${tableName}_${column} ON ${tableName}(${column})`);
+            missingIndexes.push(
+              `CREATE INDEX idx_${tableName}_${column} ON ${tableName}(${column})`,
+            );
           });
         }
       }
@@ -199,7 +212,9 @@ export class DatabaseOptimizationService {
     }
 
     if (unusedIndexes.length > 0) {
-      recommendations.push(`Unused indexes found: Consider removing ${unusedIndexes.length} indexes`);
+      recommendations.push(
+        `Unused indexes found: Consider removing ${unusedIndexes.length} indexes`,
+      );
     }
 
     if (analysis.joinOptimizations.length > 0) {
@@ -236,7 +251,9 @@ export class DatabaseOptimizationService {
           joinOptimizations: analysis.joinOptimizations,
           queryPlan: plan,
         },
-        recommendation: this.generateRecommendations(analysis, missingIndexes, unusedIndexes).join('; '),
+        recommendation: this.generateRecommendations(analysis, missingIndexes, unusedIndexes).join(
+          '; ',
+        ),
         status: OptimizationStatus.PENDING,
       });
 

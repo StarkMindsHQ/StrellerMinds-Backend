@@ -54,10 +54,13 @@ export class EnhancedBackupService {
     private readonly backupRepository: Repository<BackupRecord>,
   ) {
     this.backupDir = this.configService.get('BACKUP_DIR', './backups');
-    
+
     this.walArchivingConfig = {
       enabled: this.configService.get<boolean>('WAL_ARCHIVING_ENABLED', false),
-      archiveCommand: this.configService.get('WAL_ARCHIVE_COMMAND', 'cp %p /var/lib/postgresql/wal_archive/%f'),
+      archiveCommand: this.configService.get(
+        'WAL_ARCHIVE_COMMAND',
+        'cp %p /var/lib/postgresql/wal_archive/%f',
+      ),
       archiveTimeout: this.configService.get<number>('WAL_ARCHIVE_TIMEOUT', 60000),
       maxWalSenders: this.configService.get<number>('WAL_MAX_SENDERS', 3),
       walLevel: this.configService.get<'replica' | 'logical'>('WAL_LEVEL', 'replica'),
@@ -72,7 +75,7 @@ export class EnhancedBackupService {
     }
 
     this.logger.log('Setting up WAL archiving configuration');
-    
+
     try {
       // Create WAL archive directory
       const walArchiveDir = '/var/lib/postgresql/wal_archive';
@@ -88,18 +91,19 @@ export class EnhancedBackupService {
       this.logger.warn(`archive_mode = ${this.walArchivingConfig.archiveMode}`);
       this.logger.warn(`archive_command = '${this.walArchivingConfig.archiveCommand}'`);
       this.logger.warn(`archive_timeout = ${this.walArchivingConfig.archiveTimeout}`);
-      
     } catch (error) {
       this.logger.error(`Failed to setup WAL archiving: ${error.message}`);
       throw error;
     }
   }
 
-  async createPointInTimeBackup(options: {
-    compress?: boolean;
-    verify?: boolean;
-    retentionTier?: RetentionTier;
-  } = {}): Promise<any> {
+  async createPointInTimeBackup(
+    options: {
+      compress?: boolean;
+      verify?: boolean;
+      retentionTier?: RetentionTier;
+    } = {},
+  ): Promise<any> {
     const startTime = Date.now();
     this.logger.log('Starting point-in-time backup (base backup + WAL)');
 
@@ -143,9 +147,9 @@ export class EnhancedBackupService {
           {
             backupType: 'pitr',
             walEnabled: this.walArchivingConfig.enabled.toString(),
-          }
+          },
         );
-        
+
         backupRecord.s3PrimaryKey = uploadResult.key;
         backupRecord.s3PrimaryBucket = uploadResult.bucket;
         await this.backupRepository.save(backupRecord);
@@ -153,7 +157,6 @@ export class EnhancedBackupService {
 
       this.logger.log(`Point-in-time backup completed successfully: ${backupRecord.id}`);
       return backupRecord;
-
     } catch (error) {
       this.logger.error(`Point-in-time backup failed: ${error.message}`);
       throw error;
@@ -161,12 +164,14 @@ export class EnhancedBackupService {
   }
 
   async performPointInTimeRecovery(
-    options: PointInTimeRecoveryOptions
+    options: PointInTimeRecoveryOptions,
   ): Promise<PointInTimeRecoveryResult> {
     const startTime = Date.now();
     const targetDatabase = options.targetDatabase || `recovery_${Date.now()}`;
 
-    this.logger.log(`Starting point-in-time recovery to ${targetDatabase} at ${options.targetTime.toISOString()}`);
+    this.logger.log(
+      `Starting point-in-time recovery to ${targetDatabase} at ${options.targetTime.toISOString()}`,
+    );
 
     try {
       // Find the latest base backup before target time
@@ -183,7 +188,11 @@ export class EnhancedBackupService {
       await execAsync(recoveryCmd);
 
       // Apply WAL files for point-in-time recovery
-      const walReplayed = await this.applyWALFiles(baseBackup, options.targetTime, recoveryConfig.targetDir);
+      const walReplayed = await this.applyWALFiles(
+        baseBackup,
+        options.targetTime,
+        recoveryConfig.targetDir,
+      );
 
       // Verify integrity if requested
       let integrityPassed = true;
@@ -199,9 +208,8 @@ export class EnhancedBackupService {
         targetDatabase,
         walReplayed,
         durationMs: duration,
-        errors: integrityPassed ? undefined : ['Integrity verification failed']
+        errors: integrityPassed ? undefined : ['Integrity verification failed'],
       };
-
     } catch (error) {
       this.logger.error(`Point-in-time recovery failed: ${error.message}`);
       return {
@@ -210,7 +218,7 @@ export class EnhancedBackupService {
         targetDatabase,
         walReplayed: 0,
         durationMs: Date.now() - startTime,
-        errors: [error.message]
+        errors: [error.message],
       };
     }
   }
@@ -224,7 +232,7 @@ export class EnhancedBackupService {
           now() - pg_last_wal_receive_lsn() as last_receive_time,
           now() - pg_last_wal_replay_lsn() as last_replay_time
       `;
-      
+
       const result = await this.dataSource.query(query);
       return result[0];
     } catch (error) {
@@ -237,15 +245,15 @@ export class EnhancedBackupService {
     try {
       const backups = await this.backupRepository.find({
         where: { status: BackupStatus.COMPLETED },
-        order: { createdAt: 'ASC' }
+        order: { createdAt: 'ASC' },
       });
 
-      const timeline = backups.map(backup => ({
+      const timeline = backups.map((backup) => ({
         id: backup.id,
         timestamp: backup.createdAt,
         type: backup.type,
         filename: backup.filename,
-        canRestoreTo: this.canRestoreToPoint(backup.createdAt)
+        canRestoreTo: this.canRestoreToPoint(backup.createdAt),
       }));
 
       return timeline;
@@ -262,12 +270,12 @@ export class EnhancedBackupService {
     try {
       const walStatus = await this.getWALStatus();
       const lastArchiveAge = await this.getLastWALArchiveAge();
-      
+
       if (lastArchiveAge > this.walArchivingConfig.archiveTimeout) {
         this.logger.warn(`WAL archiving may be lagging. Last archive age: ${lastArchiveAge}ms`);
         // Trigger alert mechanism here
       }
-      
+
       this.logger.debug(`WAL archiving health check: ${JSON.stringify(walStatus)}`);
     } catch (error) {
       this.logger.error(`WAL archiving health check failed: ${error.message}`);
@@ -279,9 +287,9 @@ export class EnhancedBackupService {
       where: {
         status: BackupStatus.COMPLETED,
         type: BackupType.SNAPSHOT,
-        createdAt: LessThanOrEqual(targetTime)
+        createdAt: LessThanOrEqual(targetTime),
       },
-      order: { createdAt: 'DESC' }
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -302,23 +310,28 @@ export class EnhancedBackupService {
     return { targetDir, confPath };
   }
 
-  private async applyWALFiles(baseBackup: BackupRecord, targetTime: Date, targetDir: string): Promise<number> {
+  private async applyWALFiles(
+    baseBackup: BackupRecord,
+    targetTime: Date,
+    targetDir: string,
+  ): Promise<number> {
     // This is a simplified implementation
     // In production, this would involve:
     // 1. Finding all WAL files between base backup and target time
     // 2. Applying them in sequence
     // 3. Monitoring progress
     // 4. Handling timeline switches
-    
+
     this.logger.log(`Applying WAL files to recover to ${targetTime.toISOString()}`);
     // Simulate WAL application
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     return 10; // Return number of WAL files applied
   }
 
   private async verifyDatabaseIntegrity(databaseName: string): Promise<boolean> {
     try {
-      const testQuery = 'SELECT count(*) FROM information_schema.tables WHERE table_schema = \'public\'';
+      const testQuery =
+        "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'";
       const result = await this.dataSource.query(testQuery);
       return result[0].count > 0;
     } catch (error) {

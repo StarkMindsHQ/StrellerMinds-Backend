@@ -48,21 +48,16 @@ export class ApiKeyGuard implements CanActivate {
 
       // Track usage (don't await to avoid blocking response)
       setImmediate(() => {
-        request.analyticsService?.trackUsage(
-          key.id,
-          request.path,
-          request.method,
-          statusCode,
-          responseTime,
-          {
+        request.analyticsService
+          ?.trackUsage(key.id, request.path, request.method, statusCode, responseTime, {
             ipAddress: request.ip,
             userAgent: request.headers['user-agent'],
             queryParams: request.query,
             requestHeaders: request.headers,
-          },
-        ).catch(() => {
-          // Ignore tracking errors
-        });
+          })
+          .catch(() => {
+            // Ignore tracking errors
+          });
       });
 
       return originalSend.call(this, body);

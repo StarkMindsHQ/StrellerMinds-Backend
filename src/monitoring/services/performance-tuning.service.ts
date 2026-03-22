@@ -119,7 +119,9 @@ export class PerformanceTuningService {
       }
 
       // Store high/critical priority actions for manual review
-      const criticalActions = actions.filter((a) => a.priority === 'high' || a.priority === 'critical');
+      const criticalActions = actions.filter(
+        (a) => a.priority === 'high' || a.priority === 'critical',
+      );
       if (criticalActions.length > 0) {
         this.eventEmitter.emit('performance.tuning.actions', criticalActions);
       }
@@ -163,7 +165,9 @@ export class PerformanceTuningService {
   /**
    * Apply memory optimization action
    */
-  private async applyMemoryAction(action: TuningAction): Promise<{ success: boolean; message: string }> {
+  private async applyMemoryAction(
+    action: TuningAction,
+  ): Promise<{ success: boolean; message: string }> {
     // Clear expired cache entries
     await this.cacheOptimization.clearAll();
 
@@ -182,7 +186,9 @@ export class PerformanceTuningService {
   /**
    * Apply cache optimization action
    */
-  private async applyCacheAction(action: TuningAction): Promise<{ success: boolean; message: string }> {
+  private async applyCacheAction(
+    action: TuningAction,
+  ): Promise<{ success: boolean; message: string }> {
     // This would typically involve adjusting cache TTL or size
     // For now, we'll just log the recommendation
     action.applied = true;
@@ -195,7 +201,9 @@ export class PerformanceTuningService {
   /**
    * Apply database optimization action
    */
-  private async applyDatabaseAction(action: TuningAction): Promise<{ success: boolean; message: string }> {
+  private async applyDatabaseAction(
+    action: TuningAction,
+  ): Promise<{ success: boolean; message: string }> {
     const pendingOptimizations = await this.databaseOptimization.getPendingOptimizations(10);
 
     let applied = 0;
@@ -217,7 +225,9 @@ export class PerformanceTuningService {
   /**
    * Apply CPU optimization action
    */
-  private async applyCpuAction(action: TuningAction): Promise<{ success: boolean; message: string }> {
+  private async applyCpuAction(
+    action: TuningAction,
+  ): Promise<{ success: boolean; message: string }> {
     // CPU optimization typically requires manual intervention or scaling
     action.applied = false;
     action.result = 'CPU optimization requires manual review - consider horizontal scaling';
@@ -228,7 +238,9 @@ export class PerformanceTuningService {
   /**
    * Apply connection optimization action
    */
-  private async applyConnectionAction(action: TuningAction): Promise<{ success: boolean; message: string }> {
+  private async applyConnectionAction(
+    action: TuningAction,
+  ): Promise<{ success: boolean; message: string }> {
     // Connection optimization requires investigation
     action.applied = false;
     action.result = 'Connection issues require investigation';
@@ -360,7 +372,15 @@ export class PerformanceTuningService {
     stats: any,
     cacheMetrics: any,
     dbStats: any,
-  ): Promise<Array<{ category: string; priority: string; description: string; impact: string; action: string }>> {
+  ): Promise<
+    Array<{
+      category: string;
+      priority: string;
+      description: string;
+      impact: string;
+      action: string;
+    }>
+  > {
     const recommendations: Array<{
       category: string;
       priority: string;

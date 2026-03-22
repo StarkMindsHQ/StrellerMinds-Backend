@@ -55,7 +55,9 @@ export class RecoveryVerificationService {
   /**
    * Run comprehensive recovery verification
    */
-  async runRecoveryVerification(testType: 'automated' | 'manual' = 'automated'): Promise<VerificationTestResult> {
+  async runRecoveryVerification(
+    testType: 'automated' | 'manual' = 'automated',
+  ): Promise<VerificationTestResult> {
     this.logger.log(`Starting ${testType} recovery verification`);
 
     const testId = `recovery-test-${Date.now()}`;
@@ -77,7 +79,6 @@ export class RecoveryVerificationService {
     await this.recoveryTestRepository.save(testRecord);
 
     try {
-
       // Run verification tests
       const verificationResult = await this.executeVerificationTests(backupToTest);
 
@@ -103,30 +104,30 @@ export class RecoveryVerificationService {
         const notificationResult = {
           testId: testResult.testId,
           backupId: testResult.backupId,
-          status: testResult.status === 'passed' ? RecoveryTestStatus.PASSED : RecoveryTestStatus.FAILED,
+          status:
+            testResult.status === 'passed' ? RecoveryTestStatus.PASSED : RecoveryTestStatus.FAILED,
           durationMs: testResult.durationMs,
           tablesVerified: testResult.tablesVerified,
           rowsVerified: testResult.rowsVerified,
           checksumVerified: testResult.checksumVerified,
           integrityPassed: testResult.integrityPassed,
-          errors: testResult.errors
+          errors: testResult.errors,
         };
         await this.notificationService.sendRecoveryTestNotification(notificationResult);
       }
 
       this.logger.log(`Recovery verification ${testResult.status}: ${testId}`);
       return testResult;
-
     } catch (error) {
       this.logger.error(`Recovery verification failed: ${testId}`, error);
-      
+
       // Update test record with failure
       await this.recoveryTestRepository.update(
         { backupRecordId: testRecord.backupRecordId },
         {
           status: RecoveryTestStatus.FAILED,
           errorMessage: error.message,
-        }
+        },
       );
 
       throw error;
@@ -177,24 +178,25 @@ export class RecoveryVerificationService {
 
       // Verify checksum if available
       const checksumValid = await this.verifyChecksum(backup);
-      
+
       // Verify file existence and size
       const fileValid = await this.verifyFileIntegrity(backup);
-      
+
       // Verify metadata consistency
       const metadataValid = this.verifyMetadata(backup);
 
       const isIntegrityValid = checksumValid && fileValid && metadataValid;
-      
+
       // Update backup record
       await this.backupRecordRepository.update(backupId, {
         verifiedAt: isIntegrityValid ? new Date() : null,
         status: isIntegrityValid ? BackupStatus.VERIFIED : BackupStatus.FAILED,
       });
 
-      this.logger.log(`Backup integrity verification ${isIntegrityValid ? 'passed' : 'failed'}: ${backupId}`);
+      this.logger.log(
+        `Backup integrity verification ${isIntegrityValid ? 'passed' : 'failed'}: ${backupId}`,
+      );
       return isIntegrityValid;
-
     } catch (error) {
       this.logger.error(`Backup integrity verification failed: ${backupId}`, error);
       return false;
@@ -255,9 +257,9 @@ export class RecoveryVerificationService {
     try {
       // Find WAL backup for testing
       const walBackup = await this.backupRecordRepository.findOne({
-        where: { 
+        where: {
           type: BackupType.WAL,
-          status: BackupStatus.COMPLETED 
+          status: BackupStatus.COMPLETED,
         },
         order: { createdAt: 'DESC' },
       });
@@ -270,12 +272,13 @@ export class RecoveryVerificationService {
       // Test PITR capability
       const testResult = await this.enhancedBackupService.performPointInTimeRecovery({
         targetTime: new Date(Date.now() - 3600000), // 1 hour ago
-        verifyIntegrity: true
+        verifyIntegrity: true,
       });
 
-      this.logger.log(`Point-in-time recovery verification ${testResult.success ? 'passed' : 'failed'}`);
+      this.logger.log(
+        `Point-in-time recovery verification ${testResult.success ? 'passed' : 'failed'}`,
+      );
       return testResult.success;
-
     } catch (error) {
       this.logger.error('Point-in-time recovery verification failed', error);
       return false;
@@ -302,14 +305,20 @@ export class RecoveryVerificationService {
   private loadConfiguration(): RecoveryVerificationConfig {
     return {
       enabled: this.configService.get<boolean>('RECOVERY_VERIFICATION_ENABLED', true),
-      frequency: this.configService.get<'daily' | 'weekly' | 'monthly'>('RECOVERY_VERIFICATION_FREQUENCY', 'daily'),
+      frequency: this.configService.get<'daily' | 'weekly' | 'monthly'>(
+        'RECOVERY_VERIFICATION_FREQUENCY',
+        'daily',
+      ),
       testScenarios: this.configService.get<string[]>('RECOVERY_TEST_SCENARIOS', [
         'basic_restore',
         'point_in_time_recovery',
         'cross_region_restore',
-        'encrypted_backup_restore'
+        'encrypted_backup_restore',
       ]),
-      verificationDepth: this.configService.get<'shallow' | 'deep' | 'full'>('RECOVERY_VERIFICATION_DEPTH', 'deep'),
+      verificationDepth: this.configService.get<'shallow' | 'deep' | 'full'>(
+        'RECOVERY_VERIFICATION_DEPTH',
+        'deep',
+      ),
       alertOnFailure: this.configService.get<boolean>('RECOVERY_ALERT_ON_FAILURE', true),
       retentionDays: this.configService.get<number>('RECOVERY_TEST_RETENTION_DAYS', 90),
     };
@@ -369,7 +378,6 @@ export class RecoveryVerificationService {
 
       results.integrityPassed = results.passed;
       return results;
-
     } catch (error) {
       results.errors.push(`Verification error: ${error.message}`);
       results.passed = false;
@@ -403,9 +411,7 @@ export class RecoveryVerificationService {
   private verifyMetadata(backup: BackupRecord): boolean {
     // Verify backup metadata consistency
     try {
-      return backup.sizeBytes > 0 && 
-             backup.filename && 
-             backup.createdAt instanceof Date;
+      return backup.sizeBytes > 0 && backup.filename && backup.createdAt instanceof Date;
     } catch (error) {
       this.logger.error(`Metadata verification failed for ${backup.id}`, error);
       return false;
@@ -417,7 +423,7 @@ export class RecoveryVerificationService {
       // In a real implementation, you'd actually perform a restore test
       // For now, simulate restore test results
       const success = Math.random() > 0.1; // 90% success rate for simulation
-      
+
       return {
         success,
         tablesVerified: success ? Math.floor(Math.random() * 50) + 10 : 0,
@@ -434,16 +440,22 @@ export class RecoveryVerificationService {
     }
   }
 
-  private async updateTestRecord(testRecord: RecoveryTest, result: VerificationTestResult): Promise<void> {
-    await this.recoveryTestRepository.update({ backupRecordId: testRecord.backupRecordId }, {
-      status: result.status === 'passed' ? RecoveryTestStatus.PASSED : RecoveryTestStatus.FAILED,
-      durationMs: result.durationMs,
-      tablesRestored: result.tablesVerified,
-      rowsVerified: BigInt(result.rowsVerified) as unknown as number,
-      checksumVerified: result.checksumVerified,
-      integrityCheckPassed: result.integrityPassed,
-      errorMessage: result.errors.length > 0 ? result.errors.join(' ') : null,
-    });
+  private async updateTestRecord(
+    testRecord: RecoveryTest,
+    result: VerificationTestResult,
+  ): Promise<void> {
+    await this.recoveryTestRepository.update(
+      { backupRecordId: testRecord.backupRecordId },
+      {
+        status: result.status === 'passed' ? RecoveryTestStatus.PASSED : RecoveryTestStatus.FAILED,
+        durationMs: result.durationMs,
+        tablesRestored: result.tablesVerified,
+        rowsVerified: BigInt(result.rowsVerified) as unknown as number,
+        checksumVerified: result.checksumVerified,
+        integrityCheckPassed: result.integrityPassed,
+        errorMessage: result.errors.length > 0 ? result.errors.join(' ') : null,
+      },
+    );
   }
 
   private async runScenarioTest(scenario: string): Promise<void> {

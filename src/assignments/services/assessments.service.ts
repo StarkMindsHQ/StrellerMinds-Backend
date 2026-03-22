@@ -37,7 +37,10 @@ export class AssessmentsService {
   }
 
   async findOne(id: string): Promise<Assessment> {
-    const a = await this.assessmentRepo.findOne({ where: { id }, relations: ['questions', 'questions.options'] });
+    const a = await this.assessmentRepo.findOne({
+      where: { id },
+      relations: ['questions', 'questions.options'],
+    });
     if (!a) throw new NotFoundException('Assessment not found');
     return a;
   }
@@ -51,7 +54,9 @@ export class AssessmentsService {
     if (!assessment) throw new NotFoundException('Assessment not found');
 
     // Simple analytics using SQL is possible, but keep it lightweight here
-    const attempts = await this.assessmentRepo.manager.getRepository('attempts').find({ where: { assessment: { id: assessmentId } } });
+    const attempts = await this.assessmentRepo.manager
+      .getRepository('attempts')
+      .find({ where: { assessment: { id: assessmentId } } });
     const total = attempts.length;
     const submitted = attempts.filter((a: any) => a.submitted).length;
     const avg = attempts.reduce((s: number, a: any) => s + (a.score || 0), 0) / Math.max(total, 1);

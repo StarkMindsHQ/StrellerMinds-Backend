@@ -212,13 +212,13 @@ export class AdaptiveLearningService {
   private calculatePredictiveScore(node: LearningPathNode, metrics: PerformanceMetrics): number {
     // In a real implementation, this would call the AI module or an external ML service
     let probability = 0.5;
-    
+
     // Adjust based on past performance
     probability += (metrics.avgScore - 50) / 200; // +/- adjustment
-    
+
     // Adjust based on attempts (resilience)
     if (metrics.attempts > 1.2) probability += 0.1;
-    
+
     return Math.min(Math.max(probability, 0), 1);
   }
 

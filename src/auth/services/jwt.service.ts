@@ -23,7 +23,10 @@ export class JwtService {
     return this.jwtService.signAsync(
       { ...payload, type: 'access' },
       {
-        expiresIn: this.configService.get<string>('JWT_EXPIRES_IN', '15m') as SignOptions['expiresIn'],
+        expiresIn: this.configService.get<string>(
+          'JWT_EXPIRES_IN',
+          '15m',
+        ) as SignOptions['expiresIn'],
         secret: this.configService.get<string>('JWT_SECRET'),
       },
     );
@@ -33,7 +36,10 @@ export class JwtService {
     return this.jwtService.signAsync(
       { ...payload, type: 'refresh' },
       {
-        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d') as SignOptions['expiresIn'],
+        expiresIn: this.configService.get<string>(
+          'JWT_REFRESH_EXPIRES_IN',
+          '7d',
+        ) as SignOptions['expiresIn'],
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       },
     );
@@ -53,7 +59,10 @@ export class JwtService {
 
   async signEmailVerificationToken(payload: { email: string }): Promise<string> {
     return this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.get<string>('JWT_EMAIL_EXPIRES_IN', '24h') as SignOptions['expiresIn'],
+      expiresIn: this.configService.get<string>(
+        'JWT_EMAIL_EXPIRES_IN',
+        '24h',
+      ) as SignOptions['expiresIn'],
       secret: this.configService.get<string>('JWT_SECRET'),
     });
   }
@@ -66,7 +75,10 @@ export class JwtService {
 
   async signPasswordResetToken(payload: { email: string }): Promise<string> {
     return this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.get<string>('JWT_PASSWORD_RESET_EXPIRES_IN', '1h') as SignOptions['expiresIn'],
+      expiresIn: this.configService.get<string>(
+        'JWT_PASSWORD_RESET_EXPIRES_IN',
+        '1h',
+      ) as SignOptions['expiresIn'],
       secret: this.configService.get<string>('JWT_SECRET'),
     });
   }

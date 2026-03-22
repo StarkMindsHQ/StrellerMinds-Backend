@@ -11,7 +11,10 @@ import { User } from '../auth/entities/user.entity';
 import { I18nModule } from '../i18n/i18n.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AccessibilityAudit, AccessibilityViolation, User]), I18nModule],
+  imports: [
+    TypeOrmModule.forFeature([AccessibilityAudit, AccessibilityViolation, User]),
+    I18nModule,
+  ],
   providers: [
     AccessibilityService,
     AccessibilityTestingService,

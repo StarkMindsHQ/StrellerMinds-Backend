@@ -1,4 +1,4 @@
-import { securityLogger } from "./security.logger";
+import { securityLogger } from './security.logger';
 
 export function monitorSuspiciousActivity(req: any, event: string) {
   securityLogger.warn({
