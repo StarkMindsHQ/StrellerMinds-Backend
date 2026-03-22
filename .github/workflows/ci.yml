@@ -129,7 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     name: API Tests
     needs: [code-quality, test]
-    if: github.event_name != 'pull_request' # Skip API tests on PRs
+    if: always() # Run API tests on all events
     
     services:
       postgres:
@@ -245,7 +245,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Performance Tests
     needs: [test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: always() # Run performance tests on all push/PR events
     
     services:
       postgres:
@@ -317,7 +317,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build & Deploy
     needs: [code-quality, test, api-test, security-scan]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: always() # Run build/deploy checks on all events; adjust in branch policy if needed
     
     steps:
     - name: Checkout code
