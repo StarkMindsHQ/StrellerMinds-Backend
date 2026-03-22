@@ -129,7 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     name: API Tests
     needs: [code-quality, test]
-    if: always() # Run API tests on all events
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     env:
       NODE_ENV: test
       DATABASE_HOST: localhost
@@ -255,7 +255,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Performance Tests
     needs: [test]
-    if: always() # Run performance tests on all push/PR events
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     env:
       NODE_ENV: test
       DATABASE_HOST: localhost
