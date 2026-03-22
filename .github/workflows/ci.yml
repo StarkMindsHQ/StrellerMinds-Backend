@@ -130,6 +130,16 @@ jobs:
     name: API Tests
     needs: [code-quality, test]
     if: always() # Run API tests on all events
+    env:
+      NODE_ENV: test
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 5432
+      DATABASE_USER: test
+      DATABASE_PASSWORD: test
+      DATABASE_NAME: test_db
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ''
     
     services:
       postgres:
@@ -246,6 +256,16 @@ jobs:
     name: Performance Tests
     needs: [test]
     if: always() # Run performance tests on all push/PR events
+    env:
+      NODE_ENV: test
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 5432
+      DATABASE_USER: test
+      DATABASE_PASSWORD: test
+      DATABASE_NAME: test_db
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ''
     
     services:
       postgres:
