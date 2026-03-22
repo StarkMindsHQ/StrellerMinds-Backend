@@ -1,16 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  Payment,
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Refund,
-} from '../entities';
+import { Payment, Subscription, PaymentPlan, Invoice, Refund } from '../entities';
 import { PaymentStatus, PaymentMethod } from '../enums';
 import { CreatePaymentDto, ProcessPaymentDto } from '../dto';
-
 
 @Injectable()
 export class RazorpayService {
@@ -33,15 +26,12 @@ export class RazorpayService {
     this.baseUrl = 'https://api.razorpay.com/v1';
   }
 
-  async createPayment(
-    userId: string,
-    dto: ProcessPaymentDto,
-  ): Promise<any> {
+  async createPayment(userId: string, dto: ProcessPaymentDto): Promise<any> {
     try {
       const response = await fetch(`${this.baseUrl}/orders`, {
         method: 'POST',
         headers: {
-          'Authorization': `Basic ${Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -83,7 +73,7 @@ export class RazorpayService {
       // Fetch payment details
       const response = await fetch(`${this.baseUrl}/payments/${paymentId}`, {
         headers: {
-          'Authorization': `Basic ${Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64')}`,
+          Authorization: `Basic ${Buffer.from(`${this.keyId}:${this.keySecret}`).toString('base64')}`,
         },
       });
 
@@ -121,20 +111,12 @@ export class RazorpayService {
     }
   }
 
-  async createSubscription(
-    userId: string,
-    planId: string,
-    customerId: string,
-  ): Promise<any> {
+  async createSubscription(userId: string, planId: string, customerId: string): Promise<any> {
     // Implementation for subscription creation
     return { success: true };
   }
 
-  async refundPayment(
-    paymentId: string,
-    amount?: number,
-    notes?: string,
-  ): Promise<any> {
+  async refundPayment(paymentId: string, amount?: number, notes?: string): Promise<any> {
     // Implementation for refund creation
     return { success: true };
   }

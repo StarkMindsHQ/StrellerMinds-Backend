@@ -15,7 +15,7 @@ export class ProctoringSession {
   @Column({ nullable: true })
   userAgent?: string;
 
-  // JSON array of events: [{type: 'focus_lost', timestamp, details}] 
+  // JSON array of events: [{type: 'focus_lost', timestamp, details}]
   @Column('simple-json', { nullable: true })
   events?: any[];
 

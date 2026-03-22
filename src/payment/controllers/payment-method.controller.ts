@@ -18,9 +18,7 @@ import { PaymentMethodEntity } from '../entities';
 
 @Controller('payment-methods')
 export class PaymentMethodController {
-  constructor(
-    private paymentMethodManagementService: PaymentMethodManagementService,
-  ) {}
+  constructor(private paymentMethodManagementService: PaymentMethodManagementService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -58,14 +56,8 @@ export class PaymentMethodController {
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  async getPaymentMethod(
-    @Request() req,
-    @Param('id') id: string,
-  ): Promise<PaymentMethodEntity> {
-    return this.paymentMethodManagementService.getPaymentMethod(
-      req.user.id,
-      id,
-    );
+  async getPaymentMethod(@Request() req, @Param('id') id: string): Promise<PaymentMethodEntity> {
+    return this.paymentMethodManagementService.getPaymentMethod(req.user.id, id);
   }
 
   @Patch(':id/default')
@@ -75,10 +67,7 @@ export class PaymentMethodController {
     @Request() req,
     @Param('id') id: string,
   ): Promise<PaymentMethodEntity> {
-    return this.paymentMethodManagementService.setDefaultPaymentMethod(
-      req.user.id,
-      id,
-    );
+    return this.paymentMethodManagementService.setDefaultPaymentMethod(req.user.id, id);
   }
 
   @Patch(':id')
@@ -94,32 +83,20 @@ export class PaymentMethodController {
       metadata?: Record<string, any>;
     },
   ): Promise<PaymentMethodEntity> {
-    return this.paymentMethodManagementService.updatePaymentMethod(
-      req.user.id,
-      id,
-      body,
-    );
+    return this.paymentMethodManagementService.updatePaymentMethod(req.user.id, id, body);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async removePaymentMethod(
-    @Request() req,
-    @Param('id') id: string,
-  ): Promise<void> {
-    return this.paymentMethodManagementService.removePaymentMethod(
-      req.user.id,
-      id,
-    );
+  async removePaymentMethod(@Request() req, @Param('id') id: string): Promise<void> {
+    return this.paymentMethodManagementService.removePaymentMethod(req.user.id, id);
   }
 
   @Get('default')
   @UseGuards(JwtAuthGuard)
   async getDefaultPaymentMethod(@Request() req): Promise<PaymentMethodEntity> {
-    const method = await this.paymentMethodManagementService.getDefaultPaymentMethod(
-      req.user.id,
-    );
+    const method = await this.paymentMethodManagementService.getDefaultPaymentMethod(req.user.id);
     if (!method) {
       throw new Error('No default payment method found');
     }
@@ -132,18 +109,13 @@ export class PaymentMethodController {
     @Request() req,
     @Param('provider') provider: string,
   ): Promise<PaymentMethodEntity[]> {
-    return this.paymentMethodManagementService.getPaymentMethodsByProvider(
-      req.user.id,
-      provider,
-    );
+    return this.paymentMethodManagementService.getPaymentMethodsByProvider(req.user.id, provider);
   }
 
   @Get('stats')
   @UseGuards(JwtAuthGuard)
   async getPaymentMethodStats(@Request() req): Promise<any> {
-    return this.paymentMethodManagementService.getPaymentMethodStats(
-      req.user.id,
-    );
+    return this.paymentMethodManagementService.getPaymentMethodStats(req.user.id);
   }
 
   @Post('validate/:id')
@@ -153,10 +125,7 @@ export class PaymentMethodController {
     @Request() req,
     @Param('id') id: string,
   ): Promise<{ valid: boolean }> {
-    const valid = await this.paymentMethodManagementService.validatePaymentMethod(
-      req.user.id,
-      id,
-    );
+    const valid = await this.paymentMethodManagementService.validatePaymentMethod(req.user.id, id);
     return { valid };
   }
 }

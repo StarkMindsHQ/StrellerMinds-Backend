@@ -9,7 +9,7 @@ export class AchievementService {
   ) {}
 
   evaluate(profile: UserGamificationProfile) {
-    let updatedProfile = { ...profile };
+    const updatedProfile = { ...profile };
 
     for (const achievement of this.achievements) {
       if (!profile.achievements.includes(achievement.id) && achievement.condition(profile)) {

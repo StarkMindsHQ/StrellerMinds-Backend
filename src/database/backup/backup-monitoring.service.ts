@@ -22,7 +22,12 @@ export interface BackupHealthStatus {
 
 export interface BackupAlert {
   id: string;
-  type: 'backup_failure' | 'backup_lag' | 'storage_full' | 'recovery_test_failed' | 'performance_degradation';
+  type:
+    | 'backup_failure'
+    | 'backup_lag'
+    | 'storage_full'
+    | 'recovery_test_failed'
+    | 'performance_degradation';
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
   timestamp: Date;
@@ -69,13 +74,8 @@ export class BackupMonitoringService {
       const backupLag = this.calculateBackupLag(lastBackup);
       const successRate = await this.calculateSuccessRate();
       const storageUsage = await this.getStorageUsage();
-      
-      const alerts = this.generateHealthAlerts(
-        lastBackup,
-        backupLag,
-        storageUsage,
-        successRate
-      );
+
+      const alerts = this.generateHealthAlerts(lastBackup, backupLag, storageUsage, successRate);
 
       const overallStatus = this.determineOverallStatus(alerts, backupLag);
 
@@ -89,7 +89,7 @@ export class BackupMonitoringService {
       };
 
       // Send alerts if critical issues detected
-      if (overallStatus === 'critical' || alerts.some(a => a.severity === 'critical')) {
+      if (overallStatus === 'critical' || alerts.some((a) => a.severity === 'critical')) {
         await this.sendCriticalAlerts(alerts);
       }
 
@@ -110,7 +110,7 @@ export class BackupMonitoringService {
     try {
       const metrics = await this.collectPerformanceMetrics();
       this.performanceHistory.push(metrics);
-      
+
       // Keep only last 100 performance records
       if (this.performanceHistory.length > 100) {
         this.performanceHistory.shift();
@@ -132,7 +132,7 @@ export class BackupMonitoringService {
 
     try {
       const healthStatus = await this.checkBackupHealth();
-      
+
       // Log health status
       this.logger.log(`System Health: ${healthStatus.overallStatus}`);
       this.logger.log(`Backup Lag: ${healthStatus.backupLag} hours`);
@@ -153,7 +153,7 @@ export class BackupMonitoringService {
   async checkBackupLag(): Promise<void> {
     const lastBackup = await this.getLastSuccessfulBackup();
     const backupLag = this.calculateBackupLag(lastBackup);
-    
+
     const warningThreshold = this.configService.get<number>('BACKUP_LAG_WARNING_HOURS', 2);
     const criticalThreshold = this.configService.get<number>('BACKUP_LAG_CRITICAL_HOURS', 6);
 
@@ -186,7 +186,7 @@ export class BackupMonitoringService {
   @Cron(CronExpression.EVERY_6_HOURS)
   async monitorStorageUsage(): Promise<void> {
     const storageUsage = await this.getStorageUsage();
-    
+
     const warningThreshold = this.configService.get<number>('STORAGE_WARNING_PERCENTAGE', 80);
     const criticalThreshold = this.configService.get<number>('STORAGE_CRITICAL_PERCENTAGE', 95);
 
@@ -217,14 +217,14 @@ export class BackupMonitoringService {
    * Get current backup alerts
    */
   async getActiveAlerts(): Promise<BackupAlert[]> {
-    return this.alerts.filter(alert => !alert.resolved);
+    return this.alerts.filter((alert) => !alert.resolved);
   }
 
   /**
    * Resolve an alert
    */
   async resolveAlert(alertId: string): Promise<void> {
-    const alert = this.alerts.find(a => a.id === alertId);
+    const alert = this.alerts.find((a) => a.id === alertId);
     if (alert) {
       alert.resolved = true;
       this.logger.log(`Alert resolved: ${alertId}`);
@@ -236,7 +236,7 @@ export class BackupMonitoringService {
    */
   getPerformanceHistory(hours: number = 24): BackupPerformanceMetrics[] {
     const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
-    return this.performanceHistory.filter(metric => metric.timestamp >= cutoff);
+    return this.performanceHistory.filter((metric) => metric.timestamp >= cutoff);
   }
 
   /**
@@ -293,11 +293,11 @@ export class BackupMonitoringService {
 
   private calculateBackupLag(lastBackup: BackupRecord | null): number {
     if (!lastBackup) return Infinity;
-    
+
     const now = new Date();
     const lastBackupTime = new Date(lastBackup.createdAt);
     const diffHours = (now.getTime() - lastBackupTime.getTime()) / (1000 * 60 * 60);
-    
+
     return Math.round(diffHours * 100) / 100; // Round to 2 decimal places
   }
 
@@ -329,9 +329,9 @@ export class BackupMonitoringService {
         `${this.configService.get('BACKUP_STORAGE_ENDPOINT')}/usage`,
         {
           headers: {
-            'Authorization': `Bearer ${this.configService.get('BACKUP_STORAGE_TOKEN')}`,
+            Authorization: `Bearer ${this.configService.get('BACKUP_STORAGE_TOKEN')}`,
           },
-        }
+        },
       );
       return response.data.usagePercentage;
     } catch (error) {
@@ -345,7 +345,7 @@ export class BackupMonitoringService {
     lastBackup: BackupRecord | null,
     backupLag: number,
     storageUsage: number,
-    successRate: number
+    successRate: number,
   ): BackupAlert[] {
     const alerts: BackupAlert[] = [];
 
@@ -424,20 +424,26 @@ export class BackupMonitoringService {
     return alerts;
   }
 
-  private determineOverallStatus(alerts: BackupAlert[], backupLag: number): 'healthy' | 'warning' | 'critical' {
-    const criticalAlerts = alerts.filter(a => a.severity === 'critical');
-    const highAlerts = alerts.filter(a => a.severity === 'high');
-    
+  private determineOverallStatus(
+    alerts: BackupAlert[],
+    backupLag: number,
+  ): 'healthy' | 'warning' | 'critical' {
+    const criticalAlerts = alerts.filter((a) => a.severity === 'critical');
+    const highAlerts = alerts.filter((a) => a.severity === 'high');
+
     const criticalLag = this.configService.get<number>('BACKUP_LAG_CRITICAL_HOURS', 6);
 
     if (criticalAlerts.length > 0 || backupLag > criticalLag) {
       return 'critical';
     }
-    
-    if (highAlerts.length > 0 || backupLag > this.configService.get<number>('BACKUP_LAG_WARNING_HOURS', 2)) {
+
+    if (
+      highAlerts.length > 0 ||
+      backupLag > this.configService.get<number>('BACKUP_LAG_WARNING_HOURS', 2)
+    ) {
       return 'warning';
     }
-    
+
     return 'healthy';
   }
 
@@ -453,12 +459,14 @@ export class BackupMonitoringService {
     };
   }
 
-  private async checkPerformanceDegradation(currentMetrics: BackupPerformanceMetrics): Promise<void> {
+  private async checkPerformanceDegradation(
+    currentMetrics: BackupPerformanceMetrics,
+  ): Promise<void> {
     if (this.performanceHistory.length < 5) return; // Need sufficient history
 
     const recentMetrics = this.performanceHistory.slice(-5);
     const avgDuration = recentMetrics.reduce((sum, m) => sum + m.backupDuration, 0) / 5;
-    
+
     // Alert if current duration is 50% higher than average
     if (currentMetrics.backupDuration > avgDuration * 1.5) {
       const alert: BackupAlert = {
@@ -480,9 +488,15 @@ export class BackupMonitoringService {
 
     const latest = this.performanceHistory[this.performanceHistory.length - 1];
     const average = {
-      duration: this.performanceHistory.reduce((sum, m) => sum + m.backupDuration, 0) / this.performanceHistory.length,
-      compression: this.performanceHistory.reduce((sum, m) => sum + m.compressionRatio, 0) / this.performanceHistory.length,
-      speed: this.performanceHistory.reduce((sum, m) => sum + m.transferSpeed, 0) / this.performanceHistory.length,
+      duration:
+        this.performanceHistory.reduce((sum, m) => sum + m.backupDuration, 0) /
+        this.performanceHistory.length,
+      compression:
+        this.performanceHistory.reduce((sum, m) => sum + m.compressionRatio, 0) /
+        this.performanceHistory.length,
+      speed:
+        this.performanceHistory.reduce((sum, m) => sum + m.transferSpeed, 0) /
+        this.performanceHistory.length,
     };
 
     return {
@@ -494,13 +508,13 @@ export class BackupMonitoringService {
 
   private calculatePerformanceTrend(): 'improving' | 'degrading' | 'stable' {
     if (this.performanceHistory.length < 10) return 'stable';
-    
+
     const recent = this.performanceHistory.slice(-5);
     const older = this.performanceHistory.slice(-10, -5);
-    
+
     const recentAvg = recent.reduce((sum, m) => sum + m.backupDuration, 0) / 5;
     const olderAvg = older.reduce((sum, m) => sum + m.backupDuration, 0) / 5;
-    
+
     if (recentAvg < olderAvg * 0.9) return 'improving';
     if (recentAvg > olderAvg * 1.1) return 'degrading';
     return 'stable';
@@ -509,13 +523,13 @@ export class BackupMonitoringService {
   private async sendAlert(alert: BackupAlert): Promise<void> {
     this.alerts.push(alert);
     this.logger.warn(`New alert: ${alert.message}`);
-    
+
     // Send notification via configured channels
     await this.sendNotificationAlert(alert);
   }
 
   private async sendCriticalAlerts(alerts: BackupAlert[]): Promise<void> {
-    const criticalAlerts = alerts.filter(a => a.severity === 'critical');
+    const criticalAlerts = alerts.filter((a) => a.severity === 'critical');
     if (criticalAlerts.length > 0) {
       await this.sendCriticalNotifications(criticalAlerts);
     }
@@ -524,17 +538,17 @@ export class BackupMonitoringService {
   private async storeAlerts(alerts: BackupAlert[]): Promise<void> {
     // In a real implementation, store alerts in database
     // For now, just log them
-    alerts.forEach(alert => {
+    alerts.forEach((alert) => {
       this.logger.log(`Stored alert: ${alert.id} - ${alert.message}`);
     });
   }
 
   private async sendNotificationAlert(alert: BackupAlert): Promise<void> {
     const severityMap = {
-      'low': BackupAlertSeverity.INFO,
-      'medium': BackupAlertSeverity.WARNING,
-      'high': BackupAlertSeverity.ERROR,
-      'critical': BackupAlertSeverity.CRITICAL,
+      low: BackupAlertSeverity.INFO,
+      medium: BackupAlertSeverity.WARNING,
+      high: BackupAlertSeverity.ERROR,
+      critical: BackupAlertSeverity.CRITICAL,
     };
 
     const payload: BackupAlertPayload = {

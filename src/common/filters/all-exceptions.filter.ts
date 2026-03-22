@@ -46,7 +46,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         message = exceptionResponse;
       } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         const body = exceptionResponse as HttpExceptionResponseObject;
-        message = Array.isArray(body.message) ? body.message[0] : body.message ?? message;
+        message = Array.isArray(body.message) ? body.message[0] : (body.message ?? message);
         error = body.error ?? exception.name;
         details = body.details;
       }
@@ -117,10 +117,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
   }
 
-  private sendToMonitoring(
-    exception: unknown,
-    context: Record<string, unknown>,
-  ): void {
+  private sendToMonitoring(exception: unknown, context: Record<string, unknown>): void {
     // Integrate with your monitoring service
     // Example: Sentry
     // Sentry.captureException(exception, { contexts: { custom: context } });

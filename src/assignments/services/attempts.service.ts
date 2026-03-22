@@ -29,8 +29,16 @@ export class AttemptsService {
     private readonly plagiarismService: PlagiarismService,
   ) {}
 
-  async startAttempt(dto: StartAttemptDto, studentId: string, ip?: string, ua?: string): Promise<Attempt> {
-    const assessment = await this.assessmentRepo.findOne({ where: { id: dto.assessmentId }, relations: ['questions', 'questions.options'] });
+  async startAttempt(
+    dto: StartAttemptDto,
+    studentId: string,
+    ip?: string,
+    ua?: string,
+  ): Promise<Attempt> {
+    const assessment = await this.assessmentRepo.findOne({
+      where: { id: dto.assessmentId },
+      relations: ['questions', 'questions.options'],
+    });
     if (!assessment) throw new NotFoundException('Assessment not found');
 
     // Check availability window
@@ -43,8 +51,8 @@ export class AttemptsService {
     }
 
     const attempt = this.attemptRepo.create({
-      assessment: ({ id: assessment.id } as Assessment),
-      student: ({ id: studentId } as User),
+      assessment: { id: assessment.id } as Assessment,
+      student: { id: studentId } as User,
       startedAt: new Date(),
       submitted: false,
     });
@@ -52,13 +60,18 @@ export class AttemptsService {
     const saved = await this.attemptRepo.save(attempt);
 
     // create proctoring session record
-    await this.proctorRepo.save(this.proctorRepo.create({ attempt: saved, ipAddress: ip, userAgent: ua, events: [] }));
+    await this.proctorRepo.save(
+      this.proctorRepo.create({ attempt: saved, ipAddress: ip, userAgent: ua, events: [] }),
+    );
 
     return this.attemptRepo.findOne({ where: { id: saved.id }, relations: ['assessment'] });
   }
 
   async submitAttempt(dto: SubmitAttemptDto, studentId: string): Promise<Attempt> {
-    const attempt = await this.attemptRepo.findOne({ where: { id: dto.attemptId }, relations: ['assessment', 'assessment.questions', 'answers', 'answers.question'] });
+    const attempt = await this.attemptRepo.findOne({
+      where: { id: dto.attemptId },
+      relations: ['assessment', 'assessment.questions', 'answers', 'answers.question'],
+    });
     if (!attempt) throw new NotFoundException('Attempt not found');
     if (attempt.student && (attempt.student as any).id !== studentId) {
       throw new BadRequestException('Attempt does not belong to student');
@@ -71,23 +84,37 @@ export class AttemptsService {
         await this.answerRepo.remove(attempt.answers);
       }
 
-      const answers = dto.answers.map((a) => this.answerRepo.create({
-        attempt: ({ id: attempt.id } as Attempt),
-        question: ({ id: a.questionId } as Question),
-        answerText: a.answerText,
-        selectedOptionIds: a.selectedOptionIds,
-      }));
+      const answers = dto.answers.map((a) =>
+        this.answerRepo.create({
+          attempt: { id: attempt.id } as Attempt,
+          question: { id: a.questionId } as Question,
+          answerText: a.answerText,
+          selectedOptionIds: a.selectedOptionIds,
+        }),
+      );
 
       await this.answerRepo.save(answers);
     }
 
     // Re-fetch with answers
-    const refreshed = await this.attemptRepo.findOne({ where: { id: attempt.id }, relations: ['assessment', 'assessment.questions', 'assessment.questions.options', 'answers', 'answers.question'] });
+    const refreshed = await this.attemptRepo.findOne({
+      where: { id: attempt.id },
+      relations: [
+        'assessment',
+        'assessment.questions',
+        'assessment.questions.options',
+        'answers',
+        'answers.question',
+      ],
+    });
 
     // Auto-grade simple types
     let totalScore = 0;
     for (const answer of refreshed.answers || []) {
-      const question = await this.questionRepo.findOne({ where: { id: answer.question.id }, relations: ['options'] });
+      const question = await this.questionRepo.findOne({
+        where: { id: answer.question.id },
+        relations: ['options'],
+      });
       if (!question) continue;
 
       if (question.type === QuestionType.MULTIPLE_CHOICE) {
@@ -135,7 +162,9 @@ export class AttemptsService {
 
     const savedAttempt = await this.attemptRepo.save(refreshed);
 
-    this.logger.log(`Attempt ${savedAttempt.id} submitted by ${studentId} score=${savedAttempt.score}`);
+    this.logger.log(
+      `Attempt ${savedAttempt.id} submitted by ${studentId} score=${savedAttempt.score}`,
+    );
 
     return savedAttempt;
   }

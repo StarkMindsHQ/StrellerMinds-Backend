@@ -14,9 +14,6 @@ export class SecurityAuditService {
     @Optional() private readonly threatDetectionService: ThreatDetectionService | null,
   ) {}
 
-
-
-
   async log(
     userId: string | null,
     event: SecurityEvent,
@@ -33,7 +30,6 @@ export class SecurityAuditService {
       userAgent,
       metadata: { ...metadata, location },
     });
-
 
     const savedAudit = await this.auditRepository.save(audit);
 
@@ -53,7 +49,6 @@ export class SecurityAuditService {
 
     if (userId) {
       query.where('audit.userId = :userId', { userId });
-
     }
 
     return query.getMany();

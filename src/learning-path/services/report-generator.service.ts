@@ -12,10 +12,10 @@ export class ReportGeneratorService {
    */
   async generateData(template: ReportTemplate): Promise<any> {
     this.logger.log(`Generating data for report: ${template.name} (${template.type})`);
-    
+
     // Mock data generation based on type
     const data = this.getMockData(template);
-    
+
     return {
       meta: {
         reportName: template.name,
@@ -30,13 +30,13 @@ export class ReportGeneratorService {
 
   async exportReport(template: ReportTemplate, format: ExportFormat): Promise<Buffer> {
     const reportData = await this.generateData(template);
-    
+
     if (format === ExportFormat.CSV) {
       return this.convertToCSV(reportData.data);
     } else if (format === ExportFormat.JSON) {
       return Buffer.from(JSON.stringify(reportData, null, 2));
     }
-    
+
     // Default to JSON for unsupported formats in this mock
     return Buffer.from(JSON.stringify(reportData));
   }
@@ -45,11 +45,11 @@ export class ReportGeneratorService {
     // Generate dummy rows
     const rows = [];
     const days = 30;
-    
+
     for (let i = 0; i < days; i++) {
       const date = new Date();
       date.setDate(date.getDate() - (days - i));
-      
+
       rows.push({
         date: date.toISOString().split('T')[0],
         users: Math.floor(Math.random() * 1000) + 100,
@@ -62,8 +62,8 @@ export class ReportGeneratorService {
   }
 
   private formatForVisualization(data: any[], type: VisualizationType) {
-    const labels = data.map(d => d.date);
-    
+    const labels = data.map((d) => d.date);
+
     switch (type) {
       case VisualizationType.LINE_CHART:
       case VisualizationType.BAR_CHART:
@@ -74,14 +74,14 @@ export class ReportGeneratorService {
             datasets: [
               {
                 label: 'Revenue',
-                data: data.map(d => d.revenue),
+                data: data.map((d) => d.revenue),
               },
               {
                 label: 'Users',
-                data: data.map(d => d.users),
-              }
-            ]
-          }
+                data: data.map((d) => d.users),
+              },
+            ],
+          },
         };
       case VisualizationType.PIE_CHART:
         // Aggregate for pie chart
@@ -89,8 +89,8 @@ export class ReportGeneratorService {
           type: 'pie',
           data: {
             labels: ['Course A', 'Course B', 'Course C'],
-            datasets: [{ data: [300, 500, 100] }]
-          }
+            datasets: [{ data: [300, 500, 100] }],
+          },
         };
       default:
         return { type: 'table', data };
@@ -100,7 +100,7 @@ export class ReportGeneratorService {
   private convertToCSV(data: any[]): Buffer {
     if (!data.length) return Buffer.from('');
     const headers = Object.keys(data[0]).join(',');
-    const rows = data.map(row => Object.values(row).join(','));
+    const rows = data.map((row) => Object.values(row).join(','));
     return Buffer.from([headers, ...rows].join('\n'));
   }
 }

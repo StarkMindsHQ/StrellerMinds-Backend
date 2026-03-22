@@ -116,7 +116,10 @@ export class AccessibilityMonitoringService {
   /**
    * Get audit statistics
    */
-  async getAuditStatistics(userId?: string, days: number = 30): Promise<{
+  async getAuditStatistics(
+    userId?: string,
+    days: number = 30,
+  ): Promise<{
     totalAudits: number;
     passedAudits: number;
     failedAudits: number;
@@ -143,7 +146,9 @@ export class AccessibilityMonitoringService {
     const warningAudits = audits.filter((a) => a.status === AuditStatus.WARNING).length;
     const wcagCompliant = audits.filter((a) => a.wcag21AACompliant).length;
 
-    const scores = audits.filter((a) => a.accessibilityScore !== null).map((a) => a.accessibilityScore!);
+    const scores = audits
+      .filter((a) => a.accessibilityScore !== null)
+      .map((a) => a.accessibilityScore!);
     const averageScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
 
     const issuesBySeverity = {

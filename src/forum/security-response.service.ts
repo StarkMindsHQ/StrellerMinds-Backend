@@ -15,21 +15,26 @@ export class SecurityResponseService {
   async createIncident(data: Partial<SecurityIncident>): Promise<SecurityIncident> {
     const incident = this.incidentRepo.create(data);
     const savedIncident = await this.incidentRepo.save(incident);
-    
+
     await this.handleAutomatedResponse(savedIncident);
-    
+
     return savedIncident;
   }
 
   private async handleAutomatedResponse(incident: SecurityIncident): Promise<void> {
-    if (incident.severity === IncidentSeverity.CRITICAL || incident.severity === IncidentSeverity.HIGH) {
-      this.logger.warn(`Executing automated response for incident ${incident.id} [${incident.type}]`);
-      
+    if (
+      incident.severity === IncidentSeverity.CRITICAL ||
+      incident.severity === IncidentSeverity.HIGH
+    ) {
+      this.logger.warn(
+        `Executing automated response for incident ${incident.id} [${incident.type}]`,
+      );
+
       // Automated mitigation strategies
       if (incident.ipAddress) {
         await this.blockIpAddress(incident.ipAddress);
       }
-      
+
       if (incident.userId && incident.severity === IncidentSeverity.CRITICAL) {
         await this.lockUserAccount(incident.userId);
       }

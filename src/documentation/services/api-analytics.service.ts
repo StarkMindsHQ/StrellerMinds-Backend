@@ -55,7 +55,9 @@ export class ApiAnalyticsService {
    * Get analytics
    */
   async getAnalytics(query: ApiAnalyticsQueryDto): Promise<ApiAnalyticsResponseDto> {
-    const startDate = query.startDate ? new Date(query.startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const startDate = query.startDate
+      ? new Date(query.startDate)
+      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const endDate = query.endDate ? new Date(query.endDate) : new Date();
 
     const where: any = {
@@ -165,7 +167,11 @@ export class ApiAnalyticsService {
   /**
    * Get endpoint analytics
    */
-  async getEndpointAnalytics(endpoint: string, method: string, timeRange?: { start: Date; end: Date }) {
+  async getEndpointAnalytics(
+    endpoint: string,
+    method: string,
+    timeRange?: { start: Date; end: Date },
+  ) {
     const start = timeRange?.start || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const end = timeRange?.end || new Date();
 
@@ -211,7 +217,10 @@ export class ApiAnalyticsService {
   /**
    * Aggregate usage by time
    */
-  private aggregateByTime(usages: ApiUsage[], interval: 'hour' | 'day' = 'hour'): Array<{ timestamp: Date; count: number }> {
+  private aggregateByTime(
+    usages: ApiUsage[],
+    interval: 'hour' | 'day' = 'hour',
+  ): Array<{ timestamp: Date; count: number }> {
     const map = new Map<string, number>();
     const intervalMs = interval === 'hour' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
 

@@ -211,10 +211,7 @@ export class UserController {
   @ApiOperation({ summary: 'Soft delete a user' })
   @ApiResponse({ status: 204, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async remove(
-    @Param('id') id: string,
-    @Request() req?: RequestWithUser,
-  ): Promise<void> {
+  async remove(@Param('id') id: string, @Request() req?: RequestWithUser): Promise<void> {
     return this.userService.remove(id, req?.user?.sub);
   }
 

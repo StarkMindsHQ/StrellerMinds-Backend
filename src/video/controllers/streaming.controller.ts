@@ -17,7 +17,7 @@ export class StreamingController {
   async getManifest(@Param('videoId') videoId: string, @Res() res: Response) {
     const video = await this.videoService.findOne(videoId);
     const url = await this.streamingService.getStreamUrl(video);
-    
+
     // In a real implementation, this would redirect to the CDN
     // res.redirect(url);
     return res.json({ streamUrl: url });

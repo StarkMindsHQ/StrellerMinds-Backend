@@ -16,7 +16,9 @@ export class AzureStorageService implements StorageProvider {
       `https://${process.env.AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net`,
       sharedKeyCredential,
     );
-    this.containerClient = this.blobServiceClient.getContainerClient(process.env.AZURE_STORAGE_CONTAINER);
+    this.containerClient = this.blobServiceClient.getContainerClient(
+      process.env.AZURE_STORAGE_CONTAINER,
+    );
   }
 
   async upload(buffer: Buffer, path: string, mimeType: string) {

@@ -1,5 +1,5 @@
-import speakeasy from "speakeasy";
-import QRCode from "qrcode";
+import speakeasy from 'speakeasy';
+import QRCode from 'qrcode';
 
 export class MFAService {
   static async generateSecret(userEmail: string) {
@@ -18,7 +18,7 @@ export class MFAService {
   static verifyToken(secret: string, token: string) {
     return speakeasy.totp.verify({
       secret,
-      encoding: "base32",
+      encoding: 'base32',
       token,
       window: 1,
     });

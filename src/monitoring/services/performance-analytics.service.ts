@@ -126,7 +126,10 @@ export class PerformanceAnalyticsService {
   /**
    * Get metrics in time range
    */
-  private async getMetricsInRange(timeRange: { start: Date; end: Date }): Promise<PerformanceMetric[]> {
+  private async getMetricsInRange(timeRange: {
+    start: Date;
+    end: Date;
+  }): Promise<PerformanceMetric[]> {
     return this.metricRepository.find({
       where: {
         timestamp: Between(timeRange.start, timeRange.end),

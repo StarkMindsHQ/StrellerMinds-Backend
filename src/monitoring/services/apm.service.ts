@@ -1,8 +1,16 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { PerformanceMetric, MetricType, MetricSeverity } from '../entities/performance-metric.entity';
-import { Transaction, PerformanceSnapshot, PerformanceThresholds } from '../interfaces/apm.interface';
+import {
+  PerformanceMetric,
+  MetricType,
+  MetricSeverity,
+} from '../entities/performance-metric.entity';
+import {
+  Transaction,
+  PerformanceSnapshot,
+  PerformanceThresholds,
+} from '../interfaces/apm.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as os from 'os';
 
@@ -38,7 +46,11 @@ export class ApmService {
   /**
    * Start a new transaction
    */
-  startTransaction(name: string, type: Transaction['type'], metadata?: Record<string, any>): string {
+  startTransaction(
+    name: string,
+    type: Transaction['type'],
+    metadata?: Record<string, any>,
+  ): string {
     const transactionId = `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const transaction: Transaction = {
       id: transactionId,
@@ -190,7 +202,8 @@ export class ApmService {
 
     return {
       activeTransactions: this.activeTransactions.size,
-      averageResponseTime: durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0,
+      averageResponseTime:
+        durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0,
       errorRate: recent.length > 0 ? (errors / recent.length) * 100 : 0,
       memoryUsage: latestSnapshot
         ? (latestSnapshot.memory.heapUsed / latestSnapshot.memory.heapTotal) * 100

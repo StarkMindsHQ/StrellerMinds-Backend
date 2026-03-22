@@ -46,7 +46,12 @@ import { FilesModule } from '../files/files.module';
     ]),
     FilesModule,
   ],
-  controllers: [AssignmentsController, SubmissionController, AssessmentsController, AttemptsController],
+  controllers: [
+    AssignmentsController,
+    SubmissionController,
+    AssessmentsController,
+    AttemptsController,
+  ],
   providers: [
     AssignmentsService,
     SubmissionService,
@@ -57,6 +62,12 @@ import { FilesModule } from '../files/files.module';
     QuestionsService,
     AttemptsService,
   ],
-  exports: [AssignmentsService, SubmissionService, GradingService, AssessmentsService, AttemptsService],
+  exports: [
+    AssignmentsService,
+    SubmissionService,
+    GradingService,
+    AssessmentsService,
+    AttemptsService,
+  ],
 })
 export class AssignmentModule {}

@@ -144,7 +144,7 @@ export const createDataSourceOptions = (): DataSourceOptions => {
     migrationsTableName: 'migrations',
 
     synchronize: false, // Never use synchronize in CLI
-  logger: new CustomTypeOrmLogger(),
+    logger: new CustomTypeOrmLogger(),
     logging: isDevelopment ? ['query', 'error', 'warn', 'migration'] : ['error', 'migration'],
     maxQueryExecutionTime: 200, // ms threshold for slow query logging
   };

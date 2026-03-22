@@ -307,9 +307,7 @@ export class BackupController {
   @ApiQuery({ name: 'hours', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Performance history retrieved' })
   async getPerformanceHistory(@Query('hours') hours?: number) {
-    return this.monitoringService.getPerformanceHistory(
-      hours ? Number(hours) : 24,
-    );
+    return this.monitoringService.getPerformanceHistory(hours ? Number(hours) : 24);
   }
 
   // === Recovery Verification ===
@@ -326,9 +324,7 @@ export class BackupController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Verification history retrieved' })
   async getVerificationHistory(@Query('limit') limit?: number) {
-    return this.verificationService.getRecoveryTestHistory(
-      limit ? Number(limit) : 50,
-    );
+    return this.verificationService.getRecoveryTestHistory(limit ? Number(limit) : 50);
   }
 
   @Get('verification/stats')

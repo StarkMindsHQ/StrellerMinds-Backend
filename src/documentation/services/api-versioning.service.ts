@@ -69,7 +69,11 @@ export class ApiVersioningService {
   /**
    * Deprecate version
    */
-  async deprecateVersion(versionId: string, deprecationDate: Date, sunsetDate: Date): Promise<void> {
+  async deprecateVersion(
+    versionId: string,
+    deprecationDate: Date,
+    sunsetDate: Date,
+  ): Promise<void> {
     const version = await this.versionRepository.findOne({ where: { id: versionId } });
     if (!version) {
       throw new Error('Version not found');

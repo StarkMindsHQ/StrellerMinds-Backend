@@ -219,7 +219,8 @@ export class CacheOptimizationService {
       operations: {
         get: l1Metrics.operations.get + l2Metrics.operations.get + l3Metrics.operations.get,
         set: l1Metrics.operations.set + l2Metrics.operations.set + l3Metrics.operations.set,
-        delete: l1Metrics.operations.delete + l2Metrics.operations.delete + l3Metrics.operations.delete,
+        delete:
+          l1Metrics.operations.delete + l2Metrics.operations.delete + l3Metrics.operations.delete,
       },
     };
 

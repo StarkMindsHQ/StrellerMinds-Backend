@@ -24,7 +24,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message:
         typeof exceptionResponse === 'string'
           ? exceptionResponse
-          : responseBody?.message ?? 'Error',
+          : (responseBody?.message ?? 'Error'),
       error: responseBody?.error ?? exception.name,
     };
 

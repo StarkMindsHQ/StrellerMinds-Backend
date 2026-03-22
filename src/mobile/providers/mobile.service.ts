@@ -8,12 +8,7 @@ export class MobileService {
   async getOptimizedFeed(userId: string, updatedSince?: string) {
     const query = this.dataSource
       .createQueryBuilder()
-      .select([
-        'item.id',
-        'item.title',
-        'item.thumbnail',
-        'item.updatedAt',
-      ])
+      .select(['item.id', 'item.title', 'item.thumbnail', 'item.updatedAt'])
       .from('items', 'item')
       .orderBy('item.updatedAt', 'DESC')
       .limit(20);

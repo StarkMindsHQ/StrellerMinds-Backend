@@ -24,10 +24,13 @@ export interface EndpointExample {
     contentType: string;
     example: any;
   };
-  responses: Record<string, {
-    description: string;
-    example: any;
-  }>;
+  responses: Record<
+    string,
+    {
+      description: string;
+      example: any;
+    }
+  >;
   codeExamples: CodeExample[];
 }
 
@@ -245,18 +248,13 @@ export class ApiExplorerService {
 
     const baseUrl = spec.servers?.[0]?.url || 'https://api.strellerminds.com';
 
-    const codeExamples = this.generateCodeExamples(
-      method,
-      path,
-      baseUrl,
-      {
-        parameters: endpoint.parameters,
-        requestBody: endpoint.requestBody?.content?.['application/json']?.example,
-        headers: {
-          Authorization: 'Bearer YOUR_TOKEN',
-        },
+    const codeExamples = this.generateCodeExamples(method, path, baseUrl, {
+      parameters: endpoint.parameters,
+      requestBody: endpoint.requestBody?.content?.['application/json']?.example,
+      headers: {
+        Authorization: 'Bearer YOUR_TOKEN',
       },
-    );
+    });
 
     return {
       method: method.toUpperCase(),
@@ -276,13 +274,16 @@ export class ApiExplorerService {
             example: endpoint.requestBody.content?.['application/json']?.example,
           }
         : undefined,
-      responses: Object.entries(endpoint.responses || {}).reduce((acc, [code, response]: [string, any]) => {
-        acc[code] = {
-          description: response.description || '',
-          example: response.content?.['application/json']?.example,
-        };
-        return acc;
-      }, {} as Record<string, any>),
+      responses: Object.entries(endpoint.responses || {}).reduce(
+        (acc, [code, response]: [string, any]) => {
+          acc[code] = {
+            description: response.description || '',
+            example: response.content?.['application/json']?.example,
+          };
+          return acc;
+        },
+        {} as Record<string, any>,
+      ),
       codeExamples,
     };
   }

@@ -8,9 +8,7 @@ import { NodeProgress } from '../learning-path/entities/node-progress.entity';
 import { LearningPathEnrollment } from '../learning-path/entities/learning-path-enrollment.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([NodeProgress, LearningPathEnrollment]),
-  ],
+  imports: [TypeOrmModule.forFeature([NodeProgress, LearningPathEnrollment])],
   controllers: [AiController],
   providers: [
     ContentRecommendationService,

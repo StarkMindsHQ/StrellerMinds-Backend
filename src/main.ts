@@ -28,22 +28,21 @@ async function bootstrap() {
 
   app.use(compression());
 
-
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:"],
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:'],
+        },
       },
-    },
-  })
-);
+    }),
+  );
 
-app.use(helmet.hsts({ maxAge: 31536000 }));
-app.use(helmet.frameguard({ action: "deny" }));
+  app.use(helmet.hsts({ maxAge: 31536000 }));
+  app.use(helmet.frameguard({ action: 'deny' }));
   // Enhanced security headers with custom configuration
   app.use(helmet(SECURITY_CONFIG.securityHeaders as Parameters<typeof helmet>[0]));
 
@@ -180,7 +179,10 @@ app.use(helmet.frameguard({ action: "deny" }));
     .addTag('Forum', 'Discussion forums and community')
     .addTag('Video', 'Video processing and streaming')
     .addTag('Integrations', 'Third-party integrations')
-    .addTag('Accessibility', 'WCAG 2.1 AA compliance, screen reader optimization, keyboard navigation, and accessibility monitoring')
+    .addTag(
+      'Accessibility',
+      'WCAG 2.1 AA compliance, screen reader optimization, keyboard navigation, and accessibility monitoring',
+    )
     .addTag('Developer Portal', 'API keys, SDKs, analytics, and developer tools')
     .build();
 
@@ -219,24 +221,22 @@ app.use(helmet.frameguard({ action: "deny" }));
       requestSnippetsEnabled: true,
       requestSnippets: {
         generators: {
-          'curl_bash': {
+          curl_bash: {
             title: 'cURL (bash)',
           },
-          'curl_powershell': {
+          curl_powershell: {
             title: 'cURL (PowerShell)',
           },
-          'javascript': {
+          javascript: {
             title: 'JavaScript',
           },
-          'python': {
+          python: {
             title: 'Python',
           },
         },
       },
     },
-    customJs: [
-      'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js',
-    ],
+    customJs: ['https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js'],
   });
 
   // Additional OpenAPI JSON endpoint with versioning

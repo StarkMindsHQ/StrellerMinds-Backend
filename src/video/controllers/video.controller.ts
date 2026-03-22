@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+  Request,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiConsumes, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { VideoService } from '../services/video.service';
@@ -16,9 +27,9 @@ export class VideoController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   create(
-    @Body() createVideoDto: CreateVideoDto, 
-    @UploadedFile() file: Express.Multer.File, 
-    @Request() req
+    @Body() createVideoDto: CreateVideoDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req,
   ) {
     // Fallback for user ID if auth middleware isn't fully configured in this context
     const userId = req.user?.id || 'anonymous-uploader';

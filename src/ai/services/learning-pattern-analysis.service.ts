@@ -34,9 +34,11 @@ export class LearningPatternAnalysisService {
 
     // Analyze time distribution
     const timeDistribution = this.analyzeTimeDistribution(progress);
-    
+
     // Analyze performance
-    const avgScore = progress.reduce((acc, p) => acc + (p.score || 0), 0) / (progress.filter(p => p.score).length || 1);
+    const avgScore =
+      progress.reduce((acc, p) => acc + (p.score || 0), 0) /
+      (progress.filter((p) => p.score).length || 1);
 
     if (avgScore < 60) {
       return {
@@ -70,13 +72,13 @@ export class LearningPatternAnalysisService {
   }
 
   private analyzeTimeDistribution(progress: NodeProgress[]) {
-    const weekendActivity = progress.filter(p => {
+    const weekendActivity = progress.filter((p) => {
       const day = p.updatedAt.getDay();
       return day === 0 || day === 6;
     }).length;
 
     return {
-      isWeekendHeavy: (weekendActivity / progress.length) > 0.6
+      isWeekendHeavy: weekendActivity / progress.length > 0.6,
     };
   }
 }

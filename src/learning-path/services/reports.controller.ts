@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Param, Delete, Res, Query, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Res,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ReportBuilderService } from './report-builder.service';
@@ -48,18 +59,18 @@ export class ReportsController {
   @Get('templates/:id/export')
   @ApiOperation({ summary: 'Export report to CSV/JSON' })
   async exportReport(
-    @Param('id') id: string, 
+    @Param('id') id: string,
     @Query('format') format: ExportFormat,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     const template = await this.reportBuilder.findOne(id);
     const buffer = await this.reportGenerator.exportReport(template, format);
-    
+
     res.set({
       'Content-Type': format === ExportFormat.CSV ? 'text/csv' : 'application/json',
       'Content-Disposition': `attachment; filename="${template.name}.${format.toLowerCase()}"`,
     });
-    
+
     res.send(buffer);
   }
 

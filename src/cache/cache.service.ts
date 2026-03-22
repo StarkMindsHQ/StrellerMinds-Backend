@@ -8,11 +8,7 @@ export class CacheService {
 
   constructor(private readonly redis: RedisService) {}
 
-  async getOrSet<T>(
-    key: string,
-    handler: () => Promise<T>,
-    ttl = 60,
-  ): Promise<T> {
+  async getOrSet<T>(key: string, handler: () => Promise<T>, ttl = 60): Promise<T> {
     const cached = await this.redis.get<T>(key);
 
     if (cached) {
@@ -40,10 +36,7 @@ export class CacheService {
     return {
       hits: this.hits,
       misses: this.misses,
-      hitRate:
-        this.hits + this.misses === 0
-          ? 0
-          : (this.hits / (this.hits + this.misses)) * 100,
+      hitRate: this.hits + this.misses === 0 ? 0 : (this.hits / (this.hits + this.misses)) * 100,
     };
   }
 }

@@ -18,7 +18,10 @@ export class ApiKeyService {
   /**
    * Create a new API key
    */
-  async createApiKey(userId: string, dto: CreateApiKeyDto): Promise<{ apiKey: string; response: ApiKeyResponseDto }> {
+  async createApiKey(
+    userId: string,
+    dto: CreateApiKeyDto,
+  ): Promise<{ apiKey: string; response: ApiKeyResponseDto }> {
     // Generate API key
     const rawKey = this.generateApiKey();
     const hashedKey = await bcrypt.hash(rawKey, 10);

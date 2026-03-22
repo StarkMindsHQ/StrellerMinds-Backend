@@ -162,7 +162,10 @@ export class LoadTestingService {
         timeout: 10000,
       };
 
-      if (config.body && (config.method === 'POST' || config.method === 'PUT' || config.method === 'PATCH')) {
+      if (
+        config.body &&
+        (config.method === 'POST' || config.method === 'PUT' || config.method === 'PATCH')
+      ) {
         requestConfig.data = config.body;
       }
 

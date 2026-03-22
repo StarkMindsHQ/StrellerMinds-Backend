@@ -111,7 +111,7 @@ export class FilesService {
   async getFile(id: string, userId: string, versionNumber?: number) {
     const file = await this.repo.findOne({
       where: { id },
-      relations: ['versions']
+      relations: ['versions'],
     });
     if (!file) throw new NotFoundException('File not found');
 
@@ -167,7 +167,12 @@ export class FilesService {
     return { message: 'File and all versions deleted successfully' };
   }
 
-  async shareFile(id: string, requesterId: string, targetUserId: string, permission: 'READ' | 'WRITE' | 'DELETE' | 'SHARE' = 'READ') {
+  async shareFile(
+    id: string,
+    requesterId: string,
+    targetUserId: string,
+    permission: 'READ' | 'WRITE' | 'DELETE' | 'SHARE' = 'READ',
+  ) {
     const file = await this.repo.findOne({ where: { id } });
     if (!file) throw new NotFoundException();
 
@@ -187,7 +192,10 @@ export class FilesService {
       await this.permissionRepo.save(newPerm);
     }
 
-    await this.logAnalytics(this.analyticsRepo, id, requesterId, 'SHARE', { sharedWith: targetUserId, permission });
+    await this.logAnalytics(this.analyticsRepo, id, requesterId, 'SHARE', {
+      sharedWith: targetUserId,
+      permission,
+    });
 
     return { message: `File shared with user ${targetUserId} with ${permission} permission` };
   }
@@ -219,7 +227,9 @@ export class FilesService {
     file.currentVersion = version.versionNumber;
     await this.repo.save(file);
 
-    await this.logAnalytics(this.analyticsRepo, id, userId, 'UPLOAD', { restoredFrom: versionNumber });
+    await this.logAnalytics(this.analyticsRepo, id, userId, 'UPLOAD', {
+      restoredFrom: versionNumber,
+    });
 
     return file;
   }

@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { ApmService } from '../services/apm.service';
@@ -25,16 +19,12 @@ export class PerformanceInterceptor implements NestInterceptor {
     const endpoint = url.split('?')[0]; // Remove query params
 
     // Start transaction
-    const transactionId = this.apmService.startTransaction(
-      `${method} ${endpoint}`,
-      'http',
-      {
-        endpoint,
-        method,
-        userId: request.user?.id,
-        ip: request.ip,
-      },
-    );
+    const transactionId = this.apmService.startTransaction(`${method} ${endpoint}`, 'http', {
+      endpoint,
+      method,
+      userId: request.user?.id,
+      ip: request.ip,
+    });
 
     const startTime = Date.now();
 

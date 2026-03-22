@@ -35,8 +35,9 @@ export class VideoService {
     // However, for transcoding we need a local path usually, or a signed URL if ffmpeg supports it.
     // FilesService uploads to S3/Storage.
 
-    // We will save to a temp file for transcoding first.
-    const tempInputPath = path.join(os.tmpdir(), `${uuid()}-${file.originalname}`);
+    // Normalize user-supplied filename to prevent path traversal and injection.
+    const safeOriginalName = path.basename(file.originalname);
+    const tempInputPath = path.join(os.tmpdir(), `${uuid()}-${safeOriginalName}`);
     await fs.promises.writeFile(tempInputPath, file.buffer);
 
     const videoId = uuid();
@@ -66,7 +67,10 @@ export class VideoService {
   }
 
   async trackProgress(videoId: string, userId: string, progressDto: any) {
-    let analytics = await this.analyticsRepo.findOne({ where: { video: { id: videoId } }, relations: ['video'] });
+    let analytics = await this.analyticsRepo.findOne({
+      where: { video: { id: videoId } },
+      relations: ['video'],
+    });
     if (!analytics) {
       analytics = this.analyticsRepo.create({ video: { id: videoId } });
     }
@@ -74,16 +78,17 @@ export class VideoService {
   }
 
   async findAll(ownerId?: string): Promise<Video[]> {
-    const query = this.videoRepo.createQueryBuilder('video')
+    const query = this.videoRepo
+      .createQueryBuilder('video')
       .leftJoinAndSelect('video.variants', 'variants')
       .leftJoinAndSelect('video.analytics', 'analytics')
       .leftJoinAndSelect('video.chapters', 'chapters')
       .leftJoinAndSelect('video.quizzes', 'quizzes');
-      
+
     if (ownerId) {
       query.where('video.ownerId = :ownerId', { ownerId });
     }
-    
+
     return query.getMany();
   }
 
@@ -109,7 +114,8 @@ export class VideoService {
 
   private async processVideo(videoId: string, inputPath: string, ownerId: string) {
     try {
-      const outputDir = `videos/${videoId}/hls`;
+      const safeVideoId = path.basename(videoId);
+      const outputDir = path.join('videos', safeVideoId, 'hls');
       const manifestPath = await this.transcodingService.transcodeToHls(inputPath, outputDir);
 
       await this.videoRepo.update(videoId, {

@@ -1,9 +1,9 @@
-import { body, validationResult } from "express-validator";
-import xss from "xss";
+import { body, validationResult } from 'express-validator';
+import xss from 'xss';
 
 export const validateLogin = [
-  body("email").isEmail().normalizeEmail(),
-  body("password").isLength({ min: 8 }),
+  body('email').isEmail().normalizeEmail(),
+  body('password').isLength({ min: 8 }),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
