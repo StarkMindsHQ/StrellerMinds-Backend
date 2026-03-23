@@ -351,36 +351,71 @@ export class AuthService {
     await this.refreshTokenRepository.update({ userId }, { isRevoked: true });
   }
 
-  async forgotPassword(email: string): Promise<void> {
+  async forgotPassword(
+    email: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<void> {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
-      // Don't reveal if user exists
+      await this.securityAuditService.log(
+        null,
+        SecurityEvent.PASSWORD_RESET_REQUEST,
+        ipAddress,
+        userAgent,
+        { 
+          email, 
+          reason: 'User not found' 
+        },
+      );
       return;
     }
 
-    const resetToken = uuidv4();
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+
     const resetTokenExpiry = new Date();
-    resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1); // 1 hour expiry
+    resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1);
 
     await this.userRepository.update(user.id, {
-      passwordResetToken: resetToken,
+      passwordResetToken: tokenHash,
       passwordResetExpires: resetTokenExpiry,
     });
 
-    // TODO: Send email with reset token
-    this.logger.log(`Password reset token for ${email}: ${resetToken}`);
+    await this.securityAuditService.log(
+      user.id,
+      SecurityEvent.PASSWORD_RESET_REQUEST,
+      ipAddress,
+      userAgent,
+    );
+
+   // Note to future dev: you would send the plain text resetToken via email
   }
 
-  async resetPassword(resetToken: string, newPassword: string): Promise<void> {
+  async resetPassword(
+    resetToken: string,
+    newPassword: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<void> {
+    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+
     const user = await this.userRepository.findOne({
       where: {
-        passwordResetToken: resetToken,
+        passwordResetToken: tokenHash,
         passwordResetExpires: MoreThan(new Date()),
       },
     });
 
     if (!user) {
+      await this.securityAuditService.log(
+        null,
+        SecurityEvent.PASSWORD_RESET_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Invalid or expired token' },
+      );
       throw new Error('Invalid or expired reset token');
     }
 
@@ -389,6 +424,13 @@ export class AuthService {
       newPassword,
     );
     if (isUsedRecently) {
+      await this.securityAuditService.log(
+        user.id,
+        SecurityEvent.PASSWORD_RESET_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Password used recently' },
+      );
       throw new Error('Password has been used recently');
     }
 
@@ -401,6 +443,13 @@ export class AuthService {
       passwordResetToken: null,
       passwordResetExpires: null,
     });
+
+    await this.securityAuditService.log(
+      user.id,
+      SecurityEvent.PASSWORD_RESET_SUCCESS,
+      ipAddress,
+      userAgent,
+    );
 
     // Revoke all refresh tokens for this user
     await this.refreshTokenRepository.update({ userId: user.id }, { isRevoked: true });
