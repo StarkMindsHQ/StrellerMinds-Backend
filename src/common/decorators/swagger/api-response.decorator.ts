@@ -1,6 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { ApiResponse as IApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiOperation, ApiResponse as IApiResponse } from '@nestjs/swagger';
 
 export interface ApiErrorResponseOptions {
   status: number;
