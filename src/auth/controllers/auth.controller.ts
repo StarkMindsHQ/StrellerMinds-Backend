@@ -66,6 +66,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto, @Request() req: ExpressRequest) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
@@ -80,6 +81,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: 200, description: 'Logout successful' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   async logout(@Body() body: { refreshToken: string }) {
     return this.authService.logout(body.refreshToken);
   }
@@ -113,13 +115,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Reset password' })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
   @ApiResponse({ status: 400, description: 'Invalid reset token' })
-  @Throttle({ 
-    default: 
-    { 
-      limit: 5, 
-      ttl: 60000 
-    } 
-  })
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto, @Request() req: ExpressRequest) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
@@ -138,6 +134,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Verify email address' })
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @ApiResponse({ status: 400, description: 'Invalid verification token' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     await this.authService.verifyEmail(verifyEmailDto.verificationToken);
     return { message: 'Email verified successfully' };
@@ -150,6 +147,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Change password' })
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute
   async changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
     @Request() req: ExpressRequest & { user: UserResponse },
