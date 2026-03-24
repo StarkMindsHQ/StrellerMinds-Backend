@@ -13,6 +13,7 @@ import { PasswordHistoryService } from './password-history.service';
 import { SecurityEvent } from '../entities/security-audit.entity';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
+import { EmailService } from './email.service';
 
 // Type for user response without sensitive data
 export type UserResponse = Omit<User, 'password'> & {
@@ -33,6 +34,7 @@ export class AuthService {
     private readonly twoFactorAuthService: TwoFactorAuthService,
     private readonly securityAuditService: SecurityAuditService,
     private readonly passwordHistoryService: PasswordHistoryService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<{ user: UserResponse; message: string }> {
@@ -368,8 +370,7 @@ export class AuthService {
       passwordResetExpires: resetTokenExpiry,
     });
 
-    // TODO: Send email with reset token
-    this.logger.log(`Password reset token for ${email}: ${resetToken}`);
+    await this.emailService.sendPasswordResetEmail(email, resetToken);
   }
 
   async resetPassword(resetToken: string, newPassword: string): Promise<void> {
