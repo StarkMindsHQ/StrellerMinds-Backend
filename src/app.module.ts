@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import Redis from 'ioredis';
@@ -111,6 +112,7 @@ import { StorageModule } from './storage/storage.module';
       }),
     }),
     ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
 
     // Feature modules (alphabetical)
     AccessibilityModule,

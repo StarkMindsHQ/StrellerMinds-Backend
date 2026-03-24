@@ -19,6 +19,8 @@ import { ContentCollaborationService } from './services/content-collaboration.se
 import { ContentApprovalService } from './services/content-approval.service';
 import { ContentAnalyticsService } from './services/content-analytics.service';
 import { Module } from '@nestjs/common/decorators';
+import { CourseEventHandlers } from './events/course.event-handlers';
+import { CourseFacade } from './course.facade';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { Module } from '@nestjs/common/decorators';
   controllers: [CourseController, ContentManagementController],
   providers: [
     CourseService,
+    CourseFacade,
+    CourseEventHandlers,
     ContentManagementService,
     ContentVersioningService,
     ContentCollaborationService,
@@ -46,6 +50,7 @@ import { Module } from '@nestjs/common/decorators';
     ContentAnalyticsService,
   ],
   exports: [
+    CourseFacade,
     ContentManagementService,
     ContentVersioningService,
     ContentCollaborationService,

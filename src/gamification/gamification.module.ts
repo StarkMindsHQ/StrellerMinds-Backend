@@ -8,11 +8,12 @@ import { Challenge } from './entities/challenge.entity';
 import { GamificationService } from './gamification.service';
 import { GamificationController } from './gamification.controller';
 import { GamificationSeeder } from './gamification-seeder.service';
+import { GamificationEventHandlers } from './events/gamification.event-handlers';
 
 @Module({
   imports: [TypeOrmModule.forFeature([GamificationProfile, Badge, UserBadge, Reward, Challenge])],
   controllers: [GamificationController],
-  providers: [GamificationService, GamificationSeeder],
+  providers: [GamificationService, GamificationSeeder, GamificationEventHandlers],
   exports: [GamificationService],
 })
 export class GamificationModule {}
