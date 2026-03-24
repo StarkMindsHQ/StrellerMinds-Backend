@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { InjectDataSource } from '@nestjs/typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+
 import { DataSource, Repository } from 'typeorm';
 import { QueryOptimization, OptimizationStatus } from '../entities/query-optimization.entity';
 import { QueryAnalysis } from '../interfaces/apm.interface';

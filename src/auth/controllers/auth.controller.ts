@@ -16,7 +16,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import { AuthService, UserResponse } from '../services/auth.service';
-import { JwtAuthGuard } from '../guards/auth.guard';
+import { JwtAuthGuard, Roles } from '../guards/auth.guard';
 import {
   RegisterDto,
   LoginDto,
@@ -26,7 +26,7 @@ import {
   VerifyEmailDto,
   ChangePasswordDto,
 } from '../dto/auth.dto';
-import { Roles } from '../guards/auth.guard';
+
 import { UserRole } from '../entities/user.entity';
 
 @ApiTags('Authentication')

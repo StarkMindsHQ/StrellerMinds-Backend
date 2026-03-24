@@ -3,8 +3,8 @@
  * Defines, manages and executes multi-step integration workflows
  */
 
-import { generateId, sleep } from '../core/base';
-import { IntegrationEvent } from '../core/base';
+import { generateId, sleep, IntegrationEvent } from '../core/base';
+
 import { globalEventBus, IntegrationEventBus } from './evemt.bus';
 
 // ─── Workflow Types ───────────────────────────────────────────────────────────
