@@ -24,6 +24,19 @@ export class EmailService {
     });
   }
 
+  async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
+    const resetUrl = `${this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000')}/auth/reset-password?token=${resetToken}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Reset Your StrellerMinds Password',
+      template: 'reset-password',
+      context: {
+        resetUrl,
+      },
+    });
+  }
+
   async sendPasswordReset(user: User, token: string): Promise<void> {
     const resetUrl = `${this.configService.get<string>('FRONTEND_URL', 'http://localhost:3000')}/auth/reset-password?token=${token}`;
 
@@ -65,12 +78,26 @@ export class EmailService {
   async sendSecurityAlert(user: User, alert: string): Promise<void> {
     await this.mailerService.sendMail({
       to: user.email,
-      subject: 'StrellerMinds Security Alert',
+      subject: 'Security Alert for Your StrellerMinds Account',
       template: 'security-alert',
       context: {
         firstName: user.firstName,
         alert,
-        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  async sendInvoice(email: string, invoice: any, subject: string, message: string): Promise<void> {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: subject || 'Invoice from StrellerMinds',
+      template: 'invoice',
+      context: {
+        invoiceNumber: invoice.invoiceNumber,
+        amount: invoice.total,
+        dueDate: invoice.dueDate,
+        customerName: invoice.customerName || email,
+        message: message,
       },
     });
   }

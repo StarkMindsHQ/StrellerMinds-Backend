@@ -13,6 +13,7 @@ import { PasswordHistoryService } from './password-history.service';
 import { SecurityEvent } from '../entities/security-audit.entity';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
+import { EmailService } from './email.service';
 
 // Type for user response without sensitive data
 export type UserResponse = Omit<User, 'password'> & {
@@ -33,6 +34,7 @@ export class AuthService {
     private readonly twoFactorAuthService: TwoFactorAuthService,
     private readonly securityAuditService: SecurityAuditService,
     private readonly passwordHistoryService: PasswordHistoryService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<{ user: UserResponse; message: string }> {
@@ -387,7 +389,7 @@ export class AuthService {
       userAgent,
     );
 
-    // Note to future dev: you would send the plain text resetToken via email
+    await this.emailService.sendPasswordResetEmail(email, resetToken);
   }
 
   async resetPassword(
@@ -399,7 +401,7 @@ export class AuthService {
     if (!resetToken || !resetToken.includes(':')) {
       throw new Error('Invalid or expired reset token');
     }
-    
+
     const [userId, rawToken] = resetToken.split(':');
 
     const user = await this.userRepository.findOne({
