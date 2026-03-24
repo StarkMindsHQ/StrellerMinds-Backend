@@ -351,11 +351,7 @@ export class AuthService {
     await this.refreshTokenRepository.update({ userId }, { isRevoked: true });
   }
 
-  async forgotPassword(
-    email: string,
-    ipAddress?: string,
-    userAgent?: string,
-  ): Promise<void> {
+  async forgotPassword(email: string, ipAddress?: string, userAgent?: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
@@ -364,16 +360,17 @@ export class AuthService {
         SecurityEvent.PASSWORD_RESET_REQUEST,
         ipAddress,
         userAgent,
-        { 
-          email, 
-          reason: 'User not found' 
+        {
+          email,
+          reason: 'User not found',
         },
       );
       return;
     }
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = await this.bcryptService.hash(rawToken);
+    const resetToken = `${user.id}:${rawToken}`;
 
     const resetTokenExpiry = new Date();
     resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1);
@@ -390,7 +387,7 @@ export class AuthService {
       userAgent,
     );
 
-   // Note to future dev: you would send the plain text resetToken via email
+    // Note to future dev: you would send the plain text resetToken via email
   }
 
   async resetPassword(
@@ -399,18 +396,34 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string,
   ): Promise<void> {
-    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    if (!resetToken || !resetToken.includes(':')) {
+      throw new Error('Invalid or expired reset token');
+    }
+    
+    const [userId, rawToken] = resetToken.split(':');
 
     const user = await this.userRepository.findOne({
       where: {
-        passwordResetToken: tokenHash,
+        id: userId,
         passwordResetExpires: MoreThan(new Date()),
       },
     });
 
-    if (!user) {
+    if (!user || !user.passwordResetToken) {
       await this.securityAuditService.log(
         null,
+        SecurityEvent.PASSWORD_RESET_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Invalid or expired token' },
+      );
+      throw new Error('Invalid or expired reset token');
+    }
+
+    const isTokenValid = await this.bcryptService.compare(rawToken, user.passwordResetToken);
+    if (!isTokenValid) {
+      await this.securityAuditService.log(
+        user.id,
         SecurityEvent.PASSWORD_RESET_FAILED,
         ipAddress,
         userAgent,

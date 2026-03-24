@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SecurityIncident } from './security-incident.entity';
-import { IncidentSeverity } from './security-incident.entity';
+import { SecurityIncident, IncidentSeverity } from './security-incident.entity';
+
 @Injectable()
 export class SecurityResponseService {
   private readonly logger = new Logger(SecurityResponseService.name);
