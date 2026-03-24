@@ -41,6 +41,7 @@ interface RelationshipAnalysis {
   nullable?: boolean;
   hasJoinColumn: boolean;
   hasIndex: boolean;
+  hasJoinTable?: boolean;
   line?: number;
 }
 
@@ -164,6 +165,7 @@ class EntityStandardizer {
           type: 'ManyToMany',
           targetEntity: manyToManyMatch[1],
           cascade: this.extractCascade(line),
+          hasJoinColumn: false, // ManyToMany doesn't use JoinColumn
           hasJoinTable: content.includes('@JoinTable'),
           hasIndex: this.hasIndex(content, manyToManyMatch[2]),
           line: index + 1,
@@ -208,7 +210,7 @@ class EntityStandardizer {
       }
 
       // Check for missing JoinTable in ManyToMany
-      if (rel.type === 'ManyToMany' && !rel.hasJoinTable) {
+      if (rel.type === 'ManyToMany' && !(rel as any).hasJoinTable) {
         issues.push(`❌ Missing @JoinTable for ${rel.propertyName} (ManyToMany)`);
       }
 
