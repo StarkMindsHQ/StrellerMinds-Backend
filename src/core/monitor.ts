@@ -5,6 +5,7 @@
 
 import { BaseIntegration, IntegrationHealth, IntegrationStatus, sleep } from '../core/base';
 import { globalEventBus } from './evemt.bus';
+import { Logger } from '@nestjs/common';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,6 +79,7 @@ export class IntegrationMonitor {
   private consecutiveFailures = new Map<string, number>();
   private timers = new Map<string, NodeJS.Timeout>();
   private config: MonitoringConfig;
+  private readonly logger = new Logger(IntegrationMonitor.name);
 
   constructor(config?: Partial<MonitoringConfig>) {
     this.config = {
@@ -274,7 +276,7 @@ export class IntegrationMonitor {
       alert,
     });
 
-    console.warn(`[ALERT] [${severity.toUpperCase()}] ${integrationId}: ${message}`);
+    this.logger.warn(`[ALERT] [${severity.toUpperCase()}] ${integrationId}: ${message}`);
   }
 
   private resolveAlert(integrationId: string, type: AlertType): void {

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { join } from 'path';
 import * as fs from 'fs';
+import { AppLogger } from '../../logging/logger.service';
 
 /**
  * Supported languages in the system
@@ -28,6 +29,7 @@ export const SUPPORTED_LANGUAGES = {
 export class I18nService {
   private translations: Map<string, any> = new Map();
   private defaultLanguage = 'en';
+  private readonly logger = new AppLogger(I18nService.name);
 
   constructor() {
     this.loadTranslations();
@@ -40,7 +42,7 @@ export class I18nService {
     const translationsPath = join(__dirname, '../translations');
 
     if (!fs.existsSync(translationsPath)) {
-      console.warn(`Translations directory not found at ${translationsPath}`);
+      this.logger.warn(`Translations directory not found at ${translationsPath}`);
       return;
     }
 
@@ -52,7 +54,7 @@ export class I18nService {
           this.translations.set(lang, JSON.parse(content));
         }
       } catch (error) {
-        console.error(`Failed to load translation for language ${lang}:`, error);
+        this.logger.error(`Failed to load translation for language ${lang}:`, error.stack, { language: lang });
       }
     }
   }
@@ -84,7 +86,7 @@ export class I18nService {
     }
 
     if (!value) {
-      console.warn(`Translation key not found: ${key} for language ${normalizedLang}`);
+      this.logger.warn(`Translation key not found: ${key} for language ${normalizedLang}`);
       return key;
     }
 

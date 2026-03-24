@@ -74,6 +74,7 @@ import { MonitoringModule } from './monitoring/monitoring.module';
 import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
 import { CoreModule } from './core/core.module';
 import { StorageModule } from './storage/storage.module';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
@@ -135,6 +136,7 @@ import { StorageModule } from './storage/storage.module';
     MonitoringModule,
     CoreModule,
     StorageModule,
+    LoggingModule,
   ],
   providers: [
     {
