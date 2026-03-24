@@ -18,7 +18,10 @@ export class TodoTracker {
   private static logger = new Logger();
   private static readonly todos: Map<string, TodoItem> = new Map();
 
-  static createTodo(item: Omit<TodoItem, 'id' | 'createdAt' | 'updatedAt'> & { status?: TodoItem['status'] }, options: Partial<TodoItem> = {}): string {
+  static createTodo(
+    item: Omit<TodoItem, 'id' | 'createdAt' | 'updatedAt'> & { status?: TodoItem['status'] },
+    options: Partial<TodoItem> = {},
+  ): string {
     const id = `TODO-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const todo: TodoItem = {
       ...item,
@@ -30,8 +33,11 @@ export class TodoTracker {
     };
 
     this.todos.set(id, todo);
-    this.logger.warn(`📝 TODO Created: ${todo.description} (${todo.file}:${todo.line})`, 'TodoTracker');
-    
+    this.logger.warn(
+      `📝 TODO Created: ${todo.description} (${todo.file}:${todo.line})`,
+      'TodoTracker',
+    );
+
     return id;
   }
 
@@ -53,17 +59,17 @@ export class TodoTracker {
   }
 
   static getOpenTodos(): TodoItem[] {
-    return Array.from(this.todos.values()).filter(todo => todo.status === 'open');
+    return Array.from(this.todos.values()).filter((todo) => todo.status === 'open');
   }
 
   static getTodosByPriority(priority: TodoItem['priority']): TodoItem[] {
-    return Array.from(this.todos.values()).filter(todo => todo.priority === priority);
+    return Array.from(this.todos.values()).filter((todo) => todo.priority === priority);
   }
 
   static getOverdueTodos(): TodoItem[] {
     const now = new Date();
-    return Array.from(this.todos.values()).filter(todo => 
-      todo.dueDate && todo.dueDate < now && todo.status !== 'completed'
+    return Array.from(this.todos.values()).filter(
+      (todo) => todo.dueDate && todo.dueDate < now && todo.status !== 'completed',
     );
   }
 
@@ -110,7 +116,7 @@ This TODO was automatically generated from the codebase. Please review the imple
 
   static async createGitHubIssues(): Promise<void> {
     const openTodos = this.getOpenTodos();
-    
+
     for (const todo of openTodos) {
       try {
         // In a real implementation, this would use GitHub API
@@ -119,14 +125,17 @@ This TODO was automatically generated from the codebase. Please review the imple
         //   body: this.generateGitHubIssue(todo),
         //   labels: ['todo', todo.priority, 'automated'],
         // });
-        
+
         this.logger.info(`📋 GitHub Issue Created: ${todo.description}`, 'TodoTracker');
-        this.updateTodo(todo.id, { 
-          status: 'in-progress', 
-          issueUrl: `https://github.com/issues/${todo.id}` 
+        this.updateTodo(todo.id, {
+          status: 'in-progress',
+          issueUrl: `https://github.com/issues/${todo.id}`,
         });
       } catch (error) {
-        this.logger.error(`Failed to create GitHub issue for ${todo.id}: ${error.message}`, 'TodoTracker');
+        this.logger.error(
+          `Failed to create GitHub issue for ${todo.id}: ${error.message}`,
+          'TodoTracker',
+        );
       }
     }
   }
@@ -134,13 +143,13 @@ This TODO was automatically generated from the codebase. Please review the imple
   static scanCodeForTodos(filePath: string, content: string): void {
     const lines = content.split('\n');
     const todoRegex = /\/\/\s*TODO\s*:?\s*(.+)/i;
-    
+
     lines.forEach((line, index) => {
       const match = line.match(todoRegex);
       if (match) {
         const description = match[1].trim();
         const priority = this.extractPriority(description);
-        
+
         this.createTodo({
           file: filePath,
           line: index + 1,
@@ -165,28 +174,38 @@ This TODO was automatically generated from the codebase. Please review the imple
           return 'medium';
       }
     }
-    
+
     // Auto-detect priority based on keywords
-    if (description.toLowerCase().includes('security') || description.toLowerCase().includes('critical')) {
+    if (
+      description.toLowerCase().includes('security') ||
+      description.toLowerCase().includes('critical')
+    ) {
       return 'high';
     }
-    if (description.toLowerCase().includes('implement') || description.toLowerCase().includes('add')) {
+    if (
+      description.toLowerCase().includes('implement') ||
+      description.toLowerCase().includes('add')
+    ) {
       return 'medium';
     }
-    
+
     return 'low';
   }
 }
 
 // Global TODO tracking function
-export function trackTODO(description: string, priority: TodoItem['priority'] = 'medium', options: Partial<TodoItem> = {}): void {
+export function trackTODO(
+  description: string,
+  priority: TodoItem['priority'] = 'medium',
+  options: Partial<TodoItem> = {},
+): void {
   const stack = new Error().stack;
   const fileMatch = stack?.match(/at.*\(([^)]+)\)/)?.[1]?.split(':');
-  
+
   if (fileMatch) {
     const filePath = fileMatch[0];
     const lineNumber = parseInt(fileMatch[1]) || 0;
-    
+
     TodoTracker.createTodo({
       ...options,
       file: filePath,
