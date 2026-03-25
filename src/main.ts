@@ -11,6 +11,7 @@ import * as Sentry from '@sentry/node';
 import { Logger } from 'winston';
 import * as compression from 'compression';
 import { PerformanceInterceptor } from './common/interceptors/performance.interceptor';
+import { json, urlencoded } from 'express';
 
 async function bootstrap() {
   // Sentry: only init when a valid DSN is set (skip placeholder or empty)
@@ -26,6 +27,8 @@ async function bootstrap() {
     logger: WinstonModule.createLogger(winstonConfig),
   });
 
+  app.use(json({ limit: '1mb' }));
+  app.use(urlencoded({ extended: true, limit: '1mb' }));
   app.use(compression());
 
   app.use(
