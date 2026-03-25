@@ -22,6 +22,42 @@ import { WebhookLoggingInterceptor } from '../../webhook/interceptors/webhook-lo
 import { SetWebhookProvider } from '../../webhook/decorators/webhook-provider.decorator';
 import { WebhookProvider } from '../../webhook/interfaces/webhook.interfaces';
 
+/**
+ * Payment Webhook Controller
+ *
+ * Handles webhook events from payment providers including Stripe and PayPal.
+ * Processes payment status updates, subscription changes, and billing events.
+ * Integrates with webhook security system for comprehensive protection.
+ *
+ * Business Logic:
+ * 1. Validates webhook signatures and prevents replay attacks
+ * 2. Processes payment events and updates database records
+ * 3. Handles subscription lifecycle events
+ * 4. Maintains payment state synchronization
+ * 5. Provides audit trails for financial operations
+ *
+ * Payment Event Processing:
+ * - Payment intents (succeeded, failed, canceled)
+ * - Subscription events (created, updated, deleted)
+ * - Invoice events (payment_succeeded, payment_failed)
+ * - Customer events (created, updated, deleted)
+ *
+ * Security Features:
+ * - Signature validation through WebhookAuthGuard
+ * - Replay attack prevention
+ * - Rate limiting enforcement
+ * - Comprehensive logging and monitoring
+ *
+ * @example
+ * ```typescript
+ * // Stripe webhook event flow:
+ * 1. WebhookAuthGuard validates signature
+ * 2. Event is processed based on type
+ * 3. Database records are updated
+ * 4. Audit trail is created
+ * 5. Response sent to provider
+ * ```
+ */
 @Controller('webhooks')
 @UseInterceptors(WebhookLoggingInterceptor)
 export class WebhookController {
@@ -33,11 +69,51 @@ export class WebhookController {
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
   ) {
+    // Initialize Stripe client with API version
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
       apiVersion: '2025-12-15.acacia' as any,
     });
   }
 
+  /**
+   * Handles Stripe webhook events
+   *
+   * Event Processing Algorithm:
+   * 1. Security validation (handled by WebhookAuthGuard)
+   * 2. Event type identification and routing
+   * 3. Business logic execution
+   * 4. Database state updates
+   * 5. Audit logging
+   *
+   * Supported Event Types:
+   * - payment_intent.succeeded: Update payment status to COMPLETED
+   * - payment_intent.payment_failed: Update payment status to FAILED
+   * - payment_intent.canceled: Update payment status to CANCELED
+   * - invoice.payment_succeeded: Update subscription status
+   * - invoice.payment_failed: Handle failed subscription payments
+   * - customer.subscription.created: Create new subscription record
+   * - customer.subscription.updated: Update subscription details
+   * - customer.subscription.deleted: Cancel subscription
+   *
+   * Business Rules:
+   * - Payment status changes trigger notification workflows
+   * - Subscription failures trigger retry mechanisms
+   * - Customer updates maintain data synchronization
+   * - All events create audit trails for compliance
+   *
+   * @param request - HTTP request with validated webhook payload
+   * @returns Confirmation response to Stripe
+   *
+   * @example
+   * ```typescript
+   * // Payment success flow:
+   * 1. Stripe sends payment_intent.succeeded event
+   * 2. Guard validates signature and prevents replay
+   * 3. Payment record is updated to COMPLETED status
+   * 4. User notifications are triggered
+   * 5. Audit log records the transaction
+   * ```
+   */
   @Post('stripe')
   @HttpCode(HttpStatus.OK)
   @UseGuards(WebhookAuthGuard)

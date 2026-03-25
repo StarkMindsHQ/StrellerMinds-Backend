@@ -32,7 +32,7 @@
     "seed": "ts-node -r tsconfig-paths/register src/database/seeds/seed.command.ts",
     "backup": "bash scripts/backup.sh",
     "backup:restore": "bash scripts/restore.sh",
-    "docs:generate": "./scripts/generate-docs.sh",
+    "docs:generate": "node scripts/generate-docs.js",
     "docs:serve": "npm run start:prod && echo 'API Docs available at http://localhost:3000/api/docs'",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
     "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
