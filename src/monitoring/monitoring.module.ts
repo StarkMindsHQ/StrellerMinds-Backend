@@ -13,6 +13,7 @@ import { PerformanceTuningService } from './services/performance-tuning.service'
 import { PerformanceAnalyticsService } from './services/performance-analytics.service';
 import { LoadTestingService } from './services/load-testing.service';
 import { OptimizationRecommendationsService } from './services/optimization-recommendations.service';
+import { RealTimeMonitoringService } from './services/real-time-monitoring.service';
 import { MonitoringController } from './controllers/monitoring.controller';
 import { PerformanceInterceptor } from './interceptors/performance.interceptor';
 import { DatabaseModule } from '../database/database.module';
@@ -38,6 +39,7 @@ import { DatabaseModule } from '../database/database.module';
     LoadTestingService,
     OptimizationRecommendationsService,
     PerformanceInterceptor,
+    RealTimeMonitoringService,
   ],
   exports: [
     ApmService,
@@ -47,6 +49,7 @@ import { DatabaseModule } from '../database/database.module';
     PerformanceAnalyticsService,
     LoadTestingService,
     OptimizationRecommendationsService,
+    RealTimeMonitoringService,
   ],
 })
 export class MonitoringModule {}
