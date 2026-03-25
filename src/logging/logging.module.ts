@@ -12,6 +12,10 @@ import { LoggingInterceptor } from './logging.interceptor';
   providers: [
     AppLogger,
     {
+      provide: 'LoggerContext',
+      useValue: 'Application', // Default context value
+    },
+    {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },

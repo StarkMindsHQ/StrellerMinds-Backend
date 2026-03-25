@@ -21,7 +21,10 @@ import { DatabaseModule } from '../database/database.module';
   imports: [
     TypeOrmModule.forFeature([PerformanceMetric, PerformanceReport, QueryOptimization]),
     HttpModule,
-    CacheModule,
+    CacheModule.register({
+      ttl: 300, // Default time-to-live for cache entries
+      max: 100, // Maximum number of items in cache
+    }),
     EventEmitterModule,
     DatabaseModule,
   ],
@@ -44,7 +47,6 @@ import { DatabaseModule } from '../database/database.module';
     PerformanceAnalyticsService,
     LoadTestingService,
     OptimizationRecommendationsService,
-    PerformanceInterceptor,
   ],
 })
 export class MonitoringModule {}
