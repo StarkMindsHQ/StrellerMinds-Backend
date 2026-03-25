@@ -10,12 +10,12 @@ export class GCSStorageService implements StorageProvider {
 
   private initialize() {
     if (this.storage) return;
-    
+
     const credentials = process.env.GCP_CREDENTIALS;
     if (!credentials) {
       throw new Error('GCP_CREDENTIALS environment variable is not set');
     }
-    
+
     this.storage = new Storage({
       projectId: process.env.GCP_PROJECT_ID,
       credentials: JSON.parse(credentials),

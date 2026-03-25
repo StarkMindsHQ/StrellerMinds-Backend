@@ -10,15 +10,17 @@ export class AzureStorageService implements StorageProvider {
 
   private initialize() {
     if (this.blobServiceClient) return;
-    
+
     const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
     const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
     const container = process.env.AZURE_STORAGE_CONTAINER;
-    
+
     if (!accountName || !accountKey || !container) {
-      throw new Error('AZURE_STORAGE_ACCOUNT_NAME, AZURE_STORAGE_ACCOUNT_KEY, or AZURE_STORAGE_CONTAINER environment variable is not set');
+      throw new Error(
+        'AZURE_STORAGE_ACCOUNT_NAME, AZURE_STORAGE_ACCOUNT_KEY, or AZURE_STORAGE_CONTAINER environment variable is not set',
+      );
     }
-    
+
     const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
     this.blobServiceClient = new BlobServiceClient(
       `https://${accountName}.blob.core.windows.net`,

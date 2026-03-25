@@ -102,7 +102,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Password reset email sent' })
   @Throttle({ default: { limit: 3, ttl: 900000 } }) // 3 requests per 15 minutes
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto, @Request() req: ExpressRequest) {
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+    @Request() req: ExpressRequest,
+  ) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
 

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 
 /**
  * BlockchainKeyValidationService
- * 
+ *
  * Provides validation and security checks for Stellar blockchain keys.
  * Implements best practices for key management and validation.
  */
@@ -14,11 +14,11 @@ export class BlockchainKeyValidationService {
   private readonly STELLAR_SECRET_KEY_PATTERN = /^S[A-Z0-9]{55}$/;
   private readonly STELLAR_PUBLIC_KEY_PATTERN = /^G[A-Z0-9]{55}$/;
   private readonly TESTNET_SECRET_KEY_PATTERN = /^S[A-Z0-9]{55}$/;
-  
+
   // Security constants
   private readonly MIN_KEY_LENGTH = 56; // 'S' + 55 characters
   private readonly MAX_KEY_LENGTH = 56;
-  
+
   /**
    * Validates a Stellar secret key format
    * @param key - The secret key to validate
@@ -35,7 +35,9 @@ export class BlockchainKeyValidationService {
 
     // Check length
     if (key.length !== this.MIN_KEY_LENGTH) {
-      errors.push(`Stellar secret key must be exactly ${this.MIN_KEY_LENGTH} characters long (got ${key.length})`);
+      errors.push(
+        `Stellar secret key must be exactly ${this.MIN_KEY_LENGTH} characters long (got ${key.length})`,
+      );
     }
 
     // Check format pattern
@@ -45,7 +47,9 @@ export class BlockchainKeyValidationService {
 
     // Check for common insecure patterns
     if (this.containsInsecurePattern(key)) {
-      errors.push('Stellar secret key contains insecure patterns. Use a securely generated random key.');
+      errors.push(
+        'Stellar secret key contains insecure patterns. Use a securely generated random key.',
+      );
     }
 
     // Validate checksum (base58 check)
@@ -108,7 +112,7 @@ export class BlockchainKeyValidationService {
   private isValidBase58Check(key: string): boolean {
     // Basic validation - in production, use @stellar/stellar-sdk for full validation
     const base58Alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-    
+
     // Check if all characters are valid base58
     for (const char of key) {
       if (!base58Alphabet.includes(char)) {
@@ -170,7 +174,9 @@ export class BlockchainKeyValidationService {
 
     // Check for placeholder patterns
     if (stellarKey.includes('<') || stellarKey.includes('>')) {
-      errors.push('Stellar secret key appears to be a placeholder. Replace with actual key from secrets manager');
+      errors.push(
+        'Stellar secret key appears to be a placeholder. Replace with actual key from secrets manager',
+      );
       return { valid: false, warnings, errors };
     }
 

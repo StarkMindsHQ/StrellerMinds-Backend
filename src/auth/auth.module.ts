@@ -19,7 +19,7 @@ class CustomHandlebarsAdapter implements TemplateAdapter {
     try {
       const templateName = mail.data.template;
       const templatePath = path.join(this.templatesDir, templateName + '.hbs');
-      
+
       // Check if template file exists
       if (!fs.existsSync(templatePath)) {
         callback(new Error(`Template file not found: ${templatePath}`), '');
@@ -30,7 +30,7 @@ class CustomHandlebarsAdapter implements TemplateAdapter {
       const templateSource = fs.readFileSync(templatePath, 'utf-8');
       const template = hbs.compile(templateSource);
       const html = template(mail.data.context || {});
-      
+
       mail.data.html = html;
       callback(null, html);
     } catch (error) {

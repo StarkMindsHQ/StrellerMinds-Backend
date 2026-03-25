@@ -74,12 +74,6 @@ import { AuthModule } from '../auth/auth.module';
     WebhookController,
     PaymentMethodController,
   ],
-  exports: [
-    PaymentService,
-    StripeService,
-    PayPalService,
-    SquareService,
-    SubscriptionService,
-  ],
+  exports: [PaymentService, StripeService, PayPalService, SquareService, SubscriptionService],
 })
 export class PaymentModule {}

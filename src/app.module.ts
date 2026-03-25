@@ -19,6 +19,8 @@ import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
+import { WebhookModule } from './webhook/webhook.module';
+import { WebhookRawBodyMiddleware } from './webhook/middleware/webhook-raw-body.middleware';
 
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 
@@ -137,6 +139,7 @@ import { LoggingModule } from './logging/logging.module';
     CoreModule,
     StorageModule,
     LoggingModule,
+    WebhookModule,
   ],
   providers: [
     {
@@ -170,5 +173,6 @@ export class AppModule {
     consumer.apply(RequestIdMiddleware).forRoutes('*');
     consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
     consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+    consumer.apply(WebhookRawBodyMiddleware).forRoutes('*');
   }
 }

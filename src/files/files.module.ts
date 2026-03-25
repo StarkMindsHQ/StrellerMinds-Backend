@@ -15,7 +15,14 @@ import { StorageProviderFactory } from './storage/storage-provider.factory';
 import { FilesController } from './files.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([FileEntity, FileVersionEntity, FilePermissionEntity, FileAnalyticsEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      FileEntity,
+      FileVersionEntity,
+      FilePermissionEntity,
+      FileAnalyticsEntity,
+    ]),
+  ],
   controllers: [FilesController],
   providers: [
     FilesService,
