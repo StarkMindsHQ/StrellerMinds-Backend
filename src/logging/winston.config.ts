@@ -174,9 +174,7 @@ transports.push(
 const esOptions = getElasticsearchOptions();
 if (esOptions) {
   try {
-    transports.push(
-      new ElasticsearchTransport(esOptions as ElasticsearchTransportOptions),
-    );
+    transports.push(new ElasticsearchTransport(esOptions as ElasticsearchTransportOptions));
   } catch (error) {
     console.warn('Failed to initialize Elasticsearch transport:', error);
   }

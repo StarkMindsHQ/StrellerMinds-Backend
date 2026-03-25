@@ -27,7 +27,8 @@ export class RegisterDto {
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @MaxLength(128, { message: 'Password cannot exceed 128 characters' })
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password is too weak. Must contain uppercase, lowercase, and number/special character.',
+    message:
+      'Password is too weak. Must contain uppercase, lowercase, and number/special character.',
   })
   password: string;
 
@@ -114,7 +115,8 @@ export class ResetPasswordDto {
   @MinLength(8, { message: 'New password must be at least 8 characters long' })
   @MaxLength(128, { message: 'New password cannot exceed 128 characters' })
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'New password is too weak. Must contain uppercase, lowercase, and number/special character.',
+    message:
+      'New password is too weak. Must contain uppercase, lowercase, and number/special character.',
   })
   newPassword: string;
 }
@@ -141,7 +143,8 @@ export class ChangePasswordDto {
   @MinLength(8, { message: 'New password must be at least 8 characters long' })
   @MaxLength(128, { message: 'New password cannot exceed 128 characters' })
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'New password is too weak. Must contain uppercase, lowercase, and number/special character.',
+    message:
+      'New password is too weak. Must contain uppercase, lowercase, and number/special character.',
   })
   newPassword: string;
 }

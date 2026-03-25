@@ -8,14 +8,22 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import Stripe from 'stripe';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payment, Subscription } from '../entities';
 import { PaymentStatus, SubscriptionStatus } from '../enums';
+import { WebhookAuthGuard } from '../../webhook/guards/webhook-auth.guard';
+import { WebhookLoggingInterceptor } from '../../webhook/interceptors/webhook-logging.interceptor';
+
+import { SetWebhookProvider } from '../../webhook/decorators/webhook-provider.decorator';
+import { WebhookProvider } from '../../webhook/interfaces/webhook.interfaces';
 
 @Controller('webhooks')
+@UseInterceptors(WebhookLoggingInterceptor)
 export class WebhookController {
   private stripe: Stripe;
 
@@ -32,23 +40,11 @@ export class WebhookController {
 
   @Post('stripe')
   @HttpCode(HttpStatus.OK)
-  async handleStripeWebhook(
-    @Headers('stripe-signature') signature: string,
-    @Req() request: RawBodyRequest<any>,
-  ): Promise<{ received: boolean }> {
-    const rawBody = request.rawBody;
-
-    let event: Stripe.Event;
-
-    try {
-      event = this.stripe.webhooks.constructEvent(
-        rawBody,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET || '',
-      );
-    } catch (err) {
-      throw new BadRequestException(`Webhook Error: ${err.message}`);
-    }
+  @UseGuards(WebhookAuthGuard)
+  @SetWebhookProvider(WebhookProvider.STRIPE)
+  async handleStripeWebhook(@Req() request: RawBodyRequest<any>): Promise<{ received: boolean }> {
+    // Webhook is already validated by WebhookAuthGuard
+    const event = request.webhookPayload as Stripe.Event;
 
     switch (event.type) {
       case 'payment_intent.succeeded': {
@@ -156,10 +152,15 @@ export class WebhookController {
 
   @Post('paypal')
   @HttpCode(HttpStatus.OK)
-  async handlePayPalWebhook(@Body() event: any): Promise<{ received: boolean }> {
-    // PayPal webhook handling
-    // Verify webhook signature
+  @UseGuards(WebhookAuthGuard)
+  @SetWebhookProvider(WebhookProvider.PAYPAL)
+  async handlePayPalWebhook(@Req() request: any): Promise<{ received: boolean }> {
+    // Webhook is already validated by WebhookAuthGuard
+    const event = request.webhookPayload;
+
     // Handle various PayPal events
+    // TODO: Implement PayPal-specific event handling
+
     return { received: true };
   }
 }
