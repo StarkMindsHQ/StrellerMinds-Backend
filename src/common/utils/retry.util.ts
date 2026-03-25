@@ -17,10 +17,7 @@ export interface CircuitBreakerOptions {
 export class RetryUtil {
   private static logger = new Logger('RetryUtil');
 
-  static async withRetry<T>(
-    operation: () => Promise<T>,
-    options: RetryOptions = {},
-  ): Promise<T> {
+  static async withRetry<T>(operation: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
     const {
       maxAttempts = 3,
       delay = 1000,
@@ -45,29 +42,29 @@ export class RetryUtil {
       try {
         this.logger.debug(`Attempt ${attempt}/${maxAttempts}`, 'RetryUtil');
         const result = await operation();
-        
+
         if (attempt > 1) {
           this.logger.log(`Operation succeeded on attempt ${attempt}`, 'RetryUtil');
         }
-        
+
         return result;
       } catch (error) {
         lastError = error;
-        
+
         this.logger.warn(`Attempt ${attempt} failed: ${error.message}`, 'RetryUtil');
-        
+
         if (attempt === maxAttempts || !shouldRetry(error, attempt)) {
           this.logger.error(`All ${attempt} attempts failed. Giving up.`, 'RetryUtil');
           throw error;
         }
-        
+
         // Exponential backoff with jitter
         const jitter = Math.random() * 0.1 * currentDelay;
         const waitTime = Math.min(currentDelay + jitter, maxDelay);
-        
+
         this.logger.debug(`Waiting ${waitTime.toFixed(0)}ms before retry`, 'RetryUtil');
         await this.sleep(waitTime);
-        
+
         currentDelay *= backoffMultiplier;
       }
     }
@@ -76,7 +73,7 @@ export class RetryUtil {
   }
 
   private static sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -114,13 +111,13 @@ export class CircuitBreaker {
 
     try {
       const result = await operation();
-      
+
       // Reset on success
       if (this.state === 'HALF_OPEN') {
         this.reset();
         this.logger.log('Circuit breaker reset to CLOSED state', 'CircuitBreaker');
       }
-      
+
       return result;
     } catch (error) {
       this.handleFailure(now);
@@ -135,7 +132,10 @@ export class CircuitBreaker {
     if (this.failures >= this.options.failureThreshold) {
       this.state = 'OPEN';
       this.nextAttemptTime = now + this.options.resetTimeout;
-      this.logger.error(`Circuit breaker OPENED. ${this.failures} failures detected.`, 'CircuitBreaker');
+      this.logger.error(
+        `Circuit breaker OPENED. ${this.failures} failures detected.`,
+        'CircuitBreaker',
+      );
     }
   }
 
@@ -168,29 +168,27 @@ export class ErrorMonitor {
   static recordError(error: any, context?: string): void {
     const errorKey = `${error.code || error.name || 'UNKNOWN'}_${context || 'NO_CONTEXT'}`;
     const timestamp = Date.now();
-    
+
     // Increment total error count
     this.errorCounts.set(errorKey, (this.errorCounts.get(errorKey) || 0) + 1);
-    
+
     // Increment 24-hour error count
     this.errorCounts24h.set(errorKey, (this.errorCounts24h.get(errorKey) || 0) + 1);
-    
+
     // Log error details
-    this.logger.error(
-      `Error recorded: ${errorKey} - ${error.message}`,
-      {
-        error: error.stack,
-        context,
-        count: this.errorCounts.get(errorKey),
-        count24h: this.errorCounts24h.get(errorKey),
-      }
-    );
-    
+    this.logger.error(`Error recorded: ${errorKey} - ${error.message}`, {
+      error: error.stack,
+      context,
+      count: this.errorCounts.get(errorKey),
+      count24h: this.errorCounts24h.get(errorKey),
+    });
+
     // Check for alerting thresholds
     this.checkAlertThresholds(errorKey);
-    
+
     // Cleanup old entries periodically
-    if (timestamp - this.lastCleanup > 3600000) { // 1 hour
+    if (timestamp - this.lastCleanup > 3600000) {
+      // 1 hour
       this.cleanup();
       this.lastCleanup = timestamp;
     }
@@ -198,14 +196,14 @@ export class ErrorMonitor {
 
   private static checkAlertThresholds(errorKey: string): void {
     const count24h = this.errorCounts24h.get(errorKey) || 0;
-    
+
     // Alert if error occurs more than 10 times in 24 hours
     if (count24h >= 10) {
       this.logger.warn(
         `🚨 High error rate alert: ${errorKey} occurred ${count24h} times in 24h`,
-        'ErrorMonitor'
+        'ErrorMonitor',
       );
-      
+
       // In production, this would send alerts to monitoring systems
       // await this.alertingService.sendAlert({
       //   type: 'HIGH_ERROR_RATE',
@@ -225,14 +223,14 @@ export class ErrorMonitor {
 
   static getErrorStats(): { [key: string]: { total: number; last24h: number } } {
     const stats: { [key: string]: { total: number; last24h: number } } = {};
-    
+
     for (const [key, total] of this.errorCounts) {
       stats[key] = {
         total,
         last24h: this.errorCounts24h.get(key) || 0,
       };
     }
-    
+
     return stats;
   }
 }

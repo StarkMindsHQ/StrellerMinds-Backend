@@ -20,6 +20,8 @@ import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
+import { WebhookModule } from './webhook/webhook.module';
+import { WebhookRawBodyMiddleware } from './webhook/middleware/webhook-raw-body.middleware';
 
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 
@@ -75,6 +77,7 @@ import { MonitoringModule } from './monitoring/monitoring.module';
 import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
 import { CoreModule } from './core/core.module';
 import { StorageModule } from './storage/storage.module';
+import { LoggingModule } from './logging/logging.module';
 
 @Module({
   imports: [
@@ -137,6 +140,8 @@ import { StorageModule } from './storage/storage.module';
     MonitoringModule,
     CoreModule,
     StorageModule,
+    LoggingModule,
+    WebhookModule,
   ],
   providers: [
     {
@@ -170,5 +175,6 @@ export class AppModule {
     consumer.apply(RequestIdMiddleware).forRoutes('*');
     consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
     consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+    consumer.apply(WebhookRawBodyMiddleware).forRoutes('*');
   }
 }

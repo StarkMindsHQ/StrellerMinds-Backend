@@ -119,11 +119,12 @@ export class EnhancedInvoiceService {
         try {
           // Calculate tax with retry mechanism
           const tax = await RetryUtil.withRetry(
-            () => this.taxCalculationService.calculateTax({
-              amount: subscription.currentAmount,
-              country: 'US', // Default to US, should be from subscription
-              currency: subscription.paymentPlan.currency || 'USD',
-            }),
+            () =>
+              this.taxCalculationService.calculateTax({
+                amount: subscription.currentAmount,
+                country: 'US', // Default to US, should be from subscription
+                currency: subscription.paymentPlan.currency || 'USD',
+              }),
             {
               maxAttempts: 3,
               delay: 1000,
@@ -132,7 +133,7 @@ export class EnhancedInvoiceService {
                 ErrorMonitor.recordError(error, 'tax-calculation');
                 return attempt < 3 && error.code !== 'INVALID_AMOUNT';
               },
-            }
+            },
           );
 
           const invoice = await this.invoiceRepository.save({
@@ -156,20 +157,26 @@ export class EnhancedInvoiceService {
             return this.subscriptionRepository.save(subscription);
           });
 
-          this.logger.log(`Successfully created invoice ${invoice.id} for subscription ${subscription.id}`, 'EnhancedInvoiceService');
+          this.logger.log(
+            `Successfully created invoice ${invoice.id} for subscription ${subscription.id}`,
+            'EnhancedInvoiceService',
+          );
         } catch (error) {
           ErrorMonitor.recordError(error, 'invoice-creation');
-          this.logger.error(`Failed to create invoice for subscription ${subscription.id}: ${error.message}`, 'EnhancedInvoiceService');
-          
+          this.logger.error(
+            `Failed to create invoice for subscription ${subscription.id}: ${error.message}`,
+            'EnhancedInvoiceService',
+          );
+
           // Increment failed payment count with retry
           await RetryUtil.withRetry(
             () => {
               subscription.failedPaymentCount++;
               return this.subscriptionRepository.save(subscription);
             },
-            { maxAttempts: 2, delay: 500 }
+            { maxAttempts: 2, delay: 500 },
           );
-          
+
           // Implement recovery procedure
           await this.handleInvoiceCreationFailure(subscription, error);
         }
@@ -177,15 +184,24 @@ export class EnhancedInvoiceService {
     }
   }
 
-  private async handleInvoiceCreationFailure(subscription: Subscription, error: any): Promise<void> {
-    this.logger.warn(`Handling invoice creation failure for subscription ${subscription.id}`, 'EnhancedInvoiceService');
-    
+  private async handleInvoiceCreationFailure(
+    subscription: Subscription,
+    error: any,
+  ): Promise<void> {
+    this.logger.warn(
+      `Handling invoice creation failure for subscription ${subscription.id}`,
+      'EnhancedInvoiceService',
+    );
+
     // Check if subscription should be suspended due to too many failures
     const maxFailures = this.configService.get<number>('MAX_PAYMENT_FAILURES', 3);
-    
+
     if (subscription.failedPaymentCount >= maxFailures) {
-      this.logger.error(`Suspending subscription ${subscription.id} due to ${subscription.failedPaymentCount} failures`, 'EnhancedInvoiceService');
-      
+      this.logger.error(
+        `Suspending subscription ${subscription.id} due to ${subscription.failedPaymentCount} failures`,
+        'EnhancedInvoiceService',
+      );
+
       // Suspend subscription with retry
       await RetryUtil.withRetry(
         () => {
@@ -194,18 +210,24 @@ export class EnhancedInvoiceService {
           subscription.suspensionReason = 'Excessive payment failures';
           return this.subscriptionRepository.save(subscription);
         },
-        { maxAttempts: 3, delay: 1000 }
+        { maxAttempts: 3, delay: 1000 },
       );
-      
+
       // Send notification to user (would use email service)
-      this.logger.log(`User ${subscription.userId} notified about subscription suspension`, 'EnhancedInvoiceService');
+      this.logger.log(
+        `User ${subscription.userId} notified about subscription suspension`,
+        'EnhancedInvoiceService',
+      );
     } else {
       // Schedule retry for later
       const retryDelay = Math.min(subscription.failedPaymentCount * 3600000, 24 * 3600000); // Max 24 hours
       subscription.nextBillingDate = new Date(Date.now() + retryDelay);
-      
+
       await this.subscriptionRepository.save(subscription);
-      this.logger.log(`Scheduled retry for subscription ${subscription.id} in ${retryDelay / 3600000} hours`, 'EnhancedInvoiceService');
+      this.logger.log(
+        `Scheduled retry for subscription ${subscription.id} in ${retryDelay / 3600000} hours`,
+        'EnhancedInvoiceService',
+      );
     }
   }
 
@@ -238,7 +260,10 @@ export class EnhancedInvoiceService {
         const invoice = await this.createRecurringInvoice(subscription.id, subscription.userId);
         invoices.push(invoice);
       } catch (error) {
-        console.error(`Failed to create invoice for subscription ${subscription.id}:`, error);
+        this.logger.error(
+          `Failed to create invoice for subscription ${subscription.id}:`,
+          error instanceof Error ? error.stack : String(error),
+        );
       }
     }
 

@@ -336,8 +336,8 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build & Deploy
-    needs: [code-quality, test, api-test, security-scan]
-    if: always() # Run build/deploy checks on all events; adjust in branch policy if needed
+    needs: [code-quality, test]
+    if: always()
     
     steps:
     - name: Checkout code

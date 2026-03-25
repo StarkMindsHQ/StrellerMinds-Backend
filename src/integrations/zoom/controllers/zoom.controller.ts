@@ -10,6 +10,8 @@ import {
   BadRequestException,
   NotFoundException,
   Headers,
+  UseInterceptors,
+  Req,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../auth/guards/auth.guard';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
@@ -17,8 +19,13 @@ import { ZoomService } from '../services/zoom.service';
 import { ZoomConfigService } from '../services/zoom-config.service';
 import { ZoomConfigDto, CreateMeetingDto, WebhookEventDto } from '../dto/zoom.dto';
 import { RequestUser } from '../../../common/types/request.types';
+import { WebhookAuthGuard } from '../../../webhook/guards/webhook-auth.guard';
+import { WebhookLoggingInterceptor } from '../../../webhook/interceptors/webhook-logging.interceptor';
+import { SetWebhookProvider } from '../../../webhook/decorators/webhook-provider.decorator';
+import { WebhookProvider } from '../../../webhook/interfaces/webhook.interfaces';
 
 @Controller('integrations/zoom')
+@UseInterceptors(WebhookLoggingInterceptor)
 export class ZoomController {
   constructor(
     private zoomService: ZoomService,
@@ -172,17 +179,15 @@ export class ZoomController {
    * Handle Zoom webhooks
    */
   @Post('webhook')
-  async handleWebhook(
-    @Headers('x-zm-request-timestamp') timestamp: string,
-    @Headers('x-zm-signature') signature: string,
-    @Body() event: WebhookEventDto,
-  ) {
-    if (!this.zoomService.verifyWebhookSignature(JSON.stringify(event), timestamp, signature)) {
-      throw new BadRequestException('Invalid webhook signature');
-    }
+  @UseGuards(WebhookAuthGuard)
+  @SetWebhookProvider(WebhookProvider.ZOOM)
+  async handleWebhook(@Req() request: any) {
+    // Webhook is already validated by WebhookAuthGuard
+    const event = request.webhookPayload;
 
     // Process webhook event
     // This would typically update recordings, meeting status, etc.
+    // TODO: Implement Zoom-specific event handling
 
     return {
       success: true,

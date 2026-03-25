@@ -1,16 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Storage } from '@google-cloud/storage';
 import { StorageProvider } from './storage.interface';
 
 @Injectable()
 export class GCSStorageService implements StorageProvider {
-  private storage = new Storage({
-    projectId: process.env.GCP_PROJECT_ID,
-    credentials: JSON.parse(process.env.GCP_CREDENTIALS),
-  });
-  private bucket = this.storage.bucket(process.env.GCP_BUCKET);
+  private readonly logger = new Logger(GCSStorageService.name);
+  private storage: Storage | undefined;
+  private bucket: any;
+
+  private initialize() {
+    if (this.storage) return;
+
+    const credentials = process.env.GCP_CREDENTIALS;
+    if (!credentials) {
+      throw new Error('GCP_CREDENTIALS environment variable is not set');
+    }
+
+    this.storage = new Storage({
+      projectId: process.env.GCP_PROJECT_ID,
+      credentials: JSON.parse(credentials),
+    });
+    this.bucket = this.storage.bucket(process.env.GCP_BUCKET);
+  }
 
   async upload(buffer: Buffer, path: string, mimeType: string) {
+    this.initialize();
     const file = this.bucket.file(path);
     await file.save(buffer, {
       contentType: mimeType,
@@ -24,6 +38,7 @@ export class GCSStorageService implements StorageProvider {
   }
 
   async delete(path: string, versionId?: string) {
+    this.initialize();
     const file = this.bucket.file(path, versionId ? { generation: versionId } : {});
     await file.delete();
   }
@@ -37,6 +52,7 @@ export class GCSStorageService implements StorageProvider {
   }
 
   async download(path: string, versionId?: string): Promise<Buffer> {
+    this.initialize();
     const file = this.bucket.file(path, versionId ? { generation: versionId } : {});
     const [content] = await file.download();
     return content;

@@ -4,9 +4,12 @@ import { Repository } from 'typeorm';
 import { SecurityAudit, SecurityEvent } from '../entities/security-audit.entity';
 import { GeoIpService } from './geo-ip.service';
 import { ThreatDetectionService } from '../../forum/threat-detection.service';
+import { AppLogger } from '../../logging/logger.service';
 
 @Injectable()
 export class SecurityAuditService {
+  private readonly logger = new AppLogger(SecurityAuditService.name);
+
   constructor(
     @InjectRepository(SecurityAudit)
     private readonly auditRepository: Repository<SecurityAudit>,
@@ -36,7 +39,7 @@ export class SecurityAuditService {
     // Analyze event for threats asynchronously when ThreatDetectionService is available (ForumModule)
     if (this.threatDetectionService) {
       this.threatDetectionService.analyzeEvent(savedAudit).catch((err) => {
-        console.error('Threat detection analysis failed:', err);
+        this.logger.error('Threat detection analysis failed:', err.stack, { event: savedAudit.id });
       });
     }
   }

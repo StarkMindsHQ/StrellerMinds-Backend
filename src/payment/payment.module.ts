@@ -34,6 +34,7 @@ import {
   WebhookController,
   PaymentMethodController,
 } from './controllers';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import {
       FinancialReport,
       PaymentMethodEntity,
     ]),
+    AuthModule, // Import AuthModule to provide EmailService
   ],
   providers: [
     PaymentService,
@@ -72,18 +74,6 @@ import {
     WebhookController,
     PaymentMethodController,
   ],
-  exports: [
-    PaymentService,
-    StripeService,
-    PayPalService,
-    SquareService,
-    SubscriptionService,
-    InvoiceService,
-    FinancialReportingService,
-    TaxCalculationService,
-    DisputeService,
-    PaymentPlanService,
-    PaymentMethodManagementService,
-  ],
+  exports: [PaymentService, StripeService, PayPalService, SquareService, SubscriptionService],
 })
 export class PaymentModule {}

@@ -7,7 +7,7 @@ export class CourseFacade implements ICourseService {
   constructor(private readonly courseService: CourseService) {}
 
   async findById(id: string): Promise<any> {
-    return this.courseService.courseRepo.findOne({ where: { id } });
+    return this.courseService.findById(id);
   }
 
   async enrollUser(userId: string, courseId: string): Promise<any> {

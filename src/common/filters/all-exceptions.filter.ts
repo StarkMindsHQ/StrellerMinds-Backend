@@ -125,7 +125,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Example: Custom alerting
     if (process.env.NODE_ENV === 'production') {
       // Send alert to Slack, PagerDuty, etc.
-      console.error('[MONITORING]', { exception, context });
+      this.logger.error(
+        `[MONITORING] Exception: ${exception}, Context: ${JSON.stringify(context)}`,
+        exception instanceof Error ? exception.stack : String(exception),
+      );
     }
   }
 }

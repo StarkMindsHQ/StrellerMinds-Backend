@@ -50,24 +50,24 @@ export const SECURITY_CONFIG = {
     origin: (() => {
       const env = process.env.NODE_ENV;
       const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-      
+
       if (env === 'production') {
         return [
           'https://strellerminds.com',
           'https://www.strellerminds.com',
           'https://app.strellerminds.com',
-          ...allowedOrigins.filter(origin => origin.startsWith('https://')),
+          ...allowedOrigins.filter((origin) => origin.startsWith('https://')),
         ];
       }
-      
+
       if (env === 'staging') {
         return [
           'https://staging.strellerminds.com',
           'https://app-staging.strellerminds.com',
-          ...allowedOrigins.filter(origin => origin.startsWith('https://')),
+          ...allowedOrigins.filter((origin) => origin.startsWith('https://')),
         ];
       }
-      
+
       // Development - allow local origins with validation
       const devOrigins = [
         'http://localhost:3000',
@@ -77,17 +77,18 @@ export const SECURITY_CONFIG = {
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3001',
       ];
-      
+
       return [...devOrigins, ...allowedOrigins];
     })(),
-    
+
     // Credential handling policies
-    credentials: process.env.NODE_ENV === 'production' 
-      ? true // Allow credentials in production for trusted origins
-      : true, // Allow credentials in development for testing
-    
+    credentials:
+      process.env.NODE_ENV === 'production'
+        ? true // Allow credentials in production for trusted origins
+        : true, // Allow credentials in development for testing
+
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-    
+
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -99,16 +100,16 @@ export const SECURITY_CONFIG = {
       'X-Client-Version',
       'X-Request-ID',
     ],
-    
+
     exposedHeaders: [
-      'X-Total-Count', 
-      'X-Page-Count', 
+      'X-Total-Count',
+      'X-Page-Count',
       'X-Rate-Limit-Remaining',
       'X-Rate-Limit-Reset',
     ],
-    
+
     maxAge: process.env.NODE_ENV === 'production' ? 86400 : 7200, // 24h in prod, 2h in dev
-    
+
     // Enhanced preflight request validation
     optionsSuccessStatus: 204,
     preflightContinue: false,

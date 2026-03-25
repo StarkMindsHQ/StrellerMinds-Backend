@@ -43,6 +43,10 @@ export class CourseService {
     return this.lessonRepo.save(lesson);
   }
 
+  async findById(id: string) {
+    return this.courseRepo.findOne({ where: { id } });
+  }
+
   async enroll(studentId: string, courseId: string) {
     const course = await this.courseRepo.findOneBy({ id: courseId });
     return this.enrollmentRepo.save(this.enrollmentRepo.create({ studentId, course }));
