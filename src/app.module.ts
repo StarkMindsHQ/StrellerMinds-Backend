@@ -19,6 +19,8 @@ import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
+import { WebhookModule } from './webhook/webhook.module';
+import { WebhookRawBodyMiddleware } from './webhook/middleware/webhook-raw-body.middleware';
 
 import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
 
@@ -76,6 +78,7 @@ import { CoreModule } from './core/core.module';
 import { StorageModule } from './storage/storage.module';
 import { LoggingModule } from './logging/logging.module';
 import { ComplianceModule } from './compliance/compliance.module';
+import { CapacityPlanningModule } from './capacity-planning/capacity-planning.module';
 
 @Module({
   imports: [
@@ -137,8 +140,10 @@ import { ComplianceModule } from './compliance/compliance.module';
     MonitoringModule,
     ComplianceModule,
     CoreModule,
+    CapacityPlanningModule,
     StorageModule,
     LoggingModule,
+    WebhookModule,
   ],
   providers: [
     {
@@ -172,5 +177,6 @@ export class AppModule {
     consumer.apply(RequestIdMiddleware).forRoutes('*');
     consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
     consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+    consumer.apply(WebhookRawBodyMiddleware).forRoutes('*');
   }
 }

@@ -286,7 +286,7 @@ export class EmailNotificationsService {
     }
 
     const resetUrl = `${this.configService.get('FRONTEND_URL')}/reset-password?token=${resetToken}`;
-    
+
     await this.sendEmail({
       to: email,
       subject: template.subject,

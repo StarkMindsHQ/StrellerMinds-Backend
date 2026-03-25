@@ -21,6 +21,7 @@ export enum HttpMethod {
 @Index(['apiKeyId', 'timestamp'])
 @Index(['endpoint', 'method', 'timestamp'])
 @Index(['statusCode', 'timestamp'])
+@Index(['version', 'endpoint', 'method', 'timestamp'])
 export class ApiUsage {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -61,6 +62,9 @@ export class ApiUsage {
 
   @Column({ type: 'jsonb', nullable: true })
   requestHeaders?: Record<string, any>;
+
+  @Column({ nullable: true })
+  version?: string;
 
   @Column({ type: 'jsonb', nullable: true })
   errorDetails?: {

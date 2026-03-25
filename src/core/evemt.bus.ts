@@ -108,7 +108,10 @@ export class IntegrationEventBus {
         return;
       } catch (err) {
         if (attempt === this.options.maxRetries) {
-          this.logger.error(`Event handler failed after ${this.options.maxRetries} retries:`, err instanceof Error ? err.stack : String(err));
+          this.logger.error(
+            `Event handler failed after ${this.options.maxRetries} retries:`,
+            err instanceof Error ? err.stack : String(err),
+          );
           this.addToDeadLetterQueue({ ...event, retryCount: attempt });
           return;
         }

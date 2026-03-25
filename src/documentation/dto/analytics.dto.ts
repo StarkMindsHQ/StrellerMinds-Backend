@@ -47,6 +47,10 @@ export class ApiAnalyticsResponseDto {
     errorCount: number;
   }>;
   requestsByStatus: Record<string, number>;
+  requestsByVersion: Array<{
+    version: string;
+    count: number;
+  }>;
   requestsOverTime: Array<{
     timestamp: Date;
     count: number;

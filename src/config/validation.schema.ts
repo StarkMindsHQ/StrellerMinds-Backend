@@ -4,13 +4,17 @@ import * as Joi from 'joi';
 const stellarSecretKeyValidator = (value: string, helpers: any) => {
   // Check for placeholder patterns
   if (value.includes('<') || value.includes('>')) {
-    return helpers.message('Stellar secret key must be replaced with an actual key from a secure secrets manager');
+    return helpers.message(
+      'Stellar secret key must be replaced with an actual key from a secure secrets manager',
+    );
   }
 
   // Basic format validation (S + 55 alphanumeric characters)
   const stellarKeyPattern = /^S[A-Z0-9]{55}$/;
   if (!stellarKeyPattern.test(value)) {
-    return helpers.message('Stellar secret key must start with "S" followed by 55 uppercase alphanumeric characters');
+    return helpers.message(
+      'Stellar secret key must start with "S" followed by 55 uppercase alphanumeric characters',
+    );
   }
 
   // Check minimum length
@@ -26,7 +30,9 @@ const stellarSecretKeyValidator = (value: string, helpers: any) => {
 
   for (const pattern of insecurePatterns) {
     if (pattern.test(value)) {
-      return helpers.message('Stellar secret key contains insecure patterns. Use a securely generated random key');
+      return helpers.message(
+        'Stellar secret key contains insecure patterns. Use a securely generated random key',
+      );
     }
   }
 

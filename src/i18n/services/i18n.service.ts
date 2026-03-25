@@ -54,7 +54,9 @@ export class I18nService {
           this.translations.set(lang, JSON.parse(content));
         }
       } catch (error) {
-        this.logger.error(`Failed to load translation for language ${lang}:`, error.stack, { language: lang });
+        this.logger.error(`Failed to load translation for language ${lang}:`, error.stack, {
+          language: lang,
+        });
       }
     }
   }
