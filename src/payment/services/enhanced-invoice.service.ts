@@ -238,7 +238,7 @@ export class EnhancedInvoiceService {
         const invoice = await this.createRecurringInvoice(subscription.id, subscription.userId);
         invoices.push(invoice);
       } catch (error) {
-        console.error(`Failed to create invoice for subscription ${subscription.id}:`, error);
+        this.logger.error(`Failed to create invoice for subscription ${subscription.id}:`, error instanceof Error ? error.stack : String(error));
       }
     }
 

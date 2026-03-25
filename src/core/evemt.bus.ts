@@ -4,6 +4,7 @@
  */
 
 import { IntegrationEvent, generateId } from './base';
+import { Logger } from '@nestjs/common';
 
 type EventHandler = (event: IntegrationEvent) => Promise<void>;
 
@@ -18,6 +19,7 @@ export class IntegrationEventBus {
   private deadLetterQueue: IntegrationEvent[] = [];
   private options: Required<EventBusOptions>;
   private processingEvents = new Set<string>();
+  private readonly logger = new Logger(IntegrationEventBus.name);
 
   constructor(options: EventBusOptions = {}) {
     this.options = {
@@ -106,7 +108,7 @@ export class IntegrationEventBus {
         return;
       } catch (err) {
         if (attempt === this.options.maxRetries) {
-          console.error(`Event handler failed after ${this.options.maxRetries} retries:`, err);
+          this.logger.error(`Event handler failed after ${this.options.maxRetries} retries:`, err instanceof Error ? err.stack : String(err));
           this.addToDeadLetterQueue({ ...event, retryCount: attempt });
           return;
         }
