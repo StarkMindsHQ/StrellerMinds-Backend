@@ -18,6 +18,7 @@ import { PerformanceTuningService } from '../services/performance-tuning.service
 import { PerformanceAnalyticsService } from '../services/performance-analytics.service';
 import { LoadTestingService, LoadTestConfig } from '../services/load-testing.service';
 import { OptimizationRecommendationsService } from '../services/optimization-recommendations.service';
+import { RealTimeMonitoringService } from '../services/real-time-monitoring.service';
 import { PerformanceQueryDto, PerformanceReportDto } from '../dto/performance.dto';
 
 @ApiTags('Performance Monitoring')
@@ -33,6 +34,7 @@ export class MonitoringController {
     private analyticsService: PerformanceAnalyticsService,
     private loadTesting: LoadTestingService,
     private recommendationsService: OptimizationRecommendationsService,
+    private realTimeService: RealTimeMonitoringService,
   ) {}
 
   @Get('apm/transactions')
@@ -265,5 +267,26 @@ export class MonitoringController {
   @ApiResponse({ status: 200, description: 'Implementation plan retrieved' })
   getImplementationPlan() {
     return this.recommendationsService.getImplementationPlan();
+  }
+
+  @Get('real-time/dashboard')
+  @ApiOperation({ summary: 'Get real-time monitoring dashboard' })
+  @ApiResponse({ status: 200, description: 'Real-time dashboard data retrieved' })
+  getRealTimeDashboard() {
+    return this.realTimeService.getRealTimeDashboard();
+  }
+
+  @Get('real-time/anomalies')
+  @ApiOperation({ summary: 'Get real-time anomalies' })
+  @ApiResponse({ status: 200, description: 'Anomalies retrieved' })
+  getAnomalies() {
+    return this.realTimeService.getAnomalies();
+  }
+
+  @Get('real-time/alerts')
+  @ApiOperation({ summary: 'Get real-time alerts' })
+  @ApiResponse({ status: 200, description: 'Alerts retrieved' })
+  getAlerts() {
+    return this.realTimeService.getAlerts();
   }
 }
