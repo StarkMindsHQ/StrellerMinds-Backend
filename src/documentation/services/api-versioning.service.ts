@@ -44,6 +44,24 @@ export class ApiVersioningService {
   }
 
   /**
+   * Get version by version string (v1, v2, etc.)
+   */
+  async getVersionByName(version: string): Promise<ApiVersion | null> {
+    return this.versionRepository.findOne({
+      where: { version },
+      relations: ['endpoints'],
+    });
+  }
+
+  /**
+   * Get version status by version string
+   */
+  async getVersionStatus(version: string): Promise<VersionStatus | null> {
+    const versionEntity = await this.getVersionByName(version);
+    return versionEntity ? versionEntity.status : null;
+  }
+
+  /**
    * Create new version
    */
   async createVersion(

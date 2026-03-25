@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -12,6 +13,7 @@ import { Logger } from 'winston';
 import * as compression from 'compression';
 import { PerformanceInterceptor } from './common/interceptors/performance.interceptor';
 import { json, urlencoded } from 'express';
+import { ApiVersionGuard } from './documentation/guards/api-version.guard';
 
 async function bootstrap() {
   // Sentry: only init when a valid DSN is set (skip placeholder or empty)
@@ -54,6 +56,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  app.useGlobalGuards(app.get(ApiVersionGuard));
   app.useGlobalInterceptors(new PerformanceInterceptor());
   // CORS configuration
   // app.enableCors({
@@ -71,8 +74,13 @@ async function bootstrap() {
     1,
   );
 
-  // API prefix
+  // API prefix with versioning support
   app.setGlobalPrefix('api');
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+    prefix: 'v',
+  });
 
   // Swagger documentation
   const config = new DocumentBuilder()

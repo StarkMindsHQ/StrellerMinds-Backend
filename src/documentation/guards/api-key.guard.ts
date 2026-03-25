@@ -54,6 +54,7 @@ export class ApiKeyGuard implements CanActivate {
             userAgent: request.headers['user-agent'],
             queryParams: request.query,
             requestHeaders: request.headers,
+            version: request.apiVersion,
           })
           .catch(() => {
             // Ignore tracking errors

@@ -195,6 +195,11 @@ export class CreateDocumentationTables1710000000000 implements MigrationInterfac
             isNullable: true,
           },
           {
+            name: 'version',
+            type: 'varchar',
+            isNullable: true,
+          },
+          {
             name: 'errorDetails',
             type: 'jsonb',
             isNullable: true,
@@ -222,6 +227,14 @@ export class CreateDocumentationTables1710000000000 implements MigrationInterfac
       new TableIndex({
         name: 'IDX_api_usage_endpoint_method_timestamp',
         columnNames: ['endpoint', 'method', 'timestamp'],
+      }),
+    );
+
+    await queryRunner.createIndex(
+      'api_usage',
+      new TableIndex({
+        name: 'IDX_api_usage_version_endpoint_method_timestamp',
+        columnNames: ['version', 'endpoint', 'method', 'timestamp'],
       }),
     );
 
