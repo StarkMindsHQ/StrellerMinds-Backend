@@ -47,14 +47,23 @@ export class LearningPathController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all learning paths' })
-  @ApiResponse({ status: 200, description: 'List of learning paths' })
-  async findAll(@Request() req, @Query('instructorId') instructorId?: string) {
-    // Instructors can see their own paths, admins can see all
+  @ApiOperation({ summary: 'Get all learning paths with pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
+  @ApiQuery({ name: 'cursor', required: false, type: String, example: 'eyJj...' })
+  @ApiQuery({ name: 'instructorId', required: false, type: String })
+  @ApiResponse({ status: 200, description: 'Paginated learning paths retrieved' })
+  async findAll(@Request() req, @Query() query: any) {
     const canSeeAll = req.user.role === UserRole.ADMIN;
-    const filterInstructorId = canSeeAll ? instructorId : req.user.id;
+    const instructorId = canSeeAll ? query.instructorId : req.user.id;
 
-    return this.curriculumBuilderService.findAll(filterInstructorId);
+    const result = await this.curriculumBuilderService.findAll(query, instructorId);
+
+    return {
+      success: true,
+      data: result.data,
+      pagination: result.pagination,
+    };
   }
 
   @Get(':id')

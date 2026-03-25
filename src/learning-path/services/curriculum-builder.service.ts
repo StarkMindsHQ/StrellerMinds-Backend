@@ -3,6 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { LearningPath } from '../entities/learning-path.entity';
+import { PaginationQueryDto } from '../../common/pagination/pagination.dto';
+import {
+  buildCursorForCreatedAt,
+  decodeCursor,
+  validatePaginationParams,
+  CursorPaginationMeta,
+  OffsetPaginationMeta,
+} from '../../common/pagination/pagination.utils';
 import { LearningPathNode } from '../entities/learning-path-node.entity';
 import { NodeDependency, DependencyType } from '../entities/node-dependency.entity';
 import { LearningObjective } from '../entities/learning-objective.entity';
@@ -173,19 +181,76 @@ export class CurriculumBuilderService {
     return learningPath;
   }
 
-  async findAll(instructorId?: string): Promise<LearningPath[]> {
+  async findAll(
+    pagination: PaginationQueryDto,
+    instructorId?: string,
+  ): Promise<{
+    data: LearningPath[];
+    pagination: OffsetPaginationMeta | CursorPaginationMeta;
+  }> {
+    const { page = 1, limit = 20, cursor } = pagination;
+
+    validatePaginationParams(page, limit, cursor);
+
     const queryBuilder = this.learningPathRepository
       .createQueryBuilder('learningPath')
       .leftJoinAndSelect('learningPath.nodes', 'nodes')
       .leftJoinAndSelect('learningPath.template', 'template')
-      .leftJoinAndSelect('learningPath.instructor', 'instructor')
-      .orderBy('learningPath.createdAt', 'DESC');
+      .leftJoinAndSelect('learningPath.instructor', 'instructor');
 
     if (instructorId) {
       queryBuilder.where('learningPath.instructorId = :instructorId', { instructorId });
     }
 
-    return queryBuilder.getMany();
+    if (cursor) {
+      const cursorPayload = decodeCursor(cursor);
+      const cursorDate = new Date(cursorPayload.createdAt);
+
+      queryBuilder
+        .andWhere(
+          '(learningPath.createdAt < :cursorDate OR (learningPath.createdAt = :cursorDate AND learningPath.id < :cursorId))',
+          { cursorDate, cursorId: cursorPayload.id },
+        )
+        .orderBy('learningPath.createdAt', 'DESC')
+        .addOrderBy('learningPath.id', 'DESC')
+        .take(limit);
+
+      const results = await queryBuilder.getMany();
+      const nextCursor =
+        results.length > 0
+          ? buildCursorForCreatedAt(
+              results[results.length - 1].createdAt,
+              results[results.length - 1].id,
+            )
+          : null;
+
+      return {
+        data: results,
+        pagination: {
+          cursor,
+          nextCursor,
+          limit,
+        },
+      };
+    }
+
+    const total = await queryBuilder.getCount();
+
+    const results = await queryBuilder
+      .orderBy('learningPath.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getMany();
+
+    return {
+      data: results,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async deleteLearningPath(id: string): Promise<void> {
