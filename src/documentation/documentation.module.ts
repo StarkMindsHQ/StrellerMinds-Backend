@@ -10,6 +10,7 @@ import { ApiKeyService } from './services/api-key.service';
 import { SdkGeneratorService } from './services/sdk-generator.service';
 import { ApiAnalyticsService } from './services/api-analytics.service';
 import { ApiVersioningService } from './services/api-versioning.service';
+import { ApiVersionGuard } from './guards/api-version.guard';
 import { ApiExplorerService } from './services/api-explorer.service';
 import { ApiTestingService } from './services/api-testing.service';
 import { DocumentationController } from './controllers/documentation.controller';
@@ -33,6 +34,7 @@ import { User } from '../auth/entities/user.entity';
     ApiTestingService,
     ApiKeyGuard,
     ApiUsageInterceptor,
+    ApiVersionGuard,
   ],
   exports: [
     ApiKeyService,

@@ -28,7 +28,7 @@ import { ApiAnalyticsQueryDto } from '../dto/analytics.dto';
 import { NestApplication } from '@nestjs/core';
 
 @ApiTags('Developer Portal')
-@Controller('documentation')
+@Controller({ path: 'documentation', version: '1' })
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class DocumentationController {
@@ -150,6 +150,56 @@ export class DocumentationController {
   @ApiResponse({ status: 200, description: 'Versions retrieved' })
   async getVersions() {
     return this.versioningService.getAllVersions();
+  }
+
+  @Post('versions')
+  @ApiOperation({ summary: 'Create a new API version' })
+  @ApiResponse({ status: 201, description: 'Version created' })
+  async createVersion(
+    @Body('version') version: string,
+    @Body('releaseNotes') releaseNotes?: string,
+    @Body('breakingChanges') breakingChanges?: Array<{ endpoint: string; description: string; migration: string }>,
+  ) {
+    return this.versioningService.createVersion(version, releaseNotes, breakingChanges);
+  }
+
+  @Put('versions/:id/deprecate')
+  @ApiOperation({ summary: 'Deprecate an API version' })
+  @ApiResponse({ status: 200, description: 'Version deprecated' })
+  async deprecateVersion(
+    @Param('id') id: string,
+    @Body('deprecationDate') deprecationDate: string,
+    @Body('sunsetDate') sunsetDate: string,
+  ) {
+    await this.versioningService.deprecateVersion(id, new Date(deprecationDate), new Date(sunsetDate));
+    return { message: `Version ${id} deprecated` };
+  }
+
+  @Get('versions/:id/status')
+  @ApiOperation({ summary: 'Get status of a specific API version' })
+  @ApiResponse({ status: 200, description: 'Version status retrieved' })
+  async getVersionStatus(@Param('id') id: string) {
+    const version = await this.versioningService.getVersion(id);
+    if (!version) {
+      return { status: 'not_found' };
+    }
+    return {
+      id: version.id,
+      version: version.version,
+      status: version.status,
+      deprecationDate: version.deprecationDate,
+      sunsetDate: version.sunsetDate,
+    };
+  }
+
+  @Get('versions/analytics')
+  @ApiOperation({ summary: 'Get API usage by version' })
+  @ApiResponse({ status: 200, description: 'Version analytics retrieved' })
+  async getVersionAnalytics(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
+    return this.analyticsService.getAnalytics({
+      startDate,
+      endDate,
+    });
   }
 
   @Get('versions/current')
