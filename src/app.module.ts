@@ -77,6 +77,7 @@ import { PerformanceInterceptor } from './monitoring/interceptors/performance.in
 import { CoreModule } from './core/core.module';
 import { StorageModule } from './storage/storage.module';
 import { LoggingModule } from './logging/logging.module';
+import { ComplianceModule } from './compliance/compliance.module';
 import { CapacityPlanningModule } from './capacity-planning/capacity-planning.module';
 
 @Module({
@@ -137,6 +138,7 @@ import { CapacityPlanningModule } from './capacity-planning/capacity-planning.mo
     VideoModule,
     DocumentationModule,
     MonitoringModule,
+    ComplianceModule,
     CoreModule,
     CapacityPlanningModule,
     StorageModule,
