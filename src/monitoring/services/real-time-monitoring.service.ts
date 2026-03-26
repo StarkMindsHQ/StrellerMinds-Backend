@@ -51,7 +51,7 @@ export class RealTimeMonitoringService implements OnModuleInit {
     if (history.length < 10) return;
 
     const latestSnapshot = history[history.length - 1];
-    
+
     // CPU Spike detection
     const avgCpu = history.reduce((sum, s) => sum + s.cpu.percentage, 0) / history.length;
     if (latestSnapshot.cpu.percentage > avgCpu * 2 && latestSnapshot.cpu.percentage > 0.5) {

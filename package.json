@@ -85,6 +85,7 @@
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "bull": "^4.16.5",
+    "bullmq": "^5.71.1",
     "cache-manager": "^7.2.8",
     "class-transformer": "^0.5.0",
     "class-validator": "^0.14.0",
