@@ -6,6 +6,11 @@ import { QueueMonitoringService } from './services/queue-monitoring.service';
 import { DeadLetterQueueService } from './services/dead-letter-queue.service';
 import { QueueScalingService } from './services/queue-scaling.service';
 import { QueueHealthIndicator } from './health/queue-health.indicator';
+import { JobPrioritizationService } from './services/job-prioritization.service';
+import { JobBatchingService } from './services/job-batching.service';
+import { JobRetryStrategiesService } from './services/job-retry-strategies.service';
+import { QueueAlertingService } from './services/queue-alerting.service';
+import { JobSchedulingOptimizationService } from './services/job-scheduling-optimization.service';
 
 @Global()
 @Module({
@@ -49,7 +54,7 @@ import { QueueHealthIndicator } from './health/queue-health.indicator';
           backoff: { type: 'exponential', delay: 1000 },
           removeOnComplete: 100,
           removeOnFail: 50,
-          priority: 0,
+          priority: 0, // Default priority - will be overridden by job priority
         },
         settings: {
           lockDuration: 30000, // 30 seconds
@@ -57,6 +62,8 @@ import { QueueHealthIndicator } from './health/queue-health.indicator';
           stalledInterval: 30000, // 30 seconds
           maxStalledCount: 3,
         },
+        // Enable prioritized processing
+        prioritize: true,
       }),
       inject: [ConfigService],
     }),
@@ -76,7 +83,7 @@ import { QueueHealthIndicator } from './health/queue-health.indicator';
           backoff: { type: 'exponential', delay: 2000 },
           removeOnComplete: 50,
           removeOnFail: 20,
-          priority: 0,
+          priority: 0, // Default priority - will be overridden by job priority
         },
         settings: {
           lockDuration: 60000, // 1 minute for file processing
@@ -84,6 +91,8 @@ import { QueueHealthIndicator } from './health/queue-health.indicator';
           stalledInterval: 60000, // 1 minute
           maxStalledCount: 2,
         },
+        // Enable prioritized processing
+        prioritize: true,
       }),
       inject: [ConfigService],
     }),
@@ -113,6 +122,11 @@ import { QueueHealthIndicator } from './health/queue-health.indicator';
     DeadLetterQueueService,
     QueueScalingService,
     QueueHealthIndicator,
+    JobPrioritizationService,
+    JobBatchingService,
+    JobRetryStrategiesService,
+    QueueAlertingService,
+    JobSchedulingOptimizationService,
   ],
   exports: [
     BullModule,
@@ -120,6 +134,11 @@ import { QueueHealthIndicator } from './health/queue-health.indicator';
     DeadLetterQueueService,
     QueueScalingService,
     QueueHealthIndicator,
+    JobPrioritizationService,
+    JobBatchingService,
+    JobRetryStrategiesService,
+    QueueAlertingService,
+    JobSchedulingOptimizationService,
   ],
 })
 export class QueueModule {}
