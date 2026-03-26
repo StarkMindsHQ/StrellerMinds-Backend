@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { join } from 'path';
 import * as fs from 'fs';
+import { AppLogger } from '../../logging/logger.service';
 
 /**
  * Supported languages in the system
@@ -28,6 +29,7 @@ export const SUPPORTED_LANGUAGES = {
 export class I18nService {
   private translations: Map<string, any> = new Map();
   private defaultLanguage = 'en';
+  private readonly logger = new AppLogger(I18nService.name);
 
   constructor() {
     this.loadTranslations();
@@ -40,7 +42,7 @@ export class I18nService {
     const translationsPath = join(__dirname, '../translations');
 
     if (!fs.existsSync(translationsPath)) {
-      console.warn(`Translations directory not found at ${translationsPath}`);
+      this.logger.warn(`Translations directory not found at ${translationsPath}`);
       return;
     }
 
@@ -52,7 +54,9 @@ export class I18nService {
           this.translations.set(lang, JSON.parse(content));
         }
       } catch (error) {
-        console.error(`Failed to load translation for language ${lang}:`, error);
+        this.logger.error(`Failed to load translation for language ${lang}:`, error.stack, {
+          language: lang,
+        });
       }
     }
   }
@@ -84,7 +88,7 @@ export class I18nService {
     }
 
     if (!value) {
-      console.warn(`Translation key not found: ${key} for language ${normalizedLang}`);
+      this.logger.warn(`Translation key not found: ${key} for language ${normalizedLang}`);
       return key;
     }
 
@@ -156,6 +160,28 @@ export class I18nService {
   }
 
   /**
+   * Return text direction for language.
+   */
+  getDirection(language: string): 'ltr' | 'rtl' {
+    return this.isRTL(language) ? 'rtl' : 'ltr';
+  }
+
+  /**
+   * Build language context used by APIs/clients.
+   */
+  getLanguageContext(language: string) {
+    const normalized = this.normalizeLanguageCode(language);
+    const metadata = this.getLanguageMetadata(normalized);
+    return {
+      language: normalized,
+      locale: `${normalized}-${metadata.region}`,
+      direction: this.getDirection(normalized),
+      rtl: metadata.rtl,
+      metadata,
+    };
+  }
+
+  /**
    * Set default language
    */
   setDefaultLanguage(language: string): void {
@@ -192,6 +218,19 @@ export class I18nService {
       }
     }
 
+    return this.defaultLanguage;
+  }
+
+  /**
+   * Resolve best language from optional explicit input and Accept-Language fallback.
+   */
+  resolveLanguage(language?: string, acceptLanguageHeader?: string): string {
+    if (language) {
+      return this.normalizeLanguageCode(language);
+    }
+    if (acceptLanguageHeader) {
+      return this.detectLanguageFromHeader(acceptLanguageHeader);
+    }
     return this.defaultLanguage;
   }
 }

@@ -31,10 +31,7 @@ export class BackupGoogleCloudService {
     );
 
     this.projectId = this.configService.get('GOOGLE_CLOUD_PROJECT_ID', '');
-    this.primaryLocation = this.configService.get(
-      'GOOGLE_CLOUD_BACKUP_LOCATION',
-      'us-central1',
-    );
+    this.primaryLocation = this.configService.get('GOOGLE_CLOUD_BACKUP_LOCATION', 'us-central1');
     this.replicaLocation = this.configService.get(
       'GOOGLE_CLOUD_BACKUP_REPLICA_LOCATION',
       'us-west1',
@@ -139,7 +136,7 @@ export class BackupGoogleCloudService {
 
     try {
       const file = this.primaryBucket.file(key);
-      
+
       const writeStream = file.createWriteStream({
         metadata: {
           contentType: 'application/octet-stream',
@@ -175,17 +172,14 @@ export class BackupGoogleCloudService {
     fromReplica: boolean = false,
   ): Promise<void> {
     const bucket = fromReplica && this.replicaBucket ? this.replicaBucket : this.primaryBucket;
-    
+
     this.logger.log(`Downloading backup from Google Cloud Storage: ${key} to ${localPath}`);
 
     try {
       const file = bucket.file(key);
       const writeStream = fsSync.createWriteStream(localPath);
-      
-      await pipeline(
-        file.createReadStream(),
-        writeStream
-      );
+
+      await pipeline(file.createReadStream(), writeStream);
 
       this.logger.log(`Backup downloaded successfully: ${localPath}`);
     } catch (error) {
@@ -196,7 +190,7 @@ export class BackupGoogleCloudService {
 
   async deleteBackup(key: string, fromReplica: boolean = false): Promise<void> {
     const bucket = fromReplica && this.replicaBucket ? this.replicaBucket : this.primaryBucket;
-    
+
     this.logger.log(`Deleting backup from Google Cloud Storage: ${key}`);
 
     try {
@@ -210,12 +204,14 @@ export class BackupGoogleCloudService {
 
   async getBackupMetadata(key: string, fromReplica: boolean = false): Promise<any> {
     const bucket = fromReplica && this.replicaBucket ? this.replicaBucket : this.primaryBucket;
-    
+
     try {
       const [metadata] = await bucket.file(key).getMetadata();
       return metadata;
     } catch (error) {
-      this.logger.error(`Failed to get backup metadata from Google Cloud Storage: ${error.message}`);
+      this.logger.error(
+        `Failed to get backup metadata from Google Cloud Storage: ${error.message}`,
+      );
       throw error;
     }
   }
@@ -225,7 +221,7 @@ export class BackupGoogleCloudService {
     fromReplica: boolean = false,
   ): Promise<Array<{ key: string; size: number; modified: Date }>> {
     const bucket = fromReplica && this.replicaBucket ? this.replicaBucket : this.primaryBucket;
-    
+
     try {
       const [files] = await bucket.getFiles({
         prefix,
@@ -281,7 +277,7 @@ export class BackupGoogleCloudService {
     try {
       const file = this.primaryBucket.file(key);
       const [metadata] = await file.getMetadata();
-      
+
       // Compare with stored checksum
       const storedChecksum = metadata.metadata?.checksum;
       return storedChecksum === expectedChecksum;
@@ -294,7 +290,7 @@ export class BackupGoogleCloudService {
   async getStorageUsage(): Promise<{ totalBytes: number; fileCount: number }> {
     try {
       const [files] = await this.primaryBucket.getFiles();
-      
+
       let totalBytes = 0;
       const fileCount = files.length;
 

@@ -15,6 +15,7 @@ import { MetricsService } from '../../metrics/metrics.service';
 import { v4 as uuidv4 } from 'uuid';
 
 import * as crypto from 'crypto';
+import { EmailService } from './email.service';
 
 // Type for user response without sensitive data
 export type UserResponse = Omit<User, 'password'> & {
@@ -263,7 +264,7 @@ export class AuthService {
     await this.securityAuditService.log(userId, SecurityEvent.TWO_FACTOR_ENABLE);
   }
 
-  async generateQrCodeStream(stream: any, otpauthUrl: string) {
+  async generateQrCodeStream(_stream: NodeJS.WritableStream, otpauthUrl: string): Promise<string> {
     return this.twoFactorAuthService.generateQrCodeDataURL(otpauthUrl);
   }
 
@@ -365,36 +366,84 @@ export class AuthService {
     await this.refreshTokenRepository.update({ userId }, { isRevoked: true });
   }
 
-  async forgotPassword(email: string): Promise<void> {
+  async forgotPassword(email: string, ipAddress?: string, userAgent?: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
-      // Don't reveal if user exists
+      await this.securityAuditService.log(
+        null,
+        SecurityEvent.PASSWORD_RESET_REQUEST,
+        ipAddress,
+        userAgent,
+        {
+          email,
+          reason: 'User not found',
+        },
+      );
       return;
     }
 
-    const resetToken = uuidv4();
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const tokenHash = await this.bcryptService.hash(rawToken);
+    const resetToken = `${user.id}:${rawToken}`;
+
     const resetTokenExpiry = new Date();
-    resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1); // 1 hour expiry
+    resetTokenExpiry.setHours(resetTokenExpiry.getHours() + 1);
 
     await this.userRepository.update(user.id, {
-      passwordResetToken: resetToken,
+      passwordResetToken: tokenHash,
       passwordResetExpires: resetTokenExpiry,
     });
 
-    // TODO: Send email with reset token
-    this.logger.log(`Password reset token for ${email}: ${resetToken}`);
+    await this.securityAuditService.log(
+      user.id,
+      SecurityEvent.PASSWORD_RESET_REQUEST,
+      ipAddress,
+      userAgent,
+    );
+
+    await this.emailService.sendPasswordResetEmail(email, resetToken);
   }
 
-  async resetPassword(resetToken: string, newPassword: string): Promise<void> {
+  async resetPassword(
+    resetToken: string,
+    newPassword: string,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<void> {
+    if (!resetToken || !resetToken.includes(':')) {
+      throw new Error('Invalid or expired reset token');
+    }
+
+    const [userId, rawToken] = resetToken.split(':');
+
     const user = await this.userRepository.findOne({
       where: {
-        passwordResetToken: resetToken,
+        id: userId,
         passwordResetExpires: MoreThan(new Date()),
       },
     });
 
-    if (!user) {
+    if (!user || !user.passwordResetToken) {
+      await this.securityAuditService.log(
+        null,
+        SecurityEvent.PASSWORD_RESET_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Invalid or expired token' },
+      );
+      throw new Error('Invalid or expired reset token');
+    }
+
+    const isTokenValid = await this.bcryptService.compare(rawToken, user.passwordResetToken);
+    if (!isTokenValid) {
+      await this.securityAuditService.log(
+        user.id,
+        SecurityEvent.PASSWORD_RESET_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Invalid or expired token' },
+      );
       throw new Error('Invalid or expired reset token');
     }
 
@@ -403,6 +452,13 @@ export class AuthService {
       newPassword,
     );
     if (isUsedRecently) {
+      await this.securityAuditService.log(
+        user.id,
+        SecurityEvent.PASSWORD_RESET_FAILED,
+        ipAddress,
+        userAgent,
+        { reason: 'Password used recently' },
+      );
       throw new Error('Password has been used recently');
     }
 
@@ -415,6 +471,13 @@ export class AuthService {
       passwordResetToken: null,
       passwordResetExpires: null,
     });
+
+    await this.securityAuditService.log(
+      user.id,
+      SecurityEvent.PASSWORD_RESET_SUCCESS,
+      ipAddress,
+      userAgent,
+    );
 
     // Revoke all refresh tokens for this user
     await this.refreshTokenRepository.update({ userId: user.id }, { isRevoked: true });

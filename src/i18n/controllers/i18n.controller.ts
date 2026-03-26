@@ -13,6 +13,9 @@ export class I18nController {
     return {
       languages: SUPPORTED_LANGUAGES,
       total: Object.keys(SUPPORTED_LANGUAGES).length,
+      rtlLanguages: Object.entries(SUPPORTED_LANGUAGES)
+        .filter(([, value]) => value.rtl)
+        .map(([code]) => code),
     };
   }
 
@@ -39,13 +42,7 @@ export class I18nController {
   @Get('detect')
   detectLanguage(@Headers('accept-language') acceptLanguageHeader: string) {
     const detected = this.i18nService.detectLanguageFromHeader(acceptLanguageHeader);
-    const metadata = this.i18nService.getLanguageMetadata(detected);
-
-    return {
-      detected,
-      metadata,
-      rtl: this.i18nService.isRTL(detected),
-    };
+    return this.i18nService.getLanguageContext(detected);
   }
 
   /**
@@ -61,6 +58,16 @@ export class I18nController {
       key,
       language: this.i18nService.normalizeLanguageCode(language),
       translation: this.i18nService.translate(key, language),
+      direction: this.i18nService.getDirection(language),
     };
+  }
+
+  @Get('context')
+  getLanguageContext(
+    @Query('lang') language?: string,
+    @Headers('accept-language') acceptLanguageHeader?: string,
+  ) {
+    const resolved = this.i18nService.resolveLanguage(language, acceptLanguageHeader);
+    return this.i18nService.getLanguageContext(resolved);
   }
 }

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Param, UseGuards, Request, Query } from '@nestjs
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { GamificationService } from './gamification.service';
 import { JwtAuthGuard } from '../auth/guards/auth.guard';
+import { RequestWithUser } from '../common/types/request.types';
 
 @ApiTags('gamification')
 @ApiBearerAuth()
@@ -13,8 +14,8 @@ export class GamificationController {
   @Get('profile')
   @ApiOperation({ summary: 'Get current user gamification profile' })
   @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
-  async getMyProfile(@Request() req: any) {
-    return this.gamificationService.getProfile(req.user.id);
+  async getMyProfile(@Request() req: RequestWithUser) {
+    return this.gamificationService.getProfile(req.user!.sub);
   }
 
   @Get('leaderboard')
@@ -34,18 +35,18 @@ export class GamificationController {
   @Get('share/:badgeCode')
   @ApiOperation({ summary: 'Get shareable message for a badge' })
   @ApiResponse({ status: 200, description: 'Message generated successfully' })
-  async getShareMessage(@Request() req: any, @Param('badgeCode') badgeCode: string) {
-    const profile = await this.gamificationService.getProfile(req.user.id);
+  async getShareMessage(@Request() req: RequestWithUser, @Param('badgeCode') badgeCode: string) {
+    const profile = await this.gamificationService.getProfile(req.user!.sub);
     return {
       message: `I just earned the ${badgeCode} badge on StrellerMinds! I'm now level ${profile.level} with ${profile.xp} XP! 🚀 #StrellerMinds #BlockchainLearning`,
-      url: `https://strellerminds.edu/profile/${req.user.id}`,
+      url: `https://strellerminds.edu/profile/${req.user!.sub}`,
     };
   }
 
   @Post('streak/update')
   @ApiOperation({ summary: 'Update daily streak for current user' })
   @ApiResponse({ status: 200, description: 'Streak updated successfully' })
-  async updateMyStreak(@Request() req: any) {
-    return this.gamificationService.updateStreak(req.user.id);
+  async updateMyStreak(@Request() req: RequestWithUser) {
+    return this.gamificationService.updateStreak(req.user!.sub);
   }
 }

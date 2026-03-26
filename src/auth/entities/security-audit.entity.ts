@@ -16,6 +16,9 @@ export enum SecurityEvent {
   TWO_FACTOR_ENABLE = 'two_factor_enable',
   TWO_FACTOR_DISABLE = 'two_factor_disable',
   ACCOUNT_LOCKED = 'account_locked',
+  PASSWORD_RESET_REQUEST = 'password_reset_request',
+  PASSWORD_RESET_SUCCESS = 'password_reset_success',
+  PASSWORD_RESET_FAILED = 'password_reset_failed',
 }
 
 @Entity('security_audits')

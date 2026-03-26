@@ -7,6 +7,22 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AccessibilityTestUtils {
   /**
+   * Run a WCAG 2.1 AA-oriented test suite and return normalized output for CI pipelines.
+   */
+  runWCAG21AATestSuite(html: string, css?: string) {
+    const report = this.generateReport(html, css);
+
+    return {
+      standard: 'WCAG_2_1_AA',
+      passed: report.summary.wcagCompliant,
+      score: report.summary.score,
+      issueCount: report.summary.totalIssues,
+      issues: report.issues,
+      recommendations: report.recommendations,
+    };
+  }
+
+  /**
    * Test keyboard navigation
    */
   testKeyboardNavigation(html: string): {
@@ -323,6 +339,17 @@ export class AccessibilityTestUtils {
       },
       issues: allIssues,
       recommendations: this.generateRecommendations(allIssues),
+    };
+  }
+
+  /**
+   * Assertion helper for automated tests.
+   */
+  assertWCAGCompliance(html: string, css?: string): { pass: boolean; failures: string[] } {
+    const report = this.generateReport(html, css);
+    return {
+      pass: report.summary.totalIssues === 0,
+      failures: report.issues,
     };
   }
 

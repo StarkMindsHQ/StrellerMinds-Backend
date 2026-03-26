@@ -61,17 +61,22 @@ export class DataAggregationService {
     });
 
     const totalUsers = await this.userRepo.count();
-    const activeUsers = new Set(activities.map(a => a.userId)).size;
+    const activeUsers = new Set(activities.map((a) => a.userId)).size;
 
-    const activityByType = activities.reduce((acc, activity) => {
-      acc[activity.type] = (acc[activity.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const activityByType = activities.reduce(
+      (acc, activity) => {
+        acc[activity.type] = (acc[activity.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     const totalViews = profileAnalytics.reduce((sum, pa) => sum + pa.totalViews, 0);
-    const avgSessionDuration = profileAnalytics.length > 0
-      ? profileAnalytics.reduce((sum, pa) => sum + (pa.averageSessionDuration || 0), 0) / profileAnalytics.length
-      : 0;
+    const avgSessionDuration =
+      profileAnalytics.length > 0
+        ? profileAnalytics.reduce((sum, pa) => sum + (pa.averageSessionDuration || 0), 0) /
+          profileAnalytics.length
+        : 0;
 
     return {
       summary: {
@@ -108,11 +113,11 @@ export class DataAggregationService {
     });
 
     const totalRevenue = payments
-      .filter(p => p.status === 'completed')
+      .filter((p) => p.status === 'completed')
       .reduce((sum, p) => sum + parseFloat(p.amount.toString()), 0);
 
     const totalRefunds = payments
-      .filter(p => p.status === 'refunded')
+      .filter((p) => p.status === 'refunded')
       .reduce((sum, p) => sum + parseFloat(p.amount.toString()), 0);
 
     const transactionCount = payments.length;
@@ -129,7 +134,7 @@ export class DataAggregationService {
       revenueByGateway: this.groupByField(payments, 'gateway'),
       revenueByStatus: this.groupByField(payments, 'status'),
       timeSeriesData: this.groupByDate(payments, startDate, endDate),
-      financialReports: financialReports.map(fr => ({
+      financialReports: financialReports.map((fr) => ({
         period: fr.period,
         totalRevenue: fr.totalRevenue,
         netRevenue: fr.netRevenue,
@@ -197,14 +202,17 @@ export class DataAggregationService {
   }
 
   private groupByDate(items: any[], startDate: Date, endDate: Date): any[] {
-    const grouped = items.reduce((acc, item) => {
-      const date = new Date(item.createdAt).toISOString().split('T')[0];
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      acc[date].push(item);
-      return acc;
-    }, {} as Record<string, any[]>);
+    const grouped = items.reduce(
+      (acc, item) => {
+        const date = new Date(item.createdAt).toISOString().split('T')[0];
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(item);
+        return acc;
+      },
+      {} as Record<string, any[]>,
+    );
 
     return Object.entries(grouped).map(([date, dateItems]: [string, any[]]) => ({
       date,
@@ -213,14 +221,21 @@ export class DataAggregationService {
   }
 
   private groupByField(items: any[], field: string): Record<string, number> {
-    return items.reduce((acc, item) => {
-      const key = item[field] || 'unknown';
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return items.reduce(
+      (acc, item) => {
+        const key = item[field] || 'unknown';
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
   }
 
-  private async getTopEngagedUsers(startDate: Date, endDate: Date, limit: number = 10): Promise<any[]> {
+  private async getTopEngagedUsers(
+    startDate: Date,
+    endDate: Date,
+    limit: number = 10,
+  ): Promise<any[]> {
     const activities = await this.userActivityRepo
       .createQueryBuilder('activity')
       .select('activity.userId', 'userId')
