@@ -10,6 +10,7 @@ on:
 env:
   NODE_VERSION: '20.x'
   CACHE_VERSION: 'v1'
+  NODE_OPTIONS: '--max-old-space-size=4096'
 
 jobs:
   # Code Quality and Linting
