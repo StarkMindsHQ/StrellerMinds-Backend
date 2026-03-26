@@ -16,7 +16,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import { AuthService, UserResponse } from '../services/auth.service';
-import { JwtAuthGuard } from '../guards/auth.guard';
+import { JwtAuthGuard, Roles } from '../guards/auth.guard';
 import {
   RegisterDto,
   LoginDto,
@@ -26,7 +26,7 @@ import {
   VerifyEmailDto,
   ChangePasswordDto,
 } from '../dto/auth.dto';
-import { Roles } from '../guards/auth.guard';
+
 import { UserRole } from '../entities/user.entity';
 
 @ApiTags('Authentication')
@@ -66,6 +66,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto, @Request() req: ExpressRequest) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
@@ -80,6 +81,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: 200, description: 'Logout successful' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   async logout(@Body() body: { refreshToken: string }) {
     return this.authService.logout(body.refreshToken);
   }
@@ -99,8 +101,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Password reset email sent' })
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    await this.authService.forgotPassword(forgotPasswordDto.email);
+  @Throttle({ default: { limit: 3, ttl: 900000 } }) // 3 requests per 15 minutes
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+    @Request() req: ExpressRequest,
+  ) {
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+
+    await this.authService.forgotPassword(forgotPasswordDto.email, ipAddress, userAgent);
     return { message: 'Password reset email sent if account exists' };
   }
 
@@ -109,8 +118,17 @@ export class AuthController {
   @ApiOperation({ summary: 'Reset password' })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
   @ApiResponse({ status: 400, description: 'Invalid reset token' })
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    await this.authService.resetPassword(resetPasswordDto.resetToken, resetPasswordDto.newPassword);
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto, @Request() req: ExpressRequest) {
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+
+    await this.authService.resetPassword(
+      resetPasswordDto.resetToken,
+      resetPasswordDto.newPassword,
+      ipAddress,
+      userAgent,
+    );
     return { message: 'Password reset successful' };
   }
 
@@ -119,6 +137,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Verify email address' })
   @ApiResponse({ status: 200, description: 'Email verified successfully' })
   @ApiResponse({ status: 400, description: 'Invalid verification token' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     await this.authService.verifyEmail(verifyEmailDto.verificationToken);
     return { message: 'Email verified successfully' };
@@ -131,6 +150,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Change password' })
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute
   async changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
     @Request() req: ExpressRequest & { user: UserResponse },

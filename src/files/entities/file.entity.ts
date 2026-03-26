@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, CreateDateColumn, OneToMany } from 'typeorm';
+import { FileVersionEntity } from './file-version.entity';
 
 @Entity('files')
 export class FileEntity {
@@ -24,7 +25,14 @@ export class FileEntity {
   thumbnailPath: string;
 
   @Column({ default: 1 })
-  version: number;
+  currentVersion: number;
+
+  @Column({
+    type: 'enum',
+    enum: ['aws', 'gcs', 'azure'],
+    default: 'aws',
+  })
+  storageProvider: 'aws' | 'gcs' | 'azure';
 
   @Column({
     type: 'enum',
@@ -38,6 +46,9 @@ export class FileEntity {
 
   @Column('simple-array', { nullable: true })
   sharedWith: string[]; // Array of User IDs
+
+  @OneToMany(() => FileVersionEntity, (version) => version.file)
+  versions: FileVersionEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

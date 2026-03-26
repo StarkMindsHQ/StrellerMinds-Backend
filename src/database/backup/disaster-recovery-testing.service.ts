@@ -1,19 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { 
+import {
   RecoveryTest,
   BackupRecord,
   BackupType,
   RetentionTier,
-  RecoveryTestStatus
+  RecoveryTestStatus,
 } from './entities';
 import { RecoveryOptions } from './interfaces';
 import { BackupRecoveryService } from './backup-recovery.service';
@@ -102,17 +102,23 @@ export class DisasterRecoveryTestingService {
   ) {
     this.testDatabaseName = this.configService.get(
       'BACKUP_RECOVERY_TEST_DATABASE',
-      'strellerminds_recovery_test'
+      'strellerminds_recovery_test',
     );
 
     this.testConfig = {
       enabled: this.configService.get<boolean>('DISASTER_RECOVERY_TESTING_ENABLED', true),
-      frequency: this.configService.get<'daily' | 'weekly' | 'monthly'>('DISASTER_RECOVERY_TEST_FREQUENCY', 'weekly'),
+      frequency: this.configService.get<'daily' | 'weekly' | 'monthly'>(
+        'DISASTER_RECOVERY_TEST_FREQUENCY',
+        'weekly',
+      ),
       testDatabasePrefix: this.configService.get('DISASTER_RECOVERY_TEST_DB_PREFIX', 'dr_test_'),
-      cleanupAfterTest: this.configService.get<boolean>('DISASTER_RECOVERY_CLEANUP_AFTER_TEST', true),
+      cleanupAfterTest: this.configService.get<boolean>(
+        'DISASTER_RECOVERY_CLEANUP_AFTER_TEST',
+        true,
+      ),
       verificationDepth: this.configService.get<number>('DISASTER_RECOVERY_VERIFICATION_DEPTH', 5),
       alertOnFailure: this.configService.get<boolean>('DISASTER_RECOVERY_ALERT_ON_FAILURE', true),
-      testScenarios: this.getDefaultTestScenarios()
+      testScenarios: this.getDefaultTestScenarios(),
     };
   }
 
@@ -150,7 +156,6 @@ export class DisasterRecoveryTestingService {
 
       this.logger.log(`Disaster recovery test completed: ${testRunId}`);
       return report;
-
     } catch (error) {
       this.logger.error(`Disaster recovery test failed: ${error.message}`);
       throw error;
@@ -159,7 +164,7 @@ export class DisasterRecoveryTestingService {
 
   async runRecoveryScenario(
     scenario: RecoveryTestScenario,
-    testRunId: string
+    testRunId: string,
   ): Promise<RecoveryTestResult> {
     const testId = `${testRunId}-${scenario.name.toLowerCase().replace(/\s+/g, '-')}`;
     const startTime = Date.now();
@@ -181,7 +186,7 @@ export class DisasterRecoveryTestingService {
       const recoveryOptions: RecoveryOptions = {
         backupId: backup.id,
         targetDatabase: testDbName,
-        verifyAfterRestore: true
+        verifyAfterRestore: true,
       };
 
       if (scenario.recoveryPoint === 'point-in-time') {
@@ -206,7 +211,7 @@ export class DisasterRecoveryTestingService {
         totalRecoveryTime: Date.now() - startTime,
         dataThroughputMBps: this.calculateThroughput(backup.sizeBytes, recoveryDuration),
         cpuUsagePercent: await this.getCpuUsage(),
-        memoryUsageMB: await this.getMemoryUsage()
+        memoryUsageMB: await this.getMemoryUsage(),
       };
 
       // Cleanup test database
@@ -222,22 +227,18 @@ export class DisasterRecoveryTestingService {
         databaseRestored: recoveryResult.success,
         dataIntegrityVerified: verificationResult.success,
         performanceMetrics,
-        errors: [
-          ...(recoveryResult.errors || []),
-          ...(verificationResult.errors || [])
-        ],
+        errors: [...(recoveryResult.errors || []), ...(verificationResult.errors || [])],
         recommendations: this.generateRecommendations(
           recoveryResult,
           verificationResult,
-          performanceMetrics
-        )
+          performanceMetrics,
+        ),
       };
 
       return result;
-
     } catch (error) {
       this.logger.error(`Recovery scenario failed: ${scenario.name} - ${error.message}`);
-      
+
       return {
         testId,
         scenario: scenario.name,
@@ -252,9 +253,9 @@ export class DisasterRecoveryTestingService {
           totalRecoveryTime: Date.now() - startTime,
           dataThroughputMBps: 0,
           cpuUsagePercent: 0,
-          memoryUsageMB: 0
+          memoryUsageMB: 0,
         },
-        errors: [error.message]
+        errors: [error.message],
       };
     }
   }
@@ -288,13 +289,13 @@ export class DisasterRecoveryTestingService {
   async getTestHistory(limit: number = 10): Promise<RecoveryTest[]> {
     return this.recoveryTestRepository.find({
       order: { createdAt: 'DESC' },
-      take: limit
+      take: limit,
     });
   }
 
   async getTestReport(testId: string): Promise<DisasterRecoveryReport | null> {
     const test = await this.recoveryTestRepository.findOne({
-      where: { id: testId }
+      where: { id: testId },
     });
 
     if (!test) {
@@ -309,32 +310,34 @@ export class DisasterRecoveryTestingService {
       failedTests: test.status === RecoveryTestStatus.FAILED ? 1 : 0,
       averageRecoveryTime: test.durationMs,
       successRate: test.status === RecoveryTestStatus.PASSED ? 100 : 0,
-      detailedResults: [{
-        testId: test.id,
-        scenario: 'Recovery Test',
-        success: test.status === RecoveryTestStatus.PASSED,
-        durationMs: test.durationMs,
-        databaseRestored: test.tablesRestored > 0,
-        dataIntegrityVerified: test.integrityCheckPassed,
-        performanceMetrics: {
-          backupDownloadTime: 0,
-          restoreTime: test.durationMs,
-          verificationTime: 0,
-          totalRecoveryTime: test.durationMs,
-          dataThroughputMBps: 0,
-          cpuUsagePercent: 0,
-          memoryUsageMB: 0
-        }
-      }],
+      detailedResults: [
+        {
+          testId: test.id,
+          scenario: 'Recovery Test',
+          success: test.status === RecoveryTestStatus.PASSED,
+          durationMs: test.durationMs,
+          databaseRestored: test.tablesRestored > 0,
+          dataIntegrityVerified: test.integrityCheckPassed,
+          performanceMetrics: {
+            backupDownloadTime: 0,
+            restoreTime: test.durationMs,
+            verificationTime: 0,
+            totalRecoveryTime: test.durationMs,
+            dataThroughputMBps: 0,
+            cpuUsagePercent: 0,
+            memoryUsageMB: 0,
+          },
+        },
+      ],
       systemHealth: {
         databaseConnectivity: true,
         backupStorageHealth: true,
         cloudStorageHealth: true,
         diskSpaceAvailableGB: 100,
         memoryUsagePercent: 65,
-        cpuUsagePercent: 45
+        cpuUsagePercent: 45,
       },
-      recommendations: test.errorMessage ? [test.errorMessage] : []
+      recommendations: test.errorMessage ? [test.errorMessage] : [],
     };
   }
 
@@ -354,8 +357,11 @@ export class DisasterRecoveryTestingService {
     }
   }
 
-  private async selectBackupForScenario(scenario: RecoveryTestScenario): Promise<BackupRecord | null> {
-    const queryBuilder = this.backupRepository.createQueryBuilder('backup')
+  private async selectBackupForScenario(
+    scenario: RecoveryTestScenario,
+  ): Promise<BackupRecord | null> {
+    const queryBuilder = this.backupRepository
+      .createQueryBuilder('backup')
       .where('backup.status = :status', { status: 'completed' })
       .andWhere('backup.type = :type', { type: scenario.backupType })
       .orderBy('backup.createdAt', 'DESC')
@@ -372,7 +378,7 @@ export class DisasterRecoveryTestingService {
   private calculateTargetTime(offset: string): Date {
     const now = new Date();
     const match = offset.match(/^(\d+)([hdw])$/);
-    
+
     if (!match) {
       throw new Error(`Invalid time offset format: ${offset}`);
     }
@@ -388,7 +394,7 @@ export class DisasterRecoveryTestingService {
         now.setDate(now.getDate() - value);
         break;
       case 'w':
-        now.setDate(now.getDate() - (value * 7));
+        now.setDate(now.getDate() - value * 7);
         break;
     }
 
@@ -397,7 +403,7 @@ export class DisasterRecoveryTestingService {
 
   private async verifyRecovery(
     databaseName: string,
-    verificationSteps: string[]
+    verificationSteps: string[],
   ): Promise<{ success: boolean; errors: string[] }> {
     const errors: string[] = [];
     let success = true;
@@ -405,7 +411,7 @@ export class DisasterRecoveryTestingService {
     try {
       // Switch to test database
       const testDataSource = this.dataSource;
-      
+
       // Run verification queries
       for (const step of verificationSteps) {
         try {
@@ -422,7 +428,6 @@ export class DisasterRecoveryTestingService {
         errors.push(...integrityCheck.errors);
         success = false;
       }
-
     } catch (error) {
       errors.push(`Database verification failed: ${error.message}`);
       success = false;
@@ -431,9 +436,11 @@ export class DisasterRecoveryTestingService {
     return { success, errors };
   }
 
-  private async performIntegrityCheck(dataSource: DataSource): Promise<{ success: boolean; errors: string[] }> {
+  private async performIntegrityCheck(
+    dataSource: DataSource,
+  ): Promise<{ success: boolean; errors: string[] }> {
     const errors: string[] = [];
-    
+
     try {
       // Check for table consistency
       const tableCheck = await dataSource.query(`
@@ -441,7 +448,7 @@ export class DisasterRecoveryTestingService {
         FROM pg_tables 
         WHERE schemaname = 'public'
       `);
-      
+
       if (tableCheck.length === 0) {
         errors.push('No tables found in public schema');
         return { success: false, errors };
@@ -450,12 +457,16 @@ export class DisasterRecoveryTestingService {
       // Check for data consistency (basic row counts)
       for (const table of tableCheck.slice(0, this.testConfig.verificationDepth)) {
         try {
-          const count = await dataSource.query(`SELECT COUNT(*) as count FROM ${table.schemaname}.${table.tablename}`);
+          const count = await dataSource.query(
+            `SELECT COUNT(*) as count FROM ${table.schemaname}.${table.tablename}`,
+          );
           if (count[0].count < 0) {
             errors.push(`Invalid row count for table ${table.schemaname}.${table.tablename}`);
           }
         } catch (error) {
-          errors.push(`Failed to verify table ${table.schemaname}.${table.tablename}: ${error.message}`);
+          errors.push(
+            `Failed to verify table ${table.schemaname}.${table.tablename}: ${error.message}`,
+          );
         }
       }
 
@@ -468,7 +479,7 @@ export class DisasterRecoveryTestingService {
 
   private calculateThroughput(sizeBytes: number, durationMs: number): number {
     if (durationMs === 0) return 0;
-    return (sizeBytes / (1024 * 1024)) / (durationMs / 1000);
+    return sizeBytes / (1024 * 1024) / (durationMs / 1000);
   }
 
   private async getCpuUsage(): Promise<number> {
@@ -484,11 +495,12 @@ export class DisasterRecoveryTestingService {
   private generateRecommendations(
     recoveryResult: any,
     verificationResult: any,
-    performanceMetrics: RecoveryPerformanceMetrics
+    performanceMetrics: RecoveryPerformanceMetrics,
   ): string[] {
     const recommendations: string[] = [];
 
-    if (performanceMetrics.totalRecoveryTime > 300000) { // 5 minutes
+    if (performanceMetrics.totalRecoveryTime > 300000) {
+      // 5 minutes
       recommendations.push('Consider optimizing backup size or improving network bandwidth');
     }
 
@@ -497,7 +509,9 @@ export class DisasterRecoveryTestingService {
     }
 
     if (!recoveryResult.success) {
-      recommendations.push('Review backup creation process and ensure backups are completing successfully');
+      recommendations.push(
+        'Review backup creation process and ensure backups are completing successfully',
+      );
     }
 
     if (!verificationResult.success) {
@@ -514,7 +528,7 @@ export class DisasterRecoveryTestingService {
       cloudStorageHealth: true, // Would check cloud storage
       diskSpaceAvailableGB: 100, // Would check actual disk space
       memoryUsagePercent: 65, // Would check actual memory usage
-      cpuUsagePercent: 45 // Would check actual CPU usage
+      cpuUsagePercent: 45, // Would check actual CPU usage
     };
   }
 
@@ -522,14 +536,13 @@ export class DisasterRecoveryTestingService {
     testRunId: string,
     results: RecoveryTestResult[],
     systemHealth: SystemHealthMetrics,
-    duration: number
+    duration: number,
   ): DisasterRecoveryReport {
-    const passedTests = results.filter(r => r.success).length;
+    const passedTests = results.filter((r) => r.success).length;
     const failedTests = results.length - passedTests;
     const successRate = results.length > 0 ? (passedTests / results.length) * 100 : 0;
-    const averageRecoveryTime = results.length > 0 
-      ? results.reduce((sum, r) => sum + r.durationMs, 0) / results.length 
-      : 0;
+    const averageRecoveryTime =
+      results.length > 0 ? results.reduce((sum, r) => sum + r.durationMs, 0) / results.length : 0;
 
     const recommendations: string[] = [];
     if (successRate < 80) {
@@ -549,41 +562,45 @@ export class DisasterRecoveryTestingService {
       successRate,
       detailedResults: results,
       systemHealth,
-      recommendations
+      recommendations,
     };
   }
 
   private async storeTestResults(
     testRunId: string,
     results: RecoveryTestResult[],
-    report: DisasterRecoveryReport
+    report: DisasterRecoveryReport,
   ): Promise<void> {
     const testRecord = this.recoveryTestRepository.create({
       backupRecordId: 'test-run-' + testRunId,
-      status: results.every(r => r.success) ? RecoveryTestStatus.PASSED : RecoveryTestStatus.FAILED,
+      status: results.every((r) => r.success)
+        ? RecoveryTestStatus.PASSED
+        : RecoveryTestStatus.FAILED,
       durationMs: report.detailedResults.reduce((sum, r) => sum + r.durationMs, 0),
       tablesRestored: report.totalTests,
       rowsVerified: BigInt(report.passedTests).valueOf() as unknown as number,
-      integrityCheckPassed: results.every(r => r.success),
+      integrityCheckPassed: results.every((r) => r.success),
       checksumVerified: true,
       testResults: {
         tableChecks: [],
         constraintChecks: { foreignKeys: 0, passed: true },
         indexChecks: { count: 0, passed: true },
-        queryTests: []
+        queryTests: [],
       },
-      testDatabaseName: `dr-test-${testRunId}`
+      testDatabaseName: `dr-test-${testRunId}`,
     });
 
     await this.recoveryTestRepository.save(testRecord);
   }
 
   private async sendFailureAlerts(results: RecoveryTestResult[]): Promise<void> {
-    const failedTests = results.filter(r => !r.success);
+    const failedTests = results.filter((r) => !r.success);
     if (failedTests.length === 0) return;
 
     // This would integrate with actual alerting system
-    this.logger.error(`Disaster recovery test failures detected: ${failedTests.length} tests failed`);
+    this.logger.error(
+      `Disaster recovery test failures detected: ${failedTests.length} tests failed`,
+    );
   }
 
   private generateEmptyReport(): DisasterRecoveryReport {
@@ -602,9 +619,9 @@ export class DisasterRecoveryTestingService {
         cloudStorageHealth: false,
         diskSpaceAvailableGB: 0,
         memoryUsagePercent: 0,
-        cpuUsagePercent: 0
+        cpuUsagePercent: 0,
       },
-      recommendations: ['Disaster recovery testing is disabled']
+      recommendations: ['Disaster recovery testing is disabled'],
     };
   }
 
@@ -618,9 +635,9 @@ export class DisasterRecoveryTestingService {
         verificationSteps: [
           'SELECT COUNT(*) FROM users',
           'SELECT COUNT(*) FROM courses',
-          'SELECT COUNT(*) FROM payments'
+          'SELECT COUNT(*) FROM payments',
         ],
-        expectedDuration: 300
+        expectedDuration: 300,
       },
       {
         name: 'Point-in-Time Recovery',
@@ -629,10 +646,10 @@ export class DisasterRecoveryTestingService {
         recoveryPoint: 'point-in-time',
         targetTimeOffset: '1h',
         verificationSteps: [
-          'SELECT COUNT(*) FROM audit_logs WHERE created_at <= NOW() - INTERVAL \'1 hour\'',
-          'SELECT COUNT(*) FROM transactions WHERE created_at <= NOW() - INTERVAL \'1 hour\''
+          "SELECT COUNT(*) FROM audit_logs WHERE created_at <= NOW() - INTERVAL '1 hour'",
+          "SELECT COUNT(*) FROM transactions WHERE created_at <= NOW() - INTERVAL '1 hour'",
         ],
-        expectedDuration: 600
+        expectedDuration: 600,
       },
       {
         name: 'Incremental Backup Recovery',
@@ -641,10 +658,10 @@ export class DisasterRecoveryTestingService {
         recoveryPoint: 'latest',
         verificationSteps: [
           'SELECT COUNT(*) FROM user_sessions',
-          'SELECT COUNT(*) FROM activity_logs'
+          'SELECT COUNT(*) FROM activity_logs',
         ],
-        expectedDuration: 180
-      }
+        expectedDuration: 180,
+      },
     ];
   }
 }

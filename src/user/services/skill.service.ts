@@ -53,7 +53,8 @@ export class SkillService {
     page: number = 1,
     limit: number = 20,
   ): Promise<SkillSearchResponseDto> {
-    const query = this.skillRepository.createQueryBuilder('skill')
+    const query = this.skillRepository
+      .createQueryBuilder('skill')
       .where('skill.isActive = :isActive', { isActive: true });
 
     if (category) {
@@ -74,7 +75,11 @@ export class SkillService {
     };
   }
 
-  async searchSkills(query: string, page: number = 1, limit: number = 20): Promise<SkillSearchResponseDto> {
+  async searchSkills(
+    query: string,
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<SkillSearchResponseDto> {
     const [skills, total] = await this.skillRepository.findAndCount({
       where: [
         { name: Like(`%${query}%`), isActive: true },
@@ -133,7 +138,10 @@ export class SkillService {
   }
 
   // User Skill Management
-  async addUserSkill(profileId: string, createDto: CreateUserSkillDto): Promise<UserSkillResponseDto> {
+  async addUserSkill(
+    profileId: string,
+    createDto: CreateUserSkillDto,
+  ): Promise<UserSkillResponseDto> {
     const skill = await this.skillRepository.findOne({
       where: { id: createDto.skillId },
     });
@@ -165,8 +173,12 @@ export class SkillService {
     return this.mapUserSkillToResponseDto(saved, skill);
   }
 
-  async getUserSkills(profileId: string, includePrivate: boolean = false): Promise<UserSkillResponseDto[]> {
-    const query = this.userSkillRepository.createQueryBuilder('userSkill')
+  async getUserSkills(
+    profileId: string,
+    includePrivate: boolean = false,
+  ): Promise<UserSkillResponseDto[]> {
+    const query = this.userSkillRepository
+      .createQueryBuilder('userSkill')
       .leftJoinAndSelect('userSkill.skill', 'skill')
       .where('userSkill.profileId = :profileId', { profileId });
 
@@ -370,7 +382,8 @@ export class SkillService {
       }
 
       const isCorrect = Array.isArray(question.correctAnswer)
-        ? JSON.stringify(question.correctAnswer.sort()) === JSON.stringify((answer.answer as string[]).sort())
+        ? JSON.stringify(question.correctAnswer.sort()) ===
+          JSON.stringify((answer.answer as string[]).sort())
         : question.correctAnswer === answer.answer;
 
       if (isCorrect) {
@@ -455,7 +468,10 @@ export class SkillService {
         : 0;
 
     const topSkills = userSkills
-      .sort((a, b) => b.endorsementCount - a.endorsementCount || b.proficiencyLevel - a.proficiencyLevel)
+      .sort(
+        (a, b) =>
+          b.endorsementCount - a.endorsementCount || b.proficiencyLevel - a.proficiencyLevel,
+      )
       .slice(0, 5)
       .map((us) => ({
         skillId: us.skillId,
@@ -464,11 +480,14 @@ export class SkillService {
         endorsementCount: us.endorsementCount,
       }));
 
-    const skillsByCategory = userSkills.reduce((acc, us) => {
-      const category = us.skill.category;
-      acc[category] = (acc[category] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const skillsByCategory = userSkills.reduce(
+      (acc, us) => {
+        const category = us.skill.category;
+        acc[category] = (acc[category] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     return {
       totalSkills,
@@ -539,7 +558,9 @@ export class SkillService {
       id: endorsement.id,
       userSkillId: endorsement.userSkillId,
       endorserId: endorsement.endorserId,
-      endorserName: endorser?.user ? `${endorser.user.firstName} ${endorser.user.lastName}`.trim() : '',
+      endorserName: endorser?.user
+        ? `${endorser.user.firstName} ${endorser.user.lastName}`.trim()
+        : '',
       endorserProfilePhotoUrl: endorser?.profilePhotoUrl || '',
       weight: endorsement.weight,
       comment: endorsement.comment,
@@ -550,7 +571,10 @@ export class SkillService {
     };
   }
 
-  private mapAssessmentToResponseDto(assessment: SkillAssessment, skill: Skill): SkillAssessmentResponseDto {
+  private mapAssessmentToResponseDto(
+    assessment: SkillAssessment,
+    skill: Skill,
+  ): SkillAssessmentResponseDto {
     return {
       id: assessment.id,
       skillId: assessment.skillId,

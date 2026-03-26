@@ -32,7 +32,7 @@ export class RecommendationService {
 
       return response.hits.hits.map((hit) => ({
         id: hit._id,
-        ...hit._source as any,
+        ...(hit._source as any),
       }));
     } catch (error) {
       this.logger.error(`Failed to get similar content: ${error.message}`);
@@ -53,7 +53,7 @@ export class RecommendationService {
       return this.getPopularContent(limit);
     }
 
-    const searchTerms = recentSearches.map(s => s.query).join(' ');
+    const searchTerms = recentSearches.map((s) => s.query).join(' ');
 
     // 2. Search for content matching recent interests
     const response = await this.esService.search({
@@ -70,7 +70,7 @@ export class RecommendationService {
           // Boost newer content or highly rated content
           functions: [
             { field_value_factor: { field: 'rating', factor: 1.2, missing: 1 } },
-            { gauss: { createdAt: { scale: '30d', decay: 0.5 } } }
+            { gauss: { createdAt: { scale: '30d', decay: 0.5 } } },
           ],
         },
       } as any,
@@ -78,7 +78,7 @@ export class RecommendationService {
 
     return response.hits.hits.map((hit) => ({
       id: hit._id,
-      ...hit._source as any,
+      ...(hit._source as any),
     }));
   }
 
@@ -91,7 +91,7 @@ export class RecommendationService {
 
     return response.hits.hits.map((hit) => ({
       id: hit._id,
-      ...hit._source as any,
+      ...(hit._source as any),
     }));
   }
 }

@@ -1,22 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SecurityAudit, SecurityEvent } from '../entities/security-audit.entity';
 import { GeoIpService } from './geo-ip.service';
-import { ThreatDetectionService } from 'src/forum/threat-detection.service';
+import { ThreatDetectionService } from '../../forum/threat-detection.service';
+import { AppLogger } from '../../logging/logger.service';
 
 @Injectable()
 export class SecurityAuditService {
+  private readonly logger = new AppLogger(SecurityAuditService.name);
 
-    constructor(
-        @InjectRepository(SecurityAudit)
-        private readonly auditRepository: Repository<SecurityAudit>,
-        private readonly geoIpService: GeoIpService,
-        private readonly threatDetectionService: ThreatDetectionService,
-    ) { }
-
-
-
+  constructor(
+    @InjectRepository(SecurityAudit)
+    private readonly auditRepository: Repository<SecurityAudit>,
+    private readonly geoIpService: GeoIpService,
+    @Optional() private readonly threatDetectionService: ThreatDetectionService | null,
+  ) {}
 
   async log(
     userId: string | null,
@@ -35,15 +34,14 @@ export class SecurityAuditService {
       metadata: { ...metadata, location },
     });
 
+    const savedAudit = await this.auditRepository.save(audit);
 
-        const savedAudit = await this.auditRepository.save(audit);
-
-        // Analyze event for threats asynchronously
-        this.threatDetectionService.analyzeEvent(savedAudit).catch(err => {
-            console.error('Threat detection analysis failed:', err);
-        });
-
-    await this.auditRepository.save(audit);
+    // Analyze event for threats asynchronously when ThreatDetectionService is available (ForumModule)
+    if (this.threatDetectionService) {
+      this.threatDetectionService.analyzeEvent(savedAudit).catch((err) => {
+        this.logger.error('Threat detection analysis failed:', err.stack, { event: savedAudit.id });
+      });
+    }
   }
 
   async getRecentEvents(userId: string | null, limit: number = 10): Promise<SecurityAudit[]> {
@@ -54,7 +52,6 @@ export class SecurityAuditService {
 
     if (userId) {
       query.where('audit.userId = :userId', { userId });
-
     }
 
     return query.getMany();

@@ -8,18 +8,8 @@ import { SecurityAudit } from '../auth/entities/security-audit.entity';
 
 @Global()
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([SecurityIncident, SecurityAudit]),
-  ],
-  providers: [
-    ThreatDetectionService,
-    SecurityResponseService,
-    SecurityAnalyticsService,
-  ],
-  exports: [
-    ThreatDetectionService,
-    SecurityResponseService,
-    SecurityAnalyticsService,
-  ],
+  imports: [TypeOrmModule.forFeature([SecurityIncident, SecurityAudit])],
+  providers: [ThreatDetectionService, SecurityResponseService, SecurityAnalyticsService],
+  exports: [ThreatDetectionService, SecurityResponseService, SecurityAnalyticsService],
 })
 export class SecurityModule {}

@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     name: CodeQL Analysis
     needs: [dependency-audit]
-    if: github.event_name != 'pull_request' # Skip CodeQL on PRs
+    if: always() # Run CodeQL on all events
     
     strategy:
       fail-fast: false
@@ -126,7 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Container Security Scan
     needs: [dependency-audit]
-    if: github.event_name != 'pull_request' # Skip container scan on PRs
+    if: always() # Run container scan on all events
     
     steps:
     - name: Checkout code
@@ -168,7 +168,7 @@ jobs:
   zap-baseline:
     runs-on: ubuntu-latest
     name: OWASP ZAP Baseline Scan
-    if: github.event_name != 'pull_request' # Skip ZAP scan on PRs
+    if: always() # Run ZAP scan on all events
     
     services:
       postgres:
@@ -254,7 +254,7 @@ jobs:
   secret-scan:
     runs-on: ubuntu-latest
     name: Secret Scanning
-    if: github.event_name != 'pull_request' # Skip secret scan on PRs
+    if: always() # Run secret scan on all events
     
     steps:
     - name: Checkout code

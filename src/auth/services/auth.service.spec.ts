@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../services/auth.service';
 import { BcryptService } from '../services/bcrypt.service';
-import { JwtService } from '../services/jwt.service';
-import { EmailService } from '../services/email.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { TwoFactorAuthService } from '../services/two-factor-auth.service';
+import { SecurityAuditService } from '../services/security-audit.service';
+import { PasswordHistoryService } from '../services/password-history.service';
 import { Repository } from 'typeorm';
 import { User, UserRole, UserStatus } from '../entities/user.entity';
 import { RefreshToken } from '../entities/refresh-token.entity';
@@ -43,17 +46,28 @@ describe('AuthService', () => {
         {
           provide: JwtService,
           useValue: {
-            signAccessToken: jest.fn(),
-            signRefreshToken: jest.fn(),
-            verifyAccessToken: jest.fn(),
-            verifyRefreshToken: jest.fn(),
+            sign: jest.fn(),
+            verifyAsync: jest.fn(),
           },
         },
         {
-          provide: EmailService,
+          provide: TwoFactorAuthService,
           useValue: {
-            sendEmailVerification: jest.fn(),
-            sendPasswordReset: jest.fn(),
+            generateSecret: jest.fn(),
+            verifyToken: jest.fn(),
+          },
+        },
+        {
+          provide: SecurityAuditService,
+          useValue: {
+            logEvent: jest.fn(),
+          },
+        },
+        {
+          provide: PasswordHistoryService,
+          useValue: {
+            checkPasswordHistory: jest.fn(),
+            savePasswordHistory: jest.fn(),
           },
         },
         {
@@ -125,8 +139,10 @@ describe('AuthService', () => {
     it('should login user successfully', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as User);
       jest.spyOn(bcryptService, 'compare').mockResolvedValue(true);
-      jest.spyOn(jwtService, 'signAccessToken').mockResolvedValue('accessToken');
-      jest.spyOn(jwtService, 'signRefreshToken').mockResolvedValue('refreshToken');
+      jest.spyOn(jwtService, 'sign').mockImplementation((payload, options) => {
+        if (options.secret.includes('ACCESS')) return 'accessToken';
+        return 'refreshToken';
+      });
       jest.spyOn(refreshTokenRepository, 'create').mockReturnValue({} as RefreshToken);
       jest.spyOn(refreshTokenRepository, 'save').mockResolvedValue({} as RefreshToken);
 

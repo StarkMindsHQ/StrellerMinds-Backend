@@ -9,7 +9,8 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { Assignment, AssignmentType, SubmissionStatus } from './assignment.entity';
+import { Assignment } from './assignment.entity';
+import { AssignmentType, SubmissionStatus } from './assignment-enums';
 import { User } from '../../auth/entities/user.entity';
 import { Grade } from './grade.entity';
 import { Annotation } from './annotation.entity';

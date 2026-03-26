@@ -28,10 +28,7 @@ export class SearchService implements OnModuleInit {
     });
 
     // ES v8 returns { body: boolean }
-    const exists =
-      typeof indexExists === 'boolean'
-        ? indexExists
-        : (indexExists as any).body;
+    const exists = typeof indexExists === 'boolean' ? indexExists : (indexExists as any).body;
 
     if (!exists) {
       await this.esService.indices.create({
@@ -110,9 +107,7 @@ export class SearchService implements OnModuleInit {
 
       const hits = response.hits.hits;
       const total =
-        typeof response.hits.total === 'object'
-          ? response.hits.total.value
-          : response.hits.total;
+        typeof response.hits.total === 'object' ? response.hits.total.value : response.hits.total;
 
       const executionTime = Date.now() - startTime;
 

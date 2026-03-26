@@ -20,6 +20,7 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiQuery,
   ApiConsumes,
   ApiBody,
   ApiBearerAuth,
@@ -36,6 +37,7 @@ import {
   BulkUpdateDto,
   UserResponseDto,
 } from './dto/user.dto';
+import { RequestWithUser } from '../common/types/request.types';
 
 @ApiTags('users')
 @Controller('users')
@@ -52,19 +54,34 @@ export class UserController {
   @ApiResponse({ status: 409, description: 'Email or username already exists' })
   async create(
     @Body() createUserDto: CreateUserDto,
-    @Request() req?: any,
+    @Request() req?: RequestWithUser,
   ): Promise<UserResponseDto> {
-    return this.userService.create(createUserDto, req?.user?.id);
+    return this.userService.create(createUserDto, req?.user?.sub);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all users with filtering and pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
+  @ApiQuery({ name: 'cursor', required: false, type: String, example: 'eyJj...==' })
   @ApiResponse({
     status: 200,
     description: 'Users retrieved successfully',
   })
   async findAll(@Query() query: UserQueryDto) {
-    return this.userService.findAll(query);
+    const result = await this.userService.findAll(query);
+    return {
+      success: true,
+      data: result.data,
+      pagination: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages,
+        cursor: result.cursor,
+        nextCursor: result.nextCursor,
+      },
+    };
   }
 
   @Get(':id')
@@ -91,9 +108,9 @@ export class UserController {
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Request() req?: any,
+    @Request() req?: RequestWithUser,
   ): Promise<UserResponseDto> {
-    return this.userService.update(id, updateUserDto, req?.user?.id);
+    return this.userService.update(id, updateUserDto, req?.user?.sub);
   }
 
   @Patch(':id/profile')
@@ -182,8 +199,11 @@ export class UserController {
     type: UserResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async suspend(@Param('id') id: string, @Request() req?: any): Promise<UserResponseDto> {
-    return this.userService.suspend(id, req?.user?.id);
+  async suspend(
+    @Param('id') id: string,
+    @Request() req?: RequestWithUser,
+  ): Promise<UserResponseDto> {
+    return this.userService.suspend(id, req?.user?.sub);
   }
 
   @Post(':id/reactivate')
@@ -195,8 +215,11 @@ export class UserController {
     type: UserResponseDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async reactivate(@Param('id') id: string, @Request() req?: any): Promise<UserResponseDto> {
-    return this.userService.reactivate(id, req?.user?.id);
+  async reactivate(
+    @Param('id') id: string,
+    @Request() req?: RequestWithUser,
+  ): Promise<UserResponseDto> {
+    return this.userService.reactivate(id, req?.user?.sub);
   }
 
   @Delete(':id')
@@ -204,8 +227,8 @@ export class UserController {
   @ApiOperation({ summary: 'Soft delete a user' })
   @ApiResponse({ status: 204, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async remove(@Param('id') id: string, @Request() req?: any): Promise<void> {
-    return this.userService.remove(id, req?.user?.id);
+  async remove(@Param('id') id: string, @Request() req?: RequestWithUser): Promise<void> {
+    return this.userService.remove(id, req?.user?.sub);
   }
 
   @Post('bulk-update')
@@ -224,9 +247,9 @@ export class UserController {
   })
   async bulkUpdate(
     @Body() bulkUpdateDto: BulkUpdateDto,
-    @Request() req?: any,
+    @Request() req?: RequestWithUser,
   ): Promise<{ success: number; failed: number }> {
-    return this.userService.bulkUpdate(bulkUpdateDto, req?.user?.id);
+    return this.userService.bulkUpdate(bulkUpdateDto, req?.user?.sub);
   }
 
   @Get(':id/export')

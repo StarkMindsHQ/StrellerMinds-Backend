@@ -7,6 +7,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, In, Between } from 'typeorm';
+import {
+  decodeCursor,
+  buildCursorForCreatedAt,
+  validatePaginationParams,
+} from '../common/pagination/pagination.utils';
 import { User, UserStatus, UserRole } from './entities/user.entity';
 import { UserActivity, ActivityType } from './entities/user-activity.entity';
 import {
@@ -65,13 +70,17 @@ export class UserService {
 
   async findAll(query: UserQueryDto): Promise<{
     data: UserResponseDto[];
-    total: number;
-    page: number;
+    total?: number;
+    page?: number;
     limit: number;
-    totalPages: number;
+    totalPages?: number;
+    cursor?: string;
+    nextCursor?: string | null;
   }> {
     const { page, limit, search, status, role, sortBy, sortOrder, createdAfter, createdBefore } =
       query;
+
+    validatePaginationParams(page, limit, query.cursor);
 
     const qb = this.userRepository.createQueryBuilder('user');
 
@@ -96,6 +105,36 @@ export class UserService {
 
     if (createdBefore) {
       qb.andWhere('user.createdAt <= :createdBefore', { createdBefore });
+    }
+
+    if (query.cursor) {
+      const cursorPayload = decodeCursor(query.cursor);
+      if (!cursorPayload || !cursorPayload.createdAt || !cursorPayload.id) {
+        throw new BadRequestException('Invalid cursor value');
+      }
+
+      const cursorDate = new Date(cursorPayload.createdAt);
+      const cursorId = cursorPayload.id;
+
+      qb.andWhere(
+        '(user.createdAt < :cursorDate OR (user.createdAt = :cursorDate AND user.id < :cursorId))',
+        { cursorDate, cursorId },
+      );
+
+      qb.orderBy('user.createdAt', 'DESC').addOrderBy('user.id', 'DESC').take(limit);
+
+      const users = await qb.getMany();
+
+      const nextCursor = users.length
+        ? buildCursorForCreatedAt(users[users.length - 1].createdAt, users[users.length - 1].id)
+        : null;
+
+      return {
+        data: users.map((user) => this.toResponseDto(user)),
+        cursor: query.cursor,
+        nextCursor,
+        limit,
+      };
     }
 
     const total = await qb.getCount();
