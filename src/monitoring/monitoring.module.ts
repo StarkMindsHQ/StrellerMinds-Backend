@@ -14,8 +14,13 @@ import { PerformanceAnalyticsService } from './services/performance-analytics.se
 import { LoadTestingService } from './services/load-testing.service';
 import { OptimizationRecommendationsService } from './services/optimization-recommendations.service';
 import { RealTimeMonitoringService } from './services/real-time-monitoring.service';
+import { DistributedTracingService } from './services/distributed-tracing.service';
+import { PerformanceProfilerService } from './services/performance-profiler.service';
+import { AlertingService } from './services/alerting.service';
 import { MonitoringController } from './controllers/monitoring.controller';
 import { PerformanceInterceptor } from './interceptors/performance.interceptor';
+import { DatadogProvider } from './providers/datadog.provider';
+import { NewRelicProvider } from './providers/newrelic.provider';
 import { DatabaseModule } from '../database/database.module';
 
 @Module({
@@ -40,6 +45,11 @@ import { DatabaseModule } from '../database/database.module';
     OptimizationRecommendationsService,
     PerformanceInterceptor,
     RealTimeMonitoringService,
+    DistributedTracingService,
+    PerformanceProfilerService,
+    AlertingService,
+    DatadogProvider,
+    NewRelicProvider,
   ],
   exports: [
     ApmService,
@@ -50,6 +60,11 @@ import { DatabaseModule } from '../database/database.module';
     LoadTestingService,
     OptimizationRecommendationsService,
     RealTimeMonitoringService,
+    DistributedTracingService,
+    PerformanceProfilerService,
+    AlertingService,
+    DatadogProvider,
+    NewRelicProvider,
   ],
 })
 export class MonitoringModule {}
