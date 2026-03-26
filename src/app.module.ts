@@ -58,6 +58,7 @@ import { DocumentationModule } from './documentation/documentation.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
 import { LoggingModule } from './logging/logging.module';
+import { ComplianceModule } from './compliance/compliance.module';
 import { CapacityPlanningModule } from './capacity-planning/capacity-planning.module';
 import { QueueModule } from './common/queue/queue.module';
 import { SearchModule } from './search/entities/search.module';
@@ -119,6 +120,8 @@ import { SearchModule } from './search/entities/search.module';
     UserModule,
     DocumentationModule,
     MonitoringModule,
+    ComplianceModule,
+    CoreModule,
     CapacityPlanningModule,
     LoggingModule,
   ],
