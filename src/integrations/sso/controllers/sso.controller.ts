@@ -16,6 +16,7 @@ import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { SSOService } from '../services/sso.service';
 import { SSOConfigService } from '../services/sso-config.service';
 import { SSOConfigDto } from '../dto/sso.dto';
+import { RequestUser } from '../../../common/types/request.types';
 
 @Controller('integrations/sso')
 export class SSOController {
@@ -29,9 +30,9 @@ export class SSOController {
    */
   @Post('config')
   @UseGuards(JwtAuthGuard)
-  async createSSOConfig(@CurrentUser() user: any, @Body() dto: SSOConfigDto) {
+  async createSSOConfig(@CurrentUser() user: RequestUser, @Body() dto: SSOConfigDto) {
     const config = await this.ssoConfigService.createSSOConfig(
-      user.id,
+      user.sub,
       dto.provider,
       dto.name,
       dto,
@@ -49,8 +50,8 @@ export class SSOController {
    */
   @Get('config/:configId')
   @UseGuards(JwtAuthGuard)
-  async getSSOConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
-    const config = await this.ssoConfigService.getSSOConfig(configId, user.id);
+  async getSSOConfig(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+    const config = await this.ssoConfigService.getSSOConfig(configId, user.sub);
     if (!config) {
       throw new NotFoundException('SSO configuration not found');
     }
@@ -66,8 +67,8 @@ export class SSOController {
    */
   @Get('configs')
   @UseGuards(JwtAuthGuard)
-  async listSSOConfigs(@CurrentUser() user: any) {
-    const configs = await this.ssoConfigService.listSSOConfigs(user.id);
+  async listSSOConfigs(@CurrentUser() user: RequestUser) {
+    const configs = await this.ssoConfigService.listSSOConfigs(user.sub);
 
     return {
       success: true,
@@ -81,11 +82,11 @@ export class SSOController {
   @Put('config/:configId')
   @UseGuards(JwtAuthGuard)
   async updateSSOConfig(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Param('configId') configId: string,
     @Body() dto: Partial<SSOConfigDto>,
   ) {
-    const config = await this.ssoConfigService.updateSSOConfig(configId, user.id, {
+    const config = await this.ssoConfigService.updateSSOConfig(configId, user.sub, {
       credentials: dto,
     });
 
@@ -101,8 +102,8 @@ export class SSOController {
    */
   @Post('config/:configId/activate')
   @UseGuards(JwtAuthGuard)
-  async activateSSOConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
-    const config = await this.ssoConfigService.activateSSOConfig(configId, user.id);
+  async activateSSOConfig(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+    const config = await this.ssoConfigService.activateSSOConfig(configId, user.sub);
 
     return {
       success: true,

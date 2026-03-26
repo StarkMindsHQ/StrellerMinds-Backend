@@ -7,10 +7,7 @@ export interface VisualizationConfig {
 
 @Injectable()
 export class VisualizationService {
-  async generateVisualizations(
-    data: any,
-    configuration: any,
-  ): Promise<VisualizationConfig[]> {
+  async generateVisualizations(data: any, configuration: any): Promise<VisualizationConfig[]> {
     const visualizations: VisualizationConfig[] = [];
 
     if (data.timeSeriesData && data.timeSeriesData.length > 0) {

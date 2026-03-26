@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Invoice, Payment } from '../entities';
 import { InvoiceStatus } from '../enums';
 import { CreateInvoiceDto, UpdateInvoiceDto, SendInvoiceDto } from '../dto';
+import { EmailService } from 'src/auth/services/email.service';
 
 @Injectable()
 export class InvoiceService {
@@ -12,6 +13,7 @@ export class InvoiceService {
     private invoiceRepository: Repository<Invoice>,
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
+    private readonly emailService: EmailService,
   ) {}
 
   async createInvoice(userId: string, dto: CreateInvoiceDto): Promise<Invoice> {
@@ -78,8 +80,7 @@ export class InvoiceService {
   async sendInvoice(invoiceId: string, dto: SendInvoiceDto): Promise<Invoice> {
     const invoice = await this.getInvoice(invoiceId);
 
-    // TODO: Implement email sending logic
-    // await this.emailService.sendInvoice(dto.email, invoice, dto.subject, dto.message);
+    await this.emailService.sendInvoice(dto.email, invoice, dto.subject, dto.message);
 
     invoice.status = InvoiceStatus.SENT;
     return this.invoiceRepository.save(invoice);

@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/auth.guard';
 import { DataAggregationService } from '../services/data-aggregation.service';
@@ -23,15 +17,12 @@ export class DashboardController {
   @ApiResponse({ status: 200, description: 'Metrics retrieved successfully' })
   async getUserEngagement(@Query() query: DashboardQueryDto) {
     const dateRange = this.getDateRange(query);
-    const data = await this.dataAggregationService.aggregateData(
-      ReportType.USER_ENGAGEMENT,
-      {
-        dateRange,
-        metrics: ['totalUsers', 'activeUsers', 'engagementRate'],
-        dimensions: ['date'],
-        filters: {},
-      },
-    );
+    const data = await this.dataAggregationService.aggregateData(ReportType.USER_ENGAGEMENT, {
+      dateRange,
+      metrics: ['totalUsers', 'activeUsers', 'engagementRate'],
+      dimensions: ['date'],
+      filters: {},
+    });
 
     return {
       success: true,
@@ -44,15 +35,12 @@ export class DashboardController {
   @ApiResponse({ status: 200, description: 'Metrics retrieved successfully' })
   async getFinancialMetrics(@Query() query: DashboardQueryDto) {
     const dateRange = this.getDateRange(query);
-    const data = await this.dataAggregationService.aggregateData(
-      ReportType.FINANCIAL,
-      {
-        dateRange,
-        metrics: ['totalRevenue', 'netRevenue', 'transactionCount'],
-        dimensions: ['date'],
-        filters: {},
-      },
-    );
+    const data = await this.dataAggregationService.aggregateData(ReportType.FINANCIAL, {
+      dateRange,
+      metrics: ['totalRevenue', 'netRevenue', 'transactionCount'],
+      dimensions: ['date'],
+      filters: {},
+    });
 
     return {
       success: true,
@@ -65,15 +53,12 @@ export class DashboardController {
   @ApiResponse({ status: 200, description: 'Metrics retrieved successfully' })
   async getSystemHealth(@Query() query: DashboardQueryDto) {
     const dateRange = this.getDateRange(query);
-    const data = await this.dataAggregationService.aggregateData(
-      ReportType.SYSTEM_HEALTH,
-      {
-        dateRange,
-        metrics: ['totalRequests', 'errorRate', 'uptime'],
-        dimensions: ['date'],
-        filters: {},
-      },
-    );
+    const data = await this.dataAggregationService.aggregateData(ReportType.SYSTEM_HEALTH, {
+      dateRange,
+      metrics: ['totalRequests', 'errorRate', 'uptime'],
+      dimensions: ['date'],
+      filters: {},
+    });
 
     return {
       success: true,

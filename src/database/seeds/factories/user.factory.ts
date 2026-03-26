@@ -1,5 +1,6 @@
+import { BaseFactory } from './base.factory';
 import { User, UserRole, UserStatus } from '../../../auth/entities/user.entity';
-import * as bcrypt from 'bcrypt';
+import { DataSource } from 'typeorm';
 
 export interface UserFactoryOptions {
   role?: UserRole;
@@ -9,115 +10,109 @@ export interface UserFactoryOptions {
 }
 
 /**
- * Factory for generating user seed data
+ * Factory for generating user test data
  */
-export class UserFactory {
+export class UserFactory extends BaseFactory<User> {
   private static readonly FIRST_NAMES = [
-    'John',
-    'Jane',
-    'Michael',
-    'Sarah',
-    'David',
-    'Emily',
-    'Robert',
-    'Lisa',
-    'James',
-    'Mary',
-    'William',
-    'Patricia',
-    'Richard',
-    'Jennifer',
-    'Thomas',
-    'Linda',
+    'John', 'Jane', 'Michael', 'Sarah', 'David', 'Emily', 'Robert', 'Lisa',
+    'James', 'Mary', 'William', 'Patricia', 'Richard', 'Jennifer', 'Thomas', 'Linda',
   ];
 
   private static readonly LAST_NAMES = [
-    'Smith',
-    'Johnson',
-    'Williams',
-    'Brown',
-    'Jones',
-    'Garcia',
-    'Miller',
-    'Davis',
-    'Rodriguez',
-    'Martinez',
-    'Hernandez',
-    'Lopez',
-    'Gonzalez',
-    'Wilson',
-    'Anderson',
-    'Thomas',
+    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
+    'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas',
   ];
 
-  /**
-   * Generate a single user
-   */
-  static async generate(options: UserFactoryOptions = {}): Promise<Partial<User>> {
-    const firstName = this.randomElement(this.FIRST_NAMES);
-    const lastName = this.randomElement(this.LAST_NAMES);
-    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 1000)}@example.com`;
+  constructor(dataSource: DataSource) {
+    super(dataSource);
+  }
+
+  protected getRepository() {
+    return this.dataSource.getRepository(User);
+  }
+
+  async create(overrides: UserFactoryOptions = {}): Promise<User> {
+    const userData = this.generate(overrides);
+    return await this.save(userData);
+  }
+
+  generate(overrides: UserFactoryOptions = {}): User {
+    const firstName = this.randomPick(UserFactory.FIRST_NAMES);
+    const lastName = this.randomPick(UserFactory.LAST_NAMES);
+    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${this.randomNumber(1, 999)}@example.com`;
 
     return {
+      id: this.randomUUID(),
       email,
       firstName,
       lastName,
-      password: await bcrypt.hash('Password123!', 10),
-      role: options.role || UserRole.STUDENT,
-      status: options.status || UserStatus.ACTIVE,
-      isEmailVerified: options.isEmailVerified !== undefined ? options.isEmailVerified : true,
-      lastLoginAt: new Date(),
-    };
+      password: '$2b$10$rOzJqQjQjQjQjQjQjQjQjOzJqQjQjQjQjQjQjQjQjQjQjQjQjQjQjQ', // hashed 'Password123!'
+      role: overrides.role || UserRole.STUDENT,
+      status: overrides.status || UserStatus.ACTIVE,
+      isEmailVerified: overrides.isEmailVerified !== undefined ? overrides.isEmailVerified : true,
+      lastLoginAt: this.randomDate(),
+      createdAt: this.randomDate(),
+      updatedAt: new Date(),
+    } as User;
   }
 
   /**
-   * Generate multiple users
+   * Create admin user
    */
-  static async generateMany(
-    count: number,
-    options: UserFactoryOptions = {},
-  ): Promise<Partial<User>[]> {
-    const users: Partial<User>[] = [];
-    for (let i = 0; i < count; i++) {
-      users.push(await this.generate(options));
-    }
-    return users;
-  }
-
-  /**
-   * Generate admin user
-   */
-  static async generateAdmin(): Promise<Partial<User>> {
-    return this.generate({
+  async createAdmin(): Promise<User> {
+    return await this.create({
       role: UserRole.ADMIN,
-      status: UserStatus.ACTIVE,
       isEmailVerified: true,
     });
   }
 
   /**
-   * Generate instructor users
+   * Create instructor users
    */
-  static async generateInstructors(count: number = 5): Promise<Partial<User>[]> {
-    return this.generateMany(count, {
+  async createInstructors(count: number): Promise<User[]> {
+    return await this.createMany(count, {
       role: UserRole.INSTRUCTOR,
-      status: UserStatus.ACTIVE,
       isEmailVerified: true,
     });
   }
 
   /**
-   * Generate student users
+   * Create student users
    */
-  static async generateStudents(count: number = 20): Promise<Partial<User>[]> {
-    return this.generateMany(count, {
+  async createStudents(count: number): Promise<User[]> {
+    return await this.createMany(count, {
       role: UserRole.STUDENT,
-      status: UserStatus.ACTIVE,
       isEmailVerified: true,
     });
   }
 
-  private static randomElement<T>(array: T[]): T {
-    return array[Math.floor(Math.random() * array.length)];
+  /**
+   * Create users with specific role
+   */
+  async createWithRole(role: UserRole, count: number): Promise<User[]> {
+    return await this.createMany(count, {
+      role,
+      isEmailVerified: true,
+    });
+  }
+
+  /**
+   * Create inactive users
+   */
+  async createInactive(count: number): Promise<User[]> {
+    return await this.createMany(count, {
+      status: UserStatus.INACTIVE,
+      isEmailVerified: false,
+    });
+  }
+
+  /**
+   * Create suspended users
+   */
+  async createSuspended(count: number): Promise<User[]> {
+    return await this.createMany(count, {
+      status: UserStatus.SUSPENDED,
+      isEmailVerified: true,
+    });
   }
 }

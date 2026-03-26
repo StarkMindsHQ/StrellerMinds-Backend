@@ -275,4 +275,60 @@ export class EmailNotificationsService {
       where: { status: EmailStatus.FAILED },
     });
   }
+
+  async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
+    const template = await this.emailTemplateRepository.findOne({
+      where: { type: EmailTemplateType.PASSWORD_RESET },
+    });
+
+    if (!template) {
+      throw new Error('Password reset email template not found');
+    }
+
+    const resetUrl = `${this.configService.get('FRONTEND_URL')}/reset-password?token=${resetToken}`;
+
+    await this.sendEmail({
+      to: email,
+      subject: template.subject,
+      htmlContent: this.replacePlaceholders(template.htmlContent, {
+        resetUrl,
+        userName: email,
+      }),
+      textContent: this.replacePlaceholders(template.textContent, {
+        resetUrl,
+        userName: email,
+      }),
+      templateData: { resetToken, resetUrl },
+    });
+  }
+
+  async sendInvoice(email: string, invoice: any, subject: string, message: string): Promise<void> {
+    const template = await this.emailTemplateRepository.findOne({
+      where: { type: EmailTemplateType.INVOICE },
+    });
+
+    if (!template) {
+      throw new Error('Invoice email template not found');
+    }
+
+    await this.sendEmail({
+      to: email,
+      subject: subject || template.subject,
+      htmlContent: this.replacePlaceholders(template.htmlContent, {
+        invoiceNumber: invoice.invoiceNumber,
+        amount: invoice.total,
+        dueDate: invoice.dueDate,
+        customerName: invoice.customerName,
+        message: message,
+      }),
+      textContent: this.replacePlaceholders(template.textContent, {
+        invoiceNumber: invoice.invoiceNumber,
+        amount: invoice.total,
+        dueDate: invoice.dueDate,
+        customerName: invoice.customerName,
+        message: message,
+      }),
+      templateData: { invoice },
+    });
+  }
 }

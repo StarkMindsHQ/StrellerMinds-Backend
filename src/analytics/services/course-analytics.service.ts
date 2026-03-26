@@ -13,7 +13,7 @@ import {
   StudentAnalyticsResponse,
   InstructorDashboardResponse,
 } from '../dto/analytics.dto';
-import { ProgressTrackingService } from '../../learning-path/services/progress-tracking.service';
+import { ProgressTrackingService } from './progress-tracking.service';
 import { ProgressStatus, StudentProgress } from '../entities/student.progress.entity';
 
 const CACHE_TTL_SECONDS = 300; // 5 min

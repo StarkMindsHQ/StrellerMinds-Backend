@@ -59,7 +59,7 @@ import { PasswordHistoryService } from './services/password-history.service';
         },
         template: {
           dir: join(__dirname, 'templates'),
-          adapter: new HandlebarsAdapter(),
+          adapter: handlebarsAdapter,
           options: {
             strict: true,
           },

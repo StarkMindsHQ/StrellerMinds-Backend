@@ -1,5 +1,5 @@
 # Multi-stage Docker build for StrellerMinds Backend
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -40,7 +40,7 @@ RUN npm run build
 RUN npm prune --production --legacy-peer-deps && npm cache clean --force
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init curl
@@ -68,7 +68,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -f http://localhost:3000/api/health || exit 1
 
 # Set environment variables
 ENV NODE_ENV=production

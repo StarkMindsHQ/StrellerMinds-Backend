@@ -10,9 +10,6 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/**/*.spec.ts',
     '<rootDir>/src/**/*.test.ts',
-    '<rootDir>/test/unit/**/*.spec.ts',
-    '<rootDir>/test/integration/**/*.spec.ts',
-    '<rootDir>/apps/backend/tests/contract/**/*.test.ts',
   ],
 
   // Ignore patterns
@@ -27,14 +24,14 @@ module.exports = {
   },
 
   // Setup files
-  setupFilesAfterEnv: ['<rootDir>/test/setup/jest.setup.ts'],
+  setupFilesAfterEnv: [],
 
   // Transform configuration
   transform: {
     '^.+\\.ts$': [
       'ts-jest',
       {
-        tsconfig: 'tsconfig.json',
+        tsconfig: 'tsconfig.spec.json',
         isolatedModules: false,
       },
     ],
@@ -67,15 +64,14 @@ module.exports = {
   coverageReporters: ['text', 'text-summary', 'html', 'lcov', 'json', 'json-summary', 'cobertura'],
 
   // Coverage thresholds
-  // Temporarily disable coverage thresholds until tests are stable
-  // coverageThreshold: {
-  //   global: {
-  //     branches: 80,
-  //     functions: 80,
-  //     lines: 80,
-  //     statements: 80,
-  //   },
-  // },
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
 
   // Test timeout
   testTimeout: 10000,

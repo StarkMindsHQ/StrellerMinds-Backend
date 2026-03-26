@@ -61,6 +61,12 @@ export class Subscription {
   @Column('varchar', { nullable: true })
   cancellationReason: string;
 
+  @Column('timestamp', { nullable: true })
+  suspendedAt: Date;
+
+  @Column('varchar', { nullable: true })
+  suspensionReason: string;
+
   @Column('int', { default: 0 })
   failedPaymentCount: number;
 

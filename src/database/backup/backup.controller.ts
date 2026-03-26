@@ -29,6 +29,8 @@ import { BackupRecoveryService } from './backup-recovery.service';
 import { BackupMetricsService } from './backup-metrics.service';
 import { BackupMonitoringService } from './backup-monitoring.service';
 import { RecoveryVerificationService } from './recovery-verification.service';
+import { DisasterRecoveryTestingService } from './disaster-recovery-testing.service';
+import { DisasterRecoveryGovernanceService } from './disaster-recovery-governance.service';
 import {
   CreateBackupDto,
   RestoreBackupDto,
@@ -50,6 +52,8 @@ export class BackupController {
     private readonly metricsService: BackupMetricsService,
     private readonly monitoringService: BackupMonitoringService,
     private readonly verificationService: RecoveryVerificationService,
+    private readonly disasterRecoveryTestingService: DisasterRecoveryTestingService,
+    private readonly disasterRecoveryGovernanceService: DisasterRecoveryGovernanceService,
   ) {}
 
   // === Backup Operations ===
@@ -307,9 +311,7 @@ export class BackupController {
   @ApiQuery({ name: 'hours', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Performance history retrieved' })
   async getPerformanceHistory(@Query('hours') hours?: number) {
-    return this.monitoringService.getPerformanceHistory(
-      hours ? Number(hours) : 24,
-    );
+    return this.monitoringService.getPerformanceHistory(hours ? Number(hours) : 24);
   }
 
   // === Recovery Verification ===
@@ -326,9 +328,7 @@ export class BackupController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Verification history retrieved' })
   async getVerificationHistory(@Query('limit') limit?: number) {
-    return this.verificationService.getRecoveryTestHistory(
-      limit ? Number(limit) : 50,
-    );
+    return this.verificationService.getRecoveryTestHistory(limit ? Number(limit) : 50);
   }
 
   @Get('verification/stats')
@@ -353,5 +353,42 @@ export class BackupController {
   async verifyPointInTimeRecovery() {
     const isValid = await this.verificationService.verifyPointInTimeRecovery();
     return { valid: isValid };
+  }
+
+  // === Disaster Recovery Governance ===
+
+  @Post('disaster-recovery/run')
+  @ApiOperation({ summary: 'Run the comprehensive disaster recovery program' })
+  @ApiResponse({ status: 200, description: 'Disaster recovery program executed' })
+  async runDisasterRecoveryProgram() {
+    return this.disasterRecoveryTestingService.runComprehensiveRecoveryTest();
+  }
+
+  @Get('disaster-recovery/dashboard')
+  @ApiOperation({ summary: 'Get the disaster recovery dashboard' })
+  @ApiResponse({ status: 200, description: 'Disaster recovery dashboard returned' })
+  async getDisasterRecoveryDashboard() {
+    return this.disasterRecoveryGovernanceService.getDisasterRecoveryDashboard();
+  }
+
+  @Get('disaster-recovery/objectives')
+  @ApiOperation({ summary: 'Get disaster recovery objective status' })
+  @ApiResponse({ status: 200, description: 'Recovery objectives returned' })
+  async getRecoveryObjectives() {
+    return this.disasterRecoveryGovernanceService.getRecoveryObjectives();
+  }
+
+  @Get('disaster-recovery/training')
+  @ApiOperation({ summary: 'Get disaster recovery team training status' })
+  @ApiResponse({ status: 200, description: 'Training status returned' })
+  async getTrainingStatus() {
+    return this.disasterRecoveryGovernanceService.getTrainingStatus();
+  }
+
+  @Post('disaster-recovery/training')
+  @ApiOperation({ summary: 'Update disaster recovery team training completion' })
+  @ApiResponse({ status: 200, description: 'Training record updated' })
+  async updateTrainingStatus(@Body('member') member: string) {
+    return this.disasterRecoveryGovernanceService.updateTrainingRecord(member);
   }
 }

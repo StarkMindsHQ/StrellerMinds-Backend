@@ -104,6 +104,13 @@ export enum KeyCode {
   PAGE_DOWN = 34,
 }
 
+export interface KeyboardShortcut {
+  key: string;
+  action: string;
+  description: string;
+  ariaKeyShortcuts?: string;
+}
+
 /**
  * Service for managing ARIA attributes and accessibility features
  */
@@ -286,6 +293,12 @@ export class AccessibilityService {
             level: 'AA',
             description: 'Images of text are avoided except for logos',
           },
+          {
+            criterion: '1.2.2',
+            name: 'Captions (Prerecorded)',
+            level: 'A',
+            description: 'Prerecorded video content includes captions',
+          },
         ],
         operable: [
           {
@@ -311,6 +324,12 @@ export class AccessibilityService {
             name: 'Pointer Gestures',
             level: 'A',
             description: 'Alternatives to complex pointer gestures',
+          },
+          {
+            criterion: '2.4.7',
+            name: 'Focus Visible',
+            level: 'AA',
+            description: 'Keyboard focus indicator is clearly visible',
           },
         ],
         understandable: [
@@ -346,6 +365,12 @@ export class AccessibilityService {
             level: 'AA',
             description: 'Status messages are conveyed to assistive technologies',
           },
+          {
+            criterion: '4.1.1',
+            name: 'Parsing',
+            level: 'A',
+            description: 'Markup can be reliably interpreted by user agents',
+          },
         ],
       },
     };
@@ -375,6 +400,27 @@ export class AccessibilityService {
     if (options.hint) parts.push(`Hint: ${options.hint}`);
 
     return parts.join('. ');
+  }
+
+  /**
+   * Generate aria-live announcement payloads for screen reader optimization.
+   */
+  generateAnnouncement(options: {
+    message: string;
+    politeness?: AriaPoliteness;
+    atomic?: boolean;
+    busy?: boolean;
+  }) {
+    return {
+      attributes: this.buildAriaAttributes({
+        role: AriaRole.STATUS,
+        ariaLive: options.politeness || AriaPoliteness.POLITE,
+        ariaAtomic: options.atomic ?? true,
+      }),
+      message: options.message,
+      busy: options.busy ?? false,
+      timestamp: new Date().toISOString(),
+    };
   }
 
   /**
@@ -446,6 +492,75 @@ export class AccessibilityService {
         href: '#search',
       },
     ];
+  }
+
+  /**
+   * Keyboard shortcut contract for UI teams.
+   */
+  getKeyboardShortcuts(): KeyboardShortcut[] {
+    return [
+      {
+        key: 'Tab',
+        action: 'next_focus',
+        description: 'Move to next focusable element',
+        ariaKeyShortcuts: 'Tab',
+      },
+      {
+        key: 'Shift+Tab',
+        action: 'previous_focus',
+        description: 'Move to previous focusable element',
+        ariaKeyShortcuts: 'Shift+Tab',
+      },
+      {
+        key: 'Enter',
+        action: 'activate',
+        description: 'Activate focused control',
+        ariaKeyShortcuts: 'Enter',
+      },
+      {
+        key: 'Space',
+        action: 'toggle',
+        description: 'Toggle focused checkbox/switch/button',
+        ariaKeyShortcuts: 'Space',
+      },
+      {
+        key: 'Escape',
+        action: 'dismiss',
+        description: 'Dismiss active modal, dialog, menu, or popover',
+        ariaKeyShortcuts: 'Esc',
+      },
+      {
+        key: 'ArrowUp/ArrowDown',
+        action: 'navigate_list',
+        description: 'Navigate vertically in menus and listboxes',
+      },
+      {
+        key: 'ArrowLeft/ArrowRight',
+        action: 'navigate_tabs',
+        description: 'Navigate horizontally in tabs, carousels, and toolbars',
+      },
+      {
+        key: 'Home/End',
+        action: 'first_last_item',
+        description: 'Jump to first/last item in composites',
+      },
+    ];
+  }
+
+  /**
+   * Roving tabindex helper for composite widgets (menus, tabs, listbox, grid).
+   */
+  buildRovingTabIndexState(
+    itemIds: string[],
+    activeId?: string,
+  ): { id: string; tabIndex: 0 | -1; active: boolean }[] {
+    if (!itemIds.length) return [];
+    const selected = activeId && itemIds.includes(activeId) ? activeId : itemIds[0];
+    return itemIds.map((id) => ({
+      id,
+      tabIndex: id === selected ? 0 : -1,
+      active: id === selected,
+    }));
   }
 
   /**

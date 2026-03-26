@@ -14,6 +14,41 @@ The platform is designed for educational institutions, online learning platforms
 - **Auto-generated Documentation**: Interactive Swagger/OpenAPI documentation
 - **Comprehensive Testing**: Unit and integration tests with Jest
 - **Environment Configuration**: Flexible configuration management
+- **📊 Application Performance Monitoring**: DataDog & New Relic integration with distributed tracing, performance profiling, and alerting
+- **🔍 Performance Profiling**: Memory, CPU, and operation profiling with hotspot detection
+- **⚠️ Performance Alerting**: Real-time alerts with Slack and PagerDuty integration
+
+## 📊 Monitoring & Performance
+
+This backend includes a comprehensive **Application Performance Monitoring (APM)** system:
+
+### Key Capabilities
+- **Distributed Tracing**: W3C standard trace context for cross-service debugging
+- **Performance Profiling**: Memory leak detection, hotspot analysis, percentile calculations
+- **APM Integration**: DataDog and New Relic support with automatic instrumentation
+- **Smart Alerting**: Configurable alerts for memory, CPU, response time, error rates
+- **Real-time Dashboards**: Monitor performance through Monitoring API endpoints
+
+### Quick Start with APM
+1. Set your APM provider credentials:
+   ```bash
+   export DATADOG_API_KEY=your-key          # or NEW_RELIC_LICENSE_KEY
+   export APP_NAME=strellerminds-backend
+   ```
+
+2. Access monitoring endpoints:
+   ```bash
+   # Performance profile
+   curl http://localhost:3000/api/monitoring/profiling/report
+   
+   # Active traces
+   curl http://localhost:3000/api/monitoring/tracing/active-spans
+   
+   # Current alerts
+   curl http://localhost:3000/api/monitoring/alerts/active
+   ```
+
+See [APM_IMPLEMENTATION.md](./docs/APM_IMPLEMENTATION.md) for full documentation.
 
 ## 🛠️ Tech Stack
 
@@ -25,6 +60,7 @@ The platform is designed for educational institutions, online learning platforms
 - **Documentation**: Swagger/OpenAPI
 - **Testing**: Jest
 - **Code Quality**: ESLint + Prettier
+- **Monitoring**: DataDog/New Relic APM with distributed tracing
 
 ## 📋 Prerequisites
 
@@ -351,7 +387,7 @@ The application uses environment variables for configuration. All variables are 
 ### Stellar
 | Variable | Description | Required |
 |----------|-------------|----------|
-| STELLAR_SECRET_KEY | Secret key for Stellar network | jgjxvsjxvwjxsjxgskjxksmxjswkxwgxwdcj |
+| STELLAR_SECRET_KEY | Secret key for Stellar network (use secure key management) | <your_secure_key_from_secrets_manager> |
 
 ### Email
 | Variable | Description | Required |

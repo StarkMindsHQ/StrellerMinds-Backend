@@ -53,7 +53,10 @@ export class CourseContent {
   @Column({ type: 'uuid', nullable: true })
   templateId: string;
 
-  @ManyToOne(() => ContentTemplate, (template) => template.contents, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => ContentTemplate, (template) => template.contents, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'templateId' })
   template: ContentTemplate;
 

@@ -14,7 +14,10 @@ export class ContentAnalyticsService {
     private readonly analyticsRepo: Repository<ContentAnalytics>,
   ) {}
 
-  async trackEngagement(contentId: string, dto: TrackContentEngagementDto): Promise<ContentAnalytics> {
+  async trackEngagement(
+    contentId: string,
+    dto: TrackContentEngagementDto,
+  ): Promise<ContentAnalytics> {
     const content = await this.contentRepo.findOne({ where: { id: contentId } });
     if (!content) {
       throw new NotFoundException('Content not found');
@@ -99,7 +102,8 @@ export class ContentAnalyticsService {
     interactions: number,
     viewDurationSeconds: number,
   ): number {
-    const score = completionPercent * 0.6 + interactions * 5 + Math.min(viewDurationSeconds / 12, 40);
+    const score =
+      completionPercent * 0.6 + interactions * 5 + Math.min(viewDurationSeconds / 12, 40);
     return Number(Math.max(0, Math.min(100, score)).toFixed(2));
   }
 }

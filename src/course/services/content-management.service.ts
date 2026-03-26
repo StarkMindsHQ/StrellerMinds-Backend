@@ -188,9 +188,7 @@ export class ContentManagementService {
     }
 
     if (format === ContentFormat.INTERACTIVE && !interactiveConfig) {
-      throw new BadRequestException(
-        'interactiveConfig is required for interactive content',
-      );
+      throw new BadRequestException('interactiveConfig is required for interactive content');
     }
   }
 

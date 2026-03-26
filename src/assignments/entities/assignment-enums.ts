@@ -1,0 +1,22 @@
+export enum AssignmentType {
+  QUIZ = 'quiz',
+  PROJECT = 'project',
+  ESSAY = 'essay',
+  CODE = 'code',
+  PRESENTATION = 'presentation',
+  MIXED = 'mixed',
+}
+
+export enum AssignmentStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  CLOSED = 'closed',
+  ARCHIVED = 'archived',
+}
+
+export enum SubmissionStatus {
+  DRAFT = 'draft',
+  SUBMITTED = 'submitted',
+  GRADED = 'graded',
+  RETURNED = 'returned',
+}
