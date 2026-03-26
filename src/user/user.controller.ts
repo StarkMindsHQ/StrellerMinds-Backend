@@ -15,6 +15,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 
 import {
   ApiTags,
@@ -134,6 +135,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 401, description: 'Current password is incorrect' })
   @ApiResponse({ status: 404, description: 'User not found' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
   async changePassword(
     @Param('id') id: string,
     @Body() changePasswordDto: ChangePasswordDto,

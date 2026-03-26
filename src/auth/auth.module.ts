@@ -2,45 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { MailerModule, TemplateAdapter } from '@nestjs-modules/mailer';
-import * as hbs from 'handlebars';
-import * as fs from 'fs';
-import * as path from 'path';
-
-class CustomHandlebarsAdapter implements TemplateAdapter {
-  private templatesDir: string;
-
-  constructor(templatesDir: string) {
-    this.templatesDir = templatesDir;
-  }
-
-  compile(mail: any, callback: (err: any, body: string) => void, options: any): void {
-    try {
-      const templateName = mail.data.template;
-      const templatePath = path.join(this.templatesDir, templateName + '.hbs');
-
-      // Check if template file exists
-      if (!fs.existsSync(templatePath)) {
-        callback(new Error(`Template file not found: ${templatePath}`), '');
-        return;
-      }
-
-      // Read and compile the template
-      const templateSource = fs.readFileSync(templatePath, 'utf-8');
-      const template = hbs.compile(templateSource);
-      const html = template(mail.data.context || {});
-
-      mail.data.html = html;
-      callback(null, html);
-    } catch (error) {
-      callback(error, '');
-    }
-  }
-}
-
-const templatesDir = path.join(__dirname, 'templates');
-const handlebarsAdapter = new CustomHandlebarsAdapter(templatesDir);
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import type { JwtModuleOptions } from '@nestjs/jwt';
 
@@ -80,16 +43,6 @@ import { PasswordHistoryService } from './services/password-history.service';
       }),
       global: true,
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000, // 1 minute
-        limit: 10, // 10 requests per minute
-      },
-      {
-        ttl: 3600000, // 1 hour
-        limit: 100, // 100 requests per hour
-      },
-    ]),
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {

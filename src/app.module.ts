@@ -1,7 +1,7 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
@@ -81,7 +81,7 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
         throttlers: [
           {
             ttl: config.get('RATE_LIMIT_TTL', 60000),
-            limit: config.get('RATE_LIMIT_MAX', 10),
+            limit: config.get('RATE_LIMIT_MAX', 100),
           },
         ],
         storage: new ThrottlerStorageRedisService(
@@ -114,6 +114,10 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
   ],
 
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
