@@ -158,7 +158,8 @@ export class DocumentationController {
   async createVersion(
     @Body('version') version: string,
     @Body('releaseNotes') releaseNotes?: string,
-    @Body('breakingChanges') breakingChanges?: Array<{ endpoint: string; description: string; migration: string }>,
+    @Body('breakingChanges')
+    breakingChanges?: Array<{ endpoint: string; description: string; migration: string }>,
   ) {
     return this.versioningService.createVersion(version, releaseNotes, breakingChanges);
   }
@@ -171,7 +172,11 @@ export class DocumentationController {
     @Body('deprecationDate') deprecationDate: string,
     @Body('sunsetDate') sunsetDate: string,
   ) {
-    await this.versioningService.deprecateVersion(id, new Date(deprecationDate), new Date(sunsetDate));
+    await this.versioningService.deprecateVersion(
+      id,
+      new Date(deprecationDate),
+      new Date(sunsetDate),
+    );
     return { message: `Version ${id} deprecated` };
   }
 
@@ -195,7 +200,10 @@ export class DocumentationController {
   @Get('versions/analytics')
   @ApiOperation({ summary: 'Get API usage by version' })
   @ApiResponse({ status: 200, description: 'Version analytics retrieved' })
-  async getVersionAnalytics(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
+  async getVersionAnalytics(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
     return this.analyticsService.getAnalytics({
       startDate,
       endDate,

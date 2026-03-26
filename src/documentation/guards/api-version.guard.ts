@@ -19,10 +19,9 @@ export class ApiVersionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
 
-    const headerVersion =
-      (request.headers['x-api-version'] || request.headers['api-version'] || '')
-        .toString()
-        .trim();
+    const headerVersion = (request.headers['x-api-version'] || request.headers['api-version'] || '')
+      .toString()
+      .trim();
 
     let version = headerVersion || '';
 
@@ -55,8 +54,7 @@ export class ApiVersionGuard implements CanActivate {
       this.logger.warn(`Deprecated or sunset API version accessed: ${version}`);
       throw new GoneException(
         `API version ${version} is ${versionEntity.status}. Migrate to current version.
-` +
-          `See /api/v1/documentation/versions for version details.`,
+` + `See /api/v1/documentation/versions for version details.`,
       );
     }
 
@@ -65,7 +63,10 @@ export class ApiVersionGuard implements CanActivate {
     response.setHeader('X-API-Version', version);
     response.setHeader('X-API-Version-Status', versionEntity.status);
     if (versionEntity.deprecationDate) {
-      response.setHeader('X-API-Version-Deprecated-At', versionEntity.deprecationDate.toISOString());
+      response.setHeader(
+        'X-API-Version-Deprecated-At',
+        versionEntity.deprecationDate.toISOString(),
+      );
     }
     if (versionEntity.sunsetDate) {
       response.setHeader('X-API-Version-Sunset-At', versionEntity.sunsetDate.toISOString());

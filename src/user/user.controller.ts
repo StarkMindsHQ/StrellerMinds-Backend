@@ -20,6 +20,7 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiQuery,
   ApiConsumes,
   ApiBody,
   ApiBearerAuth,
@@ -60,12 +61,27 @@ export class UserController {
 
   @Get()
   @ApiOperation({ summary: 'Get all users with filtering and pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
+  @ApiQuery({ name: 'cursor', required: false, type: String, example: 'eyJj...==' })
   @ApiResponse({
     status: 200,
     description: 'Users retrieved successfully',
   })
   async findAll(@Query() query: UserQueryDto) {
-    return this.userService.findAll(query);
+    const result = await this.userService.findAll(query);
+    return {
+      success: true,
+      data: result.data,
+      pagination: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages,
+        cursor: result.cursor,
+        nextCursor: result.nextCursor,
+      },
+    };
   }
 
   @Get(':id')
