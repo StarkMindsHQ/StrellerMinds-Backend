@@ -139,35 +139,37 @@ NODE_ENV=development
 
 For a complete list of all available environment variables, refer to `.env.example`.
 
-## 🏗️ Project Structure
+## 🏗️ Project Structure & Architecture
+
+The project follows a modular monolithic architecture, ensuring a clean separation of concerns while maintaining development velocity.
+
+- **[Architecture Overview](./docs/architecture/overview.md)**: High-level design and infrastructure diagrams.
+- **[Module Interactions](./docs/architecture/modules.md)**: Detailed dependency mapping between core modules.
+- **[Architecture Decisions (ADR)](./docs/adr/0001-record-architecture-decisions.md)**: Rationale behind key technical choices.
 
 ```
 src/
-├── app.controller.ts          # Main application controller
 ├── app.module.ts            # Root application module
-├── app.service.ts           # Core application service
 ├── main.ts                 # Application entry point
-├── common/                 # Shared utilities and decorators
-│   ├── decorators/
-│   └── errors/
-├── config/                 # Configuration files
-├── modules/                # Feature modules
-│   ├── auth/              # Authentication & authorization
-│   ├── users/             # User management
-│   ├── courses/           # Course management
-│   ├── blockchain/        # Stellar integration
-│   └── enrollment/        # Course enrollment
-└── utils/                 # Helper utilities
+├── common/                 # Shared utilities, validation, and security
+├── modules/                # Domain-specific modules (Auth, User, Course, etc.)
+└── config/                 # Environment-specific configurations
 ```
 
-## 📖 API Documentation
+## 📖 Documentation
+
+A comprehensive documentation suite is available in the `docs/` directory:
+
+1. **[Developer Onboarding](./docs/onboarding/guide.md)**: Setup, coding standards, and Git workflow.
+2. **[Deployment & Infrastructure](./docs/deployment/infrastructure.md)**: Docker, Redis, and Observability stack.
+3. **[API Documentation (Swagger)](#📚-api-documentation)**: Interactive endpoint explorer.
+
+### 📚 API Documentation
 
 Once the server is running, access the interactive API documentation:
 
 - **Swagger UI**: `http://localhost:3000/api/docs`
 - **OpenAPI JSON**: `http://localhost:3000/api/docs-json`
-
-For onboarding, SDK generation, and multi-language examples, see `DEVELOPER_PORTAL.md`.
 
 ## 🧪 Testing
 
