@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { ThrottlerModule } from '@nestjs/throttler';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
@@ -44,16 +43,6 @@ import { PasswordHistoryService } from './services/password-history.service';
       }),
       global: true,
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000, // 1 minute
-        limit: 10, // 10 requests per minute
-      },
-      {
-        ttl: 3600000, // 1 hour
-        limit: 100, // 100 requests per hour
-      },
-    ]),
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {

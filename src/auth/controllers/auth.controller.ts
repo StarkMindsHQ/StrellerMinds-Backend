@@ -66,6 +66,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
   async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto, @Request() req: ExpressRequest) {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
@@ -99,6 +100,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Password reset email sent' })
+  @Throttle({ default: { limit: 3, ttl: 600000 } }) // 3 requests per 10 minutes
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     await this.authService.forgotPassword(forgotPasswordDto.email);
     return { message: 'Password reset email sent if account exists' };
@@ -109,6 +111,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Reset password' })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
   @ApiResponse({ status: 400, description: 'Invalid reset token' })
+  @Throttle({ default: { limit: 3, ttl: 600000 } }) // 3 requests per 10 minutes
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     await this.authService.resetPassword(resetPasswordDto.resetToken, resetPasswordDto.newPassword);
     return { message: 'Password reset successful' };
