@@ -48,6 +48,29 @@
     "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
     "passwordMismatch": "Las contraseñas no coinciden",
     "userNotFound": "Usuario no encontrado",
-    "unauthorized": "Acceso no autorizado"
+    "unauthorized": "Acceso no autorizado",
+
+    "validation": {
+      "required": "{{field}} es obligatorio. Por favor, proporcione un valor.",
+      "minLength": "{{field}} debe tener al menos {{min}} caracteres.",
+      "maxLength": "{{field}} no puede exceder {{max}} caracteres.",
+      "email": "Por favor, introduzca una dirección de correo electrónico válida (ej., usuario@ejemplo.com).",
+      "passwordStrong": "{{field}} debe tener al menos 8 caracteres e incluir letras mayúsculas, minúsculas y números.",
+      "passwordMatch": "Las contraseñas no coinciden. Asegúrese de que ambos campos sean idénticos.",
+      "minValue": "{{field}} debe ser al menos {{min}}.",
+      "maxValue": "{{field}} no puede exceder {{max}}.",
+      "positiveNumber": "{{field}} debe ser un número positivo.",
+      "date": "Por favor, introduzca una fecha válida para {{field}}.",
+      "dateFuture": "{{field}} debe ser una fecha futura.",
+      "datePast": "{{field}} debe ser una fecha pasada.",
+      "url": "Por favor, introduzca una URL válida para {{field}} (ej., https://ejemplo.com).",
+      "phone": "Por favor, introduzca un número de teléfono válido para {{field}}.",
+      "enum": "{{field}} debe ser uno de: {{values}}.",
+      "arrayNotEmpty": "{{field}} debe contener al menos un elemento.",
+      "usernameFormat": "{{field}} solo puede contener letras, números, guiones bajos y guiones (3-30 caracteres).",
+      "fileSize": "{{field}} es demasiado grande. El tamaño máximo permitido es {{max}}.",
+      "fileType": "{{field}} tiene un tipo de archivo no soportado. Tipos permitidos: {{types}}.",
+      "stringFormat": "{{field}} tiene un formato no válido."
+    }
   }
 }

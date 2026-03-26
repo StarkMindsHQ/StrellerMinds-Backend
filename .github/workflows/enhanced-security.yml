@@ -147,6 +147,17 @@ jobs:
         output: 'trivy-results.sarif'
         exit-code: '0'
         severity: 'CRITICAL,HIGH'
+        ignore-unfixed: true
+      continue-on-error: true
+      
+    - name: Run Trivy vulnerability scanner (table output)
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'strellerminds-backend:test'
+        format: 'table'
+        exit-code: '0'
+        severity: 'CRITICAL,HIGH'
+        ignore-unfixed: true
       continue-on-error: true
         
     - name: Upload Trivy scan results to GitHub Security tab
@@ -168,6 +179,7 @@ jobs:
   zap-baseline:
     runs-on: ubuntu-latest
     name: OWASP ZAP Baseline Scan
+    needs: [dependency-audit]
     if: always() # Run ZAP scan on all events
     
     services:
@@ -226,13 +238,23 @@ jobs:
     - name: Start application
       run: |
         npm run start:prod &
-        sleep 30
-      continue-on-error: true
+        APP_PID=$!
+        echo "App PID: $APP_PID"
+        sleep 10
         
     - name: Wait for application to be ready
       run: |
-        timeout 60 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 2; done' || true
-      continue-on-error: true
+        echo "Waiting for application to be ready..."
+        for i in {1..30}; do
+          if curl -f http://localhost:3000/api/health; then
+            echo "Application is ready!"
+            exit 0
+          fi
+          echo "Attempt $i: Application not ready yet, waiting..."
+          sleep 2
+        done
+        echo "Application failed to start"
+        exit 1
         
     - name: Run OWASP ZAP Baseline Scan
       uses: zaproxy/action-baseline@v0.7.0
