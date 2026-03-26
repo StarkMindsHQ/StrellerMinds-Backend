@@ -1,7 +1,7 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, Inject } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { Cache } from 'cache-manager';
-import { Inject } from '@nestjs/common';
+
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import * as natural from 'natural';
 import { SearchQueryDto, AutoSuggestDto } from './dto/search-query.dto';
@@ -185,7 +185,10 @@ export class SearchService implements OnModuleInit {
   // ============================================
   // FULL-TEXT SEARCH WITH FACETED FILTERING
   // ============================================
-  async search(searchDto: SearchQueryDto, userId?: string): Promise<{
+  async search(
+    searchDto: SearchQueryDto,
+    userId?: string,
+  ): Promise<{
     total: number;
     page: number;
     size: number;

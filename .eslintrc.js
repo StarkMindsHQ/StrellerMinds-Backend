@@ -5,7 +5,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'prettier'],
+  plugins: ['@typescript-eslint', 'prettier', 'import', 'strellerminds'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -28,6 +28,9 @@ module.exports = {
     '@typescript-eslint/consistent-type-imports': 'off',
     '@typescript-eslint/no-require-imports': 'off',
 
+    // Duplicate import / module registration
+    'import/no-duplicates': 'error',
+
     // Prettier
     'prettier/prettier': [
       'error',
@@ -39,4 +42,12 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      files: ['**/*.module.ts'],
+      rules: {
+        'strellerminds/no-duplicate-nest-module-imports': 'error',
+      },
+    },
+  ],
 };

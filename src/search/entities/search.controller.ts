@@ -28,13 +28,7 @@ export class SearchController {
   }
 
   @Get('similar/:id')
-  async getSimilarContent(
-    @Param('id') id: string,
-    @Query('limit') limit: number,
-  ) {
-    return this.recommendationService.getSimilarContent(
-      id,
-      limit ? Number(limit) : 5,
-    );
+  async getSimilarContent(@Param('id') id: string, @Query('limit') limit: number) {
+    return this.recommendationService.getSimilarContent(id, limit ? Number(limit) : 5);
   }
 }

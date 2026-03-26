@@ -29,7 +29,7 @@ export class ThreatDetectionService {
 
   private async detectBruteForce(audit: SecurityAudit): Promise<void> {
     // Assuming SecurityEvent enum has LOGIN_FAILED
-    if (audit.event !== 'LOGIN_FAILED' as SecurityEvent) return;
+    if (audit.event !== ('LOGIN_FAILED' as SecurityEvent)) return;
 
     const windowMinutes = 15;
     const threshold = 5;
@@ -56,12 +56,17 @@ export class ThreatDetectionService {
   }
 
   private async detectImpossibleTravel(audit: SecurityAudit): Promise<void> {
-    if (!audit.userId || !audit.metadata?.location || audit.event !== 'LOGIN_SUCCESS' as SecurityEvent) return;
+    if (
+      !audit.userId ||
+      !audit.metadata?.location ||
+      audit.event !== ('LOGIN_SUCCESS' as SecurityEvent)
+    )
+      return;
 
     const previousLogins = await this.auditRepo.find({
-      where: { 
+      where: {
         userId: audit.userId,
-        event: 'LOGIN_SUCCESS' as SecurityEvent
+        event: 'LOGIN_SUCCESS' as SecurityEvent,
       } as any,
       order: { createdAt: 'DESC' },
       skip: 1, // Skip the current event
@@ -76,7 +81,7 @@ export class ThreatDetectionService {
       if (currentLoc.country !== lastLoc.country) {
         const timeDiffMs = audit.createdAt.getTime() - lastLogin.createdAt.getTime();
         const hoursDiff = timeDiffMs / (1000 * 60 * 60);
-        
+
         // Heuristic: if country changed in less than 2 hours
         if (hoursDiff < 2) {
           await this.responseService.createIncident({
@@ -85,10 +90,10 @@ export class ThreatDetectionService {
             description: `Impossible travel detected: Login from ${currentLoc.country} ${hoursDiff.toFixed(1)} hours after login from ${lastLoc.country}.`,
             userId: audit.userId,
             ipAddress: audit.ipAddress,
-            details: { 
+            details: {
               previousLocation: lastLoc,
               currentLocation: currentLoc,
-              timeDifferenceHours: hoursDiff 
+              timeDifferenceHours: hoursDiff,
             },
           });
         }
@@ -100,7 +105,7 @@ export class ThreatDetectionService {
     // Placeholder for IP reputation logic integration
     // In a production environment, this would check against a threat intelligence feed
     const suspiciousIps = ['1.2.3.4', '5.6.7.8']; // Example blacklist
-    
+
     if (audit.ipAddress && suspiciousIps.includes(audit.ipAddress)) {
       await this.responseService.createIncident({
         type: 'SUSPICIOUS_IP',

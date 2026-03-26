@@ -4,6 +4,8 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { HealthController } from './health.controller';
 import { HealthService } from './health.service';
 import { HttpModule } from '@nestjs/axios';
+import { MonitoringModule } from '../monitoring/monitoring.module';
+import { QueueHealthIndicator } from '../common/queue/health/queue-health.indicator';
 
 @Module({
   imports: [
@@ -26,9 +28,10 @@ import { HttpModule } from '@nestjs/axios';
       timeout: 5000,
       maxRedirects: 5,
     }),
+    MonitoringModule,
   ],
   controllers: [HealthController],
-  providers: [HealthService],
-  exports: [HealthService],
+  providers: [HealthService, QueueHealthIndicator],
+  exports: [HealthService, QueueHealthIndicator],
 })
 export class HealthModule {}

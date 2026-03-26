@@ -26,8 +26,8 @@ export const CONTENT_INDEX_MAPPING = {
     createdAt: { type: 'date' },
     viewCount: { type: 'integer' },
     rating: { type: 'float' },
-    vectors: { type: 'dense_vector', dims: 768, index: true, similarity: 'cosine' } // For future vector search
-  }
+    vectors: { type: 'dense_vector', dims: 768, index: true, similarity: 'cosine' }, // For future vector search
+  },
 };
 
 export interface SearchAnalytics {

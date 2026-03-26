@@ -16,6 +16,7 @@ export enum EmailTemplateType {
   DIGEST = 'digest',
   SECURITY_ALERT = 'security_alert',
   ACCOUNT_SUSPENDED = 'account_suspended',
+  INVOICE = 'invoice',
 }
 
 @Entity('email_templates')

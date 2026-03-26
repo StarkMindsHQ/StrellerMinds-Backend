@@ -8,20 +8,9 @@ import {
 } from 'typeorm';
 import { Submission } from './submission.entity';
 import { Rubric } from './rubric.entity';
+import { AssignmentType, SubmissionStatus } from './assignment-enums';
 
-export enum AssignmentType {
-  FILE = 'file',
-  TEXT = 'text',
-  CODE = 'code',
-  MIXED = 'mixed',
-}
-
-export enum SubmissionStatus {
-  DRAFT = 'draft',
-  SUBMITTED = 'submitted',
-  LATE = 'late',
-  GRADED = 'graded',
-}
+export { AssignmentType, SubmissionStatus } from './assignment-enums';
 
 @Entity('assignments')
 export class Assignment {

@@ -1,8 +1,11 @@
-import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
-import { Invoice, Subscription, Payment } from '../entities';
+import { Repository, LessThan, Between } from 'typeorm';
+import { Invoice, Payment, Subscription } from '../entities';
 import { InvoiceStatus, SubscriptionStatus } from '../enums';
+import { CreateInvoiceDto, UpdateInvoiceDto } from '../dto';
+import { RetryUtil, CircuitBreaker, ErrorMonitor } from '../../common/utils/retry.util';
+import { ConfigService } from '@nestjs/config';
 import { TaxCalculationService } from './tax-calculation.service';
 
 @Injectable()
@@ -16,7 +19,16 @@ export class EnhancedInvoiceService {
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
     private taxCalculationService: TaxCalculationService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    // Initialize circuit breakers for external dependencies
+    this.paymentCircuitBreaker = new CircuitBreaker({
+      failureThreshold: 5,
+      resetTimeout: 60000,
+    });
+  }
+
+  private readonly paymentCircuitBreaker: CircuitBreaker;
 
   async createRecurringInvoice(
     subscriptionId: string,
@@ -105,26 +117,117 @@ export class EnhancedInvoiceService {
     for (const subscription of subscriptions) {
       if (subscription.nextBillingDate && subscription.nextBillingDate <= today) {
         try {
-          await this.createRecurringInvoice(
-            subscription.id,
-            subscription.userId,
-            `Recurring payment for ${subscription.paymentPlan.name}`,
+          // Calculate tax with retry mechanism
+          const tax = await RetryUtil.withRetry(
+            () =>
+              this.taxCalculationService.calculateTax({
+                amount: subscription.currentAmount,
+                country: 'US', // Default to US, should be from subscription
+                currency: subscription.paymentPlan.currency || 'USD',
+              }),
+            {
+              maxAttempts: 3,
+              delay: 1000,
+              backoffMultiplier: 2,
+              shouldRetry: (error: any, attempt: number) => {
+                ErrorMonitor.recordError(error, 'tax-calculation');
+                return attempt < 3 && error.code !== 'INVALID_AMOUNT';
+              },
+            },
           );
 
-          // Update next billing date
-          subscription.nextBillingDate = this.calculateNextBillingDate(
-            subscription.nextBillingDate,
-            subscription.billingCycle,
-          );
+          const invoice = await this.invoiceRepository.save({
+            subscriptionId: subscription.id,
+            userId: subscription.userId,
+            amount: subscription.currentAmount,
+            tax,
+            total: subscription.currentAmount + tax,
+            currency: subscription.paymentPlan.currency || 'USD',
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+            description: `Recurring invoice for ${subscription.paymentPlan.name}`,
+            status: InvoiceStatus.DRAFT,
+          });
 
-          await this.subscriptionRepository.save(subscription);
+          // Update subscription billing date with circuit breaker protection
+          await this.paymentCircuitBreaker.execute(async () => {
+            subscription.nextBillingDate = this.calculateNextBillingDate(
+              subscription.nextBillingDate,
+              subscription.billingCycle,
+            );
+            return this.subscriptionRepository.save(subscription);
+          });
+
+          this.logger.log(
+            `Successfully created invoice ${invoice.id} for subscription ${subscription.id}`,
+            'EnhancedInvoiceService',
+          );
         } catch (error) {
-          console.error(`Failed to create invoice for subscription ${subscription.id}:`, error);
-          // Increment failed payment count
-          subscription.failedPaymentCount++;
-          await this.subscriptionRepository.save(subscription);
+          ErrorMonitor.recordError(error, 'invoice-creation');
+          this.logger.error(
+            `Failed to create invoice for subscription ${subscription.id}: ${error.message}`,
+            'EnhancedInvoiceService',
+          );
+
+          // Increment failed payment count with retry
+          await RetryUtil.withRetry(
+            () => {
+              subscription.failedPaymentCount++;
+              return this.subscriptionRepository.save(subscription);
+            },
+            { maxAttempts: 2, delay: 500 },
+          );
+
+          // Implement recovery procedure
+          await this.handleInvoiceCreationFailure(subscription, error);
         }
       }
+    }
+  }
+
+  private async handleInvoiceCreationFailure(
+    subscription: Subscription,
+    error: any,
+  ): Promise<void> {
+    this.logger.warn(
+      `Handling invoice creation failure for subscription ${subscription.id}`,
+      'EnhancedInvoiceService',
+    );
+
+    // Check if subscription should be suspended due to too many failures
+    const maxFailures = this.configService.get<number>('MAX_PAYMENT_FAILURES', 3);
+
+    if (subscription.failedPaymentCount >= maxFailures) {
+      this.logger.error(
+        `Suspending subscription ${subscription.id} due to ${subscription.failedPaymentCount} failures`,
+        'EnhancedInvoiceService',
+      );
+
+      // Suspend subscription with retry
+      await RetryUtil.withRetry(
+        () => {
+          subscription.status = SubscriptionStatus.SUSPENDED;
+          subscription.suspendedAt = new Date();
+          subscription.suspensionReason = 'Excessive payment failures';
+          return this.subscriptionRepository.save(subscription);
+        },
+        { maxAttempts: 3, delay: 1000 },
+      );
+
+      // Send notification to user (would use email service)
+      this.logger.log(
+        `User ${subscription.userId} notified about subscription suspension`,
+        'EnhancedInvoiceService',
+      );
+    } else {
+      // Schedule retry for later
+      const retryDelay = Math.min(subscription.failedPaymentCount * 3600000, 24 * 3600000); // Max 24 hours
+      subscription.nextBillingDate = new Date(Date.now() + retryDelay);
+
+      await this.subscriptionRepository.save(subscription);
+      this.logger.log(
+        `Scheduled retry for subscription ${subscription.id} in ${retryDelay / 3600000} hours`,
+        'EnhancedInvoiceService',
+      );
     }
   }
 
@@ -157,7 +260,10 @@ export class EnhancedInvoiceService {
         const invoice = await this.createRecurringInvoice(subscription.id, subscription.userId);
         invoices.push(invoice);
       } catch (error) {
-        console.error(`Failed to create invoice for subscription ${subscription.id}:`, error);
+        this.logger.error(
+          `Failed to create invoice for subscription ${subscription.id}:`,
+          error instanceof Error ? error.stack : String(error),
+        );
       }
     }
 

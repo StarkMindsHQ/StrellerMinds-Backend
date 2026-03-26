@@ -1,13 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  Payment,
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Refund,
-} from '../entities';
+import { Payment, Subscription, PaymentPlan, Invoice, Refund } from '../entities';
 import { PaymentStatus, PaymentMethod } from '../enums';
 import { CreatePaymentDto, ProcessPaymentDto } from '../dto';
 import axios from 'axios';
@@ -28,15 +22,13 @@ export class SquareService {
     private refundRepository: Repository<Refund>,
   ) {
     this.accessToken = process.env.SQUARE_ACCESS_TOKEN || '';
-    this.baseUrl = process.env.SQUARE_ENVIRONMENT === 'production' 
-      ? 'https://connect.squareup.com' 
-      : 'https://connect.squareupsandbox.com';
+    this.baseUrl =
+      process.env.SQUARE_ENVIRONMENT === 'production'
+        ? 'https://connect.squareup.com'
+        : 'https://connect.squareupsandbox.com';
   }
 
-  async createPayment(
-    userId: string,
-    dto: ProcessPaymentDto,
-  ): Promise<any> {
+  async createPayment(userId: string, dto: ProcessPaymentDto): Promise<any> {
     try {
       const response = await axios.post(
         `${this.baseUrl}/v2/payments`,
@@ -48,11 +40,10 @@ export class SquareService {
           },
           idempotency_key: dto.idempotencyKey || `payment-${userId}-${Date.now()}`,
           reference_id: `user-${userId}`,
-
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
+            Authorization: `Bearer ${this.accessToken}`,
             'Content-Type': 'application/json',
           },
         },
@@ -64,20 +55,13 @@ export class SquareService {
     }
   }
 
-  async confirmPayment(
-    userId: string,
-    paymentId: string,
-    dto: CreatePaymentDto,
-  ): Promise<Payment> {
+  async confirmPayment(userId: string, paymentId: string, dto: CreatePaymentDto): Promise<Payment> {
     try {
-      const response = await axios.get(
-        `${this.baseUrl}/v2/payments/${paymentId}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
-          },
+      const response = await axios.get(`${this.baseUrl}/v2/payments/${paymentId}`, {
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
         },
-      );
+      });
 
       const squarePayment = response.data.payment;
 
@@ -109,11 +93,7 @@ export class SquareService {
     }
   }
 
-  async createSubscription(
-    userId: string,
-    planId: string,
-    customerId: string,
-  ): Promise<any> {
+  async createSubscription(userId: string, planId: string, customerId: string): Promise<any> {
     try {
       const response = await axios.post(
         `${this.baseUrl}/v2/subscriptions`,
@@ -125,7 +105,7 @@ export class SquareService {
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
+            Authorization: `Bearer ${this.accessToken}`,
             'Content-Type': 'application/json',
           },
         },
@@ -144,7 +124,7 @@ export class SquareService {
         {},
         {
           headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
+            Authorization: `Bearer ${this.accessToken}`,
             'Content-Type': 'application/json',
           },
         },
@@ -154,10 +134,7 @@ export class SquareService {
     }
   }
 
-  async refundPayment(
-    paymentId: string,
-    amount?: number,
-  ): Promise<any> {
+  async refundPayment(paymentId: string, amount?: number): Promise<any> {
     try {
       const response = await axios.post(
         `${this.baseUrl}/v2/refunds`,
@@ -173,7 +150,7 @@ export class SquareService {
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
+            Authorization: `Bearer ${this.accessToken}`,
             'Content-Type': 'application/json',
           },
         },
@@ -203,7 +180,7 @@ export class SquareService {
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
+            Authorization: `Bearer ${this.accessToken}`,
             'Content-Type': 'application/json',
           },
         },
@@ -215,10 +192,7 @@ export class SquareService {
     }
   }
 
-  async createPaymentMethod(
-    customerId: string,
-    sourceId: string,
-  ): Promise<any> {
+  async createPaymentMethod(customerId: string, sourceId: string): Promise<any> {
     try {
       const response = await axios.post(
         `${this.baseUrl}/v2/customers/${customerId}/cards`,
@@ -227,7 +201,7 @@ export class SquareService {
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
+            Authorization: `Bearer ${this.accessToken}`,
             'Content-Type': 'application/json',
           },
         },

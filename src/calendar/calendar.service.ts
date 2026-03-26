@@ -24,7 +24,9 @@ export class CalendarService {
     const ev = this.eventRepo.create({
       ...dto,
       start: DateTime.fromISO(dto.start, { zone: dto.timezone || 'UTC' }).toJSDate(),
-      end: dto.end ? DateTime.fromISO(dto.end, { zone: dto.timezone || 'UTC' }).toJSDate() : undefined,
+      end: dto.end
+        ? DateTime.fromISO(dto.end, { zone: dto.timezone || 'UTC' }).toJSDate()
+        : undefined,
       ownerId,
     });
 
@@ -47,8 +49,12 @@ export class CalendarService {
   async updateEvent(id: string, dto: UpdateEventDto) {
     const ev = await this.getById(id);
     Object.assign(ev, dto);
-    if ((dto as any).start) ev.start = DateTime.fromISO((dto as any).start, { zone: dto.timezone || ev.timezone }).toJSDate();
-    if ((dto as any).end) ev.end = DateTime.fromISO((dto as any).end, { zone: dto.timezone || ev.timezone }).toJSDate();
+    if ((dto as any).start)
+      ev.start = DateTime.fromISO((dto as any).start, {
+        zone: dto.timezone || ev.timezone,
+      }).toJSDate();
+    if ((dto as any).end)
+      ev.end = DateTime.fromISO((dto as any).end, { zone: dto.timezone || ev.timezone }).toJSDate();
     return this.eventRepo.save(ev);
   }
 
@@ -66,10 +72,16 @@ export class CalendarService {
     const current = await this.bookingRepo.count({ where: { event: { id: ev.id } as any } });
     if (current >= capacity) throw new ConflictException('No slots available');
 
-    const existing = await this.bookingRepo.findOne({ where: { event: { id: ev.id } as any, userId: dto.userId } });
+    const existing = await this.bookingRepo.findOne({
+      where: { event: { id: ev.id } as any, userId: dto.userId },
+    });
     if (existing) throw new ConflictException('You already have a booking for this slot');
 
-    const booking = this.bookingRepo.create({ event: ev, userId: dto.userId, metadata: { notes: dto.notes } });
+    const booking = this.bookingRepo.create({
+      event: ev,
+      userId: dto.userId,
+      metadata: { notes: dto.notes },
+    });
     const saved = await this.bookingRepo.save(booking);
 
     // send reminder notification (immediate enqueue)

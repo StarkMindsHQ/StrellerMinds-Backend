@@ -1,5 +1,4 @@
-import { Course } from '../../../course/entities/course.entity';
-import { CourseStatus } from '../../../course/entities/course.entity';
+import { Course, CourseStatus } from '../../../course/entities/course.entity';
 
 export interface CourseFactoryOptions {
   instructorId?: string;

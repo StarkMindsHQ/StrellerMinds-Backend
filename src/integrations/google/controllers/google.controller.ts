@@ -15,6 +15,7 @@ import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { GoogleService } from '../services/google.service';
 import { GoogleConfigService } from '../services/google-config.service';
 import { GoogleConfigDto, GoogleCourseDto } from '../dto/google.dto';
+import { RequestUser } from '../../../common/types/request.types';
 
 @Controller('integrations/google')
 export class GoogleController {
@@ -28,9 +29,9 @@ export class GoogleController {
    */
   @Post('config')
   @UseGuards(JwtAuthGuard)
-  async createGoogleConfig(@CurrentUser() user: any, @Body() dto: GoogleConfigDto) {
+  async createGoogleConfig(@CurrentUser() user: RequestUser, @Body() dto: GoogleConfigDto) {
     const config = await this.googleConfigService.createGoogleConfig(
-      user.id,
+      user.sub,
       dto.clientId,
       dto.clientSecret,
       dto.redirectUri,
@@ -67,7 +68,7 @@ export class GoogleController {
   @Get('auth/callback')
   @UseGuards(JwtAuthGuard)
   async handleCallback(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Query('code') code: string,
     @Query('clientId') clientId: string,
     @Query('clientSecret') clientSecret: string,
@@ -100,8 +101,8 @@ export class GoogleController {
    */
   @Get('config/:configId')
   @UseGuards(JwtAuthGuard)
-  async getGoogleConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
-    const config = await this.googleConfigService.getGoogleConfig(configId, user.id);
+  async getGoogleConfig(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+    const config = await this.googleConfigService.getGoogleConfig(configId, user.sub);
     if (!config) {
       throw new NotFoundException('Google configuration not found');
     }
@@ -131,8 +132,8 @@ export class GoogleController {
    */
   @Post('sync-courses')
   @UseGuards(JwtAuthGuard)
-  async syncCourses(@CurrentUser() user: any, @Body() body: { configId: string }) {
-    const syncLog = await this.googleConfigService.syncCourses(body.configId, user.id);
+  async syncCourses(@CurrentUser() user: RequestUser, @Body() body: { configId: string }) {
+    const syncLog = await this.googleConfigService.syncCourses(body.configId, user.sub);
 
     return {
       success: true,
@@ -147,12 +148,12 @@ export class GoogleController {
   @Post('sync-assignments')
   @UseGuards(JwtAuthGuard)
   async syncAssignments(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Body() body: { configId: string; courseId: string },
   ) {
     const syncLog = await this.googleConfigService.syncAssignments(
       body.configId,
-      user.id,
+      user.sub,
       body.courseId,
     );
 

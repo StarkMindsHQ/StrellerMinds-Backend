@@ -28,10 +28,7 @@ export class ReportBuilderController {
   @ApiOperation({ summary: 'Create a new report' })
   @ApiResponse({ status: 201, description: 'Report created successfully' })
   async createReport(@Request() req, @Body() createReportDto: CreateReportDto) {
-    const report = await this.reportBuilderService.createReport(
-      req.user.id,
-      createReportDto,
-    );
+    const report = await this.reportBuilderService.createReport(req.user.id, createReportDto);
     return {
       success: true,
       data: report,
@@ -46,11 +43,7 @@ export class ReportBuilderController {
     @Param('reportId') reportId: string,
     @Body() updateData: Partial<CreateReportDto>,
   ) {
-    const report = await this.reportBuilderService.updateReport(
-      reportId,
-      req.user.id,
-      updateData,
-    );
+    const report = await this.reportBuilderService.updateReport(reportId, req.user.id, updateData);
     return {
       success: true,
       data: report,

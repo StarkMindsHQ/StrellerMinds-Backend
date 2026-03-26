@@ -13,8 +13,10 @@ export class SecurityAnalyticsService {
   async getDashboardStats() {
     const totalIncidents = await this.incidentRepo.count();
     const openIncidents = await this.incidentRepo.count({ where: { status: 'OPEN' as any } });
-    const criticalIncidents = await this.incidentRepo.count({ where: { severity: 'CRITICAL' as any } });
-    
+    const criticalIncidents = await this.incidentRepo.count({
+      where: { severity: 'CRITICAL' as any },
+    });
+
     const recentIncidents = await this.incidentRepo.find({
       order: { createdAt: 'DESC' },
       take: 10,
@@ -36,10 +38,18 @@ export class SecurityAnalyticsService {
 
     for (const incident of incidents) {
       switch (incident.severity) {
-        case 'CRITICAL' as any: score -= 30; break;
-        case 'HIGH' as any: score -= 15; break;
-        case 'MEDIUM' as any: score -= 5; break;
-        case 'LOW' as any: score -= 1; break;
+        case 'CRITICAL' as any:
+          score -= 30;
+          break;
+        case 'HIGH' as any:
+          score -= 15;
+          break;
+        case 'MEDIUM' as any:
+          score -= 5;
+          break;
+        case 'LOW' as any:
+          score -= 1;
+          break;
       }
     }
 
