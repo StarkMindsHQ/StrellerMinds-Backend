@@ -55,6 +55,8 @@
     "security:scan": "node scripts/security-check.js",
     "security:zap": "node scripts/zap-scan.js",
     "quality:check": "npm run lint && npm run test:cov && npm run security:scan && npm run perf:check",
+    "coverage:report": "node scripts/generate-coverage-report.js",
+    "coverage:badge": "node scripts/generate-coverage-report.js && cat coverage/coverage-badge.json",
     "ci:test": "npm run test && npm run test:integration && npm run test:e2e && npm run test:api && npm run security:scan && npm run perf:check",
     "ci:build": "npm run build && npm run docs:generate"
   },
