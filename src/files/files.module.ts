@@ -13,6 +13,8 @@ import { GCSStorageService } from './storage/gcs.storage';
 import { AzureStorageService } from './storage/azure.storage';
 import { StorageProviderFactory } from './storage/storage-provider.factory';
 import { FilesController } from './files.controller';
+import { FileProcessorConsumer } from './processors/file-processor.consumer';
+import { QueueModule } from '../common/queue/queue.module';
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { FilesController } from './files.controller';
       FilePermissionEntity,
       FileAnalyticsEntity,
     ]),
+    QueueModule, // Import the centralized queue module
   ],
   controllers: [FilesController],
   providers: [
@@ -33,6 +36,7 @@ import { FilesController } from './files.controller';
     GCSStorageService,
     AzureStorageService,
     StorageProviderFactory,
+    FileProcessorConsumer, // Add the file processor consumer
     {
       provide: 'StorageProvider',
       useClass: S3StorageService,

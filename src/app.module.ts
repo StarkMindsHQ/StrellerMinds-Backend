@@ -1,7 +1,7 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -9,25 +9,19 @@ import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import Redis from 'ioredis';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
 import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
-import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
-import { VideoModule } from './video/video.module';
 import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
-import { WebhookModule } from './webhook/webhook.module';
-import { WebhookRawBodyMiddleware } from './webhook/middleware/webhook-raw-body.middleware';
 
-import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
+
 
 import { DatabaseConfig } from './config/database.config';
 import { configuration, validationSchema } from './config/configuration';
-import { SearchModule } from './search/search.module';
 
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
@@ -48,18 +42,7 @@ import {
 // duplicate/commented imports removed
 import { CourseModule } from './course/course.module';
 import { PaymentModule } from './payment/payment.module';
-import {
-  Payment,
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Refund,
-  Dispute,
-  TaxRate,
-  FinancialReport,
-  PaymentMethodEntity,
-} from './payment/entities';
-import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
@@ -72,12 +55,9 @@ import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
-import { DocumentationModule } from './documentation/documentation.module';
-import { MonitoringModule } from './monitoring/monitoring.module';
-import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
-import { CoreModule } from './core/core.module';
-import { StorageModule } from './storage/storage.module';
-import { LoggingModule } from './logging/logging.module';
+import { MetricsModule } from './metrics/metrics.module';
+import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
+
 
 @Module({
   imports: [
@@ -102,7 +82,7 @@ import { LoggingModule } from './logging/logging.module';
         throttlers: [
           {
             ttl: config.get('RATE_LIMIT_TTL', 60000),
-            limit: config.get('RATE_LIMIT_MAX', 10),
+            limit: config.get('RATE_LIMIT_MAX', 100),
           },
         ],
         storage: new ThrottlerStorageRedisService(
@@ -124,26 +104,22 @@ import { LoggingModule } from './logging/logging.module';
     AuthModule,
     CalendarModule,
     CourseModule,
-    DatabaseModule,
     FilesModule,
     ForumModule,
     GamificationModule,
     IntegrationsModule,
-    I18nModule.register(),
+
     LearningPathModule,
-    PaymentModule,
-    SearchModule,
-    SecurityModule,
-    UserModule,
-    VideoModule,
-    DocumentationModule,
-    MonitoringModule,
-    CoreModule,
-    StorageModule,
-    LoggingModule,
-    WebhookModule,
+    CalendarModule,
+    AnalyticsModule,
+    MetricsModule,
   ],
+
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
@@ -162,9 +138,10 @@ import { LoggingModule } from './logging/logging.module';
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: PerformanceInterceptor,
+      useClass: MetricsInterceptor,
     },
   ],
+
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
@@ -172,9 +149,6 @@ export class AppModule {
     consumer.apply(InputSecurityMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
     // consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
-    consumer.apply(RequestIdMiddleware).forRoutes('*');
     consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
-    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
-    consumer.apply(WebhookRawBodyMiddleware).forRoutes('*');
   }
 }

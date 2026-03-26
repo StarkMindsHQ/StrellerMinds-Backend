@@ -14,6 +14,41 @@ The platform is designed for educational institutions, online learning platforms
 - **Auto-generated Documentation**: Interactive Swagger/OpenAPI documentation
 - **Comprehensive Testing**: Unit and integration tests with Jest
 - **Environment Configuration**: Flexible configuration management
+- **📊 Application Performance Monitoring**: DataDog & New Relic integration with distributed tracing, performance profiling, and alerting
+- **🔍 Performance Profiling**: Memory, CPU, and operation profiling with hotspot detection
+- **⚠️ Performance Alerting**: Real-time alerts with Slack and PagerDuty integration
+
+## 📊 Monitoring & Performance
+
+This backend includes a comprehensive **Application Performance Monitoring (APM)** system:
+
+### Key Capabilities
+- **Distributed Tracing**: W3C standard trace context for cross-service debugging
+- **Performance Profiling**: Memory leak detection, hotspot analysis, percentile calculations
+- **APM Integration**: DataDog and New Relic support with automatic instrumentation
+- **Smart Alerting**: Configurable alerts for memory, CPU, response time, error rates
+- **Real-time Dashboards**: Monitor performance through Monitoring API endpoints
+
+### Quick Start with APM
+1. Set your APM provider credentials:
+   ```bash
+   export DATADOG_API_KEY=your-key          # or NEW_RELIC_LICENSE_KEY
+   export APP_NAME=strellerminds-backend
+   ```
+
+2. Access monitoring endpoints:
+   ```bash
+   # Performance profile
+   curl http://localhost:3000/api/monitoring/profiling/report
+   
+   # Active traces
+   curl http://localhost:3000/api/monitoring/tracing/active-spans
+   
+   # Current alerts
+   curl http://localhost:3000/api/monitoring/alerts/active
+   ```
+
+See [APM_IMPLEMENTATION.md](./docs/APM_IMPLEMENTATION.md) for full documentation.
 
 ## 🛠️ Tech Stack
 
@@ -25,6 +60,7 @@ The platform is designed for educational institutions, online learning platforms
 - **Documentation**: Swagger/OpenAPI
 - **Testing**: Jest
 - **Code Quality**: ESLint + Prettier
+- **Monitoring**: DataDog/New Relic APM with distributed tracing
 
 ## 📋 Prerequisites
 
@@ -139,35 +175,37 @@ NODE_ENV=development
 
 For a complete list of all available environment variables, refer to `.env.example`.
 
-## 🏗️ Project Structure
+## 🏗️ Project Structure & Architecture
+
+The project follows a modular monolithic architecture, ensuring a clean separation of concerns while maintaining development velocity.
+
+- **[Architecture Overview](./docs/architecture/overview.md)**: High-level design and infrastructure diagrams.
+- **[Module Interactions](./docs/architecture/modules.md)**: Detailed dependency mapping between core modules.
+- **[Architecture Decisions (ADR)](./docs/adr/0001-record-architecture-decisions.md)**: Rationale behind key technical choices.
 
 ```
 src/
-├── app.controller.ts          # Main application controller
 ├── app.module.ts            # Root application module
-├── app.service.ts           # Core application service
 ├── main.ts                 # Application entry point
-├── common/                 # Shared utilities and decorators
-│   ├── decorators/
-│   └── errors/
-├── config/                 # Configuration files
-├── modules/                # Feature modules
-│   ├── auth/              # Authentication & authorization
-│   ├── users/             # User management
-│   ├── courses/           # Course management
-│   ├── blockchain/        # Stellar integration
-│   └── enrollment/        # Course enrollment
-└── utils/                 # Helper utilities
+├── common/                 # Shared utilities, validation, and security
+├── modules/                # Domain-specific modules (Auth, User, Course, etc.)
+└── config/                 # Environment-specific configurations
 ```
 
-## 📖 API Documentation
+## 📖 Documentation
+
+A comprehensive documentation suite is available in the `docs/` directory:
+
+1. **[Developer Onboarding](./docs/onboarding/guide.md)**: Setup, coding standards, and Git workflow.
+2. **[Deployment & Infrastructure](./docs/deployment/infrastructure.md)**: Docker, Redis, and Observability stack.
+3. **[API Documentation (Swagger)](#📚-api-documentation)**: Interactive endpoint explorer.
+
+### 📚 API Documentation
 
 Once the server is running, access the interactive API documentation:
 
 - **Swagger UI**: `http://localhost:3000/api/docs`
 - **OpenAPI JSON**: `http://localhost:3000/api/docs-json`
-
-For onboarding, SDK generation, and multi-language examples, see `DEVELOPER_PORTAL.md`.
 
 ## 🧪 Testing
 
@@ -185,7 +223,27 @@ npm run test -- auth/auth.service.spec.ts
 
 # Run tests in watch mode for development
 npm run test:watch
+
+# Load Testing (Artillery)
+npm run perf:load          # Run standard load test
+npm run perf:stress        # Run high-load stress test
+npm run perf:check         # Run performance regression check
+
+# Benchmarking (Autocannon)
+npm run perf:benchmark     # Run benchmarks for critical endpoints
 ```
+
+## 📊 Performance Monitoring
+
+The application includes built-in Prometheus metrics. You can access them at:
+- **Metrics Endpoint**: `http://localhost:3000/api/health/metrics`
+- **Dashboard**: Use the provided `monitoring/grafana-dashboard.json` for Grafana.
+
+Key metrics tracked:
+- `http_requests_total`: Total request volume by method/route/status.
+- `http_request_duration_seconds`: Response time distributions.
+- `active_connections`: Number of concurrent connections being processed.
+- `service_memory_usage_bytes`: Real-time memory metrics.
 
 ## 🔒 Security Considerations
 

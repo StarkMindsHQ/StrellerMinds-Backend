@@ -1,17 +1,15 @@
-import { Controller, Get, Post, Body, Query, Param, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/auth.guard';
+import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { AccessibilityService, AriaRole, AriaPoliteness } from '../services/accessibility.service';
 import {
   AccessibilityTestingService,
   ViolationSeverity,
 } from '../services/accessibility-testing.service';
-import { AccessibilityMonitoringService } from '../services/accessibility-monitoring.service';
-import { RTLService } from '../services/rtl.service';
-import { CreateAuditDto, AuditHistoryQueryDto } from '../dto/audit.dto';
-import { I18nService } from '../../i18n/services/i18n.service';
+import { JwtAuthGuard } from '../../auth/guards/auth.guard';
 
 @ApiTags('Accessibility')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('accessibility')
 export class AccessibilityController {
   constructor(
@@ -22,18 +20,27 @@ export class AccessibilityController {
     private readonly i18nService: I18nService,
   ) {}
 
-  /**
-   * Get WCAG 2.1 AA compliance checklist
-   */
   @Get('wcag-checklist')
+  @ApiOperation({ summary: 'Get WCAG 2.1 AA compliance checklist', description: 'Returns a comprehensive checklist for WCAG 2.1 AA accessibility guidelines.' })
+  @ApiResponse({ status: 200, description: 'Checklist retrieved successfully.' })
   getWCAGChecklist() {
     return this.accessibilityService.getWCAGComplianceChecklist();
   }
 
-  /**
-   * Build ARIA attributes
-   */
   @Post('build-aria')
+  @ApiOperation({ summary: 'Build ARIA attributes', description: 'Generates valid ARIA attributes based on provided roles and labels.' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        role: { type: 'string', enum: Object.values(AriaRole), example: 'button' },
+        label: { type: 'string', example: 'Close menu' },
+        labelledBy: { type: 'string', example: 'modal-title' },
+        describedBy: { type: 'string', example: 'modal-desc' },
+      }
+    }
+  })
+  @ApiResponse({ status: 200, description: 'ARIA attributes built successfully.' })
   buildAriaAttributes(
     @Body()
     options: {
@@ -49,10 +56,20 @@ export class AccessibilityController {
     };
   }
 
-  /**
-   * Generate screen reader friendly text
-   */
   @Post('screen-reader-text')
+  @ApiOperation({ summary: 'Generate screen reader friendly text', description: 'Transforms raw data into descriptive strings optimized for screen readers.' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', example: 'loading' },
+        state: { type: 'string', example: 'in progress' },
+        count: { type: 'number', example: 5 },
+        total: { type: 'number', example: 10 },
+      }
+    }
+  })
+  @ApiResponse({ status: 200, description: 'Screen reader text generated successfully.' })
   generateScreenReaderText(
     @Body()
     options: {
@@ -69,10 +86,11 @@ export class AccessibilityController {
     };
   }
 
-  /**
-   * Check color contrast ratio
-   */
   @Get('contrast')
+  @ApiOperation({ summary: 'Check color contrast ratio', description: 'Validates if the foreground and background colors meet WCAG contrast requirements.' })
+  @ApiQuery({ name: 'foreground', example: '#FFFFFF' })
+  @ApiQuery({ name: 'background', example: '#000000' })
+  @ApiResponse({ status: 200, description: 'Contrast ratio checked and validated.' })
   checkContrastRatio(
     @Query('foreground') foreground: string,
     @Query('background') background: string,
@@ -84,24 +102,21 @@ export class AccessibilityController {
     return this.accessibilityService.checkContrastRatio(foreground, background);
   }
 
-  /**
-   * Get skip navigation links
-   */
   @Get('skip-links')
+  @ApiOperation({ summary: 'Get skip navigation links', description: 'Returns a list of standardized skip links for keyboard navigation.' })
+  @ApiResponse({ status: 200, description: 'Skip links retrieved successfully.' })
   getSkipLinks() {
     return {
       skipLinks: this.accessibilityService.getSkipNavigationLinks(),
     };
   }
 
-  /**
-   * Audit HTML content for accessibility
-   */
   @Post('audit')
-  @ApiOperation({ summary: 'Audit HTML content for accessibility compliance' })
-  @ApiResponse({ status: 200, description: 'Audit completed' })
-  async auditContent(@Body() dto: CreateAuditDto, @Req() req?: any) {
-    if (!dto.html) {
+  @ApiOperation({ summary: 'Audit HTML content for accessibility', description: 'Performs a comprehensive accessibility audit (WCAG, Keyboard, Screen Reader) on provided HTML.' })
+  @ApiBody({ schema: { properties: { html: { type: 'string', example: '<div><img src="foo.jpg"></div>' } } } })
+  @ApiResponse({ status: 200, description: 'Audit completed successfully with detailed report.' })
+  auditContent(@Body() body: { html: string }) {
+    if (!body.html) {
       return { error: 'HTML content required' };
     }
 
@@ -147,62 +162,9 @@ export class AccessibilityController {
     };
   }
 
-  /**
-   * Get audit history
-   */
-  @Get('audits')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get accessibility audit history' })
-  @ApiResponse({ status: 200, description: 'Audit history retrieved' })
-  async getAuditHistory(@Query() query: AuditHistoryQueryDto, @Req() req: any) {
-    const startDate = query.startDate ? new Date(query.startDate) : undefined;
-    const endDate = query.endDate ? new Date(query.endDate) : undefined;
-
-    return this.monitoringService.getAuditHistory(
-      req.user?.id,
-      startDate,
-      endDate,
-      query.limit || 50,
-    );
-  }
-
-  /**
-   * Get audit statistics
-   */
-  @Get('statistics')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get accessibility audit statistics' })
-  @ApiResponse({ status: 200, description: 'Statistics retrieved' })
-  async getStatistics(@Query('days') days?: string, @Req() req?: any) {
-    return this.monitoringService.getAuditStatistics(req?.user?.id, days ? parseInt(days) : 30);
-  }
-
-  @Get('reports/compliance')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get accessibility compliance report with top violations' })
-  async getComplianceReport(@Query('days') days?: string, @Req() req?: any) {
-    return this.monitoringService.getComplianceReport(req?.user?.id, days ? parseInt(days) : 30);
-  }
-
-  /**
-   * Get audit by ID
-   */
-  @Get('audits/:id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get audit by ID' })
-  @ApiResponse({ status: 200, description: 'Audit retrieved' })
-  async getAuditById(@Param('id') id: string) {
-    return this.monitoringService.getAuditById(id);
-  }
-
-  /**
-   * Get accessibility features overview
-   */
   @Get('overview')
+  @ApiOperation({ summary: 'Get accessibility features overview', description: 'Returns a high-level overview of available accessibility features and best practices.' })
+  @ApiResponse({ status: 200, description: 'Overview retrieved successfully.' })
   getOverview() {
     return {
       features: {

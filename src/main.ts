@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { VersioningType } from '@nestjs/common';
 import helmet from 'helmet';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -12,8 +13,64 @@ import { Logger } from 'winston';
 import * as compression from 'compression';
 import { PerformanceInterceptor } from './common/interceptors/performance.interceptor';
 import { json, urlencoded } from 'express';
+import { ApiVersionGuard } from './documentation/guards/api-version.guard';
+import { DistributedTracingMiddleware } from './monitoring/middleware/distributed-tracing.middleware';
+
+/**
+ * Initialize APM Providers (DataDog, New Relic)
+ * Should be called as early as possible in the application lifecycle
+ */
+async function initializeAPM(app: any) {
+  const logger = app.get(Logger);
+  
+  try {
+    // Initialize DataDog APM if configured
+    const datadogProvider = app.get('DatadogProvider');
+    if (datadogProvider) {
+      await datadogProvider.initialize();
+    }
+
+    // Initialize New Relic APM if configured
+    const newrelicProvider = app.get('NewRelicProvider');
+    if (newrelicProvider) {
+      await newrelicProvider.initialize();
+    }
+
+    logger.log('APM providers initialized successfully', 'APM');
+  } catch (error) {
+    logger.error('Failed to initialize APM providers', error, 'APM');
+  }
+}
 
 async function bootstrap() {
+  // Initialize APM BEFORE creating the app (critical for dd-trace)
+  const apmDatadog = process.env.DATADOG_API_KEY;
+  const apmNewRelic = process.env.NEW_RELIC_LICENSE_KEY;
+
+  // Note: dd-trace must be required before other modules for proper instrumentation
+  if (apmDatadog && !apmDatadog.includes('placeholder')) {
+    try {
+      require('dd-trace').init({
+        service: process.env.APP_NAME || 'strellerminds-backend',
+        env: process.env.NODE_ENV || 'development',
+        version: process.env.APP_VERSION || '1.0.0',
+        logInjection: true,
+        analytics: true,
+      });
+    } catch (error) {
+      console.warn('DataDog tracing not available, ensure dd-trace is installed');
+    }
+  }
+
+  // Note: newrelic must be required at the very start
+  if (apmNewRelic && !apmNewRelic.includes('placeholder')) {
+    try {
+      require('newrelic');
+    } catch (error) {
+      console.warn('New Relic APM not available, ensure newrelic package is installed');
+    }
+  }
+
   // Sentry: only init when a valid DSN is set (skip placeholder or empty)
   const sentryDsn = process.env.SENTRY_DSN;
   if (sentryDsn && !sentryDsn.includes('your-sentry-dsn') && !sentryDsn.includes('project-id')) {
@@ -26,6 +83,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger(winstonConfig),
   });
+
+  // Initialize APM providers after app creation
+  await initializeAPM(app);
+
+  // Register distributed tracing middleware
+  try {
+    const tracingMiddleware = app.get(DistributedTracingMiddleware);
+    app.use(tracingMiddleware);
+  } catch (error) {
+    const logger = app.get(Logger);
+    logger.debug('Distributed tracing middleware not available');
+  }
 
   app.use(json({ limit: '1mb' }));
   app.use(urlencoded({ extended: true, limit: '1mb' }));
@@ -54,6 +123,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
+  app.useGlobalGuards(app.get(ApiVersionGuard));
   app.useGlobalInterceptors(new PerformanceInterceptor());
   // CORS configuration
   // app.enableCors({
@@ -71,8 +141,13 @@ async function bootstrap() {
     1,
   );
 
-  // API prefix
+  // API prefix with versioning support
   app.setGlobalPrefix('api');
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+    prefix: 'v',
+  });
 
   // Swagger documentation
   const config = new DocumentBuilder()

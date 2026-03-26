@@ -31,6 +31,7 @@ export class ApiUsageInterceptor implements NestInterceptor {
                 queryParams: request.query,
                 requestHeaders: request.headers,
                 responseSize: JSON.stringify(data).length,
+                version: request.apiVersion,
               })
               .catch(() => {
                 // Ignore tracking errors
@@ -50,6 +51,7 @@ export class ApiUsageInterceptor implements NestInterceptor {
                   message: error.message,
                   code: error.code,
                 },
+                version: request.apiVersion,
               })
               .catch(() => {
                 // Ignore tracking errors

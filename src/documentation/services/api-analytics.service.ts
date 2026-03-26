@@ -33,6 +33,7 @@ export class ApiAnalyticsService {
       queryParams?: Record<string, any>;
       requestHeaders?: Record<string, any>;
       errorDetails?: any;
+      version?: string;
     },
   ): Promise<void> {
     try {
@@ -112,6 +113,18 @@ export class ApiAnalyticsService {
       requestsByStatus[status.toString()] = count;
     });
 
+    // Requests by API version
+    const versionMap = new Map<string, number>();
+    usages.forEach((usage) => {
+      const versionKey = usage.version || 'v1';
+      versionMap.set(versionKey, (versionMap.get(versionKey) || 0) + 1);
+    });
+
+    const requestsByVersion = Array.from(versionMap.entries()).map(([version, count]) => ({
+      version,
+      count,
+    }));
+
     // Requests over time (hourly aggregation)
     const timeMap = new Map<string, { count: number; totalTime: number }>();
     usages.forEach((usage) => {
@@ -159,6 +172,7 @@ export class ApiAnalyticsService {
       errorRate: Math.round(errorRate * 100) / 100,
       requestsByEndpoint,
       requestsByStatus,
+      requestsByVersion,
       requestsOverTime,
       topApiKeys,
     };

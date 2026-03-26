@@ -1,1 +1,103 @@
-export class Forum {}
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { User } from '../../auth/entities/user.entity';
+import { Course } from '../../course/entities/course.entity';
+
+export enum PostStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  ARCHIVED = 'archived',
+  DELETED = 'deleted',
+}
+
+@Entity('forum_posts')
+export class ForumPost {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => User)
+  author: User;
+
+  @ManyToOne(() => Course, { nullable: true })
+  course: Course;
+
+  @ManyToOne(() => ForumTopic, { nullable: true })
+  topic: ForumTopic;
+
+  @Column()
+  title: string;
+
+  @Column('text')
+  content: string;
+
+  @Column({
+    type: 'enum',
+    enum: PostStatus,
+    default: PostStatus.PUBLISHED,
+  })
+  status: PostStatus;
+
+  @Column({ default: false })
+  isPinned: boolean;
+
+  @Column({ default: false })
+  isLocked: boolean;
+
+  @Column({ default: 0 })
+  views: number;
+
+  @Column({ default: 0 })
+  likes: number;
+
+  @Column({ default: 0 })
+  replies: number;
+
+  @Column('simple-array', { nullable: true })
+  tags: string[];
+
+  @Column('simple-json', { nullable: true })
+  attachments: Array<{
+    name: string;
+    url: string;
+    type: string;
+    size: number;
+  }>;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastReplyAt: Date;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+@Entity('forum_topics')
+export class ForumTopic {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  name: string;
+
+  @Column('text')
+  description: string;
+
+  @ManyToOne(() => Course, { nullable: true })
+  course: Course;
+
+  @Column({ default: false })
+  isPrivate: boolean;
+
+  @Column({ default: 0 })
+  postCount: number;
+
+  @Column({ type: 'timestamp' })
+  lastActivityAt: Date;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

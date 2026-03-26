@@ -15,11 +15,13 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiQuery,
   ApiConsumes,
   ApiBody,
   ApiBearerAuth,
@@ -60,12 +62,27 @@ export class UserController {
 
   @Get()
   @ApiOperation({ summary: 'Get all users with filtering and pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 20 })
+  @ApiQuery({ name: 'cursor', required: false, type: String, example: 'eyJj...==' })
   @ApiResponse({
     status: 200,
     description: 'Users retrieved successfully',
   })
   async findAll(@Query() query: UserQueryDto) {
-    return this.userService.findAll(query);
+    const result = await this.userService.findAll(query);
+    return {
+      success: true,
+      data: result.data,
+      pagination: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages,
+        cursor: result.cursor,
+        nextCursor: result.nextCursor,
+      },
+    };
   }
 
   @Get(':id')
@@ -118,6 +135,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 401, description: 'Current password is incorrect' })
   @ApiResponse({ status: 404, description: 'User not found' })
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
   async changePassword(
     @Param('id') id: string,
     @Body() changePasswordDto: ChangePasswordDto,

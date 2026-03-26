@@ -1,18 +1,22 @@
-/**
- * Shared enums for assignments and submissions.
- * Kept in a separate file to avoid circular dependency between assignment.entity and submission.entity.
- */
-
 export enum AssignmentType {
-  FILE = 'file',
-  TEXT = 'text',
+  QUIZ = 'quiz',
+  PROJECT = 'project',
+  ESSAY = 'essay',
   CODE = 'code',
+  PRESENTATION = 'presentation',
   MIXED = 'mixed',
+}
+
+export enum AssignmentStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  CLOSED = 'closed',
+  ARCHIVED = 'archived',
 }
 
 export enum SubmissionStatus {
   DRAFT = 'draft',
   SUBMITTED = 'submitted',
-  LATE = 'late',
   GRADED = 'graded',
+  RETURNED = 'returned',
 }
