@@ -14,6 +14,7 @@ import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { MicrosoftService } from '../services/microsoft.service';
 import { MicrosoftConfigService } from '../services/microsoft-config.service';
 import { MicrosoftConfigDto, TeamsAssignmentDto } from '../dto/microsoft.dto';
+import { RequestUser } from '../../../common/types/request.types';
 
 @Controller('integrations/microsoft')
 export class MicrosoftController {
@@ -27,9 +28,9 @@ export class MicrosoftController {
    */
   @Post('config')
   @UseGuards(JwtAuthGuard)
-  async createMicrosoftConfig(@CurrentUser() user: any, @Body() dto: MicrosoftConfigDto) {
+  async createMicrosoftConfig(@CurrentUser() user: RequestUser, @Body() dto: MicrosoftConfigDto) {
     const config = await this.microsoftConfigService.createMicrosoftConfig(
-      user.id,
+      user.sub,
       dto.clientId,
       dto.clientSecret,
       dto.tenantId,
@@ -71,7 +72,7 @@ export class MicrosoftController {
   @Get('auth/callback')
   @UseGuards(JwtAuthGuard)
   async handleCallback(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Query('code') code: string,
     @Query('clientId') clientId: string,
     @Query('clientSecret') clientSecret: string,
@@ -106,8 +107,8 @@ export class MicrosoftController {
    */
   @Get('config/:configId')
   @UseGuards(JwtAuthGuard)
-  async getMicrosoftConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
-    const config = await this.microsoftConfigService.getMicrosoftConfig(configId, user.id);
+  async getMicrosoftConfig(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+    const config = await this.microsoftConfigService.getMicrosoftConfig(configId, user.sub);
     if (!config) {
       throw new NotFoundException('Microsoft configuration not found');
     }
@@ -163,8 +164,8 @@ export class MicrosoftController {
    */
   @Post('sync-teams')
   @UseGuards(JwtAuthGuard)
-  async syncTeams(@CurrentUser() user: any, @Body() body: { configId: string }) {
-    const syncLog = await this.microsoftConfigService.syncTeams(body.configId, user.id);
+  async syncTeams(@CurrentUser() user: RequestUser, @Body() body: { configId: string }) {
+    const syncLog = await this.microsoftConfigService.syncTeams(body.configId, user.sub);
 
     return {
       success: true,

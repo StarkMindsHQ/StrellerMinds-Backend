@@ -14,6 +14,7 @@ import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { LtiService } from '../services/lti.service';
 import { LtiConfigService } from '../services/lti-config.service';
 import { LtiConfigDto, LtiLaunchDto, LtiGradeDto } from '../dto/lti.dto';
+import { RequestUser } from '../../../common/types/request.types';
 
 @Controller('integrations/lti')
 @UseGuards(JwtAuthGuard)
@@ -27,9 +28,9 @@ export class LtiController {
    * Create LTI configuration
    */
   @Post('config')
-  async createLtiConfig(@CurrentUser() user: any, @Body() dto: LtiConfigDto) {
+  async createLtiConfig(@CurrentUser() user: RequestUser, @Body() dto: LtiConfigDto) {
     const config = await this.ltiConfigService.createLtiConfig(
-      user.id,
+      user.sub,
       dto.platformUrl,
       dto.clientId,
       dto.clientSecret,
@@ -49,8 +50,8 @@ export class LtiController {
    * Get LTI configuration
    */
   @Get('config/:configId')
-  async getLtiConfig(@CurrentUser() user: any, @Param('configId') configId: string) {
-    const config = await this.ltiConfigService.getLtiConfig(configId, user.id);
+  async getLtiConfig(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+    const config = await this.ltiConfigService.getLtiConfig(configId, user.sub);
     if (!config) {
       throw new NotFoundException('LTI configuration not found');
     }
@@ -66,11 +67,11 @@ export class LtiController {
    */
   @Put('config/:configId')
   async updateLtiConfig(
-    @CurrentUser() user: any,
+    @CurrentUser() user: RequestUser,
     @Param('configId') configId: string,
     @Body() dto: Partial<LtiConfigDto>,
   ) {
-    const config = await this.ltiConfigService.updateLtiConfig(configId, user.id, {
+    const config = await this.ltiConfigService.updateLtiConfig(configId, user.sub, {
       credentials: dto,
     });
 
@@ -85,8 +86,8 @@ export class LtiController {
    * Activate LTI integration
    */
   @Post('config/:configId/activate')
-  async activateLti(@CurrentUser() user: any, @Param('configId') configId: string) {
-    const config = await this.ltiConfigService.activateLtiConfig(configId, user.id);
+  async activateLti(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
+    const config = await this.ltiConfigService.activateLtiConfig(configId, user.sub);
 
     return {
       success: true,
@@ -115,7 +116,7 @@ export class LtiController {
    * Submit grade to LTI platform
    */
   @Post('grades/submit')
-  async submitGrade(@CurrentUser() user: any, @Body() dto: LtiGradeDto) {
+  async submitGrade(@CurrentUser() user: RequestUser, @Body() dto: LtiGradeDto) {
     try {
       // Implementation would submit grade to platform
       return {
@@ -131,7 +132,7 @@ export class LtiController {
    * Get sync history
    */
   @Get('config/:configId/sync-history')
-  async getSyncHistory(@CurrentUser() user: any, @Param('configId') configId: string) {
+  async getSyncHistory(@CurrentUser() user: RequestUser, @Param('configId') configId: string) {
     const history = await this.ltiConfigService.getSyncHistory(configId);
 
     return {

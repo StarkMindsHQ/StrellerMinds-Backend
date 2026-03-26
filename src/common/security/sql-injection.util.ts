@@ -20,6 +20,12 @@ const SQLI_PATTERNS: RegExp[] = [
   /(\b'?\s*or\s*'?\w+'?\s*=\s*'?\w+'?\b)/i,
   /(--\s|\/\*|\*\/)/, // comment tokens
   /(;+\s*(select|insert|update|delete|drop)\b)/i,
+  /\b(sleep|benchmark|pg_sleep|waitfor\s+delay)\b/i, // time-based blind SQLi
+  /\b(information_schema|pg_catalog|sys\.tables|sys\.databases)\b/i, // schema exploration
+  /\b(truncate|grant|revoke|alter)\b/i, // DDL/DCL commands
+  /\b(exec|execute|sp_executesql)\b/i, // dynamic execution
+  /\b(char|concat|cast|convert|md5|sha1)\b/i, // obfuscation utility functions
+  /\b(0x[0-9a-f]{2,})\b/i, // hex-encoded SQL/shellcode
 ];
 
 export type SqlScanHit = {

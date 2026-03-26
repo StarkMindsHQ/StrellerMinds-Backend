@@ -12,6 +12,8 @@ import { BackupNotificationService } from './backup-notification.service';
 import { BackupMetricsService } from './backup-metrics.service';
 import { BackupMonitoringService } from './backup-monitoring.service';
 import { RecoveryVerificationService } from './recovery-verification.service';
+import { DisasterRecoveryTestingService } from './disaster-recovery-testing.service';
+import { DisasterRecoveryGovernanceService } from './disaster-recovery-governance.service';
 import { BackupController } from './backup.controller';
 
 import { BackupRecord, BackupSchedule, RecoveryTest } from './entities';
@@ -33,6 +35,8 @@ import { BackupRecord, BackupSchedule, RecoveryTest } from './entities';
     BackupRecoveryService,
     BackupMonitoringService,
     RecoveryVerificationService,
+    DisasterRecoveryTestingService,
+    DisasterRecoveryGovernanceService,
   ],
   exports: [
     BackupService,
@@ -41,6 +45,8 @@ import { BackupRecord, BackupSchedule, RecoveryTest } from './entities';
     BackupMetricsService,
     BackupMonitoringService,
     RecoveryVerificationService,
+    DisasterRecoveryTestingService,
+    DisasterRecoveryGovernanceService,
   ],
 })
 export class BackupModule {}

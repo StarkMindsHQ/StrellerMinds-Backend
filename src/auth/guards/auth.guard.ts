@@ -31,8 +31,8 @@ export class JwtAuthGuard implements CanActivate {
         throw new UnauthorizedException('Invalid token type');
       }
 
-      // Attach user payload to request
-      request.user = payload;
+      // Attach user payload to request (id alias for backward compatibility)
+      request.user = { ...payload, id: payload.sub };
       return true;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
@@ -60,8 +60,12 @@ export class RolesGuard implements CanActivate {
 }
 
 export const Roles = (...roles: UserRole[]) => {
-  return (target: any, propertyKey?: string, descriptor?: PropertyDescriptor) => {
-    Reflect.defineMetadata('roles', roles, descriptor?.value || target);
+  return (
+    target: object | ((...args: unknown[]) => unknown),
+    propertyKey?: string,
+    descriptor?: PropertyDescriptor,
+  ) => {
+    Reflect.defineMetadata('roles', roles, descriptor?.value ?? target);
   };
 };
 
@@ -95,7 +99,7 @@ export class OptionalJwtAuthGuard implements CanActivate {
         return true;
       }
 
-      request.user = payload;
+      request.user = { ...payload, id: payload.sub };
       return true;
     } catch (error) {
       request.user = null;

@@ -1,18 +1,8 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Payment,
-} from '../entities';
-import {
-  SubscriptionStatus,
-  BillingCycle,
-  PaymentStatus,
-  InvoiceStatus,
-} from '../enums';
+import { Subscription, PaymentPlan, Invoice, Payment } from '../entities';
+import { SubscriptionStatus, BillingCycle, PaymentStatus, InvoiceStatus } from '../enums';
 import { CreateSubscriptionDto, UpdateSubscriptionDto } from '../dto';
 import { StripeService } from './stripe.service';
 import { PayPalService } from './paypal.service';
@@ -87,7 +77,7 @@ export class AdvancedSubscriptionService {
     // Update subscription
     subscription.paymentPlanId = newPlan.id;
     subscription.currentAmount = newPlan.price;
-    
+
     if (immediate) {
       subscription.nextBillingDate = this.calculateNextBillingDate(
         new Date(),
@@ -155,13 +145,11 @@ export class AdvancedSubscriptionService {
     const now = new Date();
 
     for (const subscription of subscriptions) {
-      const scheduledDowngradeAt = new Date(
-        subscription.metadata.scheduledDowngradeAt,
-      );
+      const scheduledDowngradeAt = new Date(subscription.metadata.scheduledDowngradeAt);
 
       if (scheduledDowngradeAt <= now) {
         const newPlanId = subscription.metadata.scheduledDowngradeTo;
-        
+
         const newPlan = await this.paymentPlanRepository.findOneBy({
           id: newPlanId,
           isActive: true,
@@ -170,22 +158,18 @@ export class AdvancedSubscriptionService {
         if (newPlan) {
           subscription.paymentPlanId = newPlanId;
           subscription.currentAmount = newPlan.price;
-          
+
           // Remove schedule metadata
           const { scheduledDowngradeTo, scheduledDowngradeAt, ...rest } = subscription.metadata;
           subscription.metadata = rest;
-          
+
           await this.subscriptionRepository.save(subscription);
         }
       }
     }
   }
 
-  async startFreeTrial(
-    userId: string,
-    planId: string,
-    trialDays: number,
-  ): Promise<Subscription> {
+  async startFreeTrial(userId: string, planId: string, trialDays: number): Promise<Subscription> {
     const plan = await this.paymentPlanRepository.findOneBy({
       id: planId,
       isActive: true,
@@ -278,19 +262,18 @@ export class AdvancedSubscriptionService {
     const now = new Date();
 
     for (const subscription of subscriptions) {
-      const scheduledCancellationAt = new Date(
-        subscription.metadata.scheduledCancellationAt,
-      );
+      const scheduledCancellationAt = new Date(subscription.metadata.scheduledCancellationAt);
 
       if (scheduledCancellationAt <= now) {
         subscription.status = SubscriptionStatus.CANCELLED;
         subscription.cancelledAt = new Date();
         subscription.endDate = new Date();
-        
+
         // Remove schedule metadata
-        const { scheduledCancellation, cancellationReason, scheduledCancellationAt, ...rest } = subscription.metadata;
+        const { scheduledCancellation, cancellationReason, scheduledCancellationAt, ...rest } =
+          subscription.metadata;
         subscription.metadata = rest;
-        
+
         await this.subscriptionRepository.save(subscription);
       }
     }
@@ -324,10 +307,7 @@ export class AdvancedSubscriptionService {
     subscription.cancelledAt = null;
     subscription.endDate = null;
     subscription.cancellationReason = null;
-    subscription.nextBillingDate = this.calculateNextBillingDate(
-      new Date(),
-      plan.billingCycle,
-    );
+    subscription.nextBillingDate = this.calculateNextBillingDate(new Date(), plan.billingCycle);
     subscription.currentAmount = plan.price;
 
     return this.subscriptionRepository.save(subscription);
@@ -341,24 +321,19 @@ export class AdvancedSubscriptionService {
     const now = new Date();
     const periodEnd = nextBillingDate;
     const periodStart = this.getPeriodStart(subscription, periodEnd);
-    
+
     const daysInPeriod = Math.ceil(
       (periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24),
     );
-    const daysRemaining = Math.ceil(
-      (periodEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-    );
-    
+    const daysRemaining = Math.ceil((periodEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
     const oldDailyRate = subscription.currentAmount / daysInPeriod;
     const newDailyRate = newPlan.price / daysInPeriod;
-    
+
     return (newDailyRate - oldDailyRate) * daysRemaining;
   }
 
-  private getPeriodStart(
-    subscription: Subscription,
-    periodEnd: Date,
-  ): Date {
+  private getPeriodStart(subscription: Subscription, periodEnd: Date): Date {
     // This is a simplified calculation - in production, you'd want to track
     // the actual period start date
     const periodStart = new Date(periodEnd);
@@ -386,7 +361,7 @@ export class AdvancedSubscriptionService {
     description: string,
   ): Promise<Invoice> {
     const invoiceNumber = `PRORATE-${Date.now()}-${Math.random().toString(36).substring(7)}`;
-    
+
     const invoice = this.invoiceRepository.create({
       invoiceNumber,
       userId,
@@ -415,10 +390,7 @@ export class AdvancedSubscriptionService {
     return this.invoiceRepository.save(invoice);
   }
 
-  private calculateNextBillingDate(
-    from: Date,
-    cycle: BillingCycle,
-  ): Date {
+  private calculateNextBillingDate(from: Date, cycle: BillingCycle): Date {
     const date = new Date(from);
 
     switch (cycle) {

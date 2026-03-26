@@ -143,7 +143,9 @@ export class ChangePasswordDto {
   newPassword: string;
 }
 
-export class UserQueryDto {
+import { PaginationQueryDto } from '../../common/pagination/pagination.dto';
+
+export class UserQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({ example: 1, default: 1 })
   @IsOptional()
   @Type(() => Number)

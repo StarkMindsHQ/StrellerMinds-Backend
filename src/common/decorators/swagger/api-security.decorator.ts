@@ -10,7 +10,7 @@ export const ApiApiKeyAuth = () => {
 };
 
 export const ApiOptionalAuth = () => {
-  return applyDecorators(ApiBearerAuth({} as any));
+  return applyDecorators(ApiBearerAuth());
 };
 
 export const ApiStandardSecurity = (requireAuth: boolean = true) => {

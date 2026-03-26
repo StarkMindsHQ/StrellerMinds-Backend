@@ -62,10 +62,7 @@ export class PaymentMethodManagementService {
     });
   }
 
-  async getPaymentMethod(
-    userId: string,
-    paymentMethodId: string,
-  ): Promise<PaymentMethodEntity> {
+  async getPaymentMethod(userId: string, paymentMethodId: string): Promise<PaymentMethodEntity> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { id: paymentMethodId, userId, isActive: true },
     });
@@ -96,10 +93,7 @@ export class PaymentMethodManagementService {
     return this.paymentMethodRepository.save(paymentMethod);
   }
 
-  async removePaymentMethod(
-    userId: string,
-    paymentMethodId: string,
-  ): Promise<void> {
+  async removePaymentMethod(userId: string, paymentMethodId: string): Promise<void> {
     const paymentMethod = await this.getPaymentMethod(userId, paymentMethodId);
 
     // If this is the default payment method, we need to set another one as default
@@ -134,9 +128,7 @@ export class PaymentMethodManagementService {
     return this.paymentMethodRepository.save(paymentMethod);
   }
 
-  async getDefaultPaymentMethod(
-    userId: string,
-  ): Promise<PaymentMethodEntity | null> {
+  async getDefaultPaymentMethod(userId: string): Promise<PaymentMethodEntity | null> {
     return this.paymentMethodRepository.findOne({
       where: { userId, isDefault: true, isActive: true },
     });
@@ -149,13 +141,10 @@ export class PaymentMethodManagementService {
     return count > 0;
   }
 
-  async validatePaymentMethod(
-    userId: string,
-    paymentMethodId: string,
-  ): Promise<boolean> {
+  async validatePaymentMethod(userId: string, paymentMethodId: string): Promise<boolean> {
     try {
       const paymentMethod = await this.getPaymentMethod(userId, paymentMethodId);
-      
+
       // Check if the payment method has expired
       if (paymentMethod.expiresAt && paymentMethod.expiresAt < new Date()) {
         return false;
@@ -192,10 +181,7 @@ export class PaymentMethodManagementService {
     });
   }
 
-  async bulkRemovePaymentMethods(
-    userId: string,
-    paymentMethodIds: string[],
-  ): Promise<void> {
+  async bulkRemovePaymentMethods(userId: string, paymentMethodIds: string[]): Promise<void> {
     await this.paymentMethodRepository
       .createQueryBuilder()
       .update(PaymentMethodEntity)

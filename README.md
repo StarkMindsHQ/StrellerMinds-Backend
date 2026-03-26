@@ -349,7 +349,7 @@ The application uses environment variables for configuration. All variables are 
 ### Stellar
 | Variable | Description | Required |
 |----------|-------------|----------|
-| STELLAR_SECRET_KEY | Secret key for Stellar network | jgjxvsjxvwjxsjxgskjxksmxjswkxwgxwdcj |
+| STELLAR_SECRET_KEY | Secret key for Stellar network (use secure key management) | <your_secure_key_from_secrets_manager> |
 
 ### Email
 | Variable | Description | Required |
