@@ -19,6 +19,9 @@ import { PerformanceAnalyticsService } from '../services/performance-analytics.s
 import { LoadTestingService, LoadTestConfig } from '../services/load-testing.service';
 import { OptimizationRecommendationsService } from '../services/optimization-recommendations.service';
 import { RealTimeMonitoringService } from '../services/real-time-monitoring.service';
+import { DistributedTracingService } from '../services/distributed-tracing.service';
+import { PerformanceProfilerService } from '../services/performance-profiler.service';
+import { AlertingService, AlertType, AlertSeverity } from '../services/alerting.service';
 import { PerformanceQueryDto, PerformanceReportDto } from '../dto/performance.dto';
 
 @ApiTags('Performance Monitoring')
@@ -35,7 +38,158 @@ export class MonitoringController {
     private loadTesting: LoadTestingService,
     private recommendationsService: OptimizationRecommendationsService,
     private realTimeService: RealTimeMonitoringService,
+    private tracingService: DistributedTracingService,
+    private profilerService: PerformanceProfilerService,
+    private alertingService: AlertingService,
+    private tracingService: DistributedTracingService,
+    private profilerService: PerformanceProfilerService,
+    private alertingService: AlertingService,
   ) {}
+
+  // ===== Distributed Tracing Endpoints =====
+
+  @Get('tracing/active-spans')
+  @ApiOperation({ summary: 'Get active distributed traces' })
+  @ApiResponse({ status: 200, description: 'Active spans retrieved' })
+  getActiveSpans() {
+    return this.tracingService.getActiveSpans();
+  }
+
+  @Get('tracing/spans/:traceId')
+  @ApiOperation({ summary: 'Get spans for a trace' })
+  @ApiResponse({ status: 200, description: 'Trace spans retrieved' })
+  getTraceSpans(@Param('traceId') traceId: string) {
+    return this.tracingService.getTraceSpans(traceId);
+  }
+
+  @Get('tracing/completed')
+  @ApiOperation({ summary: 'Get completed spans' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Completed spans retrieved' })
+  getCompletedSpans(@Query('limit') limit?: number) {
+    return this.tracingService.getCompletedSpans(limit || 100);
+  }
+
+  @Get('tracing/stats/:traceId')
+  @ApiOperation({ summary: 'Get trace statistics' })
+  @ApiResponse({ status: 200, description: 'Trace statistics retrieved' })
+  getTraceStats(@Param('traceId') traceId: string) {
+    return this.tracingService.getTraceStats(traceId);
+  }
+
+  // ===== Performance Profiling Endpoints =====
+
+  @Get('profiling/latest')
+  @ApiOperation({ summary: 'Get latest performance profile' })
+  @ApiResponse({ status: 200, description: 'Latest profile retrieved' })
+  getLatestProfile() {
+    return this.profilerService.getLatestProfile();
+  }
+
+  @Get('profiling/profiles')
+  @ApiOperation({ summary: 'Get performance profiles' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Profiles retrieved' })
+  getProfiles(@Query('limit') limit?: number) {
+    return this.profilerService.getProfiles(limit || 10);
+  }
+
+  @Get('profiling/memory-trend')
+  @ApiOperation({ summary: 'Get memory usage trend' })
+  @ApiQuery({ name: 'period', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Memory trend retrieved' })
+  getMemoryTrend(@Query('period') period?: number) {
+    return this.profilerService.getMemoryTrend(period || 10);
+  }
+
+  @Get('profiling/operation-stats')
+  @ApiOperation({ summary: 'Get all operation statistics' })
+  @ApiResponse({ status: 200, description: 'Operation stats retrieved' })
+  getOperationStats() {
+    return this.profilerService.getAllOperationStats();
+  }
+
+  @Get('profiling/operation-stats/:operation')
+  @ApiOperation({ summary: 'Get statistics for specific operation' })
+  @ApiResponse({ status: 200, description: 'Operation statistics retrieved' })
+  getOperationSpecificStats(@Param('operation') operation: string) {
+    return this.profilerService.getOperationStats(operation);
+  }
+
+  @Get('profiling/report')
+  @ApiOperation({ summary: 'Generate profiling report' })
+  @ApiResponse({ status: 200, description: 'Profiling report generated' })
+  getProfilingReport() {
+    return this.profilerService.generateReport();
+  }
+
+  @Get('profiling/memory-leak-detection')
+  @ApiOperation({ summary: 'Detect potential memory leaks' })
+  @ApiResponse({ status: 200, description: 'Memory leak analysis completed' })
+  detectMemoryLeaks() {
+    return this.profilerService.detectMemoryLeaks();
+  }
+
+  @Post('profiling/capture-snapshot')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Capture memory snapshot' })
+  @ApiResponse({ status: 200, description: 'Memory snapshot captured' })
+  captureMemorySnapshot() {
+    return this.profilerService.captureMemorySnapshot();
+  }
+
+  @Post('profiling/reset')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset profiler data' })
+  @ApiResponse({ status: 200, description: 'Profiler data reset' })
+  resetProfiler() {
+    this.profilerService.reset();
+    return { message: 'Profiler reset successfully' };
+  }
+
+  // ===== Alerting Endpoints =====
+
+  @Get('alerts/active')
+  @ApiOperation({ summary: 'Get active alerts' })
+  @ApiResponse({ status: 200, description: 'Active alerts retrieved' })
+  getActiveAlerts() {
+    return this.alertingService.getActiveAlerts();
+  }
+
+  @Get('alerts/history')
+  @ApiOperation({ summary: 'Get alert history' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiResponse({ status: 200, description: 'Alert history retrieved' })
+  getAlertHistory(@Query('limit') limit?: number) {
+    return this.alertingService.getAlertHistory(limit || 100);
+  }
+
+  @Get('alerts/stats')
+  @ApiOperation({ summary: 'Get alert statistics' })
+  @ApiResponse({ status: 200, description: 'Alert statistics retrieved' })
+  getAlertStats() {
+    return this.alertingService.getAlertStats();
+  }
+
+  @Post('alerts/:alertId/resolve')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resolve an alert' })
+  @ApiResponse({ status: 200, description: 'Alert resolved' })
+  async resolveAlert(@Param('alertId') alertId: string) {
+    await this.alertingService.resolveAlert(alertId);
+    return { message: `Alert ${alertId} resolved` };
+  }
+
+  @Post('alerts/clear')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Clear all alerts' })
+  @ApiResponse({ status: 200, description: 'All alerts cleared' })
+  clearAlerts() {
+    this.alertingService.clearAlerts();
+    return { message: 'All alerts cleared' };
+  }
+
+  // ===== Existing APM Endpoints =====
 
   @Get('apm/transactions')
   @ApiOperation({ summary: 'Get active transactions' })
