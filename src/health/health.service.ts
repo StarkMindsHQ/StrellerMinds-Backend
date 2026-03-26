@@ -11,6 +11,7 @@ import { Gauge, Counter, Registry, collectDefaultMetrics } from 'prom-client';
 import { ApmService } from '../monitoring/services/apm.service';
 import { CacheOptimizationService } from '../monitoring/services/cache-optimization.service';
 import { DatabaseOptimizationService } from '../monitoring/services/database-optimization.service';
+import { QueueHealthIndicator } from '../common/queue/health/queue-health.indicator';
 
 @Injectable()
 export class HealthService {
@@ -28,6 +29,7 @@ export class HealthService {
     private readonly memoryHealthIndicator: MemoryHealthIndicator,
     private readonly diskHealthIndicator: DiskHealthIndicator,
     private readonly httpHealthIndicator: HttpHealthIndicator,
+    private readonly queueHealthIndicator: QueueHealthIndicator,
     @Optional() private readonly apmService?: ApmService,
     @Optional() private readonly cacheOptimization?: CacheOptimizationService,
     @Optional() private readonly databaseOptimization?: DatabaseOptimizationService,
@@ -82,6 +84,7 @@ export class HealthService {
         () => this.checkMemoryHealth(),
         () => this.checkDiskHealth(),
         () => this.checkApplicationHealth(),
+        () => this.queueHealthIndicator.isHealthy('queue'),
       ]);
 
       const duration = (Date.now() - startTime) / 1000;

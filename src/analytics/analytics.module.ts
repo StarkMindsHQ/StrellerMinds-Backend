@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BullModule } from '@nestjs/bull';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { EngagementEvent } from './entities/engagement-event.entity';
 import { AnalyticsAggregation } from './entities/analytics-aggregation.entity';
@@ -14,11 +12,12 @@ import { AtRiskPrediction } from './entities/at-risk-prediction.entity';
 // New course/student analytics service with a distinct name
 import { CourseAnalyticsService } from './services/course-analytics.service';
 import { AnalyticsExportService } from './services/analytics-export.service';
-import { ProgressTrackingService } from '../learning-path/services/progress-tracking.service';
+import { ProgressTrackingService } from './services/progress-tracking.service';
 
 import { AnalyticsController } from './controllers/analytics.controller';
 import { StudentProgress } from './entities/student.progress.entity';
 import { AnalyticsProcessor } from './analytics.processor';
+import { QueueModule } from '../common/queue/queue.module';
 
 @Module({
   imports: [
@@ -29,25 +28,7 @@ import { AnalyticsProcessor } from './analytics.processor';
       AtRiskPrediction,
     ]),
 
-    BullModule.registerQueueAsync({
-      name: 'analytics',
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        redis: {
-          host: config.get('REDIS_HOST', 'localhost'),
-          port: config.get<number>('REDIS_PORT', 6379),
-          password: config.get('REDIS_PASSWORD'),
-        },
-        defaultJobOptions: {
-          attempts: 3,
-          backoff: { type: 'exponential', delay: 1000 },
-          removeOnComplete: 100,
-          removeOnFail: 50,
-        },
-      }),
-      inject: [ConfigService],
-    }),
-
+    QueueModule, // Import the centralized queue module
     ScheduleModule.forRoot(),
   ],
 

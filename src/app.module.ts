@@ -8,25 +8,19 @@ import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import Redis from 'ioredis';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { I18nModule } from './i18n/i18n.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
 import { FilesModule } from './files/files.module';
 import { GamificationModule } from './gamification/gamification.module';
-import { DatabaseModule } from './database/database.module';
 import { IntegrationsModule } from './integrations/integrations.module';
-import { VideoModule } from './video/video.module';
 import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
-import { WebhookModule } from './webhook/webhook.module';
-import { WebhookRawBodyMiddleware } from './webhook/middleware/webhook-raw-body.middleware';
 
-import { RequestLoggerMiddleware } from './logging/request-logger.middleware';
+
 
 import { DatabaseConfig } from './config/database.config';
 import { configuration, validationSchema } from './config/configuration';
-import { SearchModule } from './search/search.module';
 
 import { User } from './auth/entities/user.entity';
 import { RefreshToken } from './auth/entities/refresh-token.entity';
@@ -47,18 +41,7 @@ import {
 // duplicate/commented imports removed
 import { CourseModule } from './course/course.module';
 import { PaymentModule } from './payment/payment.module';
-import {
-  Payment,
-  Subscription,
-  PaymentPlan,
-  Invoice,
-  Refund,
-  Dispute,
-  TaxRate,
-  FinancialReport,
-  PaymentMethodEntity,
-} from './payment/entities';
-import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
@@ -74,10 +57,10 @@ import { EmailTemplate } from './notifications/entities/email-template.entity';
 import { DocumentationModule } from './documentation/documentation.module';
 import { MonitoringModule } from './monitoring/monitoring.module';
 import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
-import { CoreModule } from './core/core.module';
-import { StorageModule } from './storage/storage.module';
 import { LoggingModule } from './logging/logging.module';
 import { CapacityPlanningModule } from './capacity-planning/capacity-planning.module';
+import { QueueModule } from './common/queue/queue.module';
+import { SearchModule } from './search/entities/search.module';
 
 @Module({
   imports: [
@@ -123,25 +106,21 @@ import { CapacityPlanningModule } from './capacity-planning/capacity-planning.mo
     AuthModule,
     CalendarModule,
     CourseModule,
-    DatabaseModule,
     FilesModule,
     ForumModule,
     GamificationModule,
     IntegrationsModule,
-    I18nModule.register(),
+
     LearningPathModule,
     PaymentModule,
+    QueueModule, // Add queue module for reliability features
     SearchModule,
     SecurityModule,
     UserModule,
-    VideoModule,
     DocumentationModule,
     MonitoringModule,
-    CoreModule,
     CapacityPlanningModule,
-    StorageModule,
     LoggingModule,
-    WebhookModule,
   ],
   providers: [
     {
@@ -172,9 +151,6 @@ export class AppModule {
     consumer.apply(InputSecurityMiddleware).forRoutes('*');
     consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
     // consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
-    consumer.apply(RequestIdMiddleware).forRoutes('*');
     consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
-    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
-    consumer.apply(WebhookRawBodyMiddleware).forRoutes('*');
   }
 }
