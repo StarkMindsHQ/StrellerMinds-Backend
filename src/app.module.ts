@@ -54,14 +54,9 @@ import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
-import { DocumentationModule } from './documentation/documentation.module';
-import { MonitoringModule } from './monitoring/monitoring.module';
-import { PerformanceInterceptor } from './monitoring/interceptors/performance.interceptor';
-import { LoggingModule } from './logging/logging.module';
-import { ComplianceModule } from './compliance/compliance.module';
-import { CapacityPlanningModule } from './capacity-planning/capacity-planning.module';
-import { QueueModule } from './common/queue/queue.module';
-import { SearchModule } from './search/entities/search.module';
+import { MetricsModule } from './metrics/metrics.module';
+import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
+
 
 @Module({
   imports: [
@@ -113,18 +108,11 @@ import { SearchModule } from './search/entities/search.module';
     IntegrationsModule,
 
     LearningPathModule,
-    PaymentModule,
-    QueueModule, // Add queue module for reliability features
-    SearchModule,
-    SecurityModule,
-    UserModule,
-    DocumentationModule,
-    MonitoringModule,
-    ComplianceModule,
-    CoreModule,
-    CapacityPlanningModule,
-    LoggingModule,
+    CalendarModule,
+    AnalyticsModule,
+    MetricsModule,
   ],
+
   providers: [
     {
       provide: APP_GUARD,
@@ -144,9 +132,10 @@ import { SearchModule } from './search/entities/search.module';
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: PerformanceInterceptor,
+      useClass: MetricsInterceptor,
     },
   ],
+
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

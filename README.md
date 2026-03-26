@@ -185,7 +185,27 @@ npm run test -- auth/auth.service.spec.ts
 
 # Run tests in watch mode for development
 npm run test:watch
+
+# Load Testing (Artillery)
+npm run perf:load          # Run standard load test
+npm run perf:stress        # Run high-load stress test
+npm run perf:check         # Run performance regression check
+
+# Benchmarking (Autocannon)
+npm run perf:benchmark     # Run benchmarks for critical endpoints
 ```
+
+## 📊 Performance Monitoring
+
+The application includes built-in Prometheus metrics. You can access them at:
+- **Metrics Endpoint**: `http://localhost:3000/api/health/metrics`
+- **Dashboard**: Use the provided `monitoring/grafana-dashboard.json` for Grafana.
+
+Key metrics tracked:
+- `http_requests_total`: Total request volume by method/route/status.
+- `http_request_duration_seconds`: Response time distributions.
+- `active_connections`: Number of concurrent connections being processed.
+- `service_memory_usage_bytes`: Real-time memory metrics.
 
 ## 🔒 Security Considerations
 

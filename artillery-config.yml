@@ -1,54 +1,50 @@
-# Artillery Performance Testing Configuration
+# Artillery Load Testing Configuration
 config:
-  target: 'http://localhost:3000'
+  target: "http://localhost:3000"
+  plugins:
+    expect: {}
+    metrics-by-endpoint: {}
   phases:
     - duration: 60
-      arrivalRate: 10
+      arrivalRate: 5
       name: "Warm up"
-    - duration: 120
-      arrivalRate: 50
+    - duration: 300
+      arrivalRate: 20
+      rampTo: 50
       name: "Load test"
     - duration: 60
-      arrivalRate: 100
-      name: "Stress test"
-    - duration: 30
-      arrivalRate: 200
-      name: "Peak load"
+      arrivalRate: 50
+      name: "Sustained load"
   payload:
     path: "test-data/payload.csv"
     fields:
       - "email"
       - "password"
   processor: "test-functions.js"
+  defaults:
+    headers:
+      Content-Type: "application/json"
 
 scenarios:
-  - name: "Health Check"
-    weight: 40
+  - name: "Public: Health & Analytics"
+    weight: 20
     flow:
       - get:
           url: "/api/health"
           expect:
             - statusCode: 200
-            - contentType: "application/json"
-
-  - name: "User Registration"
-    weight: 20
-    flow:
-      - post:
-          url: "/api/auth/register"
-          json:
-            email: "{{ email }}"
-            password: "{{ password }}"
-            firstName: "Test"
-            lastName: "User"
-          capture:
-            - json: "$.data.user.id"
-              as: "userId"
+      - get:
+          url: "/api/health/ready"
           expect:
-            - statusCode: 201
-            - contentType: "application/json"
+            - statusCode: 200
+      - post:
+          url: "/api/search"
+          json:
+            query: "blockchain"
+          expect:
+            - statusCode: 200
 
-  - name: "User Login"
+  - name: "User: Auth Flow"
     weight: 30
     flow:
       - post:
@@ -58,19 +54,68 @@ scenarios:
             password: "{{ password }}"
           capture:
             - json: "$.data.accessToken"
-              as: "accessToken"
-            - json: "$.data.refreshToken"
-              as: "refreshToken"
+              as: "token"
           expect:
             - statusCode: 200
-            - contentType: "application/json"
+      - get:
+          url: "/api/profiles/me"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            - statusCode: 200
+      - get:
+          url: "/api/profiles/me/full"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            - statusCode: 200
 
-  - name: "Get Courses"
-    weight: 10
+  - name: "User: Course Exploration"
+    weight: 30
     flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.data.accessToken"
+              as: "token"
       - get:
           url: "/api/courses?page=1&limit=10"
+          headers:
+            Authorization: "Bearer {{ token }}"
           expect:
             - statusCode: 200
-            - contentType: "application/json"
-            - hasProperty: "data.items"
+      - post:
+          url: "/api/search"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            query: "smart contracts"
+          expect:
+            - statusCode: 200
+
+  - name: "User: Profile & Portfolio"
+    weight: 20
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            email: "{{ email }}"
+            password: "{{ password }}"
+          capture:
+            - json: "$.data.accessToken"
+              as: "token"
+      - get:
+          url: "/api/profiles/me/portfolio"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            - statusCode: 200
+      - get:
+          url: "/api/profiles/me/badges"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            - statusCode: 200

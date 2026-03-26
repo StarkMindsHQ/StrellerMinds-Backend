@@ -47,10 +47,14 @@
     "docker:dev:logs": "docker-compose -f docker-compose.dev.yml logs -f",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
     "docker:prod:down": "docker-compose -f docker-compose.prod.yml down",
+    "perf:load": "artillery run artillery-config.yml",
+    "perf:stress": "artillery run artillery-stress.yml",
+    "perf:check": "node scripts/performance-check.js",
+    "perf:benchmark": "node scripts/benchmark.js",
     "perf:test": "artillery run artillery-config.yml",
     "security:scan": "npm run audit:security && gitleaks detect --source . --verbose --report-path gitleaks-report.json",
-    "quality:check": "npm run lint && npm run test:cov && npm run security:scan",
-    "ci:test": "npm run test && npm run test:integration && npm run test:e2e && npm run test:api",
+    "quality:check": "npm run lint && npm run test:cov && npm run security:scan && npm run perf:check",
+    "ci:test": "npm run test && npm run test:integration && npm run test:e2e && npm run test:api && npm run perf:check",
     "ci:build": "npm run build && npm run docs:generate"
   },
   "dependencies": {
