@@ -11,7 +11,9 @@ import { TwoFactorAuthService } from './two-factor-auth.service';
 import { SecurityAuditService } from './security-audit.service';
 import { PasswordHistoryService } from './password-history.service';
 import { SecurityEvent } from '../entities/security-audit.entity';
+import { MetricsService } from '../../metrics/metrics.service';
 import { v4 as uuidv4 } from 'uuid';
+
 import * as crypto from 'crypto';
 import { EmailService } from './email.service';
 
@@ -34,8 +36,9 @@ export class AuthService {
     private readonly twoFactorAuthService: TwoFactorAuthService,
     private readonly securityAuditService: SecurityAuditService,
     private readonly passwordHistoryService: PasswordHistoryService,
-    private readonly emailService: EmailService,
+    private readonly metricsService: MetricsService,
   ) {}
+
 
   async register(registerDto: RegisterDto): Promise<{ user: UserResponse; message: string }> {
     const existingUser = await this.userRepository.findOne({
@@ -90,8 +93,10 @@ export class AuthService {
         email: loginDto.email,
         reason: 'User not found',
       });
+      this.metricsService.authFailuresTotal.inc({ reason: 'user_not_found', endpoint: 'login' });
       throw new Error('Invalid credentials');
     }
+
 
     if (user.status === UserStatus.PENDING) {
       await this.securityAuditService.log(
@@ -101,8 +106,10 @@ export class AuthService {
         userAgent,
         { reason: 'Email not verified' },
       );
+      this.metricsService.authFailuresTotal.inc({ reason: 'email_not_verified', endpoint: 'login' });
       throw new Error('Please verify your email before logging in');
     }
+
 
     if (user.status === UserStatus.SUSPENDED) {
       await this.securityAuditService.log(
@@ -112,8 +119,10 @@ export class AuthService {
         userAgent,
         { reason: 'Account suspended' },
       );
+      this.metricsService.authFailuresTotal.inc({ reason: 'account_suspended', endpoint: 'login' });
       throw new Error('Account suspended');
     }
+
 
     if (user.status === UserStatus.INACTIVE) {
       await this.securityAuditService.log(
@@ -135,8 +144,10 @@ export class AuthService {
         userAgent,
         { reason: 'Invalid password' },
       );
+      this.metricsService.authFailuresTotal.inc({ reason: 'invalid_password', endpoint: 'login' });
       throw new Error('Invalid credentials');
     }
+
 
     // Check if 2FA is enabled
     if (user.isTwoFactorAuthenticationEnabled) {
@@ -154,8 +165,10 @@ export class AuthService {
             userAgent,
             { reason: 'Invalid 2FA code' },
           );
+          this.metricsService.authFailuresTotal.inc({ reason: 'invalid_2fa', endpoint: 'login' });
           throw new Error('Invalid authentication code');
         }
+
       } else {
         return {
           user: this.sanitizeUser(user),

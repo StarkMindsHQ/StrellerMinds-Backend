@@ -39,7 +39,34 @@ export class MetricsService {
       labelNames: ['type'],
       registers: [this.registry],
     });
+
+    // Security Metrics
+    this.authFailuresTotal = new Counter({
+      name: 'security_auth_failures_total',
+      help: 'Total number of authentication failures',
+      labelNames: ['reason', 'endpoint'],
+      registers: [this.registry],
+    });
+
+    this.rateLimitHitsTotal = new Counter({
+      name: 'security_rate_limit_hits_total',
+      help: 'Total number of rate limit hits',
+      labelNames: ['endpoint'],
+      registers: [this.registry],
+    });
+
+    this.unauthorizedAccessTotal = new Counter({
+      name: 'security_unauthorized_access_total',
+      help: 'Total number of unauthorized access attempts',
+      labelNames: ['endpoint', 'required_role'],
+      registers: [this.registry],
+    });
   }
+
+  // Security metric helpers
+  public readonly authFailuresTotal: Counter<string>;
+  public readonly rateLimitHitsTotal: Counter<string>;
+  public readonly unauthorizedAccessTotal: Counter<string>;
 
   getMetrics(): Promise<string> {
     return this.registry.metrics();
