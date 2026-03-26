@@ -69,6 +69,9 @@ import { LearningPathModule } from './learning-path/learning-path.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { EmailTemplate } from './notifications/entities/email-template.entity';
+import { MetricsModule } from './metrics/metrics.module';
+import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
+
 
 @Module({
   imports: [
@@ -131,7 +134,9 @@ import { EmailTemplate } from './notifications/entities/email-template.entity';
     LearningPathModule,
     CalendarModule,
     AnalyticsModule,
+    MetricsModule,
   ],
+
   providers: [
     {
       provide: APP_GUARD,
@@ -149,7 +154,12 @@ import { EmailTemplate } from './notifications/entities/email-template.entity';
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MetricsInterceptor,
+    },
   ],
+
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
