@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, UseGuards, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Param, UseGuards, HttpStatus, Get, Query, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -6,13 +6,42 @@ import { CreateLessonDto } from './dto/create-lesson.dto';
 import { CreateModuleDto } from './dto/create-module.dto';
 import { JwtAuthGuard, Roles } from '../auth/guards/auth.guard';
 import { UserRole } from '../auth/entities/user.entity';
+import { CacheInterceptor } from '../cache/cache.interceptor';
 
 @ApiTags('Courses')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(CacheInterceptor)
 @Controller('courses')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get all courses with optional filters' })
+  @ApiResponse({ status: 200, description: 'Courses retrieved successfully' })
+  async getAllCourses(@Query() filters?: any) {
+    const courses = await this.courseService.getCourses(filters);
+    return { success: true, data: courses };
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get course by ID' })
+  @ApiParam({ name: 'id', description: 'The unique identifier of the course', example: 'uuid-v4-string' })
+  @ApiResponse({ status: 200, description: 'Course retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Course not found' })
+  async getCourse(@Param('id') id: string) {
+    const course = await this.courseService.getCourseById(id);
+    return { success: true, data: course };
+  }
+
+  @Get(':id/modules')
+  @ApiOperation({ summary: 'Get all modules for a course' })
+  @ApiParam({ name: 'id', description: 'The unique identifier of the course', example: 'uuid-v4-string' })
+  @ApiResponse({ status: 200, description: 'Modules retrieved successfully' })
+  async getCourseModules(@Param('id') id: string) {
+    const modules = await this.courseService.getCourseModules(id);
+    return { success: true, data: modules };
+  }
 
   @Post()
   @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
