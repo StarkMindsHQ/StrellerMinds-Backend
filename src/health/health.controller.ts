@@ -85,4 +85,40 @@ export class HealthController {
   async detailed() {
     return this.healthService.getDetailedHealth();
   }
+
+  @Get('dependencies')
+  @SkipRateLimit()
+  @ApiOperation({
+    summary: 'Dependency health status',
+    description: 'Returns health status of all system dependencies',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Dependency health status',
+  })
+  async dependencies() {
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      data: this.healthService.getDependencyHealthStatus(),
+    };
+  }
+
+  @Get('summary')
+  @SkipRateLimit()
+  @ApiOperation({
+    summary: 'Overall health summary',
+    description: 'Returns overall system health summary with score',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Overall health summary',
+  })
+  async summary() {
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      data: this.healthService.getOverallHealthSummary(),
+    };
+  }
 }
