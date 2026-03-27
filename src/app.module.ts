@@ -6,6 +6,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import Redis from 'ioredis';
+import { CqrsModule } from './cqrs/cqrs.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
@@ -104,6 +105,7 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
     CacheModule,
     CalendarModule,
     CourseModule,
+    CqrsModule,
     FilesModule,
     ForumModule,
     GamificationModule,

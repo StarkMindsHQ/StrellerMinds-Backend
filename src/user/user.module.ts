@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
+import { CqrsModule } from '../cqrs/cqrs.module';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { User } from './entities/user.entity';
@@ -31,9 +32,17 @@ import { PrivacyController } from './controllers/privacy.controller';
 import { AchievementController } from './controllers/achievement.controller';
 import { SkillController } from './controllers/skill.controller';
 import { RecommendationController } from './controllers/recommendation.controller';
+import { CqrsUserController } from './controllers/cqrs-user.controller';
+import { CreateUserHandler } from './handlers/create-user.handler';
+import { GetUserByIdHandler } from './handlers/get-user-by-id.handler';
+import { UserCreatedEventHandler } from './handlers/user-created-event.handler';
+import { UserReadModelHandler } from '../cqrs/read-models/user-read-model.handler';
+import { UserReadModelEntity } from '../cqrs/read-models/user-read-model.entity';
+import { EventEntity } from '../cqrs/entities/event.entity';
 
 @Module({
   imports: [
+    CqrsModule,
     TypeOrmModule.forFeature([
       User,
       UserActivity,
@@ -50,6 +59,8 @@ import { RecommendationController } from './controllers/recommendation.controlle
       SkillAssessment,
       SkillAssessmentResult,
       PortfolioMedia,
+      UserReadModelEntity,
+      EventEntity,
     ]),
     MulterModule.register({
       dest: './uploads',
@@ -63,6 +74,7 @@ import { RecommendationController } from './controllers/recommendation.controlle
     AchievementController,
     SkillController,
     RecommendationController,
+    CqrsUserController,
   ],
   providers: [
     UserService,
@@ -73,6 +85,10 @@ import { RecommendationController } from './controllers/recommendation.controlle
     PrivacyService,
     SkillService,
     RecommendationService,
+    CreateUserHandler,
+    GetUserByIdHandler,
+    UserCreatedEventHandler,
+    UserReadModelHandler,
   ],
   exports: [
     UserService,
