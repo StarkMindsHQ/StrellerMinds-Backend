@@ -12,6 +12,8 @@ import {
   buildCursorForCreatedAt,
   validatePaginationParams,
 } from '../common/pagination/pagination.utils';
+import { OptimizedPaginationService, PaginatedResult } from '../common/pagination/optimized-pagination.service';
+import { QueryCacheService } from '../cache/services/query-cache.service';
 import { User, UserStatus, UserRole } from './entities/user.entity';
 import { UserActivity, ActivityType } from './entities/user-activity.entity';
 import {
@@ -33,6 +35,8 @@ export class UserService {
     private userRepository: Repository<User>,
     @InjectRepository(UserActivity)
     private activityRepository: Repository<UserActivity>,
+    private readonly paginationService: OptimizedPaginationService,
+    private readonly queryCacheService: QueryCacheService,
   ) {}
 
   async create(createUserDto: CreateUserDto, createdBy?: string): Promise<UserResponseDto> {
@@ -68,100 +72,79 @@ export class UserService {
     return this.toResponseDto(savedUser);
   }
 
-  async findAll(query: UserQueryDto): Promise<{
-    data: UserResponseDto[];
-    total?: number;
-    page?: number;
-    limit: number;
-    totalPages?: number;
-    cursor?: string;
-    nextCursor?: string | null;
-  }> {
+  async findAll(query: UserQueryDto): Promise<PaginatedResult<UserResponseDto>> {
     const { page, limit, search, status, role, sortBy, sortOrder, createdAfter, createdBefore } =
       query;
 
     validatePaginationParams(page, limit, query.cursor);
 
-    const qb = this.userRepository.createQueryBuilder('user');
+    // Generate cache key
+    const cacheKey = this.queryCacheService.generateCacheKey('users:list', query);
 
-    if (search) {
-      qb.andWhere(
-        '(user.email LIKE :search OR user.username LIKE :search OR user.firstName LIKE :search OR user.lastName LIKE :search)',
-        { search: `%${search}%` },
-      );
-    }
+    // Try to get from cache first
+    return this.queryCacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const qb = this.userRepository.createQueryBuilder('user');
 
-    if (status) {
-      qb.andWhere('user.status = :status', { status });
-    }
+        // Apply filters with proper indexing
+        if (search) {
+          qb.andWhere(
+            '(user.email ILIKE :search OR user.username ILIKE :search OR user.firstName ILIKE :search OR user.lastName ILIKE :search)',
+            { search: `%${search}%` },
+          );
+        }
 
-    if (role) {
-      qb.andWhere('user.roles LIKE :role', { role: `%${role}%` });
-    }
+        if (status) {
+          qb.andWhere('user.status = :status', { status });
+        }
 
-    if (createdAfter) {
-      qb.andWhere('user.createdAt >= :createdAfter', { createdAfter });
-    }
+        if (role) {
+          qb.andWhere('user.roles LIKE :role', { role: `%${role}%` });
+        }
 
-    if (createdBefore) {
-      qb.andWhere('user.createdAt <= :createdBefore', { createdBefore });
-    }
+        if (createdAfter) {
+          qb.andWhere('user.createdAt >= :createdAfter', { createdAfter });
+        }
 
-    if (query.cursor) {
-      const cursorPayload = decodeCursor(query.cursor);
-      if (!cursorPayload || !cursorPayload.createdAt || !cursorPayload.id) {
-        throw new BadRequestException('Invalid cursor value');
-      }
+        if (createdBefore) {
+          qb.andWhere('user.createdAt <= :createdBefore', { createdBefore });
+        }
 
-      const cursorDate = new Date(cursorPayload.createdAt);
-      const cursorId = cursorPayload.id;
+        // Use optimized pagination
+        const result = await this.paginationService.paginate(qb, {
+          page,
+          limit,
+          sortBy: sortBy || 'createdAt',
+          sortOrder: sortOrder || 'DESC',
+        });
 
-      qb.andWhere(
-        '(user.createdAt < :cursorDate OR (user.createdAt = :cursorDate AND user.id < :cursorId))',
-        { cursorDate, cursorId },
-      );
-
-      qb.orderBy('user.createdAt', 'DESC').addOrderBy('user.id', 'DESC').take(limit);
-
-      const users = await qb.getMany();
-
-      const nextCursor = users.length
-        ? buildCursorForCreatedAt(users[users.length - 1].createdAt, users[users.length - 1].id)
-        : null;
-
-      return {
-        data: users.map((user) => this.toResponseDto(user)),
-        cursor: query.cursor,
-        nextCursor,
-        limit,
-      };
-    }
-
-    const total = await qb.getCount();
-
-    qb.orderBy(`user.${sortBy}`, sortOrder)
-      .skip((page - 1) * limit)
-      .take(limit);
-
-    const users = await qb.getMany();
-
-    return {
-      data: users.map((user) => this.toResponseDto(user)),
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+        // Transform data
+        return {
+          ...result,
+          data: result.data.map((user) => this.toResponseDto(user)),
+        };
+      },
+      300, // 5 minutes cache
+    );
   }
 
   async findOne(id: string): Promise<UserResponseDto> {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const cacheKey = `user:${id}`;
+    
+    return this.queryCacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const user = await this.userRepository.findOne({ where: { id } });
 
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
+        if (!user) {
+          throw new NotFoundException(`User with ID ${id} not found`);
+        }
 
-    return this.toResponseDto(user);
+        return this.toResponseDto(user);
+      },
+      600 // 10 minutes cache
+    );
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -206,6 +189,9 @@ export class UserService {
     user.updatedBy = updatedBy;
 
     const updatedUser = await this.userRepository.save(user);
+
+    // Invalidate cache
+    await this.queryCacheService.invalidateUserCache(id);
 
     await this.logActivity({
       userId: id,

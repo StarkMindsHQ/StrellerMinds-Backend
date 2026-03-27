@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { OptimizedPaginationService, PaginatedResult } from '../common/pagination/optimized-pagination.service';
+import { QueryCacheService } from '../cache/services/query-cache.service';
 import { CourseModule } from './entities/module.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -24,11 +26,72 @@ export class CourseService {
     private readonly enrollmentRepo: Repository<Enrollment>,
     @InjectRepository(CourseVersion)
     private readonly versionRepo: Repository<CourseVersion>,
+    private readonly paginationService: OptimizedPaginationService,
+    private readonly queryCacheService: QueryCacheService,
   ) {}
 
   async createCourse(dto: CreateCourseDto) {
     const course = this.courseRepo.create(dto);
-    return this.courseRepo.save(course);
+    const result = await this.courseRepo.save(course);
+    
+    // Invalidate course cache
+    await this.queryCacheService.invalidateCourseCache(result.id);
+    
+    return result;
+  }
+
+  async findAllCourses(query: any = {}): Promise<PaginatedResult<Course>> {
+    const { page = 1, limit = 20, status, instructorId, level } = query;
+    
+    const cacheKey = this.queryCacheService.generateCacheKey('courses:list', query);
+    
+    return this.queryCacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const qb = this.courseRepo.createQueryBuilder('course');
+        
+        if (status) {
+          qb.andWhere('course.status = :status', { status });
+        }
+        
+        if (instructorId) {
+          qb.andWhere('course.instructorId = :instructorId', { instructorId });
+        }
+        
+        if (level) {
+          qb.andWhere('course.level = :level', { level });
+        }
+        
+        return this.paginationService.paginate(qb, {
+          page,
+          limit,
+          sortBy: 'createdAt',
+          sortOrder: 'DESC',
+        });
+      },
+      300 // 5 minutes cache
+    );
+  }
+
+  async findCourseById(id: string): Promise<Course> {
+    const cacheKey = `course:${id}`;
+    
+    return this.queryCacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const course = await this.courseRepo.findOne({
+          where: { id },
+          relations: ['modules', 'modules.lessons'],
+        });
+        
+        if (!course) {
+          throw new Error(`Course with ID ${id} not found`);
+        }
+        
+        return course;
+      },
+      600 // 10 minutes cache
+    );
   }
 
   async addModule(courseId: string, dto: CreateModuleDto) {

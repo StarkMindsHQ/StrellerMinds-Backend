@@ -30,6 +30,12 @@ export enum UserRole {
 @Entity('users')
 @Index(['email'], { unique: true })
 @Index(['username'], { unique: true })
+@Index(['status'])
+@Index(['createdAt'])
+@Index(['lastLogin'])
+@Index(['emailVerified'])
+@Index(['status', 'createdAt'])
+@Index(['roles'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
