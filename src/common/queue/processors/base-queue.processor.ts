@@ -1,7 +1,10 @@
-import { Logger, Inject } from '@nestjs/common';
+import { Logger, Inject, Optional } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue, Job, Worker } from 'bullmq';
 import { DeadLetterQueueService } from '../services/dead-letter-queue.service';
+import { JobPrioritizationService, JobPriority } from '../services/job-prioritization.service';
+import { JobRetryStrategiesService } from '../services/job-retry-strategies.service';
+import { JobBatchingService } from '../services/job-batching.service';
 
 export interface OrderedJobData {
   sequenceId?: string; // For ordering within a group
@@ -16,6 +19,9 @@ export abstract class BaseQueueProcessor {
   constructor(
     @InjectQueue('dead-letter') protected deadLetterQueue: Queue,
     protected dlqService: DeadLetterQueueService,
+    @Optional() protected prioritizationService?: JobPrioritizationService,
+    @Optional() protected retryStrategiesService?: JobRetryStrategiesService,
+    @Optional() protected batchingService?: JobBatchingService,
   ) {}
 
   /**

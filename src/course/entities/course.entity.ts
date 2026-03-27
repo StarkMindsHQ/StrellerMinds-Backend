@@ -26,6 +26,11 @@ export { CourseStatus };
 @Index(['status', 'createdAt'])
 @Index(['instructorId'])
 @Index(['publishedAt'])
+@Index(['status'])
+@Index(['createdAt'])
+@Index(['level'])
+@Index(['language'])
+@Index(['price'])
 @Check(`"durationMinutes" >= 0`)
 export class Course {
   @PrimaryGeneratedColumn('uuid')

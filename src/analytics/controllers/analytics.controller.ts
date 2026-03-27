@@ -12,10 +12,12 @@ import {
   HttpStatus,
   Res,
   ParseUUIDPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../../auth/guards/auth.guard';
+import { CacheInterceptor } from '../../cache/cache.interceptor';
 
 // Your existing report-based service
 import { AnalyticsService } from '../services/analytics.service';
@@ -28,6 +30,7 @@ import { ProgressTrackingService } from '../../learning-path/services/progress-t
 @ApiTags('Analytics')
 @Controller('analytics')
 @UseGuards(JwtAuthGuard)
+@UseInterceptors(CacheInterceptor)
 @ApiBearerAuth()
 export class AnalyticsController {
   constructor(

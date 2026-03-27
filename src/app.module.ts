@@ -1,12 +1,13 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
-import Redis from 'ioredis';
+import { RateLimitModule } from './security/rate-limit.module';
+import { AdvancedThrottlerGuard } from './security/guards/advanced-throttler.guard';
+import { CqrsModule } from './cqrs/cqrs.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { AccessibilityModule } from './accessibility/accessibility.module';
@@ -17,6 +18,7 @@ import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
+import { CacheModule } from './cache/cache.module';
 
 
 
@@ -75,25 +77,7 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
         return dbConfig.createTypeOrmOptions();
       },
     }),
-    ThrottlerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        throttlers: [
-          {
-            ttl: config.get('RATE_LIMIT_TTL', 60000),
-            limit: config.get('RATE_LIMIT_MAX', 100),
-          },
-        ],
-        storage: new ThrottlerStorageRedisService(
-          new Redis({
-            host: config.get('REDIS_HOST', 'localhost'),
-            port: config.get('REDIS_PORT', 6379),
-            password: config.get('REDIS_PASSWORD'),
-          }),
-        ),
-      }),
-    }),
+    RateLimitModule,
     ScheduleModule.forRoot(),
     EventEmitterModule.forRoot(),
 
@@ -102,8 +86,10 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
     AnalyticsModule,
     AssignmentModule,
     AuthModule,
+    CacheModule,
     CalendarModule,
     CourseModule,
+    CqrsModule,
     FilesModule,
     ForumModule,
     GamificationModule,
@@ -118,7 +104,7 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: AdvancedThrottlerGuard,
     },
     {
       provide: APP_GUARD,

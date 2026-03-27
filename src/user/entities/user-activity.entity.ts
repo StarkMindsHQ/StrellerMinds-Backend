@@ -27,6 +27,10 @@ export enum ActivityType {
 
 @Entity('user_activities')
 @Index(['userId', 'createdAt'])
+@Index(['type'])
+@Index(['createdAt'])
+@Index(['performedBy'])
+@Index(['userId', 'type', 'createdAt'])
 export class UserActivity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
