@@ -18,6 +18,21 @@ export class FileEntity {
   @Column('bigint')
   size: number;
 
+  @Column('bigint', { nullable: true })
+  originalSize?: number;
+
+  @Column({ nullable: true })
+  fileHash?: string;
+
+  @Column({ default: false })
+  isCompressed: boolean;
+
+  @Column('decimal', { precision: 5, scale: 4, nullable: true })
+  compressionRatio?: number;
+
+  @Column({ nullable: true })
+  cdnUrl?: string;
+
   @Column()
   path: string;
 

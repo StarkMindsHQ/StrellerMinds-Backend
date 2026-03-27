@@ -1,6 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, OnApplicationShutdown } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { DatabaseConfig } from '../config/database.config';
+import { performance } from 'perf_hooks';
 
 export interface DatabaseMetrics {
   connectionPool: {
@@ -8,15 +11,33 @@ export interface DatabaseMetrics {
     idle: number;
     waiting: number;
     total: number;
+    maxConnections: number;
+    minConnections: number;
+    utilization: number;
+    averageWaitTime: number;
+    connectionErrors: number;
+    totalAcquires: number;
+    totalReleases: number;
   };
   database: {
     size: string;
     connections: number;
     transactions: number;
+    lockWaits: number;
+    deadlocks: number;
   };
   performance: {
     slowQueries: SlowQuery[];
     averageQueryTime: number;
+    queriesPerSecond: number;
+    cacheHitRatio: number;
+  };
+  health: {
+    status: 'healthy' | 'degraded' | 'unhealthy';
+    lastCheck: Date;
+    latency: number;
+    uptime: number;
+    recommendations: string[];
   };
   tables: TableStats[];
 }
@@ -38,22 +59,60 @@ export interface TableStats {
  * Service for monitoring database health and performance
  */
 @Injectable()
-export class DatabaseMonitorService {
+export class DatabaseMonitorService implements OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger(DatabaseMonitorService.name);
   private slowQueries: SlowQuery[] = [];
   private readonly slowQueryThreshold = 1000; // 1 second
+  private poolMetrics = {
+    totalAcquires: 0,
+    totalReleases: 0,
+    connectionErrors: 0,
+    lastMetricsReset: new Date(),
+  };
+  private healthCheckHistory: Array<{ timestamp: Date; healthy: boolean; latency: number }> = [];
+  private readonly healthCheckHistoryLimit = 100;
+  private moduleStartTime: number = Date.now();
 
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() private dataSource: DataSource,
+    private databaseConfig: DatabaseConfig,
+  ) {}
+
+  async onModuleInit() {
+    this.logger.log('Database Monitor Service initialized');
+    await this.performInitialHealthCheck();
+  }
+
+  async onApplicationShutdown() {
+    this.logger.log('Database Monitor Service shutting down');
+  }
+
+  /**
+   * Perform initial health check on startup
+   */
+  private async performInitialHealthCheck(): Promise<void> {
+    try {
+      const healthResult = await this.databaseConfig.performHealthCheck(this.dataSource);
+      if (healthResult.healthy) {
+        this.logger.log(`Database connection healthy (${healthResult.latency}ms latency)`);
+      } else {
+        this.logger.error(`Database connection failed: ${healthResult.error}`);
+      }
+    } catch (error) {
+      this.logger.error(`Initial health check failed: ${error.message}`);
+    }
+  }
 
   /**
    * Get comprehensive database metrics
    */
   async getMetrics(): Promise<DatabaseMetrics> {
     try {
-      const [connectionPool, database, tables] = await Promise.all([
-        this.getConnectionPoolMetrics(),
-        this.getDatabaseMetrics(),
+      const [connectionPool, database, tables, health] = await Promise.all([
+        this.getEnhancedConnectionPoolMetrics(),
+        this.getEnhancedDatabaseMetrics(),
         this.getTableStats(),
+        this.getHealthMetrics(),
       ]);
 
       return {
@@ -62,7 +121,10 @@ export class DatabaseMonitorService {
         performance: {
           slowQueries: this.getSlowQueries(),
           averageQueryTime: this.calculateAverageQueryTime(),
+          queriesPerSecond: this.calculateQueriesPerSecond(),
+          cacheHitRatio: await this.getCacheHitRatio(),
         },
+        health,
         tables,
       };
     } catch (error) {
@@ -72,60 +134,81 @@ export class DatabaseMonitorService {
   }
 
   /**
-   * Get connection pool metrics
+   * Get enhanced connection pool metrics
    */
-  private async getConnectionPoolMetrics(): Promise<DatabaseMetrics['connectionPool']> {
-    // Note: TypeORM doesn't expose pool stats directly
-    // This is a simplified version - in production, you'd use pg-pool directly
+  private async getEnhancedConnectionPoolMetrics(): Promise<DatabaseMetrics['connectionPool']> {
     const driver = this.dataSource.driver as any;
     const pool = driver.master;
+    const config = this.dataSource.options.extra as any;
+
+    const totalConnections = pool.totalCount || 0;
+    const idleConnections = pool.idleCount || 0;
+    const activeConnections = totalConnections - idleConnections;
+    const waitingClients = pool.waitingCount || 0;
+
+    // Calculate utilization
+    const utilization = totalConnections > 0 ? (activeConnections / totalConnections) * 100 : 0;
+
+    // Calculate average wait time (simplified)
+    const averageWaitTime = waitingClients > 0 ? 100 : 0; // Placeholder - would need actual timing
+
+    // Update database config metrics
+    this.databaseConfig.updatePoolMetrics({
+      totalConnections,
+      activeConnections,
+      idleConnections,
+      waitingClients,
+    });
 
     return {
-      active: pool.totalCount || 0,
-      idle: pool.idleCount || 0,
-      waiting: pool.waitingCount || 0,
-      total: pool.totalCount || 0,
+      active: activeConnections,
+      idle: idleConnections,
+      waiting: waitingClients,
+      total: totalConnections,
+      maxConnections: config?.max || 10,
+      minConnections: config?.min || 1,
+      utilization: Math.round(utilization),
+      averageWaitTime,
+      connectionErrors: this.poolMetrics.connectionErrors,
+      totalAcquires: this.poolMetrics.totalAcquires,
+      totalReleases: this.poolMetrics.totalReleases,
     };
   }
 
   /**
-   * Get database-level metrics
+   * Get enhanced database-level metrics
    */
-  private async getDatabaseMetrics(): Promise<DatabaseMetrics['database']> {
+  private async getEnhancedDatabaseMetrics(): Promise<DatabaseMetrics['database']> {
     const dbName = this.dataSource.options.database as string;
 
-    // Get database size
-    const sizeResult = await this.dataSource.query(
-      `
-      SELECT pg_size_pretty(pg_database_size($1)) as size
-    `,
-      [dbName],
-    );
-
-    // Get active connections
-    const connectionsResult = await this.dataSource.query(
-      `
-      SELECT count(*) as count
-      FROM pg_stat_activity
-      WHERE datname = $1
-    `,
-      [dbName],
-    );
-
-    // Get transaction count
-    const transactionsResult = await this.dataSource.query(
-      `
-      SELECT xact_commit + xact_rollback as transactions
-      FROM pg_stat_database
-      WHERE datname = $1
-    `,
-      [dbName],
-    );
+    // Get comprehensive database metrics
+    const [sizeResult, connectionsResult, transactionsResult, lockResult] = await Promise.all([
+      this.dataSource.query(
+        `SELECT pg_size_pretty(pg_database_size($1)) as size`,
+        [dbName],
+      ),
+      this.dataSource.query(
+        `SELECT count(*) as count FROM pg_stat_activity WHERE datname = $1`,
+        [dbName],
+      ),
+      this.dataSource.query(
+        `SELECT xact_commit + xact_rollback as transactions FROM pg_stat_database WHERE datname = $1`,
+        [dbName],
+      ),
+      this.dataSource.query(
+        `SELECT 
+         (SELECT count(*) FROM pg_stat_activity WHERE wait_event = 'Lock' AND datname = $1) as lock_waits,
+         (SELECT count(*) FROM pg_stat_database WHERE deadlocks > 0 AND datname = $1) as deadlocks`,
+        [dbName],
+      ),
+    ]);
 
     return {
       size: sizeResult[0]?.size || '0 bytes',
       connections: parseInt(connectionsResult[0]?.count || '0'),
       transactions: parseInt(transactionsResult[0]?.transactions || '0'),
+      lockWaits: parseInt(lockResult[0]?.lock_waits || '0'),
+      deadlocks: parseInt(lockResult[0]?.deadlocks || '0'),
     };
   }
 
@@ -189,45 +272,216 @@ export class DatabaseMonitorService {
   }
 
   /**
-   * Check database health
+   * Get health metrics
+   */
+  private async getHealthMetrics(): Promise<DatabaseMetrics['health']> {
+    const healthResult = await this.databaseConfig.performHealthCheck(this.dataSource);
+    const uptime = Date.now() - this.moduleStartTime;
+    const recommendations = this.databaseConfig.getPoolRecommendations();
+
+    // Determine health status
+    let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
+    
+    if (!healthResult.healthy) {
+      status = 'unhealthy';
+    } else if (healthResult.latency > 1000 || recommendations.length > 0) {
+      status = 'degraded';
+    }
+
+    return {
+      status,
+      lastCheck: new Date(),
+      latency: healthResult.latency,
+      uptime,
+      recommendations,
+    };
+  }
+
+  /**
+   * Calculate queries per second
+   */
+  private calculateQueriesPerSecond(): number {
+    const timeSinceReset = (Date.now() - this.poolMetrics.lastMetricsReset.getTime()) / 1000;
+    const totalQueries = this.poolMetrics.totalAcquires;
+    return timeSinceReset > 0 ? Math.round(totalQueries / timeSinceReset) : 0;
+  }
+
+  /**
+   * Get cache hit ratio
+   */
+  private async getCacheHitRatio(): Promise<number> {
+    try {
+      const result = await this.dataSource.query(`
+        SELECT 
+          CASE 
+            WHEN (blks_hit + blks_read) = 0 THEN 0
+            ELSE ROUND((blks_hit::float / (blks_hit + blks_read)) * 100, 2)
+          END as cache_hit_ratio
+        FROM pg_stat_database 
+        WHERE datname = current_database()
+      `);
+      
+      return parseFloat(result[0]?.cache_hit_ratio || '0');
+    } catch (error) {
+      this.logger.warn(`Failed to get cache hit ratio: ${error.message}`);
+      return 0;
+    }
+  }
+
+  /**
+   * Log connection pool events
+   */
+  logConnectionEvent(event: 'acquire' | 'release' | 'error', metadata?: any): void {
+    switch (event) {
+      case 'acquire':
+        this.poolMetrics.totalAcquires++;
+        break;
+      case 'release':
+        this.poolMetrics.totalReleases++;
+        break;
+      case 'error':
+        this.poolMetrics.connectionErrors++;
+        this.logger.error(`Connection pool error: ${JSON.stringify(metadata)}`);
+        break;
+    }
+  }
+
+  /**
+   * Reset pool metrics (useful for testing or periodic reset)
+   */
+  resetMetrics(): void {
+    this.poolMetrics = {
+      totalAcquires: 0,
+      totalReleases: 0,
+      connectionErrors: 0,
+      lastMetricsReset: new Date(),
+    };
+    this.slowQueries = [];
+    this.healthCheckHistory = [];
+    this.logger.log('Database metrics reset');
+  }
+
+  /**
+   * Get connection pool recommendations
+   */
+  getPoolRecommendations(): string[] {
+    return this.databaseConfig.getPoolRecommendations();
+  }
+
+  /**
+   * Scheduled health check
+   */
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  async scheduledHealthCheck(): Promise<void> {
+    try {
+      const healthResult = await this.databaseConfig.performHealthCheck(this.dataSource);
+      
+      this.healthCheckHistory.push({
+        timestamp: new Date(),
+        healthy: healthResult.healthy,
+        latency: healthResult.latency,
+      });
+
+      // Keep history size limited
+      if (this.healthCheckHistory.length > this.healthCheckHistoryLimit) {
+        this.healthCheckHistory.shift();
+      }
+
+      // Log if unhealthy
+      if (!healthResult.healthy) {
+        this.logger.warn(`Scheduled health check failed: ${healthResult.error}`);
+      }
+    } catch (error) {
+      this.logger.error(`Scheduled health check error: ${error.message}`);
+    }
+  }
+
+  /**
+   * Get health check history
+   */
+  getHealthCheckHistory(limit: number = 50): typeof this.healthCheckHistory {
+    return this.healthCheckHistory.slice(-limit).reverse();
+  }
+
+  /**
+   * Enhanced health check with detailed analysis
    */
   async checkHealth(): Promise<{
     healthy: boolean;
     issues: string[];
     metrics: Partial<DatabaseMetrics>;
+    recommendations: string[];
+    status: 'healthy' | 'degraded' | 'unhealthy';
   }> {
     const issues: string[] = [];
+    const recommendations: string[] = [];
 
     try {
       // Test database connection
-      await this.dataSource.query('SELECT 1');
-
+      const healthResult = await this.databaseConfig.performHealthCheck(this.dataSource);
+      
       // Get metrics
       const metrics = await this.getMetrics();
 
       // Check for issues
       if (metrics.connectionPool.waiting > 5) {
         issues.push(`High connection pool wait count: ${metrics.connectionPool.waiting}`);
+        recommendations.push('Consider increasing DATABASE_POOL_MAX');
+      }
+
+      if (metrics.connectionPool.utilization > 80) {
+        issues.push(`High connection pool utilization: ${metrics.connectionPool.utilization}%`);
+        recommendations.push('Consider scaling up database or optimizing queries');
       }
 
       if (metrics.performance.slowQueries.length > 10) {
         issues.push(`High number of slow queries: ${metrics.performance.slowQueries.length}`);
+        recommendations.push('Review and optimize slow queries');
       }
 
       if (metrics.performance.averageQueryTime > 500) {
         issues.push(`High average query time: ${metrics.performance.averageQueryTime}ms`);
+        recommendations.push('Consider adding database indexes or optimizing queries');
+      }
+
+      if (metrics.database.lockWaits > 5) {
+        issues.push(`High number of lock waits: ${metrics.database.lockWaits}`);
+        recommendations.push('Review transaction isolation levels and query patterns');
+      }
+
+      if (metrics.database.deadlocks > 0) {
+        issues.push(`Database deadlocks detected: ${metrics.database.deadlocks}`);
+        recommendations.push('Review transaction order and implement retry logic');
+      }
+
+      if (healthResult.latency > 1000) {
+        issues.push(`High database latency: ${healthResult.latency}ms`);
+        recommendations.push('Check database performance and network connectivity');
+      }
+
+      // Determine overall status
+      let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
+      
+      if (!healthResult.healthy || issues.length > 3) {
+        status = 'unhealthy';
+      } else if (issues.length > 0 || healthResult.latency > 500) {
+        status = 'degraded';
       }
 
       return {
-        healthy: issues.length === 0,
+        healthy: healthResult.healthy && issues.length === 0,
         issues,
         metrics,
+        recommendations,
+        status,
       };
     } catch (error) {
       return {
         healthy: false,
         issues: [`Database connection failed: ${error.message}`],
         metrics: {},
+        recommendations: ['Check database connection and configuration'],
+        status: 'unhealthy',
       };
     }
   }

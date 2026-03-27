@@ -17,6 +17,7 @@ import { SecurityModule } from './security/security.module';
 import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
+import { CacheModule } from './cache/cache.module';
 
 
 
@@ -101,6 +102,7 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
     AnalyticsModule,
     AssignmentModule,
     AuthModule,
+    CacheModule,
     CalendarModule,
     CourseModule,
     CqrsModule,
