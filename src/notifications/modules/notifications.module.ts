@@ -21,6 +21,7 @@ import { DigestEmailService } from '../services/digest-email.service';
 import { UnsubscribeService } from '../services/unsubscribe.service';
 import { NotificationsController } from '../controllers/notifications.controller';
 import { AuthModule } from '../../auth/auth.module';
+import { NotificationEventHandlers } from '../events/notification.event-handlers';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuthModule } from '../../auth/auth.module';
   providers: [
     NotificationsService,
     EmailNotificationsService,
+    NotificationEventHandlers,
     EmailChannel,
     SmsChannel,
     PushChannel,

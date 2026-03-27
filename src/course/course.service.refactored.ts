@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OptimizedPaginationService, PaginatedResult } from '../common/pagination/optimized-pagination.service';
-import { QueryCacheService } from '../cache/services/query-cache.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CourseModule } from './entities/module.entity';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -12,6 +11,7 @@ import { Course } from './entities/course.entity';
 import { Enrollment } from './entities/enrollment.entity';
 import { Lesson } from './entities/lesson.entity';
 import { CourseStatus } from './enums/course-status.enum';
+import { CourseEnrolledEvent, CourseCompletedEvent } from '../common/events/domain-events';
 
 @Injectable()
 export class CourseService {
@@ -26,72 +26,12 @@ export class CourseService {
     private readonly enrollmentRepo: Repository<Enrollment>,
     @InjectRepository(CourseVersion)
     private readonly versionRepo: Repository<CourseVersion>,
-    private readonly paginationService: OptimizedPaginationService,
-    private readonly queryCacheService: QueryCacheService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async createCourse(dto: CreateCourseDto) {
     const course = this.courseRepo.create(dto);
-    const result = await this.courseRepo.save(course);
-    
-    // Invalidate course cache
-    await this.queryCacheService.invalidateCourseCache(result.id);
-    
-    return result;
-  }
-
-  async findAllCourses(query: any = {}): Promise<PaginatedResult<Course>> {
-    const { page = 1, limit = 20, status, instructorId, level } = query;
-    
-    const cacheKey = this.queryCacheService.generateCacheKey('courses:list', query);
-    
-    return this.queryCacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const qb = this.courseRepo.createQueryBuilder('course');
-        
-        if (status) {
-          qb.andWhere('course.status = :status', { status });
-        }
-        
-        if (instructorId) {
-          qb.andWhere('course.instructorId = :instructorId', { instructorId });
-        }
-        
-        if (level) {
-          qb.andWhere('course.level = :level', { level });
-        }
-        
-        return this.paginationService.paginate(qb, {
-          page,
-          limit,
-          sortBy: 'createdAt',
-          sortOrder: 'DESC',
-        });
-      },
-      300 // 5 minutes cache
-    );
-  }
-
-  async findCourseById(id: string): Promise<Course> {
-    const cacheKey = `course:${id}`;
-    
-    return this.queryCacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const course = await this.courseRepo.findOne({
-          where: { id },
-          relations: ['modules', 'modules.lessons'],
-        });
-        
-        if (!course) {
-          throw new Error(`Course with ID ${id} not found`);
-        }
-        
-        return course;
-      },
-      600 // 10 minutes cache
-    );
+    return this.courseRepo.save(course);
   }
 
   async addModule(courseId: string, dto: CreateModuleDto) {
@@ -106,13 +46,16 @@ export class CourseService {
     return this.lessonRepo.save(lesson);
   }
 
-  async findById(id: string) {
-    return this.courseRepo.findOne({ where: { id } });
-  }
-
   async enroll(studentId: string, courseId: string) {
     const course = await this.courseRepo.findOneBy({ id: courseId });
-    return this.enrollmentRepo.save(this.enrollmentRepo.create({ studentId, course }));
+    const enrollment = await this.enrollmentRepo.save(
+      this.enrollmentRepo.create({ studentId, course })
+    );
+    
+    // Emit event instead of directly calling other services
+    this.eventEmitter.emit('course.enrolled', new CourseEnrolledEvent(studentId, courseId));
+    
+    return enrollment;
   }
 
   async publishCourse(courseId: string) {
@@ -133,5 +76,22 @@ export class CourseService {
 
     course.status = CourseStatus.PUBLISHED;
     return this.courseRepo.save(course);
+  }
+
+  async completeCourse(userId: string, courseId: string) {
+    // Mark course as completed
+    const enrollment = await this.enrollmentRepo.findOne({
+      where: { studentId: userId, course: { id: courseId } },
+    });
+    
+    if (enrollment) {
+      enrollment.completedAt = new Date();
+      await this.enrollmentRepo.save(enrollment);
+      
+      // Emit event for other modules to react
+      this.eventEmitter.emit('course.completed', new CourseCompletedEvent(userId, courseId));
+    }
+    
+    return enrollment;
   }
 }

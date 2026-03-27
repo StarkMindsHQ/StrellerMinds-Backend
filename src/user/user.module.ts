@@ -32,6 +32,8 @@ import { PrivacyController } from './controllers/privacy.controller';
 import { AchievementController } from './controllers/achievement.controller';
 import { SkillController } from './controllers/skill.controller';
 import { RecommendationController } from './controllers/recommendation.controller';
+import { UserEventHandlers } from './events/user.event-handlers';
+import { UserFacade } from './user.facade';
 import { CqrsUserController } from './controllers/cqrs-user.controller';
 import { CreateUserHandler } from './handlers/create-user.handler';
 import { GetUserByIdHandler } from './handlers/get-user-by-id.handler';
@@ -78,6 +80,8 @@ import { EventEntity } from '../cqrs/entities/event.entity';
   ],
   providers: [
     UserService,
+    UserFacade,
+    UserEventHandlers,
     UserProfileService,
     PortfolioService,
     AchievementService,
@@ -91,7 +95,7 @@ import { EventEntity } from '../cqrs/entities/event.entity';
     UserReadModelHandler,
   ],
   exports: [
-    UserService,
+    UserFacade,
     UserProfileService,
     PortfolioService,
     AchievementService,
