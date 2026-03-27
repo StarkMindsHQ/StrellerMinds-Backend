@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model Project {
+  id          String       @id @default(uuid())
+  creatorId   String
+  fundsRaised Float        @default(0)
+  isCompleted Boolean      @default(false)
+  
+  withdrawals Withdrawal[]
+  donations   Donation[]
+}
+
+model Withdrawal {
+  id              String           @id @default(uuid())
+  project_id      String
+  amount          Float
+  status          WithdrawalStatus @default(PENDING)
+  transaction_hash String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  project         Project          @relation(fields: [project_id], references: [id])
+}
+
+model Donation {
+  id              String   @id @default(uuid())
+  projectId       String
+  userId          String
+  amount          Float
+  assetType       String   @default("USD")
+  isAnonymous     Boolean  @default(false)
+  transactionHash String   @unique
+  createdAt       DateTime @default(now())
+
+  project         Project  @relation(fields: [projectId], references: [id])
+}
