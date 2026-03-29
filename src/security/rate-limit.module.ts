@@ -7,6 +7,9 @@ import Redis from 'ioredis';
 import { RateLimitAnalytics } from './entities/rate-limit-analytics.entity';
 import { AdvancedThrottlerGuard } from './guards/advanced-throttler.guard';
 import { RateLimitService } from './services/rate-limit.service';
+import { AdaptiveRateLimiter } from './AdaptiveRateLimiter';
+import { ThreatDetector } from './ThreatDetector';
+import { RateLimitingService } from '../services/RateLimitingService';
 
 @Module({
   imports: [
@@ -43,7 +46,21 @@ import { RateLimitService } from './services/rate-limit.service';
       }),
     }),
   ],
-  providers: [AdvancedThrottlerGuard, RateLimitService],
-  exports: [ThrottlerModule, TypeOrmModule, AdvancedThrottlerGuard, RateLimitService],
+  providers: [
+    AdvancedThrottlerGuard,
+    RateLimitService,
+    AdaptiveRateLimiter,
+    ThreatDetector,
+    RateLimitingService,
+  ],
+  exports: [
+    ThrottlerModule,
+    TypeOrmModule,
+    AdvancedThrottlerGuard,
+    RateLimitService,
+    AdaptiveRateLimiter,
+    ThreatDetector,
+    RateLimitingService,
+  ],
 })
 export class RateLimitModule {}

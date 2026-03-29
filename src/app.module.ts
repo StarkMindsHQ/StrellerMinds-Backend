@@ -20,6 +20,8 @@ import { LanguageDetectionMiddleware } from './i18n/middleware/language-detectio
 import { HealthModule } from './health/health.module';
 import { CacheModule } from './cache/cache.module';
 import { JobsModule } from './jobs/jobs.module';
+import { VersioningModule } from './versioning/versioning.module';
+import { StellarModule } from './stellar/stellar.module';
 
 
 
@@ -101,6 +103,8 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
     CalendarModule,
     AnalyticsModule,
     MetricsModule,
+    VersioningModule,
+    StellarModule,
   ],
 
   providers: [
