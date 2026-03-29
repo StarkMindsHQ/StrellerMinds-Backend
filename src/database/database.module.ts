@@ -6,6 +6,10 @@ import { DynamicPoolSizingService } from './dynamic-pool-sizing.service';
 import { DatabaseMetricsController } from './database.metrics.controller';
 import { BackupService } from './backup/backup.service';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ReplicaManager } from './ReplicaManager';
+import { ConnectionPool } from './ConnectionPool';
+import { QueryRouter } from './QueryRouter';
+import { DatabaseOptimizationService } from '../services/DatabaseOptimizationService';
 
 @Module({
   imports: [
@@ -20,11 +24,16 @@ import { ScheduleModule } from '@nestjs/schedule';
     DatabaseMonitorService,
     DynamicPoolSizingService,
     BackupService,
+    ReplicaManager,
+    ConnectionPool,
+    QueryRouter,
+    DatabaseOptimizationService,
   ],
   exports: [
     DatabaseConfig,
     DatabaseMonitorService,
     DynamicPoolSizingService,
+    DatabaseOptimizationService,
   ],
 })
 export class DatabaseModule {}

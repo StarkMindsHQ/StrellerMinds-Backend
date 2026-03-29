@@ -17,6 +17,10 @@ import { DocumentationController } from './controllers/documentation.controller'
 import { ApiKeyGuard } from './guards/api-key.guard';
 import { ApiUsageInterceptor } from './interceptors/api-usage.interceptor';
 import { User } from '../auth/entities/user.entity';
+import { DocumentationGenerator } from '../docs/DocumentationGenerator';
+import { InteractiveTester } from '../docs/InteractiveTester';
+import { ExampleGenerator } from '../docs/ExampleGenerator';
+import { DocumentationService } from '../services/DocumentationService';
 
 @Global()
 @Module({
@@ -35,6 +39,10 @@ import { User } from '../auth/entities/user.entity';
     ApiKeyGuard,
     ApiUsageInterceptor,
     ApiVersionGuard,
+    DocumentationGenerator,
+    InteractiveTester,
+    ExampleGenerator,
+    DocumentationService,
   ],
   exports: [
     ApiKeyService,
@@ -45,6 +53,7 @@ import { User } from '../auth/entities/user.entity';
     ApiTestingService,
     ApiKeyGuard,
     ApiUsageInterceptor,
+    DocumentationService,
   ],
 })
 export class DocumentationModule {}

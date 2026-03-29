@@ -19,6 +19,7 @@ import { InputSecurityMiddleware } from './common/middleware/input-security.midd
 import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
 import { HealthModule } from './health/health.module';
 import { CacheModule } from './cache/cache.module';
+import { JobsModule } from './jobs/jobs.module';
 
 
 
@@ -94,6 +95,7 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
     ForumModule,
     GamificationModule,
     IntegrationsModule,
+    JobsModule,
 
     LearningPathModule,
     CalendarModule,
