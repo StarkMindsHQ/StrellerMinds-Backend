@@ -2,6 +2,11 @@ import { Module, Global, NestModule, MiddlewareConsumer, Inject } from '@nestjs/
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppLogger } from './logger.service';
 import { LoggingInterceptor } from './logging.interceptor';
+import { CorrelationManager } from './CorrelationManager';
+import { DistributedTracer } from './DistributedTracer';
+import { LogAnalyzer } from './LogAnalyzer';
+import { LoggingService } from '../services/LoggingService';
+import { CorrelationLoggerService } from './correlation-logger.service';
 
 /**
  * Logging Module providing centralized logging for the application
@@ -11,6 +16,11 @@ import { LoggingInterceptor } from './logging.interceptor';
 @Module({
   providers: [
     AppLogger,
+    CorrelationManager,
+    DistributedTracer,
+    LogAnalyzer,
+    LoggingService,
+    CorrelationLoggerService,
     {
       provide: 'LoggerContext',
       useValue: 'Application', // Default context value
@@ -20,7 +30,14 @@ import { LoggingInterceptor } from './logging.interceptor';
       useClass: LoggingInterceptor,
     },
   ],
-  exports: [AppLogger],
+  exports: [
+    AppLogger,
+    CorrelationManager,
+    DistributedTracer,
+    LogAnalyzer,
+    LoggingService,
+    CorrelationLoggerService,
+  ],
 })
 export class LoggingModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
