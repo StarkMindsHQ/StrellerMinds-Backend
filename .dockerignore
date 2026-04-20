@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.env.local
+npm-debug.log
+coverage
+.jest-cache
+test-reports
+*.log
+.DS_Store
