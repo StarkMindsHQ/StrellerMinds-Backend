@@ -2,38 +2,22 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { join } from 'path';
 import type { JwtModuleOptions } from '@nestjs/jwt';
 
 import { AuthController } from './controllers/auth.controller';
-import { SecurityController } from './controllers/security.controller';
 import { AuthService } from './services/auth.service';
-import { BcryptService } from './services/bcrypt.service';
 import { JwtService } from './services/jwt.service';
 import { User } from './entities/user.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { JwtAuthGuard, RolesGuard, OptionalJwtAuthGuard } from './guards/auth.guard';
-import { ResponseInterceptor } from './interceptors/response.interceptor';
-import { TokenBlacklistMiddleware, SecurityHeadersMiddleware } from './middleware/auth.middleware';
-
-import { TwoFactorAuthService } from './services/two-factor-auth.service';
-import { EmailService } from './services/email.service';
-
-import { SecurityAudit } from './entities/security-audit.entity';
-import { SecurityAuditService } from './services/security-audit.service';
-import { GeoIpService } from './services/geo-ip.service';
-import { PasswordHistory } from './entities/password-history.entity';
-import { PasswordHistoryService } from './services/password-history.service';
+import { JwtAuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['.env'],
     }),
-    TypeOrmModule.forFeature([User, RefreshToken, SecurityAudit, PasswordHistory]),
+    TypeOrmModule.forFeature([User, RefreshToken]),
     JwtModule.registerAsync({
       useFactory: async (): Promise<JwtModuleOptions> => ({
         secret: process.env.JWT_SECRET || 'default-secret',
@@ -43,56 +27,17 @@ import { PasswordHistoryService } from './services/password-history.service';
       }),
       global: true,
     }),
-    MailerModule.forRootAsync({
-      useFactory: () => ({
-        transport: {
-          host: process.env.SMTP_HOST || 'localhost',
-          port: parseInt(process.env.SMTP_PORT || '587'),
-          secure: process.env.SMTP_SECURE === 'true',
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        },
-        defaults: {
-          from: process.env.SMTP_FROM || 'noreply@strellerminds.com',
-        },
-        template: {
-          dir: join(__dirname, 'templates'),
-          adapter: handlebarsAdapter,
-          options: {
-            strict: true,
-          },
-        },
-      }),
-    }),
   ],
-  controllers: [AuthController, SecurityController],
+  controllers: [AuthController],
   providers: [
     AuthService,
-    BcryptService,
     JwtService,
     JwtAuthGuard,
-    RolesGuard,
-    OptionalJwtAuthGuard,
-    ResponseInterceptor,
-    TwoFactorAuthService,
-    EmailService,
-    SecurityAuditService,
-    GeoIpService,
-    PasswordHistoryService,
   ],
   exports: [
     AuthService,
-    BcryptService,
     JwtService,
     JwtAuthGuard,
-    RolesGuard,
-    EmailService,
-    TwoFactorAuthService,
-    SecurityAuditService,
-    GeoIpService,
-    PasswordHistoryService,
   ],
 })
 export class AuthModule {}

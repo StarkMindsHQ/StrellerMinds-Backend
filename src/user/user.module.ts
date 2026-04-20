@@ -1,108 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MulterModule } from '@nestjs/platform-express';
-import { CqrsModule } from '../cqrs/cqrs.module';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { User } from './entities/user.entity';
-import { UserActivity } from './entities/user-activity.entity';
 import { UserProfile } from './entities/user-profile.entity';
-import { PortfolioItem } from './entities/portfolio-item.entity';
-import { Badge } from './entities/badge.entity';
-import { UserBadge } from './entities/user-badge.entity';
-import { Follow } from './entities/follow.entity';
-import { PrivacySettings } from './entities/privacy-settings.entity';
-import { ProfileAnalytics } from './entities/profile-analytics.entity';
-import { Skill } from './entities/skill.entity';
-import { UserSkill } from './entities/user-skill.entity';
-import { SkillEndorsement } from './entities/skill-endorsement.entity';
-import { SkillAssessment } from './entities/skill-assessment.entity';
-import { SkillAssessmentResult } from './entities/skill-assessment-result.entity';
-import { PortfolioMedia } from './entities/portfolio-media.entity';
-import { UserProfileService } from './services/user-profile.service';
-import { PortfolioService } from './services/portfolio.service';
-import { AchievementService } from './services/achievement.service';
-import { SocialService } from './services/social.service';
-import { PrivacyService } from './services/privacy.service';
-import { SkillService } from './services/skill.service';
-import { RecommendationService } from './services/recommendation.service';
-import { UserProfileController } from './controllers/profile.controller';
-import { SocialController } from './controllers/social.controller';
-import { PrivacyController } from './controllers/privacy.controller';
-import { AchievementController } from './controllers/achievement.controller';
-import { SkillController } from './controllers/skill.controller';
-import { RecommendationController } from './controllers/recommendation.controller';
-import { UserEventHandlers } from './events/user.event-handlers';
-import { UserFacade } from './user.facade';
-import { CqrsUserController } from './controllers/cqrs-user.controller';
-import { CreateUserHandler } from './handlers/create-user.handler';
-import { GetUserByIdHandler } from './handlers/get-user-by-id.handler';
-import { UserCreatedEventHandler } from './handlers/user-created-event.handler';
-import { UserReadModelHandler } from '../cqrs/read-models/user-read-model.handler';
-import { UserReadModelEntity } from '../cqrs/read-models/user-read-model.entity';
-import { EventEntity } from '../cqrs/entities/event.entity';
 
 @Module({
   imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([
-      User,
-      UserActivity,
-      UserProfile,
-      PortfolioItem,
-      Badge,
-      UserBadge,
-      Follow,
-      PrivacySettings,
-      ProfileAnalytics,
-      Skill,
-      UserSkill,
-      SkillEndorsement,
-      SkillAssessment,
-      SkillAssessmentResult,
-      PortfolioMedia,
-      UserReadModelEntity,
-      EventEntity,
-    ]),
-    MulterModule.register({
-      dest: './uploads',
-    }),
+    TypeOrmModule.forFeature([User, UserProfile]),
   ],
-  controllers: [
-    UserController,
-    UserProfileController,
-    SocialController,
-    PrivacyController,
-    AchievementController,
-    SkillController,
-    RecommendationController,
-    CqrsUserController,
-  ],
-  providers: [
-    UserService,
-    UserFacade,
-    UserEventHandlers,
-    UserProfileService,
-    PortfolioService,
-    AchievementService,
-    SocialService,
-    PrivacyService,
-    SkillService,
-    RecommendationService,
-    CreateUserHandler,
-    GetUserByIdHandler,
-    UserCreatedEventHandler,
-    UserReadModelHandler,
-  ],
-  exports: [
-    UserFacade,
-    UserProfileService,
-    PortfolioService,
-    AchievementService,
-    SocialService,
-    PrivacyService,
-    SkillService,
-    RecommendationService,
-  ],
+  controllers: [UserController],
+  providers: [UserService],
+  exports: [UserService],
 })
 export class UserModule {}
