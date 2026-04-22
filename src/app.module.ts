@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
+import { ContractTestingModule } from './common/contract-testing/contract-testing.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -26,6 +27,7 @@ import { AppService } from './app.service';
     AuthModule,
     UserModule,
     CourseModule,
+    ContractTestingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
