@@ -1,422 +1,439 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { ConfigService } from '@nestjs/config';
-// import { INestApplication } from '@nestjs/common';
-// import * as request from 'supertest';
-// import * as fs from 'fs';
-// import * as path from 'path';
-// import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
+import { INestApplication } from '@nestjs/common';
+import * as request from 'supertest';
+import * as fs from 'fs';
+import * as path from 'path';
+import { Logger } from '@nestjs/common';
 
-// /**
-//  * Visual Regression Tests (Simplified)
-//  * 
-//  * Tests API documentation and UI consistency without requiring
-//  * browser automation dependencies that have conflicts.
-//  * 
-//  * Features:
-//  * - API documentation structure validation
-//  * - Response format consistency checking
-//  * - Error page visual testing
-//  * - Documentation completeness verification
-//  * - Visual diff reporting
-//  */
+/**
+ * Visual Regression Tests (Clean Version)
+ * 
+ * Tests API documentation and UI consistency without requiring
+ * browser automation dependencies that have conflicts.
+ * 
+ * Features:
+ * - API documentation structure validation
+ * - Response format consistency checking
+ * - Error page visual testing
+ * - Documentation completeness verification
+ * - Visual diff reporting
+ */
 
-// describe('Visual Regression Tests', () => {
-//   let app: INestApplication;
-//   let page: puppeteer.Page;
-//   let configService: ConfigService;
-//   const logger = new Logger('VisualRegressionTests');
+describe('Visual Regression Tests (Clean)', () => {
+  let app: INestApplication;
+  let configService: ConfigService;
+  const logger = new Logger('VisualRegressionTestsClean');
 
-//   const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
-//   const SCREENSHOT_DIR = path.join(process.cwd(), 'test-results', 'visual-screenshots');
-//   const BASELINE_DIR = path.join(process.cwd(), 'test-baseline', 'visual-screenshots');
+  const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
+  const SCREENSHOT_DIR = path.join(process.cwd(), 'test-results', 'visual-screenshots');
+  const BASELINE_DIR = path.join(process.cwd(), 'test-baseline', 'visual-screenshots');
 
-//   beforeAll(async () => {
-//     // Create necessary directories
-//     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
-//     fs.mkdirSync(BASELINE_DIR, { recursive: true });
+  beforeAll(async () => {
+    // Create necessary directories
+    fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+    fs.mkdirSync(BASELINE_DIR, { recursive: true });
 
-//     // Launch browser
-//     browser = await puppeteer.launch({
-//       headless: process.env.CI === 'true' ? 'new' : false,
-//       args: [
-//         '--no-sandbox',
-//         '--disable-setuid-sandbox',
-//         '--disable-dev-shm-usage',
-//         '--window-size=1920,1080'
-//       ]
-//     });
+    // Create test module
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      providers: [ConfigService],
+    }).compile();
 
-//     page = await browser.newPage();
-//     await page.setViewport({ width: 1920, height: 1080 });
+    app = moduleFixture.createNestApplication();
+    configService = moduleFixture.get<ConfigService>(ConfigService);
 
-//     // Set user agent
-//     await page.setUserAgent('Visual-Regression-Test/1.0');
+    await app.init();
+    logger.log('Visual regression test environment initialized');
+  });
 
-//     logger.log('Visual regression test environment initialized');
-//   });
+  afterAll(async () => {
+    if (app) {
+      await app.close();
+    }
+    logger.log('Visual regression test environment cleaned up');
+  });
 
-//   afterAll(async () => {
-//     if (browser) {
-//       await browser.close();
-//     }
-//     logger.log('Visual regression test environment cleaned up');
-//   });
+  describe('API Documentation Structure Tests', () => {
+    it('should have accessible API documentation endpoint', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api-docs')
+        .expect(200);
 
-//   describe('API Documentation Visual Tests', () => {
-//     it('should render API documentation homepage correctly', async () => {
-//       await page.goto(`${BASE_URL}/api-docs`, { waitUntil: 'networkidle2' });
+      // Check basic response structure
+      expect(response.status).toBe(200);
+      expect(response.headers['content-type']).toMatch(/text\/html/);
+
+      // Save response content
+      const html = response.text;
+      const screenshotPath = path.join(SCREENSHOT_DIR, 'api-docs-accessible.html');
+      fs.writeFileSync(screenshotPath, html);
+
+      // Compare with baseline
+      const baselinePath = path.join(BASELINE_DIR, 'api-docs-accessible.html');
+      if (fs.existsSync(baselinePath)) {
+        const baselineContent = fs.readFileSync(baselinePath, 'utf8');
+        const isMatching = compareHTMLContent(html, baselineContent);
+        expect(isMatching).toBe(true);
+      } else {
+        // Create baseline if it doesn't exist
+        fs.writeFileSync(baselinePath, html);
+        logger.warn(`Created baseline: ${baselinePath}`);
+      }
+    }, 30000);
+
+    it('should have accessible JSON API specification', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api-docs-json')
+        .expect(200);
+
+      expect(response.status).toBe(200);
+      expect(response.headers['content-type']).toMatch(/application\/json/);
+
+      const spec = response.body;
       
-//       // Wait for main content to load
-//       await page.waitForSelector('.swagger-ui', { timeout: 10000 });
+      // Check OpenAPI structure
+      expect(spec).toHaveProperty('openapi');
+      expect(spec).toHaveProperty('info');
+      expect(spec).toHaveProperty('paths');
+
+      // Save specification
+      const specPath = path.join(SCREENSHOT_DIR, 'api-spec.json');
+      fs.writeFileSync(specPath, JSON.stringify(spec, null, 2));
+
+      const baselinePath = path.join(BASELINE_DIR, 'api-spec.json');
+      if (fs.existsSync(baselinePath)) {
+        const baselineContent = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+        const isMatching = compareJSONStructure(spec, baselineContent);
+        expect(isMatching).toBe(true);
+      } else {
+        fs.writeFileSync(baselinePath, JSON.stringify(spec, null, 2));
+        logger.warn(`Created baseline: ${baselinePath}`);
+      }
+    }, 30000);
+  });
+
+  describe('API Response Consistency Tests', () => {
+    it('should maintain consistent error response format', async () => {
+      // Test 404 error
+      const notFoundResponse = await request(app.getHttpServer())
+        .get('/nonexistent-endpoint')
+        .expect(404);
+
+      const errorBody = notFoundResponse.body;
       
-//       const screenshot = await page.screenshot({
-//         fullPage: true,
-//         type: 'png'
-//       });
+      // Check error response structure
+      expect(errorBody).toHaveProperty('error');
+      expect(errorBody).toHaveProperty('message');
+      expect(errorBody).toHaveProperty('statusCode');
+      expect(errorBody.statusCode).toBe(404);
 
-//       const screenshotPath = path.join(SCREENSHOT_DIR, 'api-docs-homepage.png');
-//       fs.writeFileSync(screenshotPath, screenshot);
+      // Save error response
+      const errorPath = path.join(SCREENSHOT_DIR, 'error-404-response.json');
+      fs.writeFileSync(errorPath, JSON.stringify(errorBody, null, 2));
 
-//       // Compare with baseline
-//       const baselinePath = path.join(BASELINE_DIR, 'api-docs-homepage.png');
-//       if (fs.existsSync(baselinePath)) {
-//         const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//         expect(isMatching).toBe(true);
-//       } else {
-//         // Create baseline if it doesn't exist
-//         fs.writeFileSync(baselinePath, screenshot);
-//         logger.warn(`Created baseline: ${baselinePath}`);
-//       }
-//     }, 30000);
+      const baselinePath = path.join(BASELINE_DIR, 'error-404-response.json');
+      if (fs.existsSync(baselinePath)) {
+        const baselineContent = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+        const isMatching = compareErrorStructure(errorBody, baselineContent);
+        expect(isMatching).toBe(true);
+      } else {
+        fs.writeFileSync(baselinePath, JSON.stringify(errorBody, null, 2));
+        logger.warn(`Created baseline: ${baselinePath}`);
+      }
+    }, 30000);
 
-//     it('should render authentication endpoints documentation', async () => {
-//       await page.goto(`${BASE_URL}/api-docs`, { waitUntil: 'networkidle2' });
+    it('should maintain consistent success response format', async () => {
+      // Test successful response
+      const successResponse = await request(app.getHttpServer())
+        .get('/')
+        .expect(200);
+
+      const successBody = successResponse.text;
       
-//       // Wait for Swagger UI to load
-//       await page.waitForSelector('.swagger-ui', { timeout: 10000 });
-      
-//       // Click on Authentication section
-//       await page.click('[data-tag="Authentication"]');
-//       await page.waitForTimeout(1000);
-      
-//       // Expand POST /auth/login endpoint
-//       await page.click('.opblock.opblock.post');
-//       await page.waitForTimeout(1000);
-      
-//       const screenshot = await page.screenshot({
-//         fullPage: true,
-//         type: 'png'
-//       });
+      // Check response structure
+      expect(typeof successBody).toBe('string');
+      expect(successBody).toContain('Hello World!');
 
-//       const screenshotPath = path.join(SCREENSHOT_DIR, 'api-docs-auth-endpoints.png');
-//       fs.writeFileSync(screenshotPath, screenshot);
+      // Save success response
+      const successPath = path.join(SCREENSHOT_DIR, 'success-root-response.json');
+      fs.writeFileSync(successPath, JSON.stringify({ 
+        type: 'string',
+        content: successBody,
+        timestamp: new Date().toISOString()
+      }, null, 2));
 
-//       const baselinePath = path.join(BASELINE_DIR, 'api-docs-auth-endpoints.png');
-//       if (fs.existsSync(baselinePath)) {
-//         const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//         expect(isMatching).toBe(true);
-//       } else {
-//         fs.writeFileSync(baselinePath, screenshot);
-//         logger.warn(`Created baseline: ${baselinePath}`);
-//       }
-//     }, 30000);
+      const baselinePath = path.join(BASELINE_DIR, 'success-root-response.json');
+      if (fs.existsSync(baselinePath)) {
+        const baselineContent = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+        const isMatching = compareSuccessStructure({ type: 'string', content: successBody }, baselineContent);
+        expect(isMatching).toBe(true);
+      } else {
+        fs.writeFileSync(baselinePath, JSON.stringify({ 
+          type: 'string',
+          content: successBody,
+          timestamp: new Date().toISOString()
+        }, null, 2));
+        logger.warn(`Created baseline: ${baselinePath}`);
+      }
+    }, 30000);
+  });
 
-//     it('should render user endpoints documentation', async () => {
-//       await page.goto(`${BASE_URL}/api-docs`, { waitUntil: 'networkidle2' });
-      
-//       await page.waitForSelector('.swagger-ui', { timeout: 10000 });
-//       await page.click('[data-tag="Users"]');
-//       await page.waitForTimeout(1000);
-      
-//       const screenshot = await page.screenshot({
-//         fullPage: true,
-//         type: 'png'
-//       });
+  describe('API Documentation Completeness', () => {
+    it('should include all required API metadata', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api-docs-json')
+        .expect(200);
 
-//       const screenshotPath = path.join(SCREENSHOT_DIR, 'api-docs-user-endpoints.png');
-//       fs.writeFileSync(screenshotPath, screenshot);
+      const spec = response.body;
 
-//       const baselinePath = path.join(BASELINE_DIR, 'api-docs-user-endpoints.png');
-//       if (fs.existsSync(baselinePath)) {
-//         const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//         expect(isMatching).toBe(true);
-//       } else {
-//         fs.writeFileSync(baselinePath, screenshot);
-//         logger.warn(`Created baseline: ${baselinePath}`);
-//       }
-//     }, 30000);
+      // Check required OpenAPI fields
+      const requiredFields = ['openapi', 'info', 'paths', 'components'];
+      const hasAllFields = requiredFields.every(field => 
+        spec.hasOwnProperty(field)
+      );
 
-//     it('should render course endpoints documentation', async () => {
-//       await page.goto(`${BASE_URL}/api-docs`, { waitUntil: 'networkidle2' });
-      
-//       await page.waitForSelector('.swagger-ui', { timeout: 10000 });
-//       await page.click('[data-tag="Courses"]');
-//       await page.waitForTimeout(1000);
-      
-//       const screenshot = await page.screenshot({
-//         fullPage: true,
-//         type: 'png'
-//       });
+      expect(hasAllFields).toBe(true);
 
-//       const screenshotPath = path.join(SCREENSHOT_DIR, 'api-docs-course-endpoints.png');
-//       fs.writeFileSync(screenshotPath, screenshot);
+      // Check info object completeness
+      const infoFields = ['title', 'version', 'description'];
+      const hasAllInfoFields = infoFields.every(field => 
+        spec.info && spec.info.hasOwnProperty(field)
+      );
 
-//       const baselinePath = path.join(BASELINE_DIR, 'api-docs-course-endpoints.png');
-//       if (fs.existsSync(baselinePath)) {
-//         const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//         expect(isMatching).toBe(true);
-//       } else {
-//         fs.writeFileSync(baselinePath, screenshot);
-//         logger.warn(`Created baseline: ${baselinePath}`);
-//       }
-//     }, 30000);
-//   });
+      expect(hasAllInfoFields).toBe(true);
 
-//   describe('Error Page Visual Tests', () => {
-//     it('should render 404 error page correctly', async () => {
-//       await page.goto(`${BASE_URL}/nonexistent-page`, { waitUntil: 'networkidle2' });
-      
-//       // Wait for error content
-//       await page.waitForSelector('body', { timeout: 5000 });
-      
-//       const screenshot = await page.screenshot({
-//         fullPage: true,
-//         type: 'png'
-//       });
+      // Save completeness report
+      const completenessPath = path.join(SCREENSHOT_DIR, 'api-completeness.json');
+      fs.writeFileSync(completenessPath, JSON.stringify({
+        requiredFields,
+        hasAllFields,
+        infoFields,
+        hasAllInfoFields,
+        timestamp: new Date().toISOString()
+      }, null, 2));
 
-//       const screenshotPath = path.join(SCREENSHOT_DIR, 'error-page-404.png');
-//       fs.writeFileSync(screenshotPath, screenshot);
+      const baselinePath = path.join(BASELINE_DIR, 'api-completeness.json');
+      if (fs.existsSync(baselinePath)) {
+        const baselineContent = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+        const isMatching = compareCompleteness({
+          requiredFields,
+          hasAllFields,
+          infoFields,
+          hasAllInfoFields
+        }, baselineContent);
+        expect(isMatching).toBe(true);
+      } else {
+        fs.writeFileSync(baselinePath, JSON.stringify({
+          requiredFields,
+          hasAllFields,
+          infoFields,
+          hasAllInfoFields,
+          timestamp: new Date().toISOString()
+        }, null, 2));
+        logger.warn(`Created baseline: ${baselinePath}`);
+      }
+    }, 30000);
 
-//       const baselinePath = path.join(BASELINE_DIR, 'error-page-404.png');
-//       if (fs.existsSync(baselinePath)) {
-//         const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//         expect(isMatching).toBe(true);
-//       } else {
-//         fs.writeFileSync(baselinePath, screenshot);
-//         logger.warn(`Created baseline: ${baselinePath}`);
-//       }
-//     }, 15000);
+    it('should have proper endpoint documentation', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api-docs-json')
+        .expect(200);
 
-//     it('should render validation error page correctly', async () => {
-//       // Make a request that will trigger validation error
-//       await page.goto(`${BASE_URL}/auth/login`, { waitUntil: 'networkidle2' });
-      
-//       // Submit invalid form data
-//       await page.type('input[name="email"]', 'invalid-email');
-//       await page.type('input[name="password"]', 'short');
-//       await page.click('button[type="submit"]');
-      
-//       // Wait for error message
-//       await page.waitForSelector('.error-message', { timeout: 5000 });
-      
-//       const screenshot = await page.screenshot({
-//         fullPage: true,
-//         type: 'png'
-//       });
+      const spec = response.body;
+      const paths = spec.paths || {};
 
-//       const screenshotPath = path.join(SCREENSHOT_DIR, 'error-page-validation.png');
-//       fs.writeFileSync(screenshotPath, screenshot);
+      // Check for expected endpoints
+      const expectedEndpoints = [
+        '/auth/login',
+        '/auth/profile',
+        '/users',
+        '/courses'
+      ];
 
-//       const baselinePath = path.join(BASELINE_DIR, 'error-page-validation.png');
-//       if (fs.existsSync(baselinePath)) {
-//         const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//         expect(isMatching).toBe(true);
-//       } else {
-//         fs.writeFileSync(baselinePath, screenshot);
-//         logger.warn(`Created baseline: ${baselinePath}`);
-//       }
-//     }, 15000);
-//   });
+      const documentedEndpoints = Object.keys(paths);
+      const hasExpectedEndpoints = expectedEndpoints.every(endpoint => 
+        documentedEndpoints.includes(endpoint)
+      );
 
-//   describe('Responsive Design Tests', () => {
-//     const viewports = [
-//       { name: 'mobile', width: 375, height: 667 },
-//       { name: 'tablet', width: 768, height: 1024 },
-//       { name: 'desktop', width: 1920, height: 1080 }
-//     ];
+      expect(hasExpectedEndpoints).toBe(true);
 
-//     viewports.forEach(viewport => {
-//       it(`should render API docs correctly on ${viewport.name} (${viewport.width}x${viewport.height})`, async () => {
-//         await page.setViewport({ width: viewport.width, height: viewport.height });
-//         await page.goto(`${BASE_URL}/api-docs`, { waitUntil: 'networkidle2' });
-        
-//         await page.waitForSelector('.swagger-ui', { timeout: 10000 });
-        
-//         const screenshot = await page.screenshot({
-//           fullPage: true,
-//           type: 'png'
-//         });
+      // Save endpoint documentation report
+      const endpointPath = path.join(SCREENSHOT_DIR, 'api-endpoints.json');
+      fs.writeFileSync(endpointPath, JSON.stringify({
+        expectedEndpoints,
+        documentedEndpoints,
+        hasExpectedEndpoints,
+        totalDocumented: documentedEndpoints.length,
+        timestamp: new Date().toISOString()
+      }, null, 2));
 
-//         const screenshotPath = path.join(SCREENSHOT_DIR, `api-docs-${viewport.name}-${viewport.width}x${viewport.height}.png`);
-//         fs.writeFileSync(screenshotPath, screenshot);
+      const baselinePath = path.join(BASELINE_DIR, 'api-endpoints.json');
+      if (fs.existsSync(baselinePath)) {
+        const baselineContent = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+        const isMatching = compareEndpointDocumentation({
+          expectedEndpoints,
+          documentedEndpoints,
+          hasExpectedEndpoints,
+          totalDocumented: documentedEndpoints.length
+        }, baselineContent);
+        expect(isMatching).toBe(true);
+      } else {
+        fs.writeFileSync(baselinePath, JSON.stringify({
+          expectedEndpoints,
+          documentedEndpoints,
+          hasExpectedEndpoints,
+          totalDocumented: documentedEndpoints.length,
+          timestamp: new Date().toISOString()
+        }, null, 2));
+        logger.warn(`Created baseline: ${baselinePath}`);
+      }
+    }, 30000);
+  });
 
-//         const baselinePath = path.join(BASELINE_DIR, `api-docs-${viewport.name}-${viewport.width}x${viewport.height}.png`);
-//         if (fs.existsSync(baselinePath)) {
-//           const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//           expect(isMatching).toBe(true);
-//         } else {
-//           fs.writeFileSync(baselinePath, screenshot);
-//           logger.warn(`Created baseline: ${baselinePath}`);
-//         }
-//       }, 30000);
-//     });
-//   });
+  describe('Visual Consistency Analysis', () => {
+    it('should analyze API documentation structure consistency', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api-docs-json')
+        .expect(200);
 
-//   describe('API Response Visual Tests', () => {
-//     it('should render JSON responses in readable format', async () => {
-//       // Test API endpoint that returns JSON
-//       const response = await page.goto(`${BASE_URL}/users`, { waitUntil: 'networkidle2' });
-      
-//       // Get response content
-//       const content = await page.content();
-      
-//       // Check if JSON is properly formatted
-//       expect(content).toContain('[');
-//       expect(content).toContain(']');
-      
-//       // Take screenshot of the page
-//       const screenshot = await page.screenshot({
-//         fullPage: true,
-//         type: 'png'
-//       });
+      const spec = response.body;
 
-//       const screenshotPath = path.join(SCREENSHOT_DIR, 'api-users-json-response.png');
-//       fs.writeFileSync(screenshotPath, screenshot);
+      // Analyze structure consistency
+      const analysis = analyzeAPIConsistency(spec);
 
-//       const baselinePath = path.join(BASELINE_DIR, 'api-users-json-response.png');
-//       if (fs.existsSync(baselinePath)) {
-//         const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//         expect(isMatching).toBe(true);
-//       } else {
-//         fs.writeFileSync(baselinePath, screenshot);
-//         logger.warn(`Created baseline: ${baselinePath}`);
-//       }
-//     }, 15000);
+      expect(analysis.hasConsistentNaming).toBe(true);
+      expect(analysis.hasConsistentResponses).toBe(true);
+      expect(analysis.hasConsistentSecurity).toBe(true);
 
-//     it('should render error responses consistently', async () => {
-//       // Test API endpoint that returns error
-//       const response = await page.goto(`${BASE_URL}/auth/login`, {
-//         waitUntil: 'networkidle2',
-//         method: 'POST',
-//         postData: JSON.stringify({ email: 'invalid', password: 'invalid' }),
-//         headers: { 'Content-Type': 'application/json' }
-//       });
-      
-//       const screenshot = await page.screenshot({
-//         fullPage: true,
-//         type: 'png'
-//       });
+      // Save analysis report
+      const analysisPath = path.join(SCREENSHOT_DIR, 'api-consistency-analysis.json');
+      fs.writeFileSync(analysisPath, JSON.stringify({
+        ...analysis,
+        timestamp: new Date().toISOString()
+      }, null, 2));
 
-//       const screenshotPath = path.join(SCREENSHOT_DIR, 'api-error-response.png');
-//       fs.writeFileSync(screenshotPath, screenshot);
+      const baselinePath = path.join(BASELINE_DIR, 'api-consistency-analysis.json');
+      if (fs.existsSync(baselinePath)) {
+        const baselineContent = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+        const isMatching = compareConsistencyAnalysis(analysis, baselineContent);
+        expect(isMatching).toBe(true);
+      } else {
+        fs.writeFileSync(baselinePath, JSON.stringify({
+          ...analysis,
+          timestamp: new Date().toISOString()
+        }, null, 2));
+        logger.warn(`Created baseline: ${baselinePath}`);
+      }
+    }, 30000);
+  });
+});
 
-//       const baselinePath = path.join(BASELINE_DIR, 'api-error-response.png');
-//       if (fs.existsSync(baselinePath)) {
-//         const isMatching = await compareScreenshots(screenshotPath, baselinePath);
-//         expect(isMatching).toBe(true);
-//       } else {
-//         fs.writeFileSync(baselinePath, screenshot);
-//         logger.warn(`Created baseline: ${baselinePath}`);
-//       }
-//     }, 15000);
-//   });
+/**
+ * Compare HTML content for visual regression
+ */
+function compareHTMLContent(current: string, baseline: string): boolean {
+  const normalizeHTML = (html: string) => 
+    html.replace(/\s+/g, ' ')
+         .replace(/>\s+</g, '><')
+         .toLowerCase()
+         .trim();
 
-//   /**
-//    * Compare two screenshots and return true if they match
-//    */
-//   async function compareScreenshots(screenshotPath: string, baselinePath: string): Promise<boolean> {
-//     try {
-//       const { createCanvas, loadImage } = require('canvas');
-//       const fs = require('fs');
-      
-//       // Load images
-//       const screenshot = await loadImage(screenshotPath);
-//       const baseline = await loadImage(baselinePath);
-      
-//       // Create canvas for comparison
-//       const canvas = createCanvas(screenshot.width, screenshot.height);
-//       const ctx = canvas.getContext('2d');
-      
-//       // Draw both images and compare
-//       ctx.drawImage(screenshot, 0, 0);
-//       const screenshotData = ctx.getImageData(0, 0, screenshot.width, screenshot.height);
-      
-//       ctx.clearRect(0, 0, canvas.width, canvas.height);
-//       ctx.drawImage(baseline, 0, 0);
-//       const baselineData = ctx.getImageData(0, 0, baseline.width, baseline.height);
-      
-//       // Compare pixel by pixel
-//       let diffPixels = 0;
-//       const totalPixels = screenshot.width * screenshot.height;
-//       const threshold = 0.01; // 1% difference threshold
-      
-//       for (let i = 0; i < screenshotData.data.length; i += 4) {
-//         const rDiff = Math.abs(screenshotData.data[i] - baselineData.data[i]);
-//         const gDiff = Math.abs(screenshotData.data[i + 1] - baselineData.data[i + 1]);
-//         const bDiff = Math.abs(screenshotData.data[i + 2] - baselineData.data[i + 2]);
-        
-//         if (rDiff > 5 || gDiff > 5 || bDiff > 5) {
-//           diffPixels++;
-//         }
-//       }
-      
-//       const diffPercentage = diffPixels / totalPixels;
-//       const isMatching = diffPercentage <= threshold;
-      
-//       if (!isMatching) {
-//         logger.warn(`Visual regression detected: ${(diffPercentage * 100).toFixed(2)}% difference`);
-        
-//         // Save diff image for debugging
-//         const diffCanvas = createCanvas(screenshot.width, screenshot.height);
-//         const diffCtx = diffCanvas.getContext('2d');
-        
-//         for (let i = 0; i < screenshotData.data.length; i += 4) {
-//           const rDiff = Math.abs(screenshotData.data[i] - baselineData.data[i]);
-//           const gDiff = Math.abs(screenshotData.data[i + 1] - baselineData.data[i + 1]);
-//           const bDiff = Math.abs(screenshotData.data[i + 2] - baselineData.data[i + 2]);
-          
-//           if (rDiff > 5 || gDiff > 5 || bDiff > 5) {
-//             diffCtx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-//             diffCtx.fillRect((i / 4) % screenshot.width, Math.floor(i / 4 / screenshot.width), 1, 1);
-//           }
-//         }
-        
-//         const diffBuffer = diffCanvas.toBuffer('image/png');
-//         const diffPath = screenshotPath.replace('.png', '-diff.png');
-//         fs.writeFileSync(diffPath, diffBuffer);
-//       }
-      
-//       return isMatching;
-//     } catch (error) {
-//       logger.error('Error comparing screenshots:', error);
-//       return false;
-//     }
-//   }
-// });
+  const normalizedCurrent = normalizeHTML(current);
+  const normalizedBaseline = normalizeHTML(baseline);
 
-// /**
-//  * Helper function to wait for element with timeout
-//  */
-// async function waitForElement(page: puppeteer.Page, selector: string, timeout: number = 5000): Promise<void> {
-//   try {
-//     await page.waitForSelector(selector, { timeout });
-//   } catch (error) {
-//     logger.warn(`Element not found within timeout: ${selector}`);
-//   }
-// }
+  return normalizedCurrent === normalizedBaseline;
+}
 
-// /**
-//  * Helper function to take stable screenshot
-//  */
-// async function takeStableScreenshot(page: puppeteer.Page, path: string): Promise<void> {
-//   // Wait for page to be stable
-//   await page.waitForTimeout(1000);
+/**
+ * Compare JSON structure for visual regression
+ */
+function compareJSONStructure(current: any, baseline: any): boolean {
+  try {
+    const currentKeys = JSON.stringify(current).split('').sort().join('');
+    const baselineKeys = JSON.stringify(baseline).split('').sort().join('');
+    
+    return currentKeys === baselineKeys;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Compare error response structure
+ */
+function compareErrorStructure(current: any, baseline: any): boolean {
+  const requiredFields = ['error', 'message', 'statusCode'];
   
-//   // Take screenshot
-//   const screenshot = await page.screenshot({
-//     fullPage: true,
-//     type: 'png'
-//   });
-  
-//   fs.writeFileSync(path, screenshot);
-// }
+  return requiredFields.every(field => 
+    current.hasOwnProperty(field) && baseline.hasOwnProperty(field)
+  );
+}
+
+/**
+ * Compare success response structure
+ */
+function compareSuccessStructure(current: any, baseline: any): boolean {
+  return current.type === baseline.type && 
+         current.content === baseline.content;
+}
+
+/**
+ * Compare completeness data
+ */
+function compareCompleteness(current: any, baseline: any): boolean {
+  return current.hasAllFields === baseline.hasAllFields &&
+         current.hasAllInfoFields === baseline.hasAllInfoFields;
+}
+
+/**
+ * Compare endpoint documentation
+ */
+function compareEndpointDocumentation(current: any, baseline: any): boolean {
+  return current.hasExpectedEndpoints === baseline.hasExpectedEndpoints &&
+         current.totalDocumented === baseline.totalDocumented;
+}
+
+/**
+ * Compare consistency analysis
+ */
+function compareConsistencyAnalysis(current: any, baseline: any): boolean {
+  return current.hasConsistentNaming === baseline.hasConsistentNaming &&
+         current.hasConsistentResponses === baseline.hasConsistentResponses &&
+         current.hasConsistentSecurity === baseline.hasConsistentSecurity;
+}
+
+/**
+ * Analyze API consistency
+ */
+function analyzeAPIConsistency(spec: any): any {
+  const paths = spec.paths || {};
+  const schemas = spec.components?.schemas || {};
+
+  // Check naming consistency
+  const pathNames = Object.keys(paths);
+  const hasConsistentNaming = pathNames.every((name: string) => 
+    /^[a-z0-9\/{}-]+$/.test(name)
+  );
+
+  // Check response consistency
+  const responses = Object.values(paths).flatMap((path: any) => Object.values(path));
+  const hasConsistentResponses = responses.every((response: any) => {
+    if (typeof response === 'object' && response.responses) {
+      const responseCodes = Object.keys(response.responses);
+      return responseCodes.some((code: string) => ['200', '201', '400', '401', '404'].includes(code));
+    }
+    return true;
+  });
+
+  // Check security consistency
+  const hasConsistentSecurity = spec.components?.securitySchemes || 
+                               Object.keys(spec.components?.securitySchemes || {}).length > 0;
+
+  return {
+    hasConsistentNaming,
+    hasConsistentResponses,
+    hasConsistentSecurity,
+    totalPaths: pathNames.length,
+    totalSchemas: Object.keys(schemas).length
+  };
+}
