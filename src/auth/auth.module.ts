@@ -11,6 +11,8 @@ import { PasswordStrengthService } from './services/password-strength.service';
 import { User } from './entities/user.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { JwtAuthGuard } from './guards/auth.guard';
+import { RateLimiterService } from './guards/rate-limiter.service';
+import { RateLimitInterceptor } from './guards/rate-limit.interceptor';
 
 @Module({
   imports: [
@@ -35,12 +37,16 @@ import { JwtAuthGuard } from './guards/auth.guard';
     JwtService,
     PasswordStrengthService,
     JwtAuthGuard,
+    RateLimiterService,
+    RateLimitInterceptor,
   ],
   exports: [
     AuthService,
     JwtService,
     PasswordStrengthService,
     JwtAuthGuard,
+    RateLimiterService,
+    RateLimitInterceptor,
   ],
 })
 export class AuthModule {}
