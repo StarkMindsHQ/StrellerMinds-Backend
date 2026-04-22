@@ -9,6 +9,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
+import { PasswordStrengthService } from '../services/password-strength.service';
 import {
   LoginDto,
   RegisterDto,
@@ -17,13 +18,17 @@ import {
   UpdatePasswordDto,
   VerifyEmailDto,
   ForgotPasswordDto,
+  CheckPasswordStrengthDto,
 } from '../dtos';
 import { ValidationExceptionFilter } from '../filters';
 
 @Controller('auth')
 @UseFilters(ValidationExceptionFilter)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly passwordStrengthService: PasswordStrengthService,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -78,6 +83,32 @@ export class AuthController {
       updatePasswordDto.currentPassword,
       updatePasswordDto.newPassword,
     );
+  }
+
+  @Post('check-password-strength')
+  @HttpCode(HttpStatus.OK)
+  checkPasswordStrength(@Body() checkPasswordStrengthDto: CheckPasswordStrengthDto) {
+    const validationResult = this.passwordStrengthService.validatePassword(
+      checkPasswordStrengthDto.password,
+    );
+    const strengthDetails = this.passwordStrengthService.getPasswordStrengthDetails(
+      checkPasswordStrengthDto.password,
+    );
+
+    return {
+      isValid: validationResult.isValid,
+      strength: strengthDetails.strength,
+      percentage: strengthDetails.percentage,
+      description: strengthDetails.description,
+      errors: validationResult.errors,
+      score: validationResult.score,
+    };
+  }
+
+  @Get('password-policy')
+  @HttpCode(HttpStatus.OK)
+  getPasswordPolicy() {
+    return this.passwordStrengthService.getPasswordPolicy();
   }
 
   @Get('profile')
