@@ -14,13 +14,25 @@ The platform is designed for educational institutions, online learning platforms
 - **Auto-generated Documentation**: Interactive Swagger/OpenAPI documentation
 - **Comprehensive Testing**: Unit and integration tests with Jest
 - **Environment Configuration**: Flexible configuration management
+- **Database Connection Pooling**: Optimized connection management with monitoring and circuit breakers
 - **📊 Application Performance Monitoring**: DataDog & New Relic integration with distributed tracing, performance profiling, and alerting
 - **🔍 Performance Profiling**: Memory, CPU, and operation profiling with hotspot detection
 - **⚠️ Performance Alerting**: Real-time alerts with Slack and PagerDuty integration
 
 ## 📊 Monitoring & Performance
 
-This backend includes a comprehensive **Application Performance Monitoring (APM)** system:
+This backend includes comprehensive monitoring and optimization features:
+
+### Database Connection Pooling
+- **Intelligent Pool Sizing**: Dynamic sizing based on CPU cores and environment
+- **Connection Monitoring**: Real-time pool statistics and health checks
+- **Circuit Breaker**: Automatic failure detection and recovery
+- **Load Testing**: Verified to handle 50+ concurrent connections
+- **Monitoring Endpoints**: `/database/pool/health`, `/database/pool/stats`
+
+See [Connection Pooling Documentation](./docs/CONNECTION_POOLING_README.md) for details.
+
+### Application Performance Monitoring (APM)
 
 ### Key Capabilities
 - **Distributed Tracing**: W3C standard trace context for cross-service debugging
@@ -371,6 +383,10 @@ The application uses environment variables for configuration. All variables are 
 | DATABASE_USER | PostgreSQL username | Required |
 | DATABASE_PASSWORD | PostgreSQL password | Required |
 | DATABASE_NAME | PostgreSQL database name | StrellerMinds |
+| DATABASE_POOL_MAX | Maximum connections in pool | 20 |
+| DATABASE_POOL_MIN | Minimum connections in pool | 5 |
+| DATABASE_IDLE_TIMEOUT | Idle connection timeout (ms) | 30000 |
+| DATABASE_CONNECTION_TIMEOUT | Connection timeout (ms) | 10000 |
 
 ### Authentication
 | Variable | Description | Required |
