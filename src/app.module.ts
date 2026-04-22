@@ -1,140 +1,33 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ThrottlerGuard } from '@nestjs/throttler';
-import { ScheduleModule } from '@nestjs/schedule';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { RateLimitModule } from './security/rate-limit.module';
-import { AdvancedThrottlerGuard } from './security/guards/advanced-throttler.guard';
-import { CqrsModule } from './cqrs/cqrs.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { AccessibilityModule } from './accessibility/accessibility.module';
-import { FilesModule } from './files/files.module';
-import { GamificationModule } from './gamification/gamification.module';
-import { IntegrationsModule } from './integrations/integrations.module';
-import { SecurityModule } from './security/security.module';
-import { InputSecurityMiddleware } from './common/middleware/input-security.middleware';
-import { LanguageDetectionMiddleware } from './i18n/middleware/language-detection.middleware';
-import { HealthModule } from './health/health.module';
-import { CacheModule } from './cache/cache.module';
-
-
-
-import { DatabaseConfig } from './config/database.config';
-import { configuration, validationSchema } from './config/configuration';
-
-import { User } from './auth/entities/user.entity';
-import { RefreshToken } from './auth/entities/refresh-token.entity';
-import { SecurityAudit } from './auth/entities/security-audit.entity';
-import { UserProfile } from './user/entities/user-profile.entity';
-import { PortfolioItem } from './user/entities/portfolio-item.entity';
-import { Badge } from './user/entities/badge.entity';
-import { UserBadge } from './user/entities/user-badge.entity';
-import { Follow } from './user/entities/follow.entity';
-import { PrivacySettings } from './user/entities/privacy-settings.entity';
-import { ProfileAnalytics } from './user/entities/profile-analytics.entity';
-import { JwtAuthGuard } from './auth/guards/auth.guard';
-import { ResponseInterceptor } from './auth/interceptors/response.interceptor';
-import {
-  TokenBlacklistMiddleware,
-  SecurityHeadersMiddleware,
-} from './auth/middleware/auth.middleware';
-// duplicate/commented imports removed
 import { CourseModule } from './course/course.module';
-import { PaymentModule } from './payment/payment.module';
-
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-import { IntegrationConfig } from './integrations/common/entities/integration-config.entity';
-import { SyncLog } from './integrations/common/entities/sync-log.entity';
-import { IntegrationMapping } from './integrations/common/entities/integration-mapping.entity';
-import { AssignmentModule } from './assignments/assignments.module';
-
-import { ForumModule } from './forum/forum.module';
-import { LearningPathModule } from './learning-path/learning-path.module';
-import { CalendarModule } from './calendar/calendar.module';
-import { AnalyticsModule } from './analytics/analytics.module';
-import { EmailTemplate } from './notifications/entities/email-template.entity';
-import { MetricsModule } from './metrics/metrics.module';
-import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
-
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local', '.env', '.env.development'],
-      load: [configuration],
-      validationSchema,
+      envFilePath: ['.env'],
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const dbConfig = new DatabaseConfig(configService);
-        return dbConfig.createTypeOrmOptions();
-      },
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      username: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      database: process.env.DB_NAME || 'strellerminds',
+      autoLoadEntities: true,
+      synchronize: process.env.NODE_ENV !== 'production',
     }),
-    RateLimitModule,
-    ScheduleModule.forRoot(),
-    EventEmitterModule.forRoot(),
-
-    // Feature modules (alphabetical)
-    AccessibilityModule,
-    AnalyticsModule,
-    AssignmentModule,
     AuthModule,
-    CacheModule,
-    CalendarModule,
+    UserModule,
     CourseModule,
-    CqrsModule,
-    FilesModule,
-    ForumModule,
-    GamificationModule,
-    IntegrationsModule,
-
-    LearningPathModule,
-    CalendarModule,
-    AnalyticsModule,
-    MetricsModule,
   ],
-
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AdvancedThrottlerGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ResponseInterceptor,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: LoggingInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: MetricsInterceptor,
-    },
-  ],
-
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
-    consumer.apply(InputSecurityMiddleware).forRoutes('*');
-    consumer.apply(TokenBlacklistMiddleware).forRoutes('*');
-    // consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
-    consumer.apply(LanguageDetectionMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

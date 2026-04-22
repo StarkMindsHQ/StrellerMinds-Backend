@@ -2,11 +2,7 @@
 FROM node:20-alpine AS base
 
 # Install system dependencies
-RUN apk add --no-cache \
-    dumb-init \
-    curl \
-    bash \
-    && rm -rf /var/cache/apk/*
+RUN apk add --no-cache dumb-init curl bash
 
 # Create app directory
 WORKDIR /app
@@ -34,10 +30,7 @@ RUN npm ci --include=dev --legacy-peer-deps
 COPY . .
 
 # Build the application
-RUN npm run build
-
-# Remove dev dependencies
-RUN npm prune --production --legacy-peer-deps && npm cache clean --force
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 # Production stage
 FROM node:20-alpine AS production
@@ -68,7 +61,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/api/health || exit 1
+    CMD curl -f http://localhost:3000 || exit 1
 
 # Set environment variables
 ENV NODE_ENV=production
