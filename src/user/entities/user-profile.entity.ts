@@ -4,15 +4,22 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
+import { User } from '../../auth/entities/user.entity';
 
-@Entity()
+@Entity('user_profiles')
 export class UserProfile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column()
   userId: string;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @Column({ nullable: true })
   bio: string;
@@ -26,3 +33,4 @@ export class UserProfile {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
