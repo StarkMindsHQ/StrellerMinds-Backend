@@ -48,9 +48,9 @@ export class ExternalServicesHealthIndicator extends HealthIndicator {
       const start = Date.now();
       try {
         await firstValueFrom(
-          this.httpService.get(service.url, { timeout: service.timeoutMs }).pipe(
-            timeout(service.timeoutMs),
-          ),
+          this.httpService
+            .get(service.url, { timeout: service.timeoutMs })
+            .pipe(timeout(service.timeoutMs)),
         );
         results[service.name] = {
           status: 'up',
@@ -78,9 +78,6 @@ export class ExternalServicesHealthIndicator extends HealthIndicator {
       return this.getStatus(key, true, { ...results, overall: 'degraded' });
     }
 
-    throw new HealthCheckError(
-      'ExternalServicesCheck failed',
-      this.getStatus(key, false, results),
-    );
+    throw new HealthCheckError('ExternalServicesCheck failed', this.getStatus(key, false, results));
   }
 }

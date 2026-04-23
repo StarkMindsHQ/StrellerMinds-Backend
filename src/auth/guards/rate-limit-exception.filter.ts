@@ -1,9 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  BadRequestException,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, BadRequestException } from '@nestjs/common';
 import { Response } from 'express';
 
 /**
@@ -17,7 +12,10 @@ export class RateLimitExceptionFilter implements ExceptionFilter {
     const exceptionResponse = exception.getResponse() as any;
 
     // Check if this is a rate limit error
-    if (exceptionResponse?.statusCode === 429 || exceptionResponse?.message?.includes('Too many requests')) {
+    if (
+      exceptionResponse?.statusCode === 429 ||
+      exceptionResponse?.message?.includes('Too many requests')
+    ) {
       const resetTime = exceptionResponse?.resetTime;
       const retryAfter = exceptionResponse?.retryAfter;
 

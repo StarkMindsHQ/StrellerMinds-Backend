@@ -93,15 +93,11 @@ export class HealthService {
     return this.redisHealthIndicator.isHealthy('redis', this.redis);
   }
 
-  private buildDetailedResult(
-    healthResult: HealthCheckResult,
-  ): DetailedHealthResult {
+  private buildDetailedResult(healthResult: HealthCheckResult): DetailedHealthResult {
     const isHealthy = healthResult.status === 'ok';
     const isDegraded =
       !isHealthy &&
-      Object.values(healthResult.info || {}).some(
-        (detail: any) => detail.status === 'up',
-      );
+      Object.values(healthResult.info || {}).some((detail: any) => detail.status === 'up');
 
     return {
       status: isHealthy ? 'healthy' : isDegraded ? 'degraded' : 'unhealthy',

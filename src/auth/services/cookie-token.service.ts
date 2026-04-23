@@ -15,11 +15,7 @@ export class CookieTokenService {
    * Set access token as httpOnly cookie
    */
   setAccessTokenCookie(response: Response, token: string): void {
-    response.cookie(
-      JWT_COOKIE_CONFIG.name,
-      token,
-      getCookieOptions(JWT_COOKIE_CONFIG),
-    );
+    response.cookie(JWT_COOKIE_CONFIG.name, token, getCookieOptions(JWT_COOKIE_CONFIG));
   }
 
   /**
@@ -91,9 +87,7 @@ export class CookieTokenService {
    * Check if cookies are available
    */
   hasAuthTokens(request: Request): boolean {
-    return !!(
-      this.getAccessToken(request) && this.getRefreshToken(request)
-    );
+    return !!(this.getAccessToken(request) && this.getRefreshToken(request));
   }
 
   /**

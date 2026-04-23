@@ -5,10 +5,10 @@ import { ContractViolationReporterService } from './contract-violation-reporter.
 
 /**
  * OpenAPI Validation Middleware
- * 
+ *
  * Automatically validates all incoming requests and outgoing responses
  * against the OpenAPI specification.
- * 
+ *
  * Features:
  * - Automatic request validation
  * - Automatic response validation
@@ -23,7 +23,7 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
 
   constructor(
     private readonly openApiValidation: OpenAPIValidationService,
-    private readonly violationReporter: ContractViolationReporterService
+    private readonly violationReporter: ContractViolationReporterService,
   ) {}
 
   /**
@@ -67,7 +67,7 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
       // Log validation errors if any
       if (!requestValidation.isValid) {
         this.logValidationErrors(requestValidation, 'request');
-        
+
         // In strict mode, reject invalid requests
         if (this.isStrictMode()) {
           return this.sendValidationError(res, requestValidation);
@@ -75,7 +75,6 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
       }
 
       next();
-
     } catch (error) {
       this.logger.error('OpenAPI validation middleware error:', error);
       next();
@@ -90,13 +89,7 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
     const query = req.query as Record<string, any>;
     const body = req.body;
 
-    return this.openApiValidation.validateRequest(
-      req.method,
-      req.path,
-      headers,
-      query,
-      body
-    );
+    return this.openApiValidation.validateRequest(req.method, req.path, headers, query, body);
   }
 
   /**
@@ -107,7 +100,7 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
     path: string,
     statusCode: number,
     headers: any,
-    body: any
+    body: any,
   ): void {
     try {
       const normalizedHeaders = this.normalizeHeaders(headers);
@@ -116,7 +109,7 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
         path,
         statusCode,
         normalizedHeaders,
-        body
+        body,
       );
 
       // Report violations if any
@@ -126,7 +119,7 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
 
       if (!responseValidation.isValid) {
         this.logValidationErrors(responseValidation, 'response');
-        
+
         // In strict mode, log warnings about contract violations
         if (this.isStrictMode()) {
           this.logger.warn(`Response contract violation detected for ${method} ${path}`, {
@@ -149,7 +142,7 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
     req: Request | null,
     statusCode?: number,
     headers?: Record<string, string>,
-    body?: any
+    body?: any,
   ): void {
     try {
       const metadata = {
@@ -173,11 +166,11 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
    */
   private normalizeHeaders(headers: any): Record<string, string> {
     const normalized: Record<string, string> = {};
-    
+
     for (const [key, value] of Object.entries(headers)) {
       normalized[key.toLowerCase()] = Array.isArray(value) ? value[0] : String(value);
     }
-    
+
     return normalized;
   }
 
@@ -213,7 +206,7 @@ export class OpenAPIValidationMiddleware implements NestMiddleware {
       error: true,
       message: 'Request validation failed',
       code: 'OPENAPI_VALIDATION_ERROR',
-      details: validation.errors.map(error => ({
+      details: validation.errors.map((error) => ({
         code: error.code,
         message: error.message,
         location: error.location,

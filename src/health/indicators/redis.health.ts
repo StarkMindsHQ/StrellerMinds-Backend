@@ -15,12 +15,8 @@ export class RedisHealthIndicator extends HealthIndicator {
         this.getStatus(key, false, { message: 'Unexpected PING response' }),
       );
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Redis connection failed';
-      throw new HealthCheckError(
-        'RedisCheck failed',
-        this.getStatus(key, false, { message }),
-      );
+      const message = error instanceof Error ? error.message : 'Redis connection failed';
+      throw new HealthCheckError('RedisCheck failed', this.getStatus(key, false, { message }));
     }
   }
 }

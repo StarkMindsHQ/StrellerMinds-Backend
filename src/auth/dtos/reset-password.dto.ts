@@ -1,10 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, MaxLength } from 'class-validator';
 import { IsStrongPassword } from '../validators';
 import { Match } from '../decorators/match.decorator';
 
@@ -24,8 +18,7 @@ export class ResetPasswordDto {
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @MaxLength(128, { message: 'Password must not exceed 128 characters' })
   @IsStrongPassword({
-    message:
-      'Password must contain uppercase, lowercase, numbers, and special characters',
+    message: 'Password must contain uppercase, lowercase, numbers, and special characters',
   })
   newPassword: string;
 

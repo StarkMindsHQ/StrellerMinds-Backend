@@ -16,11 +16,11 @@ async function isDatabaseAvailable(): Promise<boolean> {
     const { DataSource } = await import('typeorm');
     const ds = new DataSource({
       type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      username: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'strellerminds_test',
+      host: process.env.DB_HOST || process.env.DATABASE_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || process.env.DATABASE_PORT || '5432', 10),
+      username: process.env.DB_USER || process.env.DATABASE_USER || 'postgres',
+      password: process.env.DB_PASSWORD || process.env.DATABASE_PASSWORD || 'postgres',
+      database: process.env.DB_NAME || process.env.DATABASE_NAME || 'strellerminds_test',
     });
     await ds.initialize();
     await ds.destroy();
@@ -67,11 +67,11 @@ describe('User Module Integration Tests', () => {
       imports: [
         TypeOrmModule.forRoot({
           type: 'postgres',
-          host: process.env.DB_HOST || 'localhost',
-          port: parseInt(process.env.DB_PORT || '5432', 10),
-          username: process.env.DB_USER || 'postgres',
-          password: process.env.DB_PASSWORD || 'postgres',
-          database: process.env.DB_NAME || 'strellerminds_test',
+          host: process.env.DB_HOST || process.env.DATABASE_HOST || 'localhost',
+          port: parseInt(process.env.DB_PORT || process.env.DATABASE_PORT || '5432', 10),
+          username: process.env.DB_USER || process.env.DATABASE_USER || 'postgres',
+          password: process.env.DB_PASSWORD || process.env.DATABASE_PASSWORD || 'postgres',
+          database: process.env.DB_NAME || process.env.DATABASE_NAME || 'strellerminds_test',
           synchronize: true,
           dropSchema: true,
         }),

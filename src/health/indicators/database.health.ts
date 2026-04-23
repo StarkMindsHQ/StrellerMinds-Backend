@@ -19,12 +19,8 @@ export class DatabaseHealthIndicator extends HealthIndicator {
       await this.userRepository.query('SELECT 1');
       return this.getStatus(key, true);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Database connection failed';
-      throw new HealthCheckError(
-        'DatabaseCheck failed',
-        this.getStatus(key, false, { message }),
-      );
+      const message = error instanceof Error ? error.message : 'Database connection failed';
+      throw new HealthCheckError('DatabaseCheck failed', this.getStatus(key, false, { message }));
     }
   }
 }

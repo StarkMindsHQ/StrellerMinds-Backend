@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  PasswordValidator,
-  PasswordValidationResult,
-  PasswordStrength,
-} from '../validators';
+import { PasswordValidator, PasswordValidationResult, PasswordStrength } from '../validators';
 
 @Injectable()
 export class PasswordStrengthService {

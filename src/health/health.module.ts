@@ -10,11 +10,7 @@ import { RedisHealthIndicator } from './indicators/redis.health';
 import { ExternalServicesHealthIndicator } from './indicators/external-services.health';
 
 @Module({
-  imports: [
-    TerminusModule,
-    TypeOrmModule.forFeature([User]),
-    HttpModule,
-  ],
+  imports: [TerminusModule, TypeOrmModule.forFeature([User]), HttpModule],
   controllers: [HealthController],
   providers: [
     HealthService,
