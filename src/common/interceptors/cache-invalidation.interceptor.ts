@@ -12,9 +12,13 @@ export class CacheInvalidationInterceptor implements NestInterceptor {
     
     return next.handle().pipe(
       tap(async () => {
-        // Automatically invalidate on any state-changing request
         if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(method)) {
-          await this.cacheManager.reset(); 
+          // Check if 'stores' exists (modern cache-manager/keyv integration)
+          if (this.cacheManager.stores) {
+            await Promise.all(
+              this.cacheManager.stores.map(store => store.clear())
+            );
+          }
         }
       }),
     );
