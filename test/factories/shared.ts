@@ -24,7 +24,13 @@ export function resetFactoryCounters(): void {
 }
 
 export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+  [P in keyof T]?: T[P] extends Function
+    ? T[P]
+    : T[P] extends Date
+      ? T[P]
+      : T[P] extends object
+        ? DeepPartial<T[P]>
+        : T[P];
 };
 
 export type FactoryFn<T> = (overrides?: DeepPartial<T>) => T;
