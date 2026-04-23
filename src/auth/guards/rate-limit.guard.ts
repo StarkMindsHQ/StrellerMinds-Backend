@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, BadRequestException } from '@nestjs/common';
 import { RateLimiterService } from './rate-limiter.service';
 import { RATE_LIMIT_CONFIGS } from './rate-limit.config';
 
@@ -27,11 +22,7 @@ export function RateLimitGuard(type: RateLimitType) {
       const key = `${config.keyPrefix}${clientIp}`;
 
       // Check rate limit
-      const result = this.rateLimiterService.isAllowed(
-        key,
-        config.maxRequests,
-        config.windowMs,
-      );
+      const result = this.rateLimiterService.isAllowed(key, config.maxRequests, config.windowMs);
 
       // Set rate limit headers
       response.setHeader('X-RateLimit-Limit', config.maxRequests);

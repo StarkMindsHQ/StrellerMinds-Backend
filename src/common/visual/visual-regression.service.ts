@@ -5,10 +5,10 @@ import * as path from 'path';
 
 /**
  * Visual Regression Service (Simplified)
- * 
+ *
  * Provides visual regression testing capabilities for UI components and API documentation.
  * Uses file-based comparison instead of browser automation to avoid dependency conflicts.
- * 
+ *
  * Features:
  * - Response structure comparison
  * - Baseline management
@@ -70,13 +70,9 @@ export class VisualRegressionService {
    * Ensure all necessary directories exist
    */
   private ensureDirectories(): void {
-    const directories = [
-      this.config.screenshotDir,
-      this.config.baselineDir,
-      this.config.diffDir
-    ];
+    const directories = [this.config.screenshotDir, this.config.baselineDir, this.config.diffDir];
 
-    directories.forEach(dir => {
+    directories.forEach((dir) => {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
         this.logger.log(`Created directory: ${dir}`);
@@ -90,7 +86,7 @@ export class VisualRegressionService {
   async compareResponses(
     name: string,
     currentResponse: any,
-    baselineResponse: any
+    baselineResponse: any,
   ): Promise<ComparisonResult> {
     try {
       // Convert responses to strings for comparison
@@ -130,9 +126,8 @@ export class VisualRegressionService {
         totalPixels: maxLength,
         screenshotPath,
         baselinePath,
-        diffPath
+        diffPath,
       };
-
     } catch (error) {
       this.logger.error('Error comparing responses:', error);
       throw error;
@@ -142,20 +137,16 @@ export class VisualRegressionService {
   /**
    * Generate text diff showing differences
    */
-  private async generateTextDiff(
-    current: string,
-    baseline: string,
-    name: string
-  ): Promise<string> {
+  private async generateTextDiff(current: string, baseline: string, name: string): Promise<string> {
     const lines1 = current.split('\n');
     const lines2 = baseline.split('\n');
     const maxLines = Math.max(lines1.length, lines2.length);
-    
+
     let diffContent = '';
     for (let i = 0; i < maxLines; i++) {
       const line1 = lines1[i] || '';
       const line2 = lines2[i] || '';
-      
+
       if (line1 === line2) {
         diffContent += `  ${line1}\n`;
       } else {
@@ -178,7 +169,7 @@ export class VisualRegressionService {
     currentResponse: any,
     options: {
       createBaseline?: boolean;
-    } = {}
+    } = {},
   ): Promise<ComparisonResult> {
     const screenshotPath = path.join(this.config.screenshotDir, `${name}-current.json`);
     const baselinePath = path.join(this.config.baselineDir, `${name}-baseline.json`);
@@ -192,23 +183,23 @@ export class VisualRegressionService {
       if (options.createBaseline || !fs.existsSync(baselinePath)) {
         fs.writeFileSync(baselinePath, currentStr);
         this.logger.warn(`Created baseline: ${baselinePath}`);
-        
+
         return {
           isMatching: true,
           diffPercentage: 0,
           diffPixels: 0,
           totalPixels: 0,
           screenshotPath,
-          baselinePath
+          baselinePath,
         };
       } else {
         // Compare with baseline
         const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
         const comparison = await this.compareResponses(name, currentResponse, baseline);
-        
+
         if (!comparison.isMatching) {
           this.logger.warn(
-            `Visual regression detected for ${name}: ${(comparison.diffPercentage * 100).toFixed(2)}% difference`
+            `Visual regression detected for ${name}: ${(comparison.diffPercentage * 100).toFixed(2)}% difference`,
           );
         } else {
           this.logger.log(`Visual test passed: ${name}`);
@@ -216,17 +207,16 @@ export class VisualRegressionService {
 
         return comparison;
       }
-
     } catch (error) {
       this.logger.error(`Visual test failed for ${name}:`, error);
-      
+
       return {
         isMatching: false,
         diffPercentage: 100,
         diffPixels: 0,
         totalPixels: 0,
         screenshotPath,
-        baselinePath
+        baselinePath,
       };
     }
   }
@@ -236,11 +226,12 @@ export class VisualRegressionService {
    */
   generateReport(results: ComparisonResult[]): VisualTestReport {
     const totalTests = results.length;
-    const passedTests = results.filter(r => r.isMatching).length;
+    const passedTests = results.filter((r) => r.isMatching).length;
     const failedTests = totalTests - passedTests;
-    
-    const averageDiffPercentage = results.reduce((sum, r) => sum + r.diffPercentage, 0) / totalTests;
-    
+
+    const averageDiffPercentage =
+      results.reduce((sum, r) => sum + r.diffPercentage, 0) / totalTests;
+
     const recommendations = this.generateRecommendations(results);
 
     return {
@@ -252,9 +243,9 @@ export class VisualRegressionService {
         totalTests,
         passedTests,
         failedTests,
-        averageDiffPercentage
+        averageDiffPercentage,
       },
-      recommendations
+      recommendations,
     };
   }
 
@@ -263,7 +254,7 @@ export class VisualRegressionService {
    */
   private generateRecommendations(results: ComparisonResult[]): string[] {
     const recommendations: string[] = [];
-    const failedTests = results.filter(r => !r.isMatching);
+    const failedTests = results.filter((r) => !r.isMatching);
 
     if (failedTests.length === 0) {
       recommendations.push('All visual tests passed. Continue maintaining visual consistency.');
@@ -271,12 +262,16 @@ export class VisualRegressionService {
     }
 
     // Analyze failure patterns
-    const highDiffTests = failedTests.filter(r => r.diffPercentage > 0.05);
+    const highDiffTests = failedTests.filter((r) => r.diffPercentage > 0.05);
     if (highDiffTests.length > 0) {
-      recommendations.push('Some tests show significant differences (>5%). Review recent API changes.');
+      recommendations.push(
+        'Some tests show significant differences (>5%). Review recent API changes.',
+      );
     }
 
-    recommendations.push('Review diff files in test-results/visual-diffs/ directory for detailed comparison.');
+    recommendations.push(
+      'Review diff files in test-results/visual-diffs/ directory for detailed comparison.',
+    );
     recommendations.push('Consider updating baselines if changes are intentional.');
 
     return recommendations;
@@ -302,14 +297,14 @@ export class VisualRegressionService {
     const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
     const now = Date.now();
 
-    [this.config.screenshotDir, this.config.diffDir].forEach(dir => {
+    [this.config.screenshotDir, this.config.diffDir].forEach((dir) => {
       if (fs.existsSync(dir)) {
         const files = fs.readdirSync(dir);
-        
-        files.forEach(file => {
+
+        files.forEach((file) => {
           const filePath = path.join(dir, file);
           const stats = fs.statSync(filePath);
-          
+
           if (now - stats.mtime.getTime() > maxAge) {
             fs.unlinkSync(filePath);
             this.logger.log(`Cleaned up old file: ${filePath}`);

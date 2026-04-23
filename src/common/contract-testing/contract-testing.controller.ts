@@ -5,10 +5,10 @@ import { JwtAuthGuard } from '../../auth/guards/auth.guard';
 
 /**
  * Contract Testing Controller
- * 
+ *
  * Provides administrative endpoints for monitoring and managing
  * OpenAPI contract validation.
- * 
+ *
  * Features:
  * - Validation statistics and metrics
  * - Endpoint coverage reporting
@@ -38,7 +38,7 @@ export class ContractTestingController {
   @ApiResponse({ status: 200, description: 'Endpoints retrieved successfully' })
   getEndpoints() {
     const endpoints = this.openApiValidation.getEndpoints();
-    
+
     return {
       endpoints,
       total: endpoints.length,
@@ -51,7 +51,7 @@ export class ContractTestingController {
   @ApiResponse({ status: 200, description: 'Validation statistics retrieved successfully' })
   getValidationStats() {
     const stats = this.openApiValidation.getValidationStats();
-    
+
     return {
       ...stats,
       timestamp: new Date().toISOString(),
@@ -61,19 +61,22 @@ export class ContractTestingController {
   @Post('validate/request')
   @ApiOperation({ summary: 'Validate a request against OpenAPI specification' })
   @ApiResponse({ status: 200, description: 'Request validation completed' })
-  validateRequest(@Body() requestData: {
-    method: string;
-    path: string;
-    headers: Record<string, string>;
-    query: Record<string, any>;
-    body?: any;
-  }) {
+  validateRequest(
+    @Body()
+    requestData: {
+      method: string;
+      path: string;
+      headers: Record<string, string>;
+      query: Record<string, any>;
+      body?: any;
+    },
+  ) {
     const validation = this.openApiValidation.validateRequest(
       requestData.method,
       requestData.path,
       requestData.headers,
       requestData.query,
-      requestData.body
+      requestData.body,
     );
 
     return {
@@ -85,19 +88,22 @@ export class ContractTestingController {
   @Post('validate/response')
   @ApiOperation({ summary: 'Validate a response against OpenAPI specification' })
   @ApiResponse({ status: 200, description: 'Response validation completed' })
-  validateResponse(@Body() responseData: {
-    method: string;
-    path: string;
-    statusCode: number;
-    headers: Record<string, string>;
-    body?: any;
-  }) {
+  validateResponse(
+    @Body()
+    responseData: {
+      method: string;
+      path: string;
+      statusCode: number;
+      headers: Record<string, string>;
+      body?: any;
+    },
+  ) {
     const validation = this.openApiValidation.validateResponse(
       responseData.method,
       responseData.path,
       responseData.statusCode,
       responseData.headers,
-      responseData.body
+      responseData.body,
     );
 
     return {
@@ -111,7 +117,7 @@ export class ContractTestingController {
   @ApiResponse({ status: 200, description: 'Specification reloaded successfully' })
   async reloadSpecification() {
     await this.openApiValidation.reloadSpecification();
-    
+
     return {
       message: 'OpenAPI specification reloaded successfully',
       timestamp: new Date().toISOString(),
@@ -123,7 +129,7 @@ export class ContractTestingController {
   @ApiResponse({ status: 200, description: 'Cache cleared successfully' })
   clearCache() {
     this.openApiValidation.clearCache();
-    
+
     return {
       message: 'Validation cache cleared successfully',
       timestamp: new Date().toISOString(),
@@ -135,7 +141,7 @@ export class ContractTestingController {
   @ApiResponse({ status: 200, description: 'Coverage report generated successfully' })
   getCoverage(@Query('includeTests') includeTests?: string) {
     const endpoints = this.openApiValidation.getEndpoints();
-    
+
     // This would integrate with test coverage data in a real implementation
     const coverage = {
       totalEndpoints: endpoints.length,

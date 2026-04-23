@@ -18,12 +18,7 @@ export class AuthService {
     return { message: 'Login successful', user };
   }
 
-  async register(
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string,
-  ) {
+  async register(email: string, password: string, firstName: string, lastName: string) {
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
       throw new Error('Email already in use');
@@ -54,11 +49,7 @@ export class AuthService {
     return { message: 'If email exists, reset link sent' };
   }
 
-  async resetPassword(
-    email: string,
-    resetToken: string,
-    newPassword: string,
-  ) {
+  async resetPassword(email: string, resetToken: string, newPassword: string) {
     // TODO: Validate reset token
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {

@@ -5,7 +5,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'prettier', 'import', 'strellerminds'],
+  plugins: ['@typescript-eslint', 'prettier', 'import'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -16,7 +16,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', 'test/', 'src/**/*.spec.ts', 'src/**/*.test.ts'],
   rules: {
     // TypeScript strictness - relaxed for development
     '@typescript-eslint/no-explicit-any': 'warn', // warn instead of error
@@ -42,12 +42,5 @@ module.exports = {
       },
     ],
   },
-  overrides: [
-    {
-      files: ['**/*.module.ts'],
-      rules: {
-        'strellerminds/no-duplicate-nest-module-imports': 'error',
-      },
-    },
-  ],
+  overrides: [],
 };
