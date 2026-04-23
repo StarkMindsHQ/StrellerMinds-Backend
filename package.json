@@ -23,6 +23,8 @@
     "test:contract:performance": "jest --testPathPattern=contract --grep=\"Performance\"",
     "test:contract:watch": "jest --testPathPattern=contract --watch",
     "test:contract:cov": "jest --testPathPattern=contract --coverage",
+    "test:visual": "jest --testPathPattern=visual",
+    "test:visual:watch": "jest --testPathPattern=visual --watch",
     "contract:validate": "node scripts/validate-contract.js",
     "contract:diff": "node scripts/contract-diff.js",
     "contract:report": "node scripts/generate-contract-report.js"
