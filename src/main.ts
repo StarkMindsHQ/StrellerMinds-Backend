@@ -5,6 +5,10 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable cookie parsing via NestJS/Express
+  // Cookies are automatically parsed and available on Request.cookies
+  // No additional middleware needed - Express handles it by default
+
   // Global validation pipe with comprehensive error handling
   app.useGlobalPipes(
     new ValidationPipe({
