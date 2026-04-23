@@ -4,9 +4,20 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
-@Entity()
+/**
+ * Indexes:
+ *  - email    → unique B-tree (login lookups, duplicate-check on register)
+ *  - isActive → user-status filter used in admin/listing queries
+ *  - createdAt → range scans for reporting dashboards
+ */
+@Index('IDX_user_email', ['email'], { unique: true })
+@Index('IDX_user_isActive', ['isActive'])
+@Index('IDX_user_createdAt', ['createdAt'])
+@Index('IDX_user_updatedAt', ['updatedAt'])
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
