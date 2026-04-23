@@ -7,7 +7,7 @@ import { ContractTestingController } from './contract-testing.controller';
 
 /**
  * Contract Testing Module
- * 
+ *
  * Provides OpenAPI contract validation and testing capabilities.
  * Includes validation service, middleware, and monitoring endpoints.
  */

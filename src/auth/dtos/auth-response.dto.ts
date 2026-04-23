@@ -65,12 +65,7 @@ export class TokenValidityDto {
   email?: string;
   message: string;
 
-  constructor(
-    isValid: boolean,
-    expires: Date,
-    message = 'Token is valid',
-    email?: string,
-  ) {
+  constructor(isValid: boolean, expires: Date, message = 'Token is valid', email?: string) {
     this.isValid = isValid;
     this.expires = expires;
     this.email = email;

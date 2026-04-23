@@ -9,10 +9,10 @@ import addFormats from 'ajv-formats';
 
 /**
  * OpenAPI Contract Validation Service
- * 
+ *
  * Provides comprehensive OpenAPI specification validation for API endpoints.
  * Validates requests and responses against OpenAPI contracts.
- * 
+ *
  * Business Rules:
  * 1. All API endpoints must conform to OpenAPI specification
  * 2. Request/response validation must be automatic
@@ -122,7 +122,7 @@ export class OpenAPIValidationService {
       strict: this.config.strictMode,
       removeAdditional: this.config.strictMode ? 'all' : false,
     });
-    
+
     // Add format validation
     addFormats(this.ajv);
 
@@ -137,7 +137,7 @@ export class OpenAPIValidationService {
     try {
       const specPath = path.resolve(this.config.specificationPath);
       const specContent = fs.readFileSync(specPath, 'utf8');
-      
+
       // Parse YAML or JSON
       if (specPath.endsWith('.yaml') || specPath.endsWith('.yml')) {
         this.openApiSpec = yaml.load(specContent) as OpenAPIDocument;
@@ -147,14 +147,13 @@ export class OpenAPIValidationService {
 
       // Validate the specification itself
       this.validateSpecification();
-      
+
       // Pre-compile schemas for better performance
       this.precompileSchemas();
 
       this.logger.log(`OpenAPI specification loaded from ${specPath}`);
       this.logger.log(`API: ${this.openApiSpec.info.title} v${this.openApiSpec.info.version}`);
       this.logger.log(`Endpoints defined: ${Object.keys(this.openApiSpec.paths).length}`);
-
     } catch (error) {
       this.logger.error('Failed to load OpenAPI specification:', error);
       throw new Error(`OpenAPI specification loading failed: ${error.message}`);
@@ -200,7 +199,7 @@ export class OpenAPIValidationService {
     }
 
     const schemas = this.openApiSpec.components.schemas;
-    
+
     for (const [schemaName, schema] of Object.entries(schemas)) {
       try {
         const compiledSchema = this.ajv.compile(schema);
@@ -215,7 +214,7 @@ export class OpenAPIValidationService {
 
   /**
    * Validate request against OpenAPI specification
-   * 
+   *
    * @param method - HTTP method
    * @param path - Request path
    * @param headers - Request headers
@@ -228,10 +227,10 @@ export class OpenAPIValidationService {
     path: string,
     headers: Record<string, string>,
     query: Record<string, any>,
-    body?: any
+    body?: any,
   ): ValidationResult {
     const startTime = Date.now();
-    
+
     try {
       if (!this.config.enabled || !this.config.validateRequests) {
         return this.createValidResult(method, path, 'request', Date.now() - startTime);
@@ -256,7 +255,14 @@ export class OpenAPIValidationService {
           severity: 'error',
           location: {},
         });
-        return this.createInvalidResult(method, path, 'request', errors, warnings, Date.now() - startTime);
+        return this.createInvalidResult(
+          method,
+          path,
+          'request',
+          errors,
+          warnings,
+          Date.now() - startTime,
+        );
       }
 
       // Validate path parameters
@@ -273,9 +279,17 @@ export class OpenAPIValidationService {
         this.validateRequestBody(body, endpoint, errors, warnings, path);
       }
 
-      const result = errors.length > 0 
-        ? this.createInvalidResult(method, path, 'request', errors, warnings, Date.now() - startTime)
-        : this.createValidResult(method, path, 'request', Date.now() - startTime);
+      const result =
+        errors.length > 0
+          ? this.createInvalidResult(
+              method,
+              path,
+              'request',
+              errors,
+              warnings,
+              Date.now() - startTime,
+            )
+          : this.createValidResult(method, path, 'request', Date.now() - startTime);
 
       // Cache result
       if (this.config.cacheValidation) {
@@ -288,22 +302,30 @@ export class OpenAPIValidationService {
       }
 
       return result;
-
     } catch (error) {
       this.logger.error('Request validation error:', error);
-      return this.createInvalidResult(method, path, 'request', [{
+      return this.createInvalidResult(
+        method,
         path,
-        message: `Validation error: ${error.message}`,
-        code: 'VALIDATION_ERROR',
-        severity: 'error',
-        location: {},
-      }], [], Date.now() - startTime);
+        'request',
+        [
+          {
+            path,
+            message: `Validation error: ${error.message}`,
+            code: 'VALIDATION_ERROR',
+            severity: 'error',
+            location: {},
+          },
+        ],
+        [],
+        Date.now() - startTime,
+      );
     }
   }
 
   /**
    * Validate response against OpenAPI specification
-   * 
+   *
    * @param method - HTTP method
    * @param path - Request path
    * @param statusCode - HTTP status code
@@ -316,7 +338,7 @@ export class OpenAPIValidationService {
     path: string,
     statusCode: number,
     headers: Record<string, string>,
-    body?: any
+    body?: any,
   ): ValidationResult {
     const startTime = Date.now();
 
@@ -344,7 +366,14 @@ export class OpenAPIValidationService {
           severity: 'error',
           location: {},
         });
-        return this.createInvalidResult(method, path, 'response', errors, warnings, Date.now() - startTime);
+        return this.createInvalidResult(
+          method,
+          path,
+          'response',
+          errors,
+          warnings,
+          Date.now() - startTime,
+        );
       }
 
       // Validate response
@@ -353,9 +382,17 @@ export class OpenAPIValidationService {
         this.validateResponseHeaders(statusCode, headers, endpoint, errors, warnings, path);
       }
 
-      const result = errors.length > 0
-        ? this.createInvalidResult(method, path, 'response', errors, warnings, Date.now() - startTime)
-        : this.createValidResult(method, path, 'response', Date.now() - startTime);
+      const result =
+        errors.length > 0
+          ? this.createInvalidResult(
+              method,
+              path,
+              'response',
+              errors,
+              warnings,
+              Date.now() - startTime,
+            )
+          : this.createValidResult(method, path, 'response', Date.now() - startTime);
 
       // Cache result
       if (this.config.cacheValidation) {
@@ -368,16 +405,24 @@ export class OpenAPIValidationService {
       }
 
       return result;
-
     } catch (error) {
       this.logger.error('Response validation error:', error);
-      return this.createInvalidResult(method, path, 'response', [{
+      return this.createInvalidResult(
+        method,
         path,
-        message: `Validation error: ${error.message}`,
-        code: 'VALIDATION_ERROR',
-        severity: 'error',
-        location: {},
-      }], [], Date.now() - startTime);
+        'response',
+        [
+          {
+            path,
+            message: `Validation error: ${error.message}`,
+            code: 'VALIDATION_ERROR',
+            severity: 'error',
+            location: {},
+          },
+        ],
+        [],
+        Date.now() - startTime,
+      );
     }
   }
 
@@ -391,7 +436,7 @@ export class OpenAPIValidationService {
 
     // Normalize path for matching
     const normalizedPath = this.normalizePath(path);
-    
+
     // Try exact match first
     let endpoint = this.openApiSpec.paths[normalizedPath]?.[method.toLowerCase()];
     if (endpoint) {
@@ -454,21 +499,21 @@ export class OpenAPIValidationService {
     method: string,
     path: string,
     endpoint: any,
-    errors: ValidationError[]
+    errors: ValidationError[],
   ): void {
     const specPath = endpoint.path;
     const requestPath = this.normalizePath(path);
-    
+
     const specParts = specPath.split('/').filter(Boolean);
     const requestParts = requestPath.split('/').filter(Boolean);
 
     for (let i = 0; i < specParts.length; i++) {
       const specPart = specParts[i];
-      
+
       if (specPart.startsWith('{') && specPart.endsWith('}')) {
         const paramName = specPart.slice(1, -1);
         const paramValue = requestParts[i];
-        
+
         if (!paramValue) {
           errors.push({
             path,
@@ -490,18 +535,18 @@ export class OpenAPIValidationService {
     endpoint: any,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    path: string
+    path: string,
   ): void {
     if (!endpoint.parameters) {
       return;
     }
 
     const queryParams = endpoint.parameters.filter((param: any) => param.in === 'query');
-    
+
     for (const param of queryParams) {
       const paramName = param.name;
       const paramValue = query[paramName];
-      
+
       // Check required parameters
       if (param.required && (paramValue === undefined || paramValue === null)) {
         errors.push({
@@ -558,18 +603,18 @@ export class OpenAPIValidationService {
     endpoint: any,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    path: string
+    path: string,
   ): void {
     if (!endpoint.parameters) {
       return;
     }
 
     const headerParams = endpoint.parameters.filter((param: any) => param.in === 'header');
-    
+
     for (const param of headerParams) {
       const headerName = param.name.toLowerCase();
       const headerValue = headers[headerName];
-      
+
       // Check required headers
       if (param.required && !headerValue) {
         errors.push({
@@ -611,10 +656,10 @@ export class OpenAPIValidationService {
     endpoint: any,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    path: string
+    path: string,
   ): void {
     const requestBody = endpoint.requestBody;
-    
+
     // Check content type
     const contentType = requestBody.content?.['application/json'];
     if (!contentType) {
@@ -653,10 +698,10 @@ export class OpenAPIValidationService {
     endpoint: any,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    path: string
+    path: string,
   ): void {
     const responses = endpoint.responses;
-    
+
     // Find response specification
     let responseSpec = responses[statusCode.toString()];
     if (!responseSpec) {
@@ -711,18 +756,18 @@ export class OpenAPIValidationService {
     endpoint: any,
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    path: string
+    path: string,
   ): void {
     const responses = endpoint.responses;
     const responseSpec = responses[statusCode.toString()] || responses.default;
-    
+
     if (!responseSpec?.headers) {
       return;
     }
 
     for (const [headerName, headerSpec] of Object.entries(responseSpec.headers)) {
       const headerValue = headers[headerName.toLowerCase()];
-      
+
       // Check required headers
       if ((headerSpec as any).required && !headerValue) {
         errors.push({
@@ -763,7 +808,7 @@ export class OpenAPIValidationService {
     try {
       const validate = this.ajv.compile(schema);
       const isValid = validate(data);
-      
+
       if (isValid) {
         return [];
       }
@@ -782,7 +827,7 @@ export class OpenAPIValidationService {
     path: string,
     type: 'request' | 'response',
     body?: any,
-    statusCode?: number
+    statusCode?: number,
   ): string {
     const bodyHash = body ? this.hashObject(body) : '';
     const statusSuffix = statusCode ? `_${statusCode}` : '';
@@ -805,7 +850,7 @@ export class OpenAPIValidationService {
       const firstKey = this.validationCache.keys().next().value;
       this.validationCache.delete(firstKey);
     }
-    
+
     this.validationCache.set(key, result);
   }
 
@@ -816,7 +861,7 @@ export class OpenAPIValidationService {
     method: string,
     path: string,
     type: 'request' | 'response',
-    duration: number
+    duration: number,
   ): ValidationResult {
     return {
       isValid: true,
@@ -842,7 +887,7 @@ export class OpenAPIValidationService {
     type: 'request' | 'response',
     errors: ValidationError[],
     warnings: ValidationWarning[],
-    duration: number
+    duration: number,
   ): ValidationResult {
     return {
       isValid: false,
@@ -912,7 +957,7 @@ export class OpenAPIValidationService {
     }
 
     const endpoints = [];
-    
+
     for (const [path, pathSpec] of Object.entries(this.openApiSpec.paths)) {
       for (const method of ['get', 'post', 'put', 'delete', 'patch']) {
         const operation = pathSpec[method];

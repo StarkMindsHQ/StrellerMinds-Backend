@@ -1,14 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { OpenAPIValidationService, ValidationResult, ValidationError } from './openapi-validation.service';
+import {
+  OpenAPIValidationService,
+  ValidationResult,
+  ValidationError,
+} from './openapi-validation.service';
 
 /**
  * Contract Violation Reporter Service
- * 
+ *
  * Monitors, reports, and alerts on OpenAPI contract violations.
  * Provides comprehensive violation tracking and notification capabilities.
- * 
+ *
  * Features:
  * - Real-time violation monitoring
  * - Violation aggregation and analysis
@@ -120,7 +124,7 @@ export class ContractViolationReporterService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly openApiValidation: OpenAPIValidationService
+    private readonly openApiValidation: OpenAPIValidationService,
   ) {
     this.config = {
       enabled: this.configService.get('CONTRACT_VIOLATION_REPORTING_ENABLED', true),
@@ -137,9 +141,18 @@ export class ContractViolationReporterService {
         dashboard: this.configService.get('CONTRACT_ALERT_DASHBOARD_ENABLED', true),
       },
       recipients: {
-        email: this.configService.get('CONTRACT_ALERT_EMAIL_RECIPIENTS', '').split(',').filter(Boolean),
-        slack: this.configService.get('CONTRACT_ALERT_SLACK_CHANNELS', '').split(',').filter(Boolean),
-        webhook: this.configService.get('CONTRACT_ALERT_WEBHOOK_URLS', '').split(',').filter(Boolean),
+        email: this.configService
+          .get('CONTRACT_ALERT_EMAIL_RECIPIENTS', '')
+          .split(',')
+          .filter(Boolean),
+        slack: this.configService
+          .get('CONTRACT_ALERT_SLACK_CHANNELS', '')
+          .split(',')
+          .filter(Boolean),
+        webhook: this.configService
+          .get('CONTRACT_ALERT_WEBHOOK_URLS', '')
+          .split(',')
+          .filter(Boolean),
       },
       cooldown: this.configService.get('CONTRACT_ALERT_COOLDOWN', 300), // 5 minutes
     };
@@ -147,7 +160,7 @@ export class ContractViolationReporterService {
 
   /**
    * Record a contract violation
-   * 
+   *
    * @param validation - Validation result containing violations
    * @param metadata - Additional violation metadata
    */
@@ -178,14 +191,14 @@ export class ContractViolationReporterService {
 
   /**
    * Generate violation report for time range
-   * 
+   *
    * @param startTime - Start timestamp
    * @param endTime - End timestamp
    * @returns Violation report
    */
   generateReport(startTime: number, endTime: number): ViolationReport {
     const violations = this.violationHistory.filter(
-      v => v.timestamp >= startTime && v.timestamp <= endTime
+      (v) => v.timestamp >= startTime && v.timestamp <= endTime,
     );
 
     const summary = this.calculateSummary(violations);
@@ -205,7 +218,7 @@ export class ContractViolationReporterService {
 
   /**
    * Get violation statistics
-   * 
+   *
    * @param timeRangeHours - Time range in hours (default: 24)
    * @returns Violation statistics
    */
@@ -217,33 +230,43 @@ export class ContractViolationReporterService {
     resolutionRate: number;
     averageResolutionTime: number;
   } {
-    const cutoffTime = Date.now() - (timeRangeHours * 60 * 60 * 1000);
-    const recentViolations = this.violationHistory.filter(v => v.timestamp >= cutoffTime);
+    const cutoffTime = Date.now() - timeRangeHours * 60 * 60 * 1000;
+    const recentViolations = this.violationHistory.filter((v) => v.timestamp >= cutoffTime);
 
-    const bySeverity = recentViolations.reduce((acc, v) => {
-      acc[v.severity] = (acc[v.severity] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const bySeverity = recentViolations.reduce(
+      (acc, v) => {
+        acc[v.severity] = (acc[v.severity] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const byEndpoint = recentViolations.reduce((acc, v) => {
-      const key = `${v.method} ${v.endpoint}`;
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const byEndpoint = recentViolations.reduce(
+      (acc, v) => {
+        const key = `${v.method} ${v.endpoint}`;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const byType = recentViolations.reduce((acc, v) => {
-      acc[v.violationType] = (acc[v.violationType] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const byType = recentViolations.reduce(
+      (acc, v) => {
+        acc[v.violationType] = (acc[v.violationType] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
-    const resolvedViolations = recentViolations.filter(v => v.resolved);
-    const resolutionRate = recentViolations.length > 0 
-      ? (resolvedViolations.length / recentViolations.length) * 100 
-      : 0;
+    const resolvedViolations = recentViolations.filter((v) => v.resolved);
+    const resolutionRate =
+      recentViolations.length > 0 ? (resolvedViolations.length / recentViolations.length) * 100 : 0;
 
-    const averageResolutionTime = resolvedViolations.length > 0
-      ? resolvedViolations.reduce((sum, v) => sum + (v.resolvedAt! - v.timestamp), 0) / resolvedViolations.length
-      : 0;
+    const averageResolutionTime =
+      resolvedViolations.length > 0
+        ? resolvedViolations.reduce((sum, v) => sum + (v.resolvedAt! - v.timestamp), 0) /
+          resolvedViolations.length
+        : 0;
 
     return {
       total: recentViolations.length,
@@ -257,7 +280,7 @@ export class ContractViolationReporterService {
 
   /**
    * Resolve a violation
-   * 
+   *
    * @param violationId - Violation ID
    * @param resolvedBy - Who resolved it
    */
@@ -267,18 +290,18 @@ export class ContractViolationReporterService {
       violation.resolved = true;
       violation.resolvedAt = Date.now();
       violation.resolvedBy = resolvedBy;
-      
+
       this.logger.log(`Contract violation resolved: ${violationId} by ${resolvedBy}`);
     }
   }
 
   /**
    * Get unresolved violations
-   * 
+   *
    * @returns List of unresolved violations
    */
   getUnresolvedViolations(): ContractViolation[] {
-    return Array.from(this.violations.values()).filter(v => !v.resolved);
+    return Array.from(this.violations.values()).filter((v) => !v.resolved);
   }
 
   /**
@@ -286,11 +309,11 @@ export class ContractViolationReporterService {
    */
   private checkAlertThresholds(): void {
     const now = Date.now();
-    const lastHour = now - (60 * 60 * 1000);
-    const recentViolations = this.violationHistory.filter(v => v.timestamp >= lastHour);
+    const lastHour = now - 60 * 60 * 1000;
+    const recentViolations = this.violationHistory.filter((v) => v.timestamp >= lastHour);
 
     // Check critical violations
-    const criticalCount = recentViolations.filter(v => v.severity === 'critical').length;
+    const criticalCount = recentViolations.filter((v) => v.severity === 'critical').length;
     if (criticalCount >= this.config.thresholds.criticalViolations) {
       this.sendAlert('threshold_exceeded', 'critical', {
         type: 'critical_violations',
@@ -300,7 +323,7 @@ export class ContractViolationReporterService {
     }
 
     // Check high violations
-    const highCount = recentViolations.filter(v => v.severity === 'high').length;
+    const highCount = recentViolations.filter((v) => v.severity === 'high').length;
     if (highCount >= this.config.thresholds.highViolations) {
       this.sendAlert('threshold_exceeded', 'high', {
         type: 'high_violations',
@@ -341,7 +364,7 @@ export class ContractViolationReporterService {
 
     // Check cooldown
     const lastAlert = this.lastAlertTime.get(cooldownKey);
-    if (lastAlert && (now - lastAlert) < (this.config.cooldown * 1000)) {
+    if (lastAlert && now - lastAlert < this.config.cooldown * 1000) {
       return; // Still in cooldown period
     }
 
@@ -389,15 +412,21 @@ export class ContractViolationReporterService {
    */
   private generateViolationId(validation: ValidationResult): string {
     const { method, endpoint } = validation.metadata;
-    const errorSignature = validation.errors.map(e => e.code).sort().join('_');
+    const errorSignature = validation.errors
+      .map((e) => e.code)
+      .sort()
+      .join('_');
     return `${method}_${endpoint}_${errorSignature}`.replace(/[^a-zA-Z0-9_]/g, '_');
   }
 
   /**
    * Create new violation object
    */
-  private createViolation(validation: ValidationResult, metadata: ViolationMetadata): ContractViolation {
-    const errors = validation.errors.map(error => ({
+  private createViolation(
+    validation: ValidationResult,
+    metadata: ViolationMetadata,
+  ): ContractViolation {
+    const errors = validation.errors.map((error) => ({
       ...error,
       count: 1,
       firstSeen: Date.now(),
@@ -427,8 +456,8 @@ export class ContractViolationReporterService {
    */
   private updateViolation(violation: ContractViolation, validation: ValidationResult): void {
     // Update error counts and timestamps
-    validation.errors.forEach(newError => {
-      const existingError = violation.errors.find(e => e.code === newError.code);
+    validation.errors.forEach((newError) => {
+      const existingError = violation.errors.find((e) => e.code === newError.code);
       if (existingError) {
         existingError.count++;
         existingError.lastSeen = Date.now();
@@ -454,27 +483,30 @@ export class ContractViolationReporterService {
    */
   private determineSeverity(errors: ValidationError[]): 'low' | 'medium' | 'high' | 'critical' {
     if (errors.length === 0) return 'low';
-    
-    const errorCodes = errors.map(e => e.code);
-    
+
+    const errorCodes = errors.map((e) => e.code);
+
     // Critical errors
-    if (errorCodes.includes('ENDPOINT_NOT_FOUND') || 
-        errorCodes.includes('MISSING_REQUIRED_FIELD')) {
+    if (
+      errorCodes.includes('ENDPOINT_NOT_FOUND') ||
+      errorCodes.includes('MISSING_REQUIRED_FIELD')
+    ) {
       return 'critical';
     }
-    
+
     // High severity errors
-    if (errorCodes.includes('INVALID_DATA_TYPE') || 
-        errorCodes.includes('MISSING_HEADER')) {
+    if (errorCodes.includes('INVALID_DATA_TYPE') || errorCodes.includes('MISSING_HEADER')) {
       return 'high';
     }
-    
+
     // Medium severity errors
-    if (errorCodes.includes('INVALID_PARAMETER') || 
-        errorCodes.includes('MISSING_QUERY_PARAMETER')) {
+    if (
+      errorCodes.includes('INVALID_PARAMETER') ||
+      errorCodes.includes('MISSING_QUERY_PARAMETER')
+    ) {
       return 'medium';
     }
-    
+
     return 'low';
   }
 
@@ -491,20 +523,22 @@ export class ContractViolationReporterService {
    */
   private calculateSummary(violations: ContractViolation[]) {
     const total = violations.length;
-    const critical = violations.filter(v => v.severity === 'critical').length;
-    const high = violations.filter(v => v.severity === 'high').length;
-    const medium = violations.filter(v => v.severity === 'medium').length;
-    const low = violations.filter(v => v.severity === 'low').length;
-    const resolved = violations.filter(v => v.resolved).length;
-    
-    const resolvedViolations = violations.filter(v => v.resolved);
-    const averageResolutionTime = resolvedViolations.length > 0
-      ? resolvedViolations.reduce((sum, v) => sum + (v.resolvedAt! - v.timestamp), 0) / resolvedViolations.length
-      : 0;
+    const critical = violations.filter((v) => v.severity === 'critical').length;
+    const high = violations.filter((v) => v.severity === 'high').length;
+    const medium = violations.filter((v) => v.severity === 'medium').length;
+    const low = violations.filter((v) => v.severity === 'low').length;
+    const resolved = violations.filter((v) => v.resolved).length;
+
+    const resolvedViolations = violations.filter((v) => v.resolved);
+    const averageResolutionTime =
+      resolvedViolations.length > 0
+        ? resolvedViolations.reduce((sum, v) => sum + (v.resolvedAt! - v.timestamp), 0) /
+          resolvedViolations.length
+        : 0;
 
     return {
       totalViolations: total,
-      uniqueEndpoints: new Set(violations.map(v => `${v.method} ${v.endpoint}`)).size,
+      uniqueEndpoints: new Set(violations.map((v) => `${v.method} ${v.endpoint}`)).size,
       criticalViolations: critical,
       highViolations: high,
       mediumViolations: medium,
@@ -528,18 +562,21 @@ export class ContractViolationReporterService {
    */
   private generateRecommendations(violations: ContractViolation[]): string[] {
     const recommendations: string[] = [];
-    
+
     if (violations.length === 0) {
       recommendations.push('No violations detected. Continue maintaining API contract compliance.');
       return recommendations;
     }
 
     // Analyze common issues
-    const errorCodes = violations.flatMap(v => v.errors.map(e => e.code));
-    const codeFrequency = errorCodes.reduce((acc, code) => {
-      acc[code] = (acc[code] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const errorCodes = violations.flatMap((v) => v.errors.map((e) => e.code));
+    const codeFrequency = errorCodes.reduce(
+      (acc, code) => {
+        acc[code] = (acc[code] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     // Generate recommendations based on common errors
     if (codeFrequency['ENDPOINT_NOT_FOUND'] > 0) {
@@ -555,11 +592,14 @@ export class ContractViolationReporterService {
     }
 
     // Endpoint-specific recommendations
-    const endpointViolations = violations.reduce((acc, v) => {
-      const key = `${v.method} ${v.endpoint}`;
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const endpointViolations = violations.reduce(
+      (acc, v) => {
+        const key = `${v.method} ${v.endpoint}`;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     const problematicEndpoints = Object.entries(endpointViolations)
       .filter(([, count]) => count > 5)
@@ -567,7 +607,9 @@ export class ContractViolationReporterService {
       .slice(0, 3);
 
     if (problematicEndpoints.length > 0) {
-      recommendations.push(`Pay special attention to these endpoints: ${problematicEndpoints.map(([endpoint]) => endpoint).join(', ')}`);
+      recommendations.push(
+        `Pay special attention to these endpoints: ${problematicEndpoints.map(([endpoint]) => endpoint).join(', ')}`,
+      );
     }
 
     return recommendations;
@@ -631,21 +673,23 @@ export class ContractViolationReporterService {
    */
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   cleanupOldViolations(): void {
-    const cutoffTime = Date.now() - (30 * 24 * 60 * 60 * 1000); // 30 days ago
-    
+    const cutoffTime = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 days ago
+
     // Remove old violations from history
     const initialSize = this.violationHistory.length;
-    this.violationHistory.splice(0, this.violationHistory.length, 
-      ...this.violationHistory.filter(v => v.timestamp >= cutoffTime)
+    this.violationHistory.splice(
+      0,
+      this.violationHistory.length,
+      ...this.violationHistory.filter((v) => v.timestamp >= cutoffTime),
     );
-    
+
     // Remove old resolved violations from active map
     for (const [id, violation] of this.violations.entries()) {
       if (violation.resolved && violation.resolvedAt! < cutoffTime) {
         this.violations.delete(id);
       }
     }
-    
+
     const removedCount = initialSize - this.violationHistory.length;
     if (removedCount > 0) {
       this.logger.log(`Cleaned up ${removedCount} old contract violations`);
@@ -658,10 +702,10 @@ export class ContractViolationReporterService {
   @Cron(CronExpression.EVERY_DAY_AT_9AM)
   generateDailySummary(): void {
     const now = Date.now();
-    const yesterday = now - (24 * 60 * 60 * 1000);
-    
+    const yesterday = now - 24 * 60 * 60 * 1000;
+
     const report = this.generateReport(yesterday, now);
-    
+
     // Send daily summary to configured channels
     if (report.summary.totalViolations > 0) {
       this.sendAlert('trend_analysis', 'medium', {
@@ -669,7 +713,9 @@ export class ContractViolationReporterService {
         report,
       });
     }
-    
-    this.logger.log(`Daily violation summary generated: ${report.summary.totalViolations} violations`);
+
+    this.logger.log(
+      `Daily violation summary generated: ${report.summary.totalViolations} violations`,
+    );
   }
 }
