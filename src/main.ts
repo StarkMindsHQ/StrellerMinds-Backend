@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { OpenAPIValidationMiddleware } from './common/contract-testing/openapi-validation.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Apply OpenAPI validation middleware globally
+  const openApiValidation = app.get(OpenAPIValidationMiddleware);
+  app.use(openApiValidation);
 
   // Enable cookie parsing via NestJS/Express
   // Cookies are automatically parsed and available on Request.cookies

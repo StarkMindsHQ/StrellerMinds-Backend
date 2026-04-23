@@ -15,7 +15,17 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage"
+    "test:cov": "jest --coverage",
+    "test:contract": "jest --testPathPattern=contract",
+    "test:contract:request": "jest --testPathPattern=contract --grep=\"Request Validation\"",
+    "test:contract:response": "jest --testPathPattern=contract --grep=\"Response Validation\"",
+    "test:contract:coverage": "jest --testPathPattern=contract --grep=\"Coverage\"",
+    "test:contract:performance": "jest --testPathPattern=contract --grep=\"Performance\"",
+    "test:contract:watch": "jest --testPathPattern=contract --watch",
+    "test:contract:cov": "jest --testPathPattern=contract --coverage",
+    "contract:validate": "node scripts/validate-contract.js",
+    "contract:diff": "node scripts/contract-diff.js",
+    "contract:report": "node scripts/generate-contract-report.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.972.0",
@@ -74,7 +84,6 @@
     "multer": "^2.0.2",
     "natural": "^8.1.0",
     "nest-winston": "^1.10.2",
-    "nestjs-throttler-storage-redis": "^0.5.1",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.12",
     "npm": "^11.10.1",
