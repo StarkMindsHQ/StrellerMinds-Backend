@@ -4,6 +4,8 @@ import request from 'supertest';
 import helmet from 'helmet';
 import { AuthController } from './auth/controllers/auth.controller';
 import { AuthService } from './auth/services/auth.service';
+import { RateLimiterService } from './auth/guards/rate-limiter.service';
+import { PasswordStrengthService } from './auth/services/password-strength.service';
 
 describe('Security Configuration and Vulnerability Tests (e2e)', () => {
   let app: INestApplication;
@@ -25,6 +27,21 @@ describe('Security Configuration and Vulnerability Tests (e2e)', () => {
 
               return { access_token: 'mock_token' };
             }),
+          },
+        },
+        {
+          provide: RateLimiterService,
+          useValue: {
+            isAllowed: jest.fn().mockReturnValue({ allowed: true, remaining: 10, resetTime: Date.now() + 60000 }),
+            getStatus: jest.fn().mockReturnValue({ count: 1, remaining: 9, resetTime: Date.now() + 60000, resetIn: 60000 }),
+          },
+        },
+        {
+          provide: PasswordStrengthService,
+          useValue: {
+            validatePassword: jest.fn(),
+            getPasswordStrengthDetails: jest.fn(),
+            getPasswordPolicy: jest.fn(),
           },
         },
       ],
