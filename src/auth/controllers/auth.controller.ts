@@ -86,7 +86,10 @@ export class AuthController {
   @UseGuards()
   @HttpCode(HttpStatus.OK)
   async updatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
+    // TODO: pass req.user.id once JWT guard is properly wired
+    const userId = 'TODO-get-from-jwt-guard';
     return this.authService.updatePassword(
+      userId,
       updatePasswordDto.currentPassword,
       updatePasswordDto.newPassword,
     );
