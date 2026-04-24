@@ -1,65 +1,12 @@
-import { DomainEntity } from '../../../shared/domain/entities/domain-entity.base';
+import { BaseUserEntity, UserPrimitives } from '../../../shared/domain/entities/user-entity.base';
 
-export interface UserPrimitives {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export { UserPrimitives };
 
 /**
- * User Domain Entity
- * This represents a user in the domain layer
- * It contains pure business logic and is decoupled from persistence
+ * Auth module User domain entity.
+ * Extends shared BaseUserEntity to avoid duplication with user module.
  */
-export class User extends DomainEntity<UserPrimitives> {
-  private readonly email: string;
-  private readonly firstName: string | null;
-  private readonly lastName: string | null;
-  private readonly isActive: boolean;
-
-  constructor(
-    id: string,
-    email: string,
-    firstName: string | null,
-    lastName: string | null,
-    isActive: boolean,
-    createdAt: Date,
-    updatedAt: Date,
-  ) {
-    super(id, createdAt, updatedAt);
-    this.email = email;
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.isActive = isActive;
-  }
-
-  getEmail(): string {
-    return this.email;
-  }
-
-  getFirstName(): string | null {
-    return this.firstName;
-  }
-
-  getLastName(): string | null {
-    return this.lastName;
-  }
-
-  getFullName(): string {
-    return `${this.firstName || ''} ${this.lastName || ''}`.trim();
-  }
-
-  isUserActive(): boolean {
-    return this.isActive;
-  }
-
-  /**
-   * Create a new User from primitives (usually from persistence layer)
-   */
+export class User extends BaseUserEntity {
   static create(primitives: UserPrimitives): User {
     return new User(
       primitives.id,
@@ -70,17 +17,5 @@ export class User extends DomainEntity<UserPrimitives> {
       primitives.createdAt,
       primitives.updatedAt,
     );
-  }
-
-  toPrimitives(): UserPrimitives {
-    return {
-      id: this.id,
-      email: this.email,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      isActive: this.isActive,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-    };
   }
 }
