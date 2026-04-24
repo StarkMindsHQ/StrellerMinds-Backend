@@ -25,6 +25,8 @@ export class RefreshToken {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  /** Hashed token value */
+  @Index()
   /** SHA-256 hash of the raw token sent to the client */
   @Column()
   token: string;
@@ -35,11 +37,10 @@ export class RefreshToken {
   @Column({ type: 'timestamptz' })
   expiresAt: Date;
 
-  /** Soft-revocation flag; allows invalidating tokens without deleting rows */
   @Column({ default: false })
   isRevoked: boolean;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.refreshTokens, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 

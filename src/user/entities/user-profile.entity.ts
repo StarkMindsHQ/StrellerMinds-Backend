@@ -4,8 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
   Index,
 } from 'typeorm';
+import { User } from '../../auth/entities/user.entity';
 
 /**
  * Indexes:
@@ -22,6 +25,10 @@ export class UserProfile {
   /** One-to-one FK to users.id; unique constraint enforced at DB level */
   @Column({ unique: true })
   userId: string;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @Column({ nullable: true })
   bio: string;

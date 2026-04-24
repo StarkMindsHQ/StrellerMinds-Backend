@@ -6,7 +6,11 @@ import { IUserRepository } from '../../domain/repositories/user-repository.inter
  * List Users Use Case Request
  */
 export class ListUsersRequest {
-  constructor(public readonly search?: string) {}
+  constructor(
+    public readonly search?: string,
+    public readonly cursor?: string,
+    public readonly limit?: number,
+  ) {}
 }
 
 /**
@@ -29,7 +33,11 @@ export class ListUserItem {
  * List Users Use Case Response
  */
 export class ListUsersResponse {
-  constructor(public readonly users: ListUserItem[]) {}
+  constructor(
+    public readonly users: ListUserItem[],
+    public readonly nextCursor: string | null,
+    public readonly hasMore: boolean,
+  ) {}
 }
 
 /**
@@ -43,6 +51,8 @@ export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersRespons
   }
 
   async execute(request: ListUsersRequest): Promise<ListUsersResponse> {
+    const limit = request.limit || 20;
+    
     let users = [];
 
     if (request.search) {
@@ -51,7 +61,22 @@ export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersRespons
       users = await this.userRepository.findAll();
     }
 
-    const userItems = users.map((user) => {
+    // Apply cursor-based pagination
+    let filteredUsers = users;
+    if (request.cursor) {
+      const cursorIndex = users.findIndex(u => u.id === request.cursor);
+      if (cursorIndex !== -1) {
+        filteredUsers = users.slice(cursorIndex + 1);
+      }
+    }
+
+    // Check if there are more results
+    const hasMore = filteredUsers.length > limit;
+    
+    // Take only the requested limit
+    const paginatedUsers = hasMore ? filteredUsers.slice(0, limit) : filteredUsers;
+
+    const userItems = paginatedUsers.map((user) => {
       const primitives = user.toPrimitives();
       return new ListUserItem(
         primitives.id,
@@ -65,6 +90,11 @@ export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersRespons
       );
     });
 
-    return new ListUsersResponse(userItems);
+    // Generate next cursor
+    const nextCursor = hasMore && userItems.length > 0
+      ? userItems[userItems.length - 1].id
+      : null;
+
+    return new ListUsersResponse(userItems, nextCursor, hasMore);
   }
 }
