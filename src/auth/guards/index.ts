@@ -8,3 +8,4 @@ export {
 export { RateLimitExceptionFilter } from './rate-limit-exception.filter';
 export { RateLimitGuard, type RateLimitType } from './rate-limit.guard';
 export { RATE_LIMIT_CONFIGS, type RateLimitConfig } from './rate-limit.config';
+export { CsrfGuard } from './csrf.guard';

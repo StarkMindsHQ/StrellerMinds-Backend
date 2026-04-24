@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { RateLimitGuard } from 'src/auth/guards';
+import { EntityNotFoundException } from '../shared/domain/exceptions/domain-exceptions';
 
 @Controller('courses')
 export class CourseController {
@@ -13,7 +14,11 @@ export class CourseController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.courseService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const course = await this.courseService.findOne(id);
+    if (!course) {
+      throw new EntityNotFoundException('Course', id);
+    }
+    return course;
   }
 }

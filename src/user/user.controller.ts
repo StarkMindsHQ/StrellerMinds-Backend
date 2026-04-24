@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { UserService } from './user.service';
+import { EntityNotFoundException } from '../shared/domain/exceptions/domain-exceptions';
 
 @Controller('users')
 export class UserController {
@@ -11,7 +12,11 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const user = await this.userService.findOne(id);
+    if (!user) {
+      throw new EntityNotFoundException('User', id);
+    }
+    return user;
   }
 }

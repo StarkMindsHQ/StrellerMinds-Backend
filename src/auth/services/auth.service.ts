@@ -3,6 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { SecureLoggerService } from '../../common/secure-logging/secure-logger.service';
+import {
+  InvalidCredentialsException,
+  UserAlreadyExistsException,
+  UserNotFoundException,
+} from '../domain/exceptions/auth-exceptions';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +29,7 @@ export class AuthService {
     if (!user) {
       // Don't reveal if email exists or not for security
       this.secureLogger.warn(`Login failed: Invalid credentials for email: ${email}`);
-      throw new Error('Invalid credentials');
+      throw new InvalidCredentialsException();
     }
 
     // TODO: Compare password with hashed password
@@ -55,7 +60,7 @@ export class AuthService {
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
       this.secureLogger.warn(`Registration failed: Email already in use: ${email}`);
-      throw new Error('Email already in use');
+      throw new UserAlreadyExistsException(email);
     }
 
     // TODO: Hash password before storing
@@ -118,7 +123,7 @@ export class AuthService {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       this.secureLogger.warn(`Password reset failed: User not found for email: ${email}`);
-      throw new Error('User not found');
+      throw new UserNotFoundException(email);
     }
 
     // TODO: Hash new password before storing

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { OpenAPIValidationService } from '../../src/common/contract-testing/openapi-validation.service';
 import { OpenAPIValidationMiddleware } from '../../src/common/contract-testing/openapi-validation.middleware';
 import { Logger } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 
 /**

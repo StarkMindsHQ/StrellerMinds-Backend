@@ -10,8 +10,11 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/**/*.spec.ts',
     '<rootDir>/src/**/*.test.ts',
+    '<rootDir>/test/**/*.spec.ts',
+    '<rootDir>/test/**/*.test.ts',
     '<rootDir>/test/integration/**/*.spec.ts',
     '<rootDir>/test/integration/**/*.test.ts',
+
   ],
 
   // Ignore patterns
