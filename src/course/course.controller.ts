@@ -1,9 +1,18 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { CourseService } from './course.service';
 import { RateLimitGuard } from 'src/auth/guards';
 import { EntityNotFoundException } from '../shared/domain/exceptions/domain-exceptions';
 
 @Controller('courses')
+@UseInterceptors(ClassSerializerInterceptor)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
