@@ -10,8 +10,15 @@ export class CourseService {
     private readonly courseRepository: Repository<Course>,
   ) {}
 
-  async findAll(): Promise<Course[]> {
-    return this.courseRepository.find();
+  async findAll(category?: string, difficulty?: string): Promise<Course[]> {
+    const where: any = {};
+    if (category) {
+      where.category = category;
+    }
+    if (difficulty) {
+      where.difficulty = difficulty;
+    }
+    return this.courseRepository.find({ where });
   }
 
   async findOne(id: string): Promise<Course | null> {
