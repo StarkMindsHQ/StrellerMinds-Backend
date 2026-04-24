@@ -8,17 +8,17 @@ export interface SecureLoggerConfig {
    * Fields to sanitize in objects (case-insensitive)
    */
   sensitiveFields: string[];
-  
+
   /**
    * Replacement value for sensitive data
    */
   replacementValue: string;
-  
+
   /**
    * Whether to enable secure logging
    */
   enabled: boolean;
-  
+
   /**
    * Maximum depth for object sanitization
    */
@@ -69,7 +69,7 @@ const DEFAULT_CONFIG: SecureLoggerConfig = {
 
 /**
  * Secure Logger Service that prevents sensitive data from being logged
- * 
+ *
  * This service automatically sanitizes sensitive fields like passwords,
  * tokens, PII, and other confidential data before logging.
  */
@@ -109,7 +109,7 @@ export class SecureLoggerService implements LoggerService {
     }
 
     const sanitizedMessage = this.sanitize(message);
-    const sanitizedParams = optionalParams.map(param => this.sanitize(param));
+    const sanitizedParams = optionalParams.map((param) => this.sanitize(param));
     this.defaultLogger.log(sanitizedMessage, ...sanitizedParams);
   }
 
@@ -123,7 +123,7 @@ export class SecureLoggerService implements LoggerService {
     }
 
     const sanitizedMessage = this.sanitize(message);
-    const sanitizedParams = optionalParams.map(param => this.sanitize(param));
+    const sanitizedParams = optionalParams.map((param) => this.sanitize(param));
     this.defaultLogger.error(sanitizedMessage, ...sanitizedParams);
   }
 
@@ -137,7 +137,7 @@ export class SecureLoggerService implements LoggerService {
     }
 
     const sanitizedMessage = this.sanitize(message);
-    const sanitizedParams = optionalParams.map(param => this.sanitize(param));
+    const sanitizedParams = optionalParams.map((param) => this.sanitize(param));
     this.defaultLogger.warn(sanitizedMessage, ...sanitizedParams);
   }
 
@@ -151,7 +151,7 @@ export class SecureLoggerService implements LoggerService {
     }
 
     const sanitizedMessage = this.sanitize(message);
-    const sanitizedParams = optionalParams.map(param => this.sanitize(param));
+    const sanitizedParams = optionalParams.map((param) => this.sanitize(param));
     this.defaultLogger.debug(sanitizedMessage, ...sanitizedParams);
   }
 
@@ -165,7 +165,7 @@ export class SecureLoggerService implements LoggerService {
     }
 
     const sanitizedMessage = this.sanitize(message);
-    const sanitizedParams = optionalParams.map(param => this.sanitize(param));
+    const sanitizedParams = optionalParams.map((param) => this.sanitize(param));
     this.defaultLogger.verbose(sanitizedMessage, ...sanitizedParams);
   }
 
@@ -194,7 +194,7 @@ export class SecureLoggerService implements LoggerService {
 
     // Handle arrays
     if (Array.isArray(value)) {
-      return value.map(item => this.sanitize(item, depth + 1));
+      return value.map((item) => this.sanitize(item, depth + 1));
     }
 
     // Handle objects
@@ -259,10 +259,10 @@ export class SecureLoggerService implements LoggerService {
 
     for (const [key, value] of Object.entries(obj)) {
       const lowerKey = key.toLowerCase();
-      
+
       // Check if this field should be sanitized
-      const isSensitive = this.config.sensitiveFields.some(
-        sensitiveField => lowerKey.includes(sensitiveField.toLowerCase())
+      const isSensitive = this.config.sensitiveFields.some((sensitiveField) =>
+        lowerKey.includes(sensitiveField.toLowerCase()),
       );
 
       if (isSensitive) {
@@ -272,7 +272,8 @@ export class SecureLoggerService implements LoggerService {
           if (value.length <= 6) {
             sanitized[key] = this.config.replacementValue;
           } else {
-            sanitized[key] = `${value.substring(0, 2)}${'*'.repeat(Math.min(value.length - 4, 10))}${value.substring(value.length - 2)}`;
+            sanitized[key] =
+              `${value.substring(0, 2)}${'*'.repeat(Math.min(value.length - 4, 10))}${value.substring(value.length - 2)}`;
           }
         } else {
           sanitized[key] = this.config.replacementValue;
@@ -299,8 +300,8 @@ export class SecureLoggerService implements LoggerService {
    */
   isSensitiveField(fieldName: string): boolean {
     const lowerField = fieldName.toLowerCase();
-    return this.config.sensitiveFields.some(
-      sensitiveField => lowerField.includes(sensitiveField.toLowerCase())
+    return this.config.sensitiveFields.some((sensitiveField) =>
+      lowerField.includes(sensitiveField.toLowerCase()),
     );
   }
 

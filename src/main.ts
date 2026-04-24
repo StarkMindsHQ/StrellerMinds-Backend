@@ -1,10 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, BadRequestException } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { OpenAPIValidationMiddleware } from './common/contract-testing/openapi-validation.middleware';
 import { SecureLoggingInterceptor } from './common/secure-logging/secure-logging.interceptor';
-import { VersioningType } from '@nestjs/common'; // <-- Add this
-
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -18,7 +16,7 @@ async function bootstrap() {
   // Minimal logic to enable URI-based versioning
   app.enableVersioning({
     type: VersioningType.URI,
-    defaultVersion: '1', 
+    defaultVersion: '1',
   });
   // Apply OpenAPI validation middleware globally
   const openApiValidation = app.get(OpenAPIValidationMiddleware);
