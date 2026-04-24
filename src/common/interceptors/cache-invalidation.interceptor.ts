@@ -9,15 +9,15 @@ export class CacheInvalidationInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler) {
     const method = context.switchToHttp().getRequest().method;
-    
+
     return next.handle().pipe(
       tap(async () => {
         if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(method)) {
           // Check if 'stores' exists (modern cache-manager/keyv integration)
           if (this.cacheManager.stores) {
             await Promise.all(
-              this.cacheManager.stores.map(store => store.clear())
-              // fix build 
+              this.cacheManager.stores.map((store) => store.clear()),
+              // fix build
             );
           }
         }

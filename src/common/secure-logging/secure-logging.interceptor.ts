@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Request, Response } from 'express';
@@ -12,7 +6,7 @@ import { SecureLoggerService } from './secure-logger.service';
 
 /**
  * Logging Interceptor that sanitizes sensitive data from HTTP request/response logs
- * 
+ *
  * This interceptor logs HTTP requests and responses while ensuring that
  * sensitive data like passwords, tokens, and PII are never logged.
  */
@@ -49,30 +43,36 @@ export class SecureLoggingInterceptor implements NestInterceptor {
       tap({
         next: (data) => {
           const duration = Date.now() - startTime;
-          
+
           // Log successful response (with sanitized data)
-          this.secureLogger.log(`Response: ${method} ${url} - ${response.statusCode} (${duration}ms)`, {
-            method,
-            url,
-            statusCode: response.statusCode,
-            duration: `${duration}ms`,
-            // Sanitize response body to prevent leaking sensitive data
-            responseBody: this.sanitizeResponse(data),
-            timestamp: new Date().toISOString(),
-          });
+          this.secureLogger.log(
+            `Response: ${method} ${url} - ${response.statusCode} (${duration}ms)`,
+            {
+              method,
+              url,
+              statusCode: response.statusCode,
+              duration: `${duration}ms`,
+              // Sanitize response body to prevent leaking sensitive data
+              responseBody: this.sanitizeResponse(data),
+              timestamp: new Date().toISOString(),
+            },
+          );
         },
         error: (error) => {
           const duration = Date.now() - startTime;
-          
+
           // Log error response (with sanitized data)
-          this.secureLogger.error(`Error Response: ${method} ${url} - ${error?.status || 500} (${duration}ms)`, {
-            method,
-            url,
-            statusCode: error?.status || 500,
-            duration: `${duration}ms`,
-            error: this.sanitizeError(error),
-            timestamp: new Date().toISOString(),
-          });
+          this.secureLogger.error(
+            `Error Response: ${method} ${url} - ${error?.status || 500} (${duration}ms)`,
+            {
+              method,
+              url,
+              statusCode: error?.status || 500,
+              duration: `${duration}ms`,
+              error: this.sanitizeError(error),
+              timestamp: new Date().toISOString(),
+            },
+          );
         },
       }),
     );
@@ -117,10 +117,10 @@ export class SecureLoggingInterceptor implements NestInterceptor {
 
     for (const key of Object.keys(sanitized)) {
       const lowerKey = key.toLowerCase();
-      
+
       // Check if this field should be sanitized
-      const isSensitive = sensitiveFields.some(
-        sensitiveField => lowerKey.includes(sensitiveField.toLowerCase())
+      const isSensitive = sensitiveFields.some((sensitiveField) =>
+        lowerKey.includes(sensitiveField.toLowerCase()),
       );
 
       if (isSensitive && sanitized[key]) {
