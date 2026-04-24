@@ -21,7 +21,6 @@ import { SecureLoggerService } from '../../common/secure-logging/secure-logger.s
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
-  private readonly secureLogger: SecureLoggerService;
 
   constructor(
     @InjectRepository(User)
@@ -31,6 +30,7 @@ export class AuthService {
     private readonly refreshTokenRepository: Repository<RefreshToken>,
 
     private readonly transactionManager: TransactionManager,
+    private readonly secureLogger: SecureLoggerService,
   ) {}
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -46,6 +46,17 @@ export class AuthService {
     extra: Partial<Pick<SecurityAudit, 'ipAddress' | 'userAgent' | 'metadata'>> = {},
   ): Partial<SecurityAudit> {
     return { userId: userId ?? undefined, event, ...extra };
+  }
+
+  private sanitizeUser(user: User) {
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+    };
   }
 
   // ─── Register ────────────────────────────────────────────────────────────────
@@ -66,8 +77,10 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string,
   ) {
+    this.secureLogger.log(`Registration attempt for email: ${email}`);
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
+      this.secureLogger.warn(`Registration failed: Email already in use: ${email}`);
       throw new ConflictException('Email already in use');
     }
 
@@ -102,7 +115,8 @@ export class AuthService {
         return { user, profile };
       });
 
-      return { message: 'Registration successful', user };
+      this.secureLogger.log(`Registration successful for user: ${user.id}`);
+      return { message: 'Registration successful', user: this.sanitizeUser(user) };
     } catch (error) {
       if (error instanceof ConflictException) throw error;
       this.logger.error('Registration transaction failed', error);
@@ -118,9 +132,11 @@ export class AuthService {
    *  2. Writes a LOGIN_SUCCESS / LOGIN_FAILED SecurityAudit entry
    */
   async login(email: string, password: string, ipAddress?: string, userAgent?: string) {
+    this.secureLogger.log(`Login attempt for email: ${email}`);
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user || user.password !== password /* TODO: bcrypt.compare */) {
+      this.secureLogger.warn(`Login failed: Invalid credentials for email: ${email}`);
       // Still write an audit log for failed attempts – not inside a tx because
       // user may not exist, but we want the record regardless.
       try {
@@ -168,7 +184,12 @@ export class AuthService {
         );
       });
 
-      return { message: 'Login successful', user, refreshToken: rawRefreshToken };
+      this.secureLogger.log(`Login successful for user: ${user.id}`);
+      return {
+        message: 'Login successful',
+        user: this.sanitizeUser(user),
+        refreshToken: rawRefreshToken,
+      };
     } catch (error) {
       this.logger.error('Login transaction failed', error);
       throw new InternalServerErrorException('Login failed. Please try again.');
@@ -178,6 +199,7 @@ export class AuthService {
   // ─── Refresh Token ───────────────────────────────────────────────────────────
 
   async refreshToken(rawRefreshToken: string) {
+    this.secureLogger.log('Token refresh attempt');
     // TODO: integrate JwtService to verify & re-issue JWT pair
     const hashed = this.hashToken(rawRefreshToken);
     const stored = await this.refreshTokenRepository.findOne({
@@ -186,6 +208,7 @@ export class AuthService {
     });
 
     if (!stored || stored.expiresAt < new Date()) {
+      this.secureLogger.warn('Token refresh failed: Invalid or expired token');
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
@@ -198,9 +221,11 @@ export class AuthService {
    * Atomically stores the reset token on the user row and writes an audit log.
    */
   async forgotPassword(email: string, ipAddress?: string, userAgent?: string) {
+    this.secureLogger.log(`Password reset request for email: ${email}`);
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       // Security: don't reveal whether the email exists
+      this.secureLogger.log(`Password reset request: Email not found (intentionally not revealing)`);
       return { message: 'If email exists, a reset link has been sent' };
     }
 
@@ -251,6 +276,7 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string,
   ) {
+    this.secureLogger.log(`Password reset attempt for email: ${email}`);
     const user = await this.userRepository
       .createQueryBuilder('user')
       .addSelect(['user.passwordResetToken', 'user.passwordResetExpires'])
@@ -258,6 +284,7 @@ export class AuthService {
       .getOne();
 
     if (!user) {
+      this.secureLogger.warn(`Password reset failed: User not found for email: ${email}`);
       throw new NotFoundException('User not found');
     }
 
@@ -268,6 +295,7 @@ export class AuthService {
       !user.passwordResetExpires ||
       user.passwordResetExpires < new Date()
     ) {
+      this.secureLogger.warn(`Password reset failed: Invalid or expired token for user: ${user.id}`);
       throw new BadRequestException('Invalid or expired reset token');
     }
 
@@ -295,6 +323,7 @@ export class AuthService {
         );
       });
 
+      this.secureLogger.log(`Password reset successful for user: ${user.id}`);
       return { message: 'Password reset successful' };
     } catch (error) {
       this.logger.error('Reset-password transaction failed', error);
@@ -308,12 +337,14 @@ export class AuthService {
    * Atomically marks the user as email-verified and writes an audit entry.
    */
   async verifyEmail(token: string, ipAddress?: string, userAgent?: string) {
+    this.secureLogger.log('Email verification attempt');
     // TODO: validate JWT / HMAC email-verification token via JwtService
     // Stub: resolve email from token
     const email = 'user@example.com'; // replace with JwtService.verifyEmailVerificationToken(token).email
 
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
+      this.secureLogger.warn('Email verification failed: User not found');
       throw new NotFoundException('User not found');
     }
 
@@ -339,6 +370,7 @@ export class AuthService {
         );
       });
 
+      this.secureLogger.log(`Email verified successfully for user: ${user.id}`);
       return { message: 'Email verified successfully' };
     } catch (error) {
       this.logger.error('Verify-email transaction failed', error);
@@ -362,12 +394,15 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string,
   ) {
+    this.secureLogger.log('Password update attempt');
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
+      this.secureLogger.warn(`Password update failed: User not found for ID: ${userId}`);
       throw new NotFoundException('User not found');
     }
 
     if (user.password !== currentPassword /* TODO: bcrypt.compare */) {
+      this.secureLogger.warn(`Password update failed: Incorrect current password for user: ${user.id}`);
       throw new UnauthorizedException('Current password is incorrect');
     }
 
@@ -393,6 +428,7 @@ export class AuthService {
         );
       });
 
+      this.secureLogger.log(`Password updated successfully for user: ${user.id}`);
       return { message: 'Password updated successfully' };
     } catch (error) {
       this.logger.error('Update-password transaction failed', error);
