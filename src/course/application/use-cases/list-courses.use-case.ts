@@ -53,7 +53,7 @@ export class ListCoursesUseCase extends UseCase<ListCoursesRequest, ListCoursesR
 
   async execute(request: ListCoursesRequest): Promise<ListCoursesResponse> {
     const limit = request.limit || 20;
-    
+
     let courses = [];
 
     if (request.category && request.difficulty) {
@@ -72,7 +72,7 @@ export class ListCoursesUseCase extends UseCase<ListCoursesRequest, ListCoursesR
     // Apply cursor-based pagination
     let filteredCourses = courses;
     if (request.cursor) {
-      const cursorIndex = courses.findIndex(c => c.id === request.cursor);
+      const cursorIndex = courses.findIndex((c) => c.id === request.cursor);
       if (cursorIndex !== -1) {
         filteredCourses = courses.slice(cursorIndex + 1);
       }
@@ -80,7 +80,7 @@ export class ListCoursesUseCase extends UseCase<ListCoursesRequest, ListCoursesR
 
     // Check if there are more results
     const hasMore = filteredCourses.length > limit;
-    
+
     // Take only the requested limit
     const paginatedCourses = hasMore ? filteredCourses.slice(0, limit) : filteredCourses;
 
@@ -99,9 +99,8 @@ export class ListCoursesUseCase extends UseCase<ListCoursesRequest, ListCoursesR
     });
 
     // Generate next cursor
-    const nextCursor = hasMore && courseItems.length > 0
-      ? courseItems[courseItems.length - 1].id
-      : null;
+    const nextCursor =
+      hasMore && courseItems.length > 0 ? courseItems[courseItems.length - 1].id : null;
 
     return new ListCoursesResponse(courseItems, nextCursor, hasMore);
   }

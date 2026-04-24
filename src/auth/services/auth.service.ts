@@ -33,16 +33,8 @@ export class AuthService {
 
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
-     private readonly transactionManager: TransactionManager,
+    private readonly transactionManager: TransactionManager,
     private readonly secureLogger: SecureLoggerService,
-
-    const user = await this.userRepository.findOne({ where: { email } });
-    if (!user) {
-      // Don't reveal if email exists or not for security
-      this.secureLogger.warn(`Login failed: Invalid credentials for email: ${email}`);
-      throw new InvalidCredentialsException();
-    }
-    
   ) {}
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -94,7 +86,6 @@ export class AuthService {
     if (existingUser) {
       this.secureLogger.warn(`Registration failed: Email already in use: ${email}`);
       throw new UserAlreadyExistsException(email);
-      throw new ConflictException('Email already in use');
     }
 
     try {

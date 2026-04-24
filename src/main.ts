@@ -23,7 +23,7 @@ async function bootstrap() {
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, curl, etc.)
       if (!origin) return callback(null, true);
-      
+
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -40,7 +40,7 @@ async function bootstrap() {
   // Issue #731: Add request body size limits to prevent DoS attacks
   // Max 10MB for regular requests, can be overridden via environment variable
   const maxRequestSize = process.env.MAX_REQUEST_SIZE || '10mb';
-  
+
   // Get the underlying Express instance and apply body size limits
   const httpAdapter = app.getHttpAdapter();
   const expressInstance = httpAdapter.getInstance();
