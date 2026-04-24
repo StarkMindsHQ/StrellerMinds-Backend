@@ -4,16 +4,31 @@ import {
   ArgumentsHost,
   BadRequestException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { SecureLoggerService } from '../../common/secure-logging/secure-logger.service';
 
 @Catch(BadRequestException)
 export class ValidationExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(ValidationExceptionFilter.name);
+  private readonly secureLogger: SecureLoggerService;
+
+  constructor() {
+    this.secureLogger = new SecureLoggerService();
+  }
+
   catch(exception: BadRequestException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
     const exceptionResponse = exception.getResponse() as any;
+
+    // Log validation error without sensitive request data
+    this.secureLogger.warn('Validation error occurred', {
+      status,
+      message: 'Validation failed',
+    });
 
     const validationErrors = exceptionResponse?.message || [];
 

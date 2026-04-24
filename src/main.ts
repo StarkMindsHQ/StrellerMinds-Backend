@@ -2,10 +2,18 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { OpenAPIValidationMiddleware } from './common/contract-testing/openapi-validation.middleware';
+import { SecureLoggingInterceptor } from './common/secure-logging/secure-logging.interceptor';
 import { VersioningType } from '@nestjs/common'; // <-- Add this
 
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    // Disable default NestJS logger to use our secure logger
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
+
+  // Apply secure logging interceptor globally
+  app.useGlobalInterceptors(new SecureLoggingInterceptor());
 
   // Minimal logic to enable URI-based versioning
   app.enableVersioning({

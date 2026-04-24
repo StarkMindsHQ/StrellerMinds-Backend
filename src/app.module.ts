@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
 import { HealthModule } from './health/health.module';
 import { ContractTestingModule } from './common/contract-testing/contract-testing.module';
+import { SecureLoggingModule } from './common/secure-logging/secure-logging.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -25,6 +26,7 @@ import { AppService } from './app.service';
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
     }),
+    SecureLoggingModule,
     AuthModule,
     UserModule,
     CourseModule,
