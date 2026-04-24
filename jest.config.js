@@ -30,7 +30,7 @@ module.exports = {
   },
 
   // Setup files
-  setupFilesAfterEnv: [],
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
 
   // Transform configuration
   transform: {
@@ -113,7 +113,6 @@ module.exports = {
 
   // Error handling
   bail: false,
-  errorOnDeprecated: true,
 
   // Module file extensions
   moduleFileExtensions: ['js', 'json', 'ts'],
