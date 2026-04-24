@@ -6,15 +6,24 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
 
+/**
+ * Indexes:
+ *  - userId → unique FK; profile is always fetched by owner userId
+ */
+@Index('IDX_user_profile_userId', ['userId'], { unique: true })
+@Index('IDX_user_profile_createdAt', ['createdAt'])
+@Index('IDX_user_profile_updatedAt', ['updatedAt'])
 @Entity('user_profiles')
 export class UserProfile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  /** One-to-one FK to users.id; unique constraint enforced at DB level */
+  @Column({ unique: true })
   userId: string;
 
   @OneToOne(() => User, { onDelete: 'CASCADE' })
@@ -33,4 +42,3 @@ export class UserProfile {
   @UpdateDateColumn()
   updatedAt: Date;
 }
-

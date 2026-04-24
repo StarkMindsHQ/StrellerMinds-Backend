@@ -16,10 +16,12 @@ import { RefreshToken } from '../entities/refresh-token.entity';
 import { SecurityAudit, SecurityEvent } from '../entities/security-audit.entity';
 import { UserProfile } from '../../user/entities/user-profile.entity';
 import { TransactionManager } from '../../common/database/transaction.manager';
+import { SecureLoggerService } from '../../common/secure-logging/secure-logger.service';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
+  private readonly secureLogger: SecureLoggerService;
 
   constructor(
     @InjectRepository(User)
@@ -115,12 +117,7 @@ export class AuthService {
    *  1. Creates a RefreshToken row
    *  2. Writes a LOGIN_SUCCESS / LOGIN_FAILED SecurityAudit entry
    */
-  async login(
-    email: string,
-    password: string,
-    ipAddress?: string,
-    userAgent?: string,
-  ) {
+  async login(email: string, password: string, ipAddress?: string, userAgent?: string) {
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user || user.password !== password /* TODO: bcrypt.compare */) {
@@ -128,13 +125,16 @@ export class AuthService {
       // user may not exist, but we want the record regardless.
       try {
         await this.transactionManager.run(async (em) => {
-          await em.save(SecurityAudit, em.create(SecurityAudit, {
-            userId: user?.id,
-            event: SecurityEvent.LOGIN_FAILED,
-            ipAddress,
-            userAgent,
-            metadata: { email },
-          }));
+          await em.save(
+            SecurityAudit,
+            em.create(SecurityAudit, {
+              userId: user?.id,
+              event: SecurityEvent.LOGIN_FAILED,
+              ipAddress,
+              userAgent,
+              metadata: { email },
+            }),
+          );
         });
       } catch {
         // Non-critical – don't surface audit errors to the caller
@@ -157,12 +157,15 @@ export class AuthService {
         await em.save(RefreshToken, refreshToken);
 
         // 2. Write success audit
-        await em.save(SecurityAudit, em.create(SecurityAudit, {
-          userId: user.id,
-          event: SecurityEvent.LOGIN_SUCCESS,
-          ipAddress,
-          userAgent,
-        }));
+        await em.save(
+          SecurityAudit,
+          em.create(SecurityAudit, {
+            userId: user.id,
+            event: SecurityEvent.LOGIN_SUCCESS,
+            ipAddress,
+            userAgent,
+          }),
+        );
       });
 
       return { message: 'Login successful', user, refreshToken: rawRefreshToken };
@@ -213,12 +216,15 @@ export class AuthService {
         });
 
         // 2. Audit the request
-        await em.save(SecurityAudit, em.create(SecurityAudit, {
-          userId: user.id,
-          event: SecurityEvent.PASSWORD_RESET_REQUEST,
-          ipAddress,
-          userAgent,
-        }));
+        await em.save(
+          SecurityAudit,
+          em.create(SecurityAudit, {
+            userId: user.id,
+            event: SecurityEvent.PASSWORD_RESET_REQUEST,
+            ipAddress,
+            userAgent,
+          }),
+        );
       });
     } catch (error) {
       this.logger.error('Forgot-password transaction failed', error);
@@ -275,19 +281,18 @@ export class AuthService {
         });
 
         // 2. Revoke all active refresh tokens for this user
-        await em.update(
-          RefreshToken,
-          { userId: user.id, isRevoked: false },
-          { isRevoked: true },
-        );
+        await em.update(RefreshToken, { userId: user.id, isRevoked: false }, { isRevoked: true });
 
         // 3. Audit success
-        await em.save(SecurityAudit, em.create(SecurityAudit, {
-          userId: user.id,
-          event: SecurityEvent.PASSWORD_RESET_SUCCESS,
-          ipAddress,
-          userAgent,
-        }));
+        await em.save(
+          SecurityAudit,
+          em.create(SecurityAudit, {
+            userId: user.id,
+            event: SecurityEvent.PASSWORD_RESET_SUCCESS,
+            ipAddress,
+            userAgent,
+          }),
+        );
       });
 
       return { message: 'Password reset successful' };
@@ -322,13 +327,16 @@ export class AuthService {
         await em.update(User, user.id, { isEmailVerified: true });
 
         // 2. Audit the verification
-        await em.save(SecurityAudit, em.create(SecurityAudit, {
-          userId: user.id,
-          event: SecurityEvent.TWO_FACTOR_ENABLE, // nearest event; extend enum with EMAIL_VERIFIED
-          ipAddress,
-          userAgent,
-          metadata: { action: 'email_verified' },
-        }));
+        await em.save(
+          SecurityAudit,
+          em.create(SecurityAudit, {
+            userId: user.id,
+            event: SecurityEvent.TWO_FACTOR_ENABLE, // nearest event; extend enum with EMAIL_VERIFIED
+            ipAddress,
+            userAgent,
+            metadata: { action: 'email_verified' },
+          }),
+        );
       });
 
       return { message: 'Email verified successfully' };
@@ -371,19 +379,18 @@ export class AuthService {
         });
 
         // 2. Revoke all active refresh tokens
-        await em.update(
-          RefreshToken,
-          { userId: user.id, isRevoked: false },
-          { isRevoked: true },
-        );
+        await em.update(RefreshToken, { userId: user.id, isRevoked: false }, { isRevoked: true });
 
         // 3. Audit
-        await em.save(SecurityAudit, em.create(SecurityAudit, {
-          userId: user.id,
-          event: SecurityEvent.PASSWORD_CHANGE,
-          ipAddress,
-          userAgent,
-        }));
+        await em.save(
+          SecurityAudit,
+          em.create(SecurityAudit, {
+            userId: user.id,
+            event: SecurityEvent.PASSWORD_CHANGE,
+            ipAddress,
+            userAgent,
+          }),
+        );
       });
 
       return { message: 'Password updated successfully' };

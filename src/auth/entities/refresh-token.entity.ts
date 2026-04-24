@@ -9,6 +9,17 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
+/**
+ * Indexes:
+ *  - token      → B-tree on the stored hash; hit on every token validation
+ *  - userId     → FK index; used to revoke all tokens for a user
+ *  - expiresAt  → range scan to purge / skip expired tokens
+ */
+@Index('IDX_refresh_token_token', ['token'])
+@Index('IDX_refresh_token_userId', ['userId'])
+@Index('IDX_refresh_token_expiresAt', ['expiresAt'])
+@Index('IDX_refresh_token_createdAt', ['createdAt'])
+@Index('IDX_refresh_token_userId_isRevoked', ['userId', 'isRevoked'])
 @Entity('refresh_tokens')
 export class RefreshToken {
   @PrimaryGeneratedColumn('uuid')
@@ -16,6 +27,7 @@ export class RefreshToken {
 
   /** Hashed token value */
   @Index()
+  /** SHA-256 hash of the raw token sent to the client */
   @Column()
   token: string;
 
@@ -35,4 +47,3 @@ export class RefreshToken {
   @CreateDateColumn()
   createdAt: Date;
 }
-
