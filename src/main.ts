@@ -10,6 +10,40 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
 
+  // Issue #730: Implement proper CORS configuration
+  // Only allow specific trusted origins in production
+  const allowedOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : ['http://localhost:3000']; // Default for development
+
+  app.enableCors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['X-Total-Count', 'X-Next-Cursor'],
+    maxAge: 86400, // 24 hours
+  });
+
+  // Issue #731: Add request body size limits to prevent DoS attacks
+  // Max 10MB for regular requests, can be overridden via environment variable
+  const maxRequestSize = process.env.MAX_REQUEST_SIZE || '10mb';
+  
+  // Get the underlying Express instance and apply body size limits
+  const httpAdapter = app.getHttpAdapter();
+  const expressInstance = httpAdapter.getInstance();
+  expressInstance.use(expressInstance.json({ limit: maxRequestSize }));
+  expressInstance.use(expressInstance.urlencoded({ limit: maxRequestSize, extended: true }));
+
   // Apply secure logging interceptor globally
   app.useGlobalInterceptors(new SecureLoggingInterceptor());
 
