@@ -1,4 +1,7 @@
 import { Controller, Get, Param, Query, Header } from '@nestjs/common';
+import { UserService } from './user.service';
+import { EntityNotFoundException } from '../shared/domain/exceptions/domain-exceptions';
+
 import { ListUsersUseCase, ListUsersRequest } from './application/use-cases/list-users.use-case';
 import { GetUserUseCase, GetUserRequest } from './application/use-cases/get-user.use-case';
 
@@ -18,13 +21,15 @@ export class UserController {
   ) {
     const defaultLimit = 20;
     const requestedLimit = limit ? parseInt(limit.toString(), 10) : defaultLimit;
-    return this.listUsersUseCase.execute(
-      new ListUsersRequest(search, cursor, requestedLimit),
-    );
+    return this.listUsersUseCase.execute(new ListUsersRequest(search, cursor, requestedLimit));
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.getUserUseCase.execute(new GetUserRequest(id));
+    const user = await this.getUserUseCase.execute(new GetUserRequest(id));
+    if (!user) {
+      throw new EntityNotFoundException('User', id);
+    }
+    return user;
   }
 }

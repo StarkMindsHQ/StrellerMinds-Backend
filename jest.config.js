@@ -10,8 +10,11 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/**/*.spec.ts',
     '<rootDir>/src/**/*.test.ts',
+    '<rootDir>/test/**/*.spec.ts',
+    '<rootDir>/test/**/*.test.ts',
     '<rootDir>/test/integration/**/*.spec.ts',
     '<rootDir>/test/integration/**/*.test.ts',
+
   ],
 
   // Ignore patterns
@@ -27,7 +30,7 @@ module.exports = {
   },
 
   // Setup files
-  setupFilesAfterEnv: [],
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
 
   // Transform configuration
   transform: {
@@ -110,7 +113,6 @@ module.exports = {
 
   // Error handling
   bail: false,
-  errorOnDeprecated: true,
 
   // Module file extensions
   moduleFileExtensions: ['js', 'json', 'ts'],

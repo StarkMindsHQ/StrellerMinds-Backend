@@ -1,9 +1,25 @@
-import { Controller, Get, Param, Query, UseGuards, Header } from '@nestjs/common';
-import { ListCoursesUseCase, ListCoursesRequest } from './application/use-cases/list-courses.use-case';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  Header,
+} from '@nestjs/common';
+import { CourseService } from './course.service';
+
+import {
+  ListCoursesUseCase,
+  ListCoursesRequest,
+} from './application/use-cases/list-courses.use-case';
 import { GetCourseUseCase, GetCourseRequest } from './application/use-cases/get-course.use-case';
 import { RateLimitGuard } from 'src/auth/guards';
+import { EntityNotFoundException } from '../shared/domain/exceptions/domain-exceptions';
 
 @Controller('courses')
+@UseInterceptors(ClassSerializerInterceptor)
 export class CourseController {
   constructor(
     private readonly listCoursesUseCase: ListCoursesUseCase,
@@ -28,6 +44,10 @@ export class CourseController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.getCourseUseCase.execute(new GetCourseRequest(id));
+    const course = await this.getCourseUseCase.execute(new GetCourseRequest(id));
+    if (!course) {
+      throw new EntityNotFoundException('Course', id);
+    }
+    return course;
   }
 }

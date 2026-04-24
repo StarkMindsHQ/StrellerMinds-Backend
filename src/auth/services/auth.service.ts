@@ -17,6 +17,11 @@ import { SecurityAudit, SecurityEvent } from '../entities/security-audit.entity'
 import { UserProfile } from '../../user/entities/user-profile.entity';
 import { TransactionManager } from '../../common/database/transaction.manager';
 import { SecureLoggerService } from '../../common/secure-logging/secure-logger.service';
+import {
+  InvalidCredentialsException,
+  UserAlreadyExistsException,
+  UserNotFoundException,
+} from '../domain/exceptions/auth-exceptions';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +33,6 @@ export class AuthService {
 
     @InjectRepository(RefreshToken)
     private readonly refreshTokenRepository: Repository<RefreshToken>,
-
     private readonly transactionManager: TransactionManager,
     private readonly secureLogger: SecureLoggerService,
   ) {}
@@ -81,7 +85,7 @@ export class AuthService {
     const existingUser = await this.userRepository.findOne({ where: { email } });
     if (existingUser) {
       this.secureLogger.warn(`Registration failed: Email already in use: ${email}`);
-      throw new ConflictException('Email already in use');
+      throw new UserAlreadyExistsException(email);
     }
 
     try {
@@ -285,6 +289,7 @@ export class AuthService {
 
     if (!user) {
       this.secureLogger.warn(`Password reset failed: User not found for email: ${email}`);
+      throw new UserNotFoundException(email);
       throw new NotFoundException('User not found');
     }
 

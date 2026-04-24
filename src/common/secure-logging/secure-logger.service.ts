@@ -265,19 +265,9 @@ export class SecureLoggerService implements LoggerService {
         lowerKey.includes(sensitiveField.toLowerCase()),
       );
 
-      if (isSensitive) {
+      if (isSensitive && value !== null && value !== undefined) {
         // Sanitize sensitive fields
-        if (typeof value === 'string' && value.length > 0) {
-          // Show first and last 2 characters for context, mask the rest
-          if (value.length <= 6) {
-            sanitized[key] = this.config.replacementValue;
-          } else {
-            sanitized[key] =
-              `${value.substring(0, 2)}${'*'.repeat(Math.min(value.length - 4, 10))}${value.substring(value.length - 2)}`;
-          }
-        } else {
-          sanitized[key] = this.config.replacementValue;
-        }
+        sanitized[key] = this.config.replacementValue;
       } else {
         // Recursively sanitize nested objects
         sanitized[key] = this.sanitize(value, depth + 1);

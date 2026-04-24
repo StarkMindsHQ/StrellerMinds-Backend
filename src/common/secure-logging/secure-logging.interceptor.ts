@@ -22,13 +22,16 @@ export class SecureLoggingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
+    const requestId = request['requestId'];
 
     const { method, url, headers, body, params, query } = request;
 
     // Log request start (with sanitized data)
-    this.secureLogger.log(`Incoming Request: ${method} ${url}`, {
+    this.secureLogger.log(`Incoming Request: ${method} ${url} [ID: ${requestId}]`, {
+      requestId,
       method,
       url,
+
       params: this.sanitizeSensitiveData(params),
       query: this.sanitizeSensitiveData(query),
       // Don't log full headers to avoid logging authorization tokens
@@ -46,8 +49,9 @@ export class SecureLoggingInterceptor implements NestInterceptor {
 
           // Log successful response (with sanitized data)
           this.secureLogger.log(
-            `Response: ${method} ${url} - ${response.statusCode} (${duration}ms)`,
+            `Response: ${method} ${url} - ${response.statusCode} (${duration}ms) [ID: ${requestId}]`,
             {
+              requestId,
               method,
               url,
               statusCode: response.statusCode,
@@ -63,8 +67,9 @@ export class SecureLoggingInterceptor implements NestInterceptor {
 
           // Log error response (with sanitized data)
           this.secureLogger.error(
-            `Error Response: ${method} ${url} - ${error?.status || 500} (${duration}ms)`,
+            `Error Response: ${method} ${url} - ${error?.status || 500} (${duration}ms) [ID: ${requestId}]`,
             {
+              requestId,
               method,
               url,
               statusCode: error?.status || 500,

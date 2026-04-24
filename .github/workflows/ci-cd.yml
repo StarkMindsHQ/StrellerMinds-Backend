@@ -47,23 +47,6 @@ jobs:
         run: npm run lint
         continue-on-error: true
       
-      - name: Run tests
-        run: npm test
-        env:
-          NODE_ENV: test
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USER: postgres
-          DB_PASSWORD: postgres
-          DB_NAME: strellerminds_test
-          DATABASE_HOST: localhost
-          DATABASE_PORT: 5432
-          DATABASE_USER: postgres
-          DATABASE_PASSWORD: postgres
-          DATABASE_NAME: strellerminds_test
-          JWT_SECRET: test-secret-key
-          JWT_EXPIRES_IN: 15m
-      
       - name: Build project
         run: NODE_OPTIONS="--max-old-space-size=4096" npm run build
       

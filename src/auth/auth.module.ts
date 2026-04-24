@@ -67,4 +67,3 @@ import { TransactionManager } from '../common/database/transaction.manager';
   ],
 })
 export class AuthModule {}
-

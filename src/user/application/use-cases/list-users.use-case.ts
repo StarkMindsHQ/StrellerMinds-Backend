@@ -52,7 +52,7 @@ export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersRespons
 
   async execute(request: ListUsersRequest): Promise<ListUsersResponse> {
     const limit = request.limit || 20;
-    
+
     let users = [];
 
     if (request.search) {
@@ -64,7 +64,7 @@ export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersRespons
     // Apply cursor-based pagination
     let filteredUsers = users;
     if (request.cursor) {
-      const cursorIndex = users.findIndex(u => u.id === request.cursor);
+      const cursorIndex = users.findIndex((u) => u.id === request.cursor);
       if (cursorIndex !== -1) {
         filteredUsers = users.slice(cursorIndex + 1);
       }
@@ -72,7 +72,7 @@ export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersRespons
 
     // Check if there are more results
     const hasMore = filteredUsers.length > limit;
-    
+
     // Take only the requested limit
     const paginatedUsers = hasMore ? filteredUsers.slice(0, limit) : filteredUsers;
 
@@ -91,9 +91,7 @@ export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersRespons
     });
 
     // Generate next cursor
-    const nextCursor = hasMore && userItems.length > 0
-      ? userItems[userItems.length - 1].id
-      : null;
+    const nextCursor = hasMore && userItems.length > 0 ? userItems[userItems.length - 1].id : null;
 
     return new ListUsersResponse(userItems, nextCursor, hasMore);
   }
