@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { OpenAPIValidationMiddleware } from './common/contract-testing/openapi-validation.middleware';
 import { SecureLoggingInterceptor } from './common/secure-logging/secure-logging.interceptor';
 import { CsrfGuard } from './auth/guards/csrf.guard';
@@ -12,6 +13,40 @@ async function bootstrap() {
     // Disable default NestJS logger to use our secure logger
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
+
+  // Issue #728: Enforce HTTPS in production
+  // Use helmet to set security headers and redirect HTTP to HTTPS
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction) {
+    app.use(
+      helmet({
+        hsts: {
+          maxAge: 31536000, // 1 year in seconds
+          includeSubDomains: true,
+          preload: true,
+        },
+        contentSecurityPolicy: {
+          directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
+            imgSrc: ["'self'", 'data:', 'https:'],
+          },
+        },
+      }),
+    );
+
+    // Redirect HTTP to HTTPS
+    app.use((req, res, next) => {
+      if (!req.secure && req.protocol === 'http') {
+        return res.redirect(301, `https://${req.headers.host}${req.url}`);
+      }
+      next();
+    });
+  } else {
+    // In development, use helmet without HSTS to allow HTTP
+    app.use(helmet({ contentSecurityPolicy: false }));
+  }
 
   // Issue #730: Implement proper CORS configuration
   // Only allow specific trusted origins in production

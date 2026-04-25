@@ -126,7 +126,7 @@
     "@types/cypress": "^0.1.6",
     "@types/express": "^5.0.6",
     "@types/express-fileupload": "^1.5.1",
-    "@types/geoip-lite": "^1.4.4",
+    "@types/js-yaml": "^4.0.9",
     "@types/jest": "^29.5.14",
     "@types/multer": "^2.0.0",
     "@types/newman": "^5.3.6",
