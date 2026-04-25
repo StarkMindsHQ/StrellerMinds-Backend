@@ -1,0 +1,48 @@
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Res,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { DataRetentionService } from './data-retention.service';
+import { GdprService } from './gdpr.service';
+
+@Controller('gdpr')
+export class GdprController {
+  constructor(
+    private readonly gdprService: GdprService,
+    private readonly dataRetentionService: DataRetentionService,
+  ) {}
+
+  @Get('export/:userId')
+  async exportData(@Param('userId') userId: string, @Res() res: Response) {
+    const result = await this.gdprService.exportUserData(userId);
+    if (!result) throw new NotFoundException(`User ${userId} not found`);
+    res.setHeader('Content-Type', result.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.send(result.data);
+  }
+
+  @Delete('users/:userId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUserData(@Param('userId') userId: string) {
+    const deleted = await this.gdprService.deleteUserData(userId);
+    if (!deleted) throw new NotFoundException(`User ${userId} not found`);
+  }
+
+  @Get('retention-policies')
+  getRetentionPolicies() {
+    return this.dataRetentionService.getPolicies();
+  }
+
+  @Delete('retention-policies/apply')
+  @HttpCode(HttpStatus.OK)
+  async applyRetentionPolicies() {
+    return this.dataRetentionService.applyRetentionPolicies();
+  }
+}
