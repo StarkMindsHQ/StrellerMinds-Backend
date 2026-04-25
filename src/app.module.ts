@@ -8,6 +8,7 @@ import { HealthModule } from './health/health.module';
 import { ContractTestingModule } from './common/contract-testing/contract-testing.module';
 import { SecureLoggingModule } from './common/secure-logging/secure-logging.module';
 import { GdprModule } from './gdpr/gdpr.module';
+import { SecurityModule } from './security/security.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
@@ -33,6 +34,7 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
       }),
     }),
     SecureLoggingModule,
+    SecurityModule,
     AuthModule,
     UserModule,
     CourseModule,
