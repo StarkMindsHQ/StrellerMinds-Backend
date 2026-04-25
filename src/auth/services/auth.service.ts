@@ -10,6 +10,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 
 import { User } from '../entities/user.entity';
 import { RefreshToken } from '../entities/refresh-token.entity';
@@ -22,6 +23,7 @@ import {
   UserAlreadyExistsException,
   UserNotFoundException,
 } from '../domain/exceptions/auth-exceptions';
+import { EncryptionService } from '../../common/encryption.service';
 
 @Injectable()
 export class AuthService {
@@ -35,6 +37,7 @@ export class AuthService {
     private readonly refreshTokenRepository: Repository<RefreshToken>,
     private readonly transactionManager: TransactionManager,
     private readonly secureLogger: SecureLoggerService,
+    private readonly encryptionService: EncryptionService,
   ) {}
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -82,7 +85,8 @@ export class AuthService {
     userAgent?: string,
   ) {
     this.secureLogger.log(`Registration attempt for email: ${email}`);
-    const existingUser = await this.userRepository.findOne({ where: { email } });
+    const emailHash = this.encryptionService.hash(email.toLowerCase());
+    const existingUser = await this.userRepository.findOne({ where: { emailHash } as any });
     if (existingUser) {
       this.secureLogger.warn(`Registration failed: Email already in use: ${email}`);
       throw new UserAlreadyExistsException(email);
@@ -90,11 +94,11 @@ export class AuthService {
 
     try {
       const { user } = await this.transactionManager.run(async (em) => {
+        const hashedPassword = await bcrypt.hash(password, 12);
         // 1. Persist the new user
         const user = em.create(User, {
           email,
-          // TODO: hash password before persisting
-          password,
+          password: hashedPassword,
           firstName,
           lastName,
           isActive: true,
@@ -137,9 +141,11 @@ export class AuthService {
    */
   async login(email: string, password: string, ipAddress?: string, userAgent?: string) {
     this.secureLogger.log(`Login attempt for email: ${email}`);
-    const user = await this.userRepository.findOne({ where: { email } });
+    const emailHash = this.encryptionService.hash(email.toLowerCase());
+    const user = await this.userRepository.findOne({ where: { emailHash } as any });
+    const isPasswordValid = user ? await bcrypt.compare(password, user.password) : false;
 
-    if (!user || user.password !== password /* TODO: bcrypt.compare */) {
+    if (!user || !isPasswordValid) {
       this.secureLogger.warn(`Login failed: Invalid credentials for email: ${email}`);
       // Still write an audit log for failed attempts – not inside a tx because
       // user may not exist, but we want the record regardless.
@@ -226,7 +232,8 @@ export class AuthService {
    */
   async forgotPassword(email: string, ipAddress?: string, userAgent?: string) {
     this.secureLogger.log(`Password reset request for email: ${email}`);
-    const user = await this.userRepository.findOne({ where: { email } });
+    const emailHash = this.encryptionService.hash(email.toLowerCase());
+    const user = await this.userRepository.findOne({ where: { emailHash } as any });
     if (!user) {
       // Security: don't reveal whether the email exists
       this.secureLogger.log(`Password reset request: Email not found (intentionally not revealing)`);
@@ -281,10 +288,11 @@ export class AuthService {
     userAgent?: string,
   ) {
     this.secureLogger.log(`Password reset attempt for email: ${email}`);
+    const emailHash = this.encryptionService.hash(email.toLowerCase());
     const user = await this.userRepository
       .createQueryBuilder('user')
       .addSelect(['user.passwordResetToken', 'user.passwordResetExpires'])
-      .where('user.email = :email', { email })
+      .where('user.emailHash = :emailHash', { emailHash })
       .getOne();
 
     if (!user) {
@@ -306,9 +314,10 @@ export class AuthService {
 
     try {
       await this.transactionManager.run(async (em) => {
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
         // 1. Update password, clear reset token fields
         await em.update(User, user.id, {
-          password: newPassword, // TODO: bcrypt hash
+          password: hashedPassword,
           passwordResetToken: null as any,
           passwordResetExpires: null as any,
         });
@@ -346,8 +355,9 @@ export class AuthService {
     // TODO: validate JWT / HMAC email-verification token via JwtService
     // Stub: resolve email from token
     const email = 'user@example.com'; // replace with JwtService.verifyEmailVerificationToken(token).email
+    const emailHash = this.encryptionService.hash(email.toLowerCase());
 
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({ where: { emailHash } as any });
     if (!user) {
       this.secureLogger.warn('Email verification failed: User not found');
       throw new NotFoundException('User not found');
@@ -406,16 +416,18 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    if (user.password !== currentPassword /* TODO: bcrypt.compare */) {
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
       this.secureLogger.warn(`Password update failed: Incorrect current password for user: ${user.id}`);
       throw new UnauthorizedException('Current password is incorrect');
     }
 
     try {
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
       await this.transactionManager.run(async (em) => {
         // 1. Update password
         await em.update(User, user.id, {
-          password: newPassword, // TODO: bcrypt hash
+          password: hashedPassword,
         });
 
         // 2. Revoke all active refresh tokens
