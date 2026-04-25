@@ -12,6 +12,7 @@ import {
 import { RefreshToken } from './refresh-token.entity';
 import { EncryptionService } from '../../common/encryption.service';
 import { encryptionTransformer } from '../../common/encryption.transformer';
+import { Role } from '../enums/role.enum';
 
 /**
  * Indexes:
@@ -52,6 +53,16 @@ export class User {
   isEmailVerified: boolean;
 
   @Column({ nullable: true, select: false, transformer: encryptionTransformer })
+  @Column({ type: 'enum', enum: Role, default: Role.Student })
+  role: Role;
+
+  @Column({ nullable: true, select: false })
+  mfaSecret: string;
+
+  @Column({ default: false })
+  mfaEnabled: boolean;
+
+  @Column({ nullable: true, select: false })
   passwordResetToken: string;
 
   @Column({ type: 'timestamptz', nullable: true, select: false })
