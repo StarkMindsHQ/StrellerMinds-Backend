@@ -1,6 +1,8 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ResponseTimeInterceptor } from './common/interceptors/response-time.interceptor';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
@@ -12,6 +14,7 @@ import { SecurityModule } from './security/security.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { CertificatePinningMiddleware } from './common/middleware/certificate-pinning.middleware';
 
 @Module({
   imports: [
@@ -43,10 +46,14 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
     ContractTestingModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(RequestIdMiddleware).forRoutes('*');
+    consumer.apply(CertificatePinningMiddleware).forRoutes('*');
   }
 }
