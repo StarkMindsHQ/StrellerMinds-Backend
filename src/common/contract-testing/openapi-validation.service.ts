@@ -148,6 +148,9 @@ export class OpenAPIValidationService {
       // Validate the specification itself
       this.validateSpecification();
 
+      // Register all schemas with AJV for $ref resolution
+      this.registerSchemas();
+
       // Pre-compile schemas for better performance
       this.precompileSchemas();
 
@@ -188,6 +191,28 @@ export class OpenAPIValidationService {
         throw new Error(`Missing required info field: ${field}`);
       }
     }
+  }
+
+  /**
+   * Register all schemas from OpenAPI spec with AJV for $ref resolution
+   */
+  private registerSchemas(): void {
+    if (!this.openApiSpec?.components?.schemas) {
+      return;
+    }
+
+    const schemas = this.openApiSpec.components.schemas;
+
+    for (const [schemaName, schema] of Object.entries(schemas)) {
+      try {
+        // Add schema with its full reference path
+        this.ajv.addSchema(schema, `#/components/schemas/${schemaName}`);
+      } catch (error) {
+        this.logger.warn(`Failed to register schema ${schemaName}:`, error.message);
+      }
+    }
+
+    this.logger.log(`Registered ${Object.keys(schemas).length} schemas with AJV`);
   }
 
   /**
