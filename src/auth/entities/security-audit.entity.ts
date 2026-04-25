@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -21,6 +22,17 @@ export enum SecurityEvent {
   PASSWORD_RESET_FAILED = 'password_reset_failed',
 }
 
+/**
+ * Indexes:
+ *  - userId    → FK; fetch audit trail for a specific user
+ *  - event     → filter by event type (e.g. all LOGIN_FAILED in a window)
+ *  - createdAt → time-range queries for security dashboards / alerting
+ *  - (userId, createdAt) composite → "all events for user X after time T"
+ */
+@Index('IDX_security_audit_userId', ['userId'])
+@Index('IDX_security_audit_event', ['event'])
+@Index('IDX_security_audit_createdAt', ['createdAt'])
+@Index('IDX_security_audit_userId_createdAt', ['userId', 'createdAt'])
 @Entity('security_audits')
 export class SecurityAudit {
   @PrimaryGeneratedColumn('uuid')

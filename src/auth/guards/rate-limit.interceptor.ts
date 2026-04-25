@@ -37,11 +37,7 @@ export class RateLimitInterceptor implements NestInterceptor {
     const key = this.getKey(request, options);
 
     // Check if request is allowed
-    const result = this.rateLimiterService.isAllowed(
-      key,
-      options.maxRequests,
-      options.windowMs,
-    );
+    const result = this.rateLimiterService.isAllowed(key, options.maxRequests, options.windowMs);
 
     // Set rate limit headers
     response.setHeader('X-RateLimit-Limit', options.maxRequests);

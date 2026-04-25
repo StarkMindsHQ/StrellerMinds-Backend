@@ -42,6 +42,16 @@ export const SESSION_COOKIE_CONFIG: CookieConfig = {
   domain: process.env.COOKIE_DOMAIN,
 };
 
+export const CSRF_COOKIE_CONFIG: CookieConfig = {
+  name: 'XSRF-TOKEN',
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  httpOnly: true, // Only accessible by the server
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/',
+  domain: process.env.COOKIE_DOMAIN,
+};
+
 /**
  * Cookie options compatible with express Response.cookie()
  */

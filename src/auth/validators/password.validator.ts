@@ -30,7 +30,8 @@ export class PasswordValidator {
   private static readonly VALID_CHARS_PATTERN = /^[A-Za-z\d@$!%*?&]+$/;
 
   // Combined validation pattern (for quick validation)
-  private static readonly STRENGTH_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,128}$/;
+  private static readonly STRENGTH_PATTERN =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,128}$/;
 
   /**
    * Validate password against all requirements
@@ -161,4 +162,5 @@ export class PasswordValidator {
 }
 
 // Export regex for DTO decorator usage
-export const PASSWORD_STRENGTH_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,128}$/;
+export const PASSWORD_STRENGTH_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,128}$/;

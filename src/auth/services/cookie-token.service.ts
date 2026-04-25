@@ -3,8 +3,10 @@ import { Response, Request } from 'express';
 import {
   JWT_COOKIE_CONFIG,
   REFRESH_TOKEN_COOKIE_CONFIG,
+  CSRF_COOKIE_CONFIG,
   getCookieOptions,
 } from '../config/cookie.config';
+import * as crypto from 'crypto';
 
 /**
  * Service for managing JWT tokens via secure httpOnly cookies
@@ -15,11 +17,7 @@ export class CookieTokenService {
    * Set access token as httpOnly cookie
    */
   setAccessTokenCookie(response: Response, token: string): void {
-    response.cookie(
-      JWT_COOKIE_CONFIG.name,
-      token,
-      getCookieOptions(JWT_COOKIE_CONFIG),
-    );
+    response.cookie(JWT_COOKIE_CONFIG.name, token, getCookieOptions(JWT_COOKIE_CONFIG));
   }
 
   /**
@@ -39,6 +37,20 @@ export class CookieTokenService {
   setAuthTokenCookies(response: Response, accessToken: string, refreshToken: string): void {
     this.setAccessTokenCookie(response, accessToken);
     this.setRefreshTokenCookie(response, refreshToken);
+  }
+
+  /**
+   * Set CSRF token as httpOnly cookie
+   */
+  setCsrfCookie(response: Response, token: string): void {
+    response.cookie(CSRF_COOKIE_CONFIG.name, token, getCookieOptions(CSRF_COOKIE_CONFIG));
+  }
+
+  /**
+   * Generate a random CSRF token
+   */
+  generateCsrfToken(): string {
+    return crypto.randomBytes(32).toString('hex');
   }
 
   /**
@@ -80,20 +92,31 @@ export class CookieTokenService {
   }
 
   /**
+   * Clear CSRF cookie
+   */
+  clearCsrfCookie(response: Response): void {
+    response.clearCookie(CSRF_COOKIE_CONFIG.name, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+  }
+
+  /**
    * Clear all auth cookies (logout)
    */
   clearAuthTokenCookies(response: Response): void {
     this.clearAccessTokenCookie(response);
     this.clearRefreshTokenCookie(response);
+    this.clearCsrfCookie(response);
   }
 
   /**
    * Check if cookies are available
    */
   hasAuthTokens(request: Request): boolean {
-    return !!(
-      this.getAccessToken(request) && this.getRefreshToken(request)
-    );
+    return !!(this.getAccessToken(request) && this.getRefreshToken(request));
   }
 
   /**

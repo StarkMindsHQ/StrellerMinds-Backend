@@ -103,10 +103,11 @@ The JWT token is **only** in the httpOnly cookie, not in the response body.
 - Development uses HTTP for testing
 - Set via `secure: process.env.NODE_ENV === 'production'`
 
-### 3. SameSite Protection
-- **Value: 'lax'** - Prevents CSRF attacks
-- Cookies only sent on same-site requests
-- Blocks cross-site request forgery attempts
+### 3. CSRF Protection
+- **SameSite: 'lax'**: Provides basic browser-level protection.
+- **CSRF Tokens**: explicit validation for all state-changing operations (POST, PUT, DELETE, PATCH).
+- **Double Submit Cookie pattern**: Server compares an `HttpOnly` cookie with a custom header (`X-CSRF-Token`).
+- **Endpoint**: `GET /auth/csrf-token` to retrieve a new token.
 
 ### 4. Token Separation
 - **Access tokens**: Short-lived (15 minutes)
@@ -136,6 +137,7 @@ Content-Type: application/json
 HTTP/1.1 200 OK
 Set-Cookie: accessToken=eyJhbGc...; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=900
 Set-Cookie: refreshToken=eyJhbGc...; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800
+Set-Cookie: XSRF-TOKEN=...; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=86400
 Content-Type: application/json
 
 {
@@ -209,10 +211,16 @@ const api = axios.create({
   withCredentials: true  // Include cookies in requests
 });
 
-// Make authenticated requests
-api.get('/auth/profile')
-  .then(res => console.log('User:', res.data))
-  .catch(err => console.error('Not authenticated'));
+// 1. Get CSRF token first
+const { csrfToken } = await api.get('/auth/csrf-token').then(res => res.data);
+
+// 2. Make state-changing requests with the token in header
+api.post('/user/update-profile', { name: 'New Name' }, {
+  headers: { 'X-CSRF-Token': csrfToken }
+})
+  .then(res => console.log('Updated:', res.data))
+  .catch(err => console.error('Update failed'));
+
 ```
 
 ### Protected Routes

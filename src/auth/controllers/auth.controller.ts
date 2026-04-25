@@ -7,9 +7,13 @@ import {
   UseFilters,
   HttpCode,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from '../services/auth.service';
+import { CookieTokenService } from '../services/cookie-token.service';
 import { PasswordStrengthService } from '../services/password-strength.service';
+
 import {
   LoginDto,
   RegisterDto,
@@ -20,16 +24,23 @@ import {
   ForgotPasswordDto,
   CheckPasswordStrengthDto,
 } from '../dtos';
-import { ValidationExceptionFilter } from '../filters';
-import { RateLimitGuard, RateLimitExceptionFilter } from '../guards';
+import { RateLimitGuard } from '../guards';
 
 @Controller('auth')
-@UseFilters(ValidationExceptionFilter, RateLimitExceptionFilter)
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly passwordStrengthService: PasswordStrengthService,
+    private readonly cookieTokenService: CookieTokenService,
   ) {}
+
+  @Get('csrf-token')
+  @HttpCode(HttpStatus.OK)
+  async getCsrfToken(@Res({ passthrough: true }) res: Response) {
+    const token = this.cookieTokenService.generateCsrfToken();
+    this.cookieTokenService.setCsrfCookie(res, token);
+    return { csrfToken: token };
+  }
 
   @Post('login')
   @UseGuards(RateLimitGuard('LOGIN'))
@@ -86,7 +97,10 @@ export class AuthController {
   @UseGuards()
   @HttpCode(HttpStatus.OK)
   async updatePassword(@Body() updatePasswordDto: UpdatePasswordDto) {
+    // TODO: pass req.user.id once JWT guard is properly wired
+    const userId = 'TODO-get-from-jwt-guard';
     return this.authService.updatePassword(
+      userId,
       updatePasswordDto.currentPassword,
       updatePasswordDto.newPassword,
     );
