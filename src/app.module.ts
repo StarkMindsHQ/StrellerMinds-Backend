@@ -12,6 +12,7 @@ import { SecurityModule } from './security/security.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { SecurityHeadersMiddleware } from './security/security-headers.middleware';
 
 @Module({
   imports: [
@@ -47,6 +48,8 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    // Security headers applied first, before any route logic
+    consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
     consumer.apply(RequestIdMiddleware).forRoutes('*');
   }
 }
