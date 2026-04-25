@@ -8,6 +8,7 @@ import {
   Index,
 } from 'typeorm';
 import { RefreshToken } from './refresh-token.entity';
+import { Role } from '../enums/role.enum';
 
 /**
  * Indexes:
@@ -43,6 +44,15 @@ export class User {
 
   @Column({ default: false })
   isEmailVerified: boolean;
+
+  @Column({ type: 'enum', enum: Role, default: Role.Student })
+  role: Role;
+
+  @Column({ nullable: true, select: false })
+  mfaSecret: string;
+
+  @Column({ default: false })
+  mfaEnabled: boolean;
 
   @Column({ nullable: true, select: false })
   passwordResetToken: string;

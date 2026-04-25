@@ -7,10 +7,12 @@ import type { JwtModuleOptions } from '@nestjs/jwt';
 
 import { AuthController } from './controllers/auth.controller';
 import { TokenController } from './controllers/token.controller';
+import { MfaController } from './controllers/mfa.controller';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { PasswordStrengthService } from './services/password-strength.service';
 import { CookieTokenService } from './services/cookie-token.service';
+import { MfaService } from './services/mfa.service';
 import { User } from './entities/user.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { SecurityAudit } from './entities/security-audit.entity';
@@ -40,12 +42,13 @@ import { TransactionManager } from '../common/database/transaction.manager';
       global: true,
     }),
   ],
-  controllers: [AuthController, TokenController],
+  controllers: [AuthController, TokenController, MfaController],
   providers: [
     AuthService,
     JwtService,
     PasswordStrengthService,
     CookieTokenService,
+    MfaService,
     JwtAuthGuard,
     JwtCookieGuard,
     JwtCookieStrategy,
@@ -58,6 +61,7 @@ import { TransactionManager } from '../common/database/transaction.manager';
     JwtService,
     PasswordStrengthService,
     CookieTokenService,
+    MfaService,
     JwtAuthGuard,
     JwtCookieGuard,
     JwtCookieStrategy,
