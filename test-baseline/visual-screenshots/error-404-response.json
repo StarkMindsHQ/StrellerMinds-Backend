@@ -1,0 +1,5 @@
+{
+  "message": "Cannot GET /nonexistent-endpoint",
+  "error": "Not Found",
+  "statusCode": 404
+}

@@ -1,0 +1,1627 @@
+openapi: 3.0.3
+info:
+  title: StrellerMinds Backend API
+  description: Minimal Blockchain Education Platform API
+  version: 1.0.0
+  contact:
+    name: StarkMindsHQ
+    url: https://github.com/StarkMindsHQ/StrellerMinds-Backend
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.strellerminds.com
+    description: Production server
+
+tags:
+  - name: Health
+    description: Health check and system status
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Users
+    description: User management operations
+  - name: Courses
+    description: Course management operations
+  - name: Webhooks
+    description: External service webhook handlers
+  - name: Payments
+    description: Payment processing operations
+  - name: Integrations
+    description: Third-party service integrations
+
+paths:
+  /:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      description: Returns a simple health check message
+      operationId: getHealth
+      responses:
+        '200':
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Hello World!"
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Detailed health check
+      description: Returns detailed system health information
+      operationId: getDetailedHealth
+      responses:
+        '200':
+          description: System health information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticates a user and returns access tokens
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Too many login attempts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: User registration
+      description: Registers a new user account
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Refreshes an access token using a refresh token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Logs out a user and invalidates tokens
+      operationId: logoutUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/profile:
+    get:
+      tags:
+        - Authentication
+      summary: Get user profile
+      description: Retrieves the authenticated user's profile
+      operationId: getUserProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      description: Retrieves a list of all users
+      operationId: getAllUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: search
+          in: query
+          description: Search term for filtering users
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Users
+      summary: Create user
+      description: Creates a new user account
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Retrieves a specific user by their ID
+      operationId: getUserById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Updates a user's information
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Deletes a user account
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: User deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /courses:
+    get:
+      tags:
+        - Courses
+      summary: Get all courses
+      description: Retrieves a list of all courses
+      operationId: getAllCourses
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: category
+          in: query
+          description: Filter by course category
+          required: false
+          schema:
+            type: string
+        - name: difficulty
+          in: query
+          description: Filter by difficulty level
+          required: false
+          schema:
+            type: string
+            enum: [beginner, intermediate, advanced]
+      responses:
+        '200':
+          description: Courses retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoursesListResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Courses
+      summary: Create course
+      description: Creates a new course
+      operationId: createCourse
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseRequest'
+      responses:
+        '201':
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /courses/{id}:
+    get:
+      tags:
+        - Courses
+      summary: Get course by ID
+      description: Retrieves a specific course by its ID
+      operationId: getCourseById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Course ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Course retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Courses
+      summary: Update course
+      description: Updates a course's information
+      operationId: updateCourse
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Course ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCourseRequest'
+      responses:
+        '200':
+          description: Course updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Courses
+      summary: Delete course
+      description: Deletes a course
+      operationId: deleteCourse
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Course ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Course deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /courses/{id}/enroll:
+    post:
+      tags:
+        - Courses
+      summary: Enroll in course
+      description: Enrolls a user in a course
+      operationId: enrollInCourse
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Course ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Enrollment successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Already enrolled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/stripe:
+    post:
+      tags:
+        - Webhooks
+      summary: Stripe webhook handler
+      description: Processes webhook events from Stripe
+      operationId: handleStripeWebhook
+      security:
+        - stripeSignature: []
+      parameters:
+        - name: stripe-signature
+          in: header
+          description: Stripe webhook signature
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Stripe webhook event payload
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/paypal:
+    post:
+      tags:
+        - Webhooks
+      summary: PayPal webhook handler
+      description: Processes webhook events from PayPal
+      operationId: handlePayPalWebhook
+      security:
+        - paypalSignature: []
+      parameters:
+        - name: paypal-auth-algo
+          in: header
+          description: PayPal signature algorithm
+          required: true
+          schema:
+            type: string
+        - name: paypal-transmission-id
+          in: header
+          description: PayPal transmission ID
+          required: true
+          schema:
+            type: string
+        - name: paypal-cert-id
+          in: header
+          description: PayPal certificate ID
+          required: true
+          schema:
+            type: string
+        - name: paypal-transmission-sig
+          in: header
+          description: PayPal transmission signature
+          required: true
+          schema:
+            type: string
+        - name: paypal-transmission-time
+          in: header
+          description: PayPal transmission time
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: PayPal webhook event payload
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/zoom:
+    post:
+      tags:
+        - Webhooks
+      summary: Zoom webhook handler
+      description: Processes webhook events from Zoom
+      operationId: handleZoomWebhook
+      security:
+        - zoomSignature: []
+      parameters:
+        - name: x-zm-signature
+          in: header
+          description: Zoom webhook signature
+          required: true
+          schema:
+            type: string
+        - name: x-zm-request-timestamp
+          in: header
+          description: Zoom request timestamp
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Zoom webhook event payload
+      responses:
+        '200':
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized webhook
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /payments/stripe/create-payment-intent:
+    post:
+      tags:
+        - Payments
+      summary: Create Stripe payment intent
+      description: Creates a new payment intent using Stripe
+      operationId: createStripePaymentIntent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentIntentRequest'
+      responses:
+        '200':
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntentResponse'
+        '400':
+          description: Invalid payment data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /payments/paypal/create-order:
+    post:
+      tags:
+        - Payments
+      summary: Create PayPal order
+      description: Creates a new order using PayPal
+      operationId: createPayPalOrder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePayPalOrderRequest'
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayPalOrderResponse'
+        '400':
+          description: Invalid order data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/integration/health:
+    get:
+      tags:
+        - Integrations
+      summary: Get integration health status
+      description: Retrieves health status for all external integrations
+      operationId: getIntegrationHealth
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Integration health status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationHealthResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /admin/integration/metrics:
+    get:
+      tags:
+        - Integrations
+      summary: Get integration metrics
+      description: Retrieves performance metrics for external integrations
+      operationId: getIntegrationMetrics
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: service
+          in: query
+          description: Filter by specific service
+          required: false
+          schema:
+            type: string
+            enum: [stripe, paypal, zoom, email, storage]
+        - name: timeRange
+          in: query
+          description: Time range in hours
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 168
+            default: 24
+      responses:
+        '200':
+          description: Integration metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntegrationMetricsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    stripeSignature:
+      type: apiKey
+      in: header
+      name: stripe-signature
+    paypalSignature:
+      type: apiKey
+      in: header
+      name: paypal-transmission-sig
+    zoomSignature:
+      type: apiKey
+      in: header
+      name: x-zm-signature
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy, degraded]
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: number
+          description: Server uptime in seconds
+        version:
+          type: string
+          description: API version
+        environment:
+          type: string
+          enum: [development, staging, production]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: true
+        message:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+        details:
+          type: object
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+          description: Request path
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          description: Success message
+        timestamp:
+          type: string
+          format: date-time
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+        password:
+          type: string
+          minLength: 8
+          description: User password
+        rememberMe:
+          type: boolean
+          description: Remember user session
+          default: false
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+        password:
+          type: string
+          minLength: 8
+          description: User password
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: User first name
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: User last name
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: Refresh token
+
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+        refreshToken:
+          type: string
+          description: JWT refresh token
+        expiresIn:
+          type: number
+          description: Token expiration time in seconds
+        tokenType:
+          type: string
+          enum: [Bearer]
+          example: Bearer
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User ID
+        email:
+          type: string
+          format: email
+          description: User email
+        firstName:
+          type: string
+          description: User first name
+        lastName:
+          type: string
+          description: User last name
+        role:
+          type: string
+          enum: [user, admin, instructor]
+          description: User role
+        isActive:
+          type: boolean
+          description: Whether user account is active
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    UserProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User ID
+        email:
+          type: string
+          format: email
+          description: User email
+        firstName:
+          type: string
+          description: User first name
+        lastName:
+          type: string
+          description: User last name
+        role:
+          type: string
+          enum: [user, admin, instructor]
+          description: User role
+        profile:
+          type: object
+          properties:
+            bio:
+              type: string
+              description: User bio
+            avatar:
+              type: string
+              format: uri
+              description: Avatar URL
+            preferences:
+              type: object
+              description: User preferences
+        enrollments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnrollmentResponse'
+          description: User course enrollments
+
+    CreateUserRequest:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: User first name
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: User last name
+        role:
+          type: string
+          enum: [user, admin, instructor]
+          description: User role
+        isActive:
+          type: boolean
+          description: Whether user account should be active
+          default: true
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: User first name
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: User last name
+        role:
+          type: string
+          enum: [user, admin, instructor]
+          description: User role
+        isActive:
+          type: boolean
+          description: Whether user account is active
+
+    UsersListResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+        total:
+          type: number
+          description: Total number of users
+
+    CourseResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Course ID
+        title:
+          type: string
+          description: Course title
+        description:
+          type: string
+          description: Course description
+        category:
+          type: string
+          description: Course category
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          description: Course difficulty level
+        price:
+          type: number
+          format: float
+          description: Course price
+        duration:
+          type: number
+          description: Course duration in hours
+        instructor:
+          $ref: '#/components/schemas/UserResponse'
+        enrollmentCount:
+          type: number
+          description: Number of enrolled students
+        isPublished:
+          type: boolean
+          description: Whether course is published
+        createdAt:
+          type: string
+          format: date-time
+          description: Course creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    CreateCourseRequest:
+      type: object
+      required:
+        - title
+        - description
+        - category
+        - difficulty
+        - price
+        - duration
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Course title
+        description:
+          type: string
+          minLength: 1
+          description: Course description
+        category:
+          type: string
+          description: Course category
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          description: Course difficulty level
+        price:
+          type: number
+          format: float
+          minimum: 0
+          description: Course price
+        duration:
+          type: number
+          minimum: 1
+          description: Course duration in hours
+
+    UpdateCourseRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Course title
+        description:
+          type: string
+          description: Course description
+        category:
+          type: string
+          description: Course category
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+          description: Course difficulty level
+        price:
+          type: number
+          format: float
+          minimum: 0
+          description: Course price
+        duration:
+          type: number
+          minimum: 1
+          description: Course duration in hours
+        isPublished:
+          type: boolean
+          description: Whether course is published
+
+    CoursesListResponse:
+      type: object
+      properties:
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/CourseResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+        total:
+          type: number
+          description: Total number of courses
+
+    EnrollmentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Enrollment ID
+        userId:
+          type: string
+          format: uuid
+          description: User ID
+        courseId:
+          type: string
+          format: uuid
+          description: Course ID
+        status:
+          type: string
+          enum: [active, completed, dropped]
+          description: Enrollment status
+        enrolledAt:
+          type: string
+          format: date-time
+          description: Enrollment timestamp
+        completedAt:
+          type: string
+          format: date-time
+          description: Completion timestamp
+        progress:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Course completion percentage
+
+    CreatePaymentIntentRequest:
+      type: object
+      required:
+        - amount
+        - currency
+        - courseId
+      properties:
+        amount:
+          type: integer
+          minimum: 50
+          description: Amount in cents
+        currency:
+          type: string
+          enum: [usd, eur, gbp]
+          description: Currency code
+        courseId:
+          type: string
+          format: uuid
+          description: Course ID
+        paymentMethodId:
+          type: string
+          description: Payment method ID (optional)
+
+    PaymentIntentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Payment intent ID
+        amount:
+          type: integer
+          description: Amount in cents
+        currency:
+          type: string
+          description: Currency code
+        status:
+          type: string
+          enum: [requires_payment_method, requires_confirmation, requires_action, processing, succeeded, canceled]
+          description: Payment intent status
+        clientSecret:
+          type: string
+          description: Client secret for frontend payment processing
+
+    CreatePayPalOrderRequest:
+      type: object
+      required:
+        - amount
+        - currency
+        - courseId
+      properties:
+        amount:
+          type: string
+          description: Amount with decimal places
+        currency:
+          type: string
+          enum: [USD, EUR, GBP]
+          description: Currency code
+        courseId:
+          type: string
+          format: uuid
+          description: Course ID
+        returnUrl:
+          type: string
+          format: uri
+          description: Return URL after payment
+        cancelUrl:
+          type: string
+          format: uri
+          description: Cancel URL
+
+    PayPalOrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: PayPal order ID
+        status:
+          type: string
+          description: Order status
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              href:
+                type: string
+                format: uri
+              rel:
+                type: string
+              method:
+                type: string
+
+    IntegrationHealthResponse:
+      type: object
+      properties:
+        overall:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+          description: Overall integration health
+        services:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Service name
+              status:
+                type: string
+                enum: [healthy, degraded, unhealthy]
+                description: Service health status
+              availability:
+                type: number
+                description: Service availability percentage
+              averageResponseTime:
+                type: number
+                description: Average response time in milliseconds
+              lastCheck:
+                type: string
+                format: date-time
+                description: Last health check timestamp
+
+    IntegrationMetricsResponse:
+      type: object
+      properties:
+        serviceName:
+          type: string
+          description: Service name
+        timeRange:
+          type: number
+          description: Time range in hours
+        metrics:
+          type: object
+          properties:
+            totalRequests:
+              type: number
+              description: Total number of requests
+            successfulRequests:
+              type: number
+              description: Number of successful requests
+            failedRequests:
+              type: number
+              description: Number of failed requests
+            successRate:
+              type: number
+              description: Success rate percentage
+            errorRate:
+              type: number
+              description: Error rate percentage
+            averageResponseTime:
+              type: number
+              description: Average response time in milliseconds
+            minResponseTime:
+              type: number
+              description: Minimum response time
+            maxResponseTime:
+              type: number
+              description: Maximum response time
+            p95ResponseTime:
+              type: number
+              description: 95th percentile response time
+            p99ResponseTime:
+              type: number
+              description: 99th percentile response time
+
+    PaginationInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: Current page number
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: Items per page
+        totalPages:
+          type: integer
+          minimum: 0
+          description: Total number of pages
+        hasNext:
+          type: boolean
+          description: Whether there are more pages
+        hasPrev:
+          type: boolean
+          description: Whether there are previous pages

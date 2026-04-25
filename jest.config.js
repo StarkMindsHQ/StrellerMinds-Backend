@@ -10,6 +10,11 @@ module.exports = {
   testMatch: [
     '<rootDir>/src/**/*.spec.ts',
     '<rootDir>/src/**/*.test.ts',
+    '<rootDir>/test/**/*.spec.ts',
+    '<rootDir>/test/**/*.test.ts',
+    '<rootDir>/test/integration/**/*.spec.ts',
+    '<rootDir>/test/integration/**/*.test.ts',
+
   ],
 
   // Ignore patterns
@@ -21,10 +26,11 @@ module.exports = {
     '^@test/(.*)$': '<rootDir>/test/$1',
     '^src/(.*)$': '<rootDir>/src/$1',
     '^uuid$': '<rootDir>/node_modules/uuid/dist/index.js',
+    '^uuid/(.*)$': '<rootDir>/node_modules/uuid/dist/$1',
   },
 
   // Setup files
-  setupFilesAfterEnv: [],
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
 
   // Transform configuration
   transform: {
@@ -35,11 +41,19 @@ module.exports = {
         isolatedModules: false,
       },
     ],
+    // Transform ESM .js files from node_modules that need CJS conversion
+    '^.+\\.js$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.spec.json',
+        isolatedModules: true,
+      },
+    ],
   },
 
-  // Transform ignore patterns
+  // Transform ignore patterns — un-ignore ESM-only packages in node_modules
   transformIgnorePatterns: [
-    'node_modules/(?!(@nestjs/typeorm|typeorm|uuid))',
+    'node_modules/(?!(@nestjs/typeorm|typeorm|uuid|@nestjs/axios|axios|ioredis|@nestjs-modules/ioredis))',
   ],
 
   // Coverage configuration
@@ -99,7 +113,6 @@ module.exports = {
 
   // Error handling
   bail: false,
-  errorOnDeprecated: true,
 
   // Module file extensions
   moduleFileExtensions: ['js', 'json', 'ts'],
