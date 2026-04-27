@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { createHash } from 'crypto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ShardKeyService {
   private readonly shardCount: number;
 
-  constructor() {
-    this.shardCount = 4; // Default shard count
+  constructor(private configService: ConfigService) {
+    this.shardCount = this.configService.get<number>('DATABASE_SHARD_COUNT', 4);
   }
 
   /**

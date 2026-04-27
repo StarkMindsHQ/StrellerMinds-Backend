@@ -35,6 +35,7 @@ import { ShardingController } from './sharding/sharding.controller';
     DynamicPoolSizingService,
     ConnectionPoolMonitor,
     ConnectionPoolManager,
+    ShardingModule,
   ],
 })
 export class DatabaseModule {}
