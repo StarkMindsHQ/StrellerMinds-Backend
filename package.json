@@ -60,6 +60,8 @@
     "@stellar/stellar-sdk": "^13.3.0",
     "@types/uuid": "^10.0.0",
     "@willsoto/nestjs-prometheus": "^6.0.2",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "bull": "^4.16.5",
@@ -83,6 +85,7 @@
     "install": "^0.13.0",
     "ioredis": "^5.9.2",
     "joi": "^18.0.2",
+    "js-yaml": "^4.1.0",
     "json2csv": "^6.0.0-alpha.2",
     "juice": "^11.1.1",
     "luxon": "^3.7.2",
@@ -126,6 +129,7 @@
     "@types/cypress": "^0.1.6",
     "@types/express": "^5.0.6",
     "@types/express-fileupload": "^1.5.1",
+    "@types/geoip-lite": "^1.4.4",
     "@types/js-yaml": "^4.0.9",
     "@types/jest": "^29.5.14",
     "@types/multer": "^2.0.0",
@@ -156,37 +160,5 @@
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.3"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": ".",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverage": true,
-    "coverageDirectory": "coverage",
-    "coverageReporters": [
-      "text",
-      "lcov",
-      "html"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.(t|j)s",
-      "!src/main.ts",
-      "!src/**/*.module.ts"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 80,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    }
   }
 }
