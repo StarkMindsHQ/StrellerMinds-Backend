@@ -13,6 +13,7 @@ import { GdprModule } from './gdpr/gdpr.module';
 import { SecurityModule } from './security/security.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CommonModule } from './common/common.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { CertificatePinningMiddleware } from './common/middleware/certificate-pinning.middleware';
 
@@ -44,6 +45,7 @@ import { CertificatePinningMiddleware } from './common/middleware/certificate-pi
     HealthModule,
     GdprModule,
     ContractTestingModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [
