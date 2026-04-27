@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import xss from 'xss';
+import { IFilterXSSOptions } from 'xss';
 
-const xssOptions: xss.IFilterXSSOptions = {
+const xssOptions: IFilterXSSOptions = {
   whiteList: {},
   stripIgnoreTag: true,
   stripIgnoreTagBody: ['script'],
