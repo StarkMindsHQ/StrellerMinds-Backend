@@ -6,17 +6,21 @@ import {
   UpdateDateColumn,
   OneToMany,
   Index,
+  BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { RefreshToken } from './refresh-token.entity';
+import { EncryptionService } from '../../common/encryption.service';
+import { encryptionTransformer } from '../../common/encryption.transformer';
 import { Role } from '../enums/role.enum';
 
 /**
  * Indexes:
- *  - email        → unique B-tree (login lookups, duplicate-check on register)
+ *  - emailHash    → unique B-tree (login lookups, duplicate-check on register)
  *  - isActive     → partial-index candidate; used in user-status filters
  *  - createdAt    → range scans for admin dashboards / reporting
  */
-@Index('IDX_user_email', ['email'], { unique: true })
+@Index('IDX_user_email_hash', ['emailHash'], { unique: true })
 @Index('IDX_user_isActive', ['isActive'])
 @Index('IDX_user_createdAt', ['createdAt'])
 @Index('IDX_user_updatedAt', ['updatedAt'])
@@ -25,18 +29,21 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  /** Unique index defined both via @Column unique:true (DDL constraint)
-   *  and the composite @Index above so TypeORM names it predictably. */
-  @Column({ unique: true })
+  /** Encrypted email for display/communication */
+  @Column({ transformer: encryptionTransformer })
   email: string;
 
-  @Column()
+  /** Blind index for email lookups */
+  @Column({ unique: true, select: false })
+  emailHash: string;
+
+  @Column({ transformer: encryptionTransformer })
   password: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, transformer: encryptionTransformer })
   firstName: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, transformer: encryptionTransformer })
   lastName: string;
 
   @Column({ default: true })
@@ -45,6 +52,7 @@ export class User {
   @Column({ default: false })
   isEmailVerified: boolean;
 
+  @Column({ nullable: true, select: false, transformer: encryptionTransformer })
   @Column({ type: 'enum', enum: Role, default: Role.Student })
   role: Role;
 
@@ -68,4 +76,15 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  updateEmailHash() {
+    if (this.email) {
+      const service = EncryptionService.getInstance();
+      if (service) {
+        this.emailHash = service.hash(this.email.toLowerCase());
+      }
+    }
+  }
 }

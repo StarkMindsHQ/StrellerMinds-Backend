@@ -5,6 +5,7 @@ import { IUserRepository } from '../../domain/repositories/user-repository.inter
 import { User } from '../../domain/entities/user.entity';
 import { UserPersistenceEntity } from '../persistence/user-persistence.entity';
 import { UserMapper } from '../../application/mappers/user.mapper';
+import { EncryptionService } from '../../../common/encryption.service';
 
 /**
  * User Repository Implementation (for User Module)
@@ -17,6 +18,7 @@ export class UserRepositoryImpl implements IUserRepository {
     @InjectRepository(UserPersistenceEntity)
     private readonly typeOrmRepository: Repository<UserPersistenceEntity>,
     private readonly userMapper: UserMapper,
+    private readonly encryptionService: EncryptionService,
   ) {}
 
   async save(entity: User): Promise<User> {
@@ -34,7 +36,8 @@ export class UserRepositoryImpl implements IUserRepository {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const entity = await this.typeOrmRepository.findOne({ where: { email } });
+    const emailHash = this.encryptionService.hash(email.toLowerCase());
+    const entity = await this.typeOrmRepository.findOne({ where: { emailHash } as any });
     if (!entity) {
       return null;
     }
@@ -47,11 +50,14 @@ export class UserRepositoryImpl implements IUserRepository {
   }
 
   async findBySearchTerm(searchTerm: string): Promise<User[]> {
+    // Note: ILike on encrypted fields (firstName, lastName, email) won't work.
+    // For exact match on email, we can use emailHash.
+    const emailHash = this.encryptionService.hash(searchTerm.toLowerCase());
     const entities = await this.typeOrmRepository.find({
       where: [
-        { firstName: ILike(`%${searchTerm}%`) },
-        { lastName: ILike(`%${searchTerm}%`) },
-        { email: ILike(`%${searchTerm}%`) },
+        { emailHash } as any,
+        // Partial search on name is disabled for now due to encryption at rest.
+        // Ideally, these should be indexed in ElasticSearch if partial search is required.
       ],
     });
     return entities.map((entity) => this.userMapper.toDomain(entity));

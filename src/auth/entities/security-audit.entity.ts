@@ -29,6 +29,8 @@ export enum SecurityEvent {
  *  - createdAt → time-range queries for security dashboards / alerting
  *  - (userId, createdAt) composite → "all events for user X after time T"
  */
+import { encryptionTransformer } from '../../common/encryption.transformer';
+
 @Index('IDX_security_audit_userId', ['userId'])
 @Index('IDX_security_audit_event', ['event'])
 @Index('IDX_security_audit_createdAt', ['createdAt'])
@@ -51,13 +53,13 @@ export class SecurityAudit {
   })
   event: SecurityEvent;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, transformer: encryptionTransformer })
   ipAddress: string;
 
   @Column({ nullable: true })
   userAgent: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'text', nullable: true, transformer: encryptionTransformer })
   metadata: any;
 
   @CreateDateColumn()
