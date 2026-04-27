@@ -9,6 +9,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ConnectionPoolMonitor } from './connection-pool.monitor';
 import { ConnectionPoolManager } from './connection-pool.manager';
 import { ConnectionPoolController } from './connection-pool.controller';
+import { ShardingModule } from './sharding/sharding.module';
+import { ShardingController } from './sharding/sharding.controller';
 
 @Module({
   imports: [
@@ -16,8 +18,9 @@ import { ConnectionPoolController } from './connection-pool.controller';
       useClass: DatabaseConfig,
     }),
     ScheduleModule.forRoot(),
+    ShardingModule,
   ],
-  controllers: [DatabaseMetricsController, ConnectionPoolController],
+  controllers: [DatabaseMetricsController, ConnectionPoolController, ShardingController],
   providers: [
     DatabaseConfig,
     DatabaseMonitorService,

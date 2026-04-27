@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { CourseController } from './course.controller';
 import { CourseService } from './course.service';
-import { Course } from './entities/course.entity';
+import { ShardedCourseRepository } from './repositories/sharded-course.repository';
+import { ShardingModule } from '../database/sharding/sharding.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Course])],
+  imports: [ShardingModule],
   controllers: [CourseController],
-  providers: [CourseService],
-  exports: [CourseService],
+  providers: [CourseService, ShardedCourseRepository],
+  exports: [CourseService, ShardedCourseRepository],
 })
 export class CourseModule {}

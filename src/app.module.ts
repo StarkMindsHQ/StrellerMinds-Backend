@@ -16,6 +16,7 @@ import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { CertificatePinningMiddleware } from './common/middleware/certificate-pinning.middleware';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CertificatePinningMiddleware } from './common/middleware/certificate-pi
         synchronize: configService.get<string>('NODE_ENV') !== 'production',
       }),
     }),
+    DatabaseModule,
     SecureLoggingModule,
     SecurityModule,
     AuthModule,
