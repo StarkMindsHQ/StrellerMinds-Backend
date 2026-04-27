@@ -4,7 +4,7 @@ import { DataSource } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-interface PoolStats {
+export interface PoolStats {
   totalConnections: number;
   activeConnections: number;
   idleConnections: number;

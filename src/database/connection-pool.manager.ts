@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, QueryRunner } from 'typeorm';
 
-enum CircuitState {
+export enum CircuitState {
   CLOSED = 'CLOSED',
   OPEN = 'OPEN',
   HALF_OPEN = 'HALF_OPEN',

@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { ConnectionPoolMonitor } from './connection-pool.monitor';
-import { ConnectionPoolManager } from './connection-pool.manager';
+import { ConnectionPoolMonitor, PoolStats } from './connection-pool.monitor';
+import { ConnectionPoolManager, CircuitState } from './connection-pool.manager';
 
 @ApiTags('Database Pool')
 @Controller('database/pool')
@@ -14,14 +14,14 @@ export class ConnectionPoolController {
   @Get('health')
   @ApiOperation({ summary: 'Check connection pool health' })
   @ApiResponse({ status: 200, description: 'Pool health status' })
-  async getPoolHealth() {
+  async getPoolHealth(): Promise<{ healthy: boolean; stats: PoolStats }> {
     return this.poolMonitor.checkPoolHealth();
   }
 
   @Get('stats')
   @ApiOperation({ summary: 'Get current pool statistics' })
   @ApiResponse({ status: 200, description: 'Current pool stats' })
-  async getPoolStats() {
+  async getPoolStats(): Promise<PoolStats> {
     return this.poolMonitor.getPoolStats();
   }
 
@@ -29,7 +29,7 @@ export class ConnectionPoolController {
   @ApiOperation({ summary: 'Get recent pool statistics history' })
   @ApiQuery({ name: 'count', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Recent pool stats' })
-  async getRecentStats(@Query('count') count?: number) {
+  async getRecentStats(@Query('count') count?: number): Promise<PoolStats[]> {
     return this.poolMonitor.getRecentStats(count ? parseInt(count.toString()) : 10);
   }
 
@@ -47,7 +47,7 @@ export class ConnectionPoolController {
   @Get('circuit-breaker')
   @ApiOperation({ summary: 'Get circuit breaker state' })
   @ApiResponse({ status: 200, description: 'Circuit breaker state' })
-  async getCircuitBreakerState() {
+  async getCircuitBreakerState(): Promise<{ state: CircuitState }> {
     return { state: this.poolManager.getCircuitState() };
   }
 }

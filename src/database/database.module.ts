@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseConfig } from '../config/database.config';
+import { DatabaseConfig } from './database.config';
 import { DatabaseMonitorService } from './database.monitor.service';
 import { DynamicPoolSizingService } from './dynamic-pool-sizing.service';
 import { DatabaseMetricsController } from './database.metrics.controller';
-import { BackupService } from './backup/backup.service';
+import { BackupService } from './backup.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConnectionPoolMonitor } from './connection-pool.monitor';
 import { ConnectionPoolManager } from './connection-pool.manager';
