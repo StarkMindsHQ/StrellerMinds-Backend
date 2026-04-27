@@ -236,7 +236,9 @@ export class AuthService {
     const user = await this.userRepository.findOne({ where: { emailHash } as any });
     if (!user) {
       // Security: don't reveal whether the email exists
-      this.secureLogger.log(`Password reset request: Email not found (intentionally not revealing)`);
+      this.secureLogger.log(
+        `Password reset request: Email not found (intentionally not revealing)`,
+      );
       return { message: 'If email exists, a reset link has been sent' };
     }
 
@@ -308,7 +310,9 @@ export class AuthService {
       !user.passwordResetExpires ||
       user.passwordResetExpires < new Date()
     ) {
-      this.secureLogger.warn(`Password reset failed: Invalid or expired token for user: ${user.id}`);
+      this.secureLogger.warn(
+        `Password reset failed: Invalid or expired token for user: ${user.id}`,
+      );
       throw new BadRequestException('Invalid or expired reset token');
     }
 
