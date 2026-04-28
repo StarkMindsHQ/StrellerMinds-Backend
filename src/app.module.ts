@@ -16,6 +16,8 @@ import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { CertificatePinningMiddleware } from './common/middleware/certificate-pinning.middleware';
+import { JobsModule } from './jobs/jobs.module';
+import { CdnModule } from './cdn/cdn.module';
 
 @Module({
   imports: [
@@ -46,12 +48,11 @@ import { CertificatePinningMiddleware } from './common/middleware/certificate-pi
     GdprModule,
     ContractTestingModule,
     CommonModule,
+    JobsModule,
+    CdnModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor },
-  ],
+  providers: [AppService, { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

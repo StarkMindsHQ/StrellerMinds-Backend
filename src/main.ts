@@ -3,6 +3,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import compression from 'compression';
 import { OpenAPIValidationMiddleware } from './common/contract-testing/openapi-validation.middleware';
 import { SecureLoggingInterceptor } from './common/secure-logging/secure-logging.interceptor';
 import { CsrfGuard } from './auth/guards/csrf.guard';
@@ -13,6 +14,9 @@ async function bootstrap() {
     // Disable default NestJS logger to use our secure logger
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
+
+  // Issue #801: Enable gzip/brotli compression for API responses
+  app.use(compression());
 
   // Issue #728: Enforce HTTPS in production
   // Use helmet to set security headers and redirect HTTP to HTTPS
