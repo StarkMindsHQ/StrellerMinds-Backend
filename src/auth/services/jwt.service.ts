@@ -5,8 +5,6 @@ import type { SignOptions } from 'jsonwebtoken';
 
 export interface JwtPayload {
   sub: string;
-  email: string;
-  role: string;
   type: 'access' | 'refresh';
   iat?: number;
   exp?: number;
@@ -21,7 +19,7 @@ export class JwtService {
 
   async signAccessToken(payload: Omit<JwtPayload, 'type' | 'iat' | 'exp'>): Promise<string> {
     return this.jwtService.signAsync(
-      { ...payload, type: 'access' },
+      { sub: payload.sub, type: 'access' },
       {
         expiresIn: this.configService.get<string>(
           'JWT_EXPIRES_IN',
@@ -34,7 +32,7 @@ export class JwtService {
 
   async signRefreshToken(payload: Omit<JwtPayload, 'type' | 'iat' | 'exp'>): Promise<string> {
     return this.jwtService.signAsync(
-      { ...payload, type: 'refresh' },
+      { sub: payload.sub, type: 'refresh' },
       {
         expiresIn: this.configService.get<string>(
           'JWT_REFRESH_EXPIRES_IN',
