@@ -107,7 +107,7 @@
     "socket.io": "^4.8.3",
     "speakeasy": "^2.0.0",
     "string-similarity": "^4.0.4",
-    "stripe": "^20.2.0",
+    "stripe": "^22.1.0",
     "textract": "^2.5.0",
     "typeorm": "^0.3.0",
     "ua-parser-js": "^2.0.8",
