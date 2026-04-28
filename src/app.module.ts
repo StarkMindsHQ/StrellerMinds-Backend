@@ -3,6 +3,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ResponseTimeInterceptor } from './common/interceptors/response-time.interceptor';
+import { StreamingResponseInterceptor } from './common/interceptors/streaming-response.interceptor';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
@@ -53,6 +54,7 @@ import { DatabaseModule } from './database/database.module';
   providers: [
     AppService,
     { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: StreamingResponseInterceptor },
   ],
 })
 export class AppModule implements NestModule {
