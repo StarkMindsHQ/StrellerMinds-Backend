@@ -7,6 +7,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "build:prod": "nest build --configPath tsconfig.prod.json && npm run minify",
+    "build:prod-no-minify": "nest build --configPath tsconfig.prod.json",
+    "minify": "node scripts/minify-assets.js",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
@@ -159,6 +162,7 @@
     "ts-loader": "^9.4.3",
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^4.2.0",
+    "terser": "^5.36.0",
     "typescript": "^5.1.3"
   }
 }
