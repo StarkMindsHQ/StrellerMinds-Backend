@@ -18,6 +18,10 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { CertificatePinningMiddleware } from './common/middleware/certificate-pinning.middleware';
 import { JobsModule } from './jobs/jobs.module';
 import { CdnModule } from './cdn/cdn.module';
+import { AppCacheModule } from './common/cache/cache.module';
+import { RedisPoolModule } from './common/redis/redis-pool.module';
+import { DebounceModule } from './common/debounce/debounce.module';
+import { ImageProcessingModule } from './common/image/image-processing.module';
 
 @Module({
   imports: [
@@ -50,6 +54,10 @@ import { CdnModule } from './cdn/cdn.module';
     CommonModule,
     JobsModule,
     CdnModule,
+    AppCacheModule,
+    RedisPoolModule,
+    DebounceModule,
+    ImageProcessingModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor }],
