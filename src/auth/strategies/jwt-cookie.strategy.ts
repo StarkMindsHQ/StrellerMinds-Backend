@@ -35,10 +35,9 @@ export class JwtCookieStrategy extends PassportStrategy(Strategy, 'jwt-cookie') 
   }
 
   async validate(payload: any) {
+    // Issue #803: JWT payload minimized to sub only; email/role fetched from DB when needed
     return {
       id: payload.sub,
-      email: payload.email,
-      roles: payload.roles,
     };
   }
 }
