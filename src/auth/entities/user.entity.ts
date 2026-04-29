@@ -53,6 +53,8 @@ export class User {
   isEmailVerified: boolean;
 
   @Column({ nullable: true, select: false, transformer: encryptionTransformer })
+  phoneNumber: string;
+
   @Column({ type: 'enum', enum: Role, default: Role.Student })
   role: Role;
 
