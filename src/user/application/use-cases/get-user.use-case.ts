@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { UseCase } from '../../../shared/application/use-case.base';
-import { IUserRepository } from '../../domain/repositories/user-repository.interface';
+import { IUserRepository, USER_REPOSITORY } from '../../domain/repositories/user-repository.interface';
 import { UserNotFoundException } from '../../domain/exceptions/user-exceptions';
 
 /**
@@ -32,7 +32,7 @@ export class GetUserResponse {
  */
 @Injectable()
 export class GetUserUseCase extends UseCase<GetUserRequest, GetUserResponse> {
-  constructor(private readonly userRepository: IUserRepository) {
+  constructor(@Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository) {
     super();
   }
 

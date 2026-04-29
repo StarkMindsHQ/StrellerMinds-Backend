@@ -1,16 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ICourseRepository } from '../../domain/repositories/course-repository.interface';
+import { ICourseRepository, PaginatedResult } from '../../domain/repositories/course-repository.interface';
 import { Course } from '../../domain/entities/course.entity';
 import { CoursePersistenceEntity } from '../persistence/course-persistence.entity';
 import { CourseMapper } from '../../application/mappers/course.mapper';
 
-/**
- * Course Repository Implementation
- * Implements the ICourseRepository interface using TypeORM
- * Handles all database operations for Course entities
- */
 @Injectable()
 export class CourseRepositoryImpl implements ICourseRepository {
   constructor(
@@ -27,37 +22,84 @@ export class CourseRepositoryImpl implements ICourseRepository {
 
   async findById(id: string): Promise<Course | null> {
     const entity = await this.typeOrmRepository.findOne({ where: { id } });
-    if (!entity) {
-      return null;
-    }
-    return this.courseMapper.toDomain(entity);
+    return entity ? this.courseMapper.toDomain(entity) : null;
   }
 
   async findAll(): Promise<Course[]> {
-    const entities = await this.typeOrmRepository.find();
-    return entities.map((entity) => this.courseMapper.toDomain(entity));
+    const entities = await this.typeOrmRepository.find({ take: 1000 });
+    return entities.map((e) => this.courseMapper.toDomain(e));
   }
 
-  async findByCategory(category: string): Promise<Course[]> {
-    const entities = await this.typeOrmRepository.find({ where: { category } });
-    return entities.map((entity) => this.courseMapper.toDomain(entity));
+  async findPaginated(limit: number, afterId?: string): Promise<PaginatedResult<Course>> {
+    const qb = this.typeOrmRepository
+      .createQueryBuilder('course')
+      .orderBy('course.id', 'ASC')
+      .take(limit + 1);
+
+    if (afterId) {
+      qb.where('course.id > :afterId', { afterId });
+    }
+
+    const entities = await qb.getMany();
+    const hasMore = entities.length > limit;
+    const items = entities.slice(0, limit).map((e) => this.courseMapper.toDomain(e));
+    return { items, hasMore };
   }
 
-  async findByDifficulty(difficulty: string): Promise<Course[]> {
-    const entities = await this.typeOrmRepository.find({ where: { difficulty } });
-    return entities.map((entity) => this.courseMapper.toDomain(entity));
+  async findByCategory(category: string, limit: number, afterId?: string): Promise<PaginatedResult<Course>> {
+    const qb = this.typeOrmRepository
+      .createQueryBuilder('course')
+      .where('course.category = :category', { category })
+      .orderBy('course.id', 'ASC')
+      .take(limit + 1);
+
+    if (afterId) {
+      qb.andWhere('course.id > :afterId', { afterId });
+    }
+
+    const entities = await qb.getMany();
+    const hasMore = entities.length > limit;
+    const items = entities.slice(0, limit).map((e) => this.courseMapper.toDomain(e));
+    return { items, hasMore };
   }
 
-  async findByCategoryAndDifficulty(category: string, difficulty: string): Promise<Course[]> {
-    const entities = await this.typeOrmRepository.find({
-      where: { category, difficulty },
-    });
-    return entities.map((entity) => this.courseMapper.toDomain(entity));
+  async findByDifficulty(difficulty: string, limit: number, afterId?: string): Promise<PaginatedResult<Course>> {
+    const qb = this.typeOrmRepository
+      .createQueryBuilder('course')
+      .where('course.difficulty = :difficulty', { difficulty })
+      .orderBy('course.id', 'ASC')
+      .take(limit + 1);
+
+    if (afterId) {
+      qb.andWhere('course.id > :afterId', { afterId });
+    }
+
+    const entities = await qb.getMany();
+    const hasMore = entities.length > limit;
+    const items = entities.slice(0, limit).map((e) => this.courseMapper.toDomain(e));
+    return { items, hasMore };
+  }
+
+  async findByCategoryAndDifficulty(category: string, difficulty: string, limit: number, afterId?: string): Promise<PaginatedResult<Course>> {
+    const qb = this.typeOrmRepository
+      .createQueryBuilder('course')
+      .where('course.category = :category AND course.difficulty = :difficulty', { category, difficulty })
+      .orderBy('course.id', 'ASC')
+      .take(limit + 1);
+
+    if (afterId) {
+      qb.andWhere('course.id > :afterId', { afterId });
+    }
+
+    const entities = await qb.getMany();
+    const hasMore = entities.length > limit;
+    const items = entities.slice(0, limit).map((e) => this.courseMapper.toDomain(e));
+    return { items, hasMore };
   }
 
   async findAllActive(): Promise<Course[]> {
     const entities = await this.typeOrmRepository.find({ where: { isActive: true } });
-    return entities.map((entity) => this.courseMapper.toDomain(entity));
+    return entities.map((e) => this.courseMapper.toDomain(e));
   }
 
   async findByTitle(title: string): Promise<Course[]> {
@@ -65,7 +107,7 @@ export class CourseRepositoryImpl implements ICourseRepository {
       .createQueryBuilder('course')
       .where('course.title ILIKE :title', { title: `%${title}%` })
       .getMany();
-    return entities.map((entity) => this.courseMapper.toDomain(entity));
+    return entities.map((e) => this.courseMapper.toDomain(e));
   }
 
   async delete(id: string): Promise<boolean> {
