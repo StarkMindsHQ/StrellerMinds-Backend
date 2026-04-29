@@ -1,33 +1,18 @@
 import { IRepository } from '../../../shared/domain/repositories/repository.interface';
 import { Course } from '../entities/course.entity';
 
-/**
- * Course Repository Interface
- * Extends the generic IRepository with Course-specific query methods
- */
+export const COURSE_REPOSITORY = 'ICourseRepository';
+
+export interface PaginatedResult<T> {
+  items: T[];
+  hasMore: boolean;
+}
+
 export interface ICourseRepository extends IRepository<Course> {
-  /**
-   * Find courses by category
-   */
-  findByCategory(category: string): Promise<Course[]>;
-
-  /**
-   * Find courses by difficulty level
-   */
-  findByDifficulty(difficulty: string): Promise<Course[]>;
-
-  /**
-   * Find courses by both category and difficulty
-   */
-  findByCategoryAndDifficulty(category: string, difficulty: string): Promise<Course[]>;
-
-  /**
-   * Find all active courses
-   */
+  findByCategory(category: string, limit: number, afterId?: string): Promise<PaginatedResult<Course>>;
+  findByDifficulty(difficulty: string, limit: number, afterId?: string): Promise<PaginatedResult<Course>>;
+  findByCategoryAndDifficulty(category: string, difficulty: string, limit: number, afterId?: string): Promise<PaginatedResult<Course>>;
   findAllActive(): Promise<Course[]>;
-
-  /**
-   * Search courses by title
-   */
   findByTitle(title: string): Promise<Course[]>;
+  findPaginated(limit: number, afterId?: string): Promise<PaginatedResult<Course>>;
 }

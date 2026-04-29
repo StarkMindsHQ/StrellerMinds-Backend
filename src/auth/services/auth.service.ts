@@ -300,7 +300,6 @@ export class AuthService {
     if (!user) {
       this.secureLogger.warn(`Password reset failed: User not found for email: ${email}`);
       throw new UserNotFoundException(email);
-      throw new NotFoundException('User not found');
     }
 
     const hashedToken = this.hashToken(resetToken);
