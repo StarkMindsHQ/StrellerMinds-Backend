@@ -1,23 +1,16 @@
 import { IRepository } from '../../../shared/domain/repositories/repository.interface';
 import { User } from '../entities/user.entity';
 
-/**
- * User Repository Interface (for User Module)
- * Extends the generic IRepository with User-specific query methods
- */
+export const USER_REPOSITORY = 'IUserRepository';
+
+export interface PaginatedResult<T> {
+  items: T[];
+  hasMore: boolean;
+}
+
 export interface IUserRepository extends IRepository<User> {
-  /**
-   * Find a user by email
-   */
   findByEmail(email: string): Promise<User | null>;
-
-  /**
-   * Find users by search term (matches first name, last name, or email)
-   */
-  findBySearchTerm(searchTerm: string): Promise<User[]>;
-
-  /**
-   * Find all active users
-   */
+  findBySearchTerm(searchTerm: string, limit: number, afterId?: string): Promise<PaginatedResult<User>>;
   findAllActive(): Promise<User[]>;
+  findPaginated(limit: number, afterId?: string): Promise<PaginatedResult<User>>;
 }
