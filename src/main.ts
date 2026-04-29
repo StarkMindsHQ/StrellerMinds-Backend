@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -123,6 +124,58 @@ async function bootstrap() {
 
   // Enable graceful shutdown hooks to handle SIGTERM, SIGINT, etc.
   app.enableShutdownHooks();
+
+  // Issue #771: Configure Swagger/OpenAPI documentation
+  // Swagger UI is enabled in all environments for API discoverability
+  // In production, consider restricting access via reverse proxy or environment variable
+  const config = new DocumentBuilder()
+    .setTitle('StrellerMinds Backend API')
+    .setDescription(
+      'Comprehensive API for StrellerMinds - a blockchain education platform built on the Stellar network. ' +
+      'Provides secure user management, course delivery, and seamless Stellar blockchain integration for on-chain learning verification and credentialing.',
+    )
+    .setVersion('0.0.1')
+    .setContact(
+      'StarkMindsHQ',
+      'https://github.com/StarkMindsHQ/StrellerMinds-Backend',
+      'contact@strellerminds.com',
+    )
+    .setLicense('UNLICENSED', '')
+    .addServer('http://localhost:3000', 'Development server')
+    .addServer('https://api.strellerminds.com', 'Production server')
+    // Security scheme for JWT Bearer tokens (httpOnly cookies + fallback Bearer header)
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'bearerAuth',
+    )
+    // Tags for endpoint grouping
+    .addTag('Health', 'Health check and system status endpoints')
+    .addTag('Authentication', 'User authentication, registration, and token management')
+    .addTag('MFA', 'Multi-factor authentication setup and verification')
+    .addTag('Users', 'User management and profile operations')
+    .addTag('Courses', 'Course management and enrollment')
+    .addTag('Database', 'Database connection pool monitoring and metrics')
+    .addTag('GDPR', 'GDPR compliance - data export and deletion')
+    .addTag('Contract Testing', 'Contract testing and OpenAPI validation')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true, // Persist auth token across requests in Swagger UI
+      displayOperationId: false,
+      filter: true,
+      showRequestHeaders: true,
+      docExpansion: 'list',
+    },
+    customCss: '.swagger-ui .topbar { display: none }', // Hide Swagger UI topbar for cleaner look
+    customSiteTitle: 'StrellerMinds API Documentation',
+  });
+
+  // Serve OpenAPI JSON at /api/docs-json for external tools
+  app.getHttpAdapter().get('/api/docs-json', (req, res) => {
+    res.json(document);
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
