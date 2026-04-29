@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
-import { IUserRepository } from '../../domain/repositories/user-repository.interface';
+import { Repository } from 'typeorm';
+import { IUserRepository, PaginatedResult } from '../../domain/repositories/user-repository.interface';
 import { User } from '../../domain/entities/user.entity';
 import { UserPersistenceEntity } from '../persistence/user-persistence.entity';
 import { UserMapper } from '../../application/mappers/user.mapper';
 import { EncryptionService } from '../../../common/encryption.service';
 
-/**
- * User Repository Implementation (for User Module)
- * Implements the IUserRepository interface using TypeORM
- * Handles all database operations for User entities in the user module context
- */
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
   constructor(
@@ -29,43 +24,58 @@ export class UserRepositoryImpl implements IUserRepository {
 
   async findById(id: string): Promise<User | null> {
     const entity = await this.typeOrmRepository.findOne({ where: { id } });
-    if (!entity) {
-      return null;
-    }
-    return this.userMapper.toDomain(entity);
+    return entity ? this.userMapper.toDomain(entity) : null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const emailHash = this.encryptionService.hash(email.toLowerCase());
     const entity = await this.typeOrmRepository.findOne({ where: { emailHash } as any });
-    if (!entity) {
-      return null;
-    }
-    return this.userMapper.toDomain(entity);
+    return entity ? this.userMapper.toDomain(entity) : null;
   }
 
   async findAll(): Promise<User[]> {
-    const entities = await this.typeOrmRepository.find();
-    return entities.map((entity) => this.userMapper.toDomain(entity));
+    const entities = await this.typeOrmRepository.find({ take: 1000 });
+    return entities.map((e) => this.userMapper.toDomain(e));
   }
 
-  async findBySearchTerm(searchTerm: string): Promise<User[]> {
-    // Note: ILike on encrypted fields (firstName, lastName, email) won't work.
-    // For exact match on email, we can use emailHash.
+  async findPaginated(limit: number, afterId?: string): Promise<PaginatedResult<User>> {
+    const qb = this.typeOrmRepository
+      .createQueryBuilder('user')
+      .orderBy('user.id', 'ASC')
+      .take(limit + 1);
+
+    if (afterId) {
+      qb.where('user.id > :afterId', { afterId });
+    }
+
+    const entities = await qb.getMany();
+    const hasMore = entities.length > limit;
+    const items = entities.slice(0, limit).map((e) => this.userMapper.toDomain(e));
+    return { items, hasMore };
+  }
+
+  async findBySearchTerm(searchTerm: string, limit: number, afterId?: string): Promise<PaginatedResult<User>> {
+    // Partial search on encrypted fields isn't possible; match on emailHash only.
     const emailHash = this.encryptionService.hash(searchTerm.toLowerCase());
-    const entities = await this.typeOrmRepository.find({
-      where: [
-        { emailHash } as any,
-        // Partial search on name is disabled for now due to encryption at rest.
-        // Ideally, these should be indexed in ElasticSearch if partial search is required.
-      ],
-    });
-    return entities.map((entity) => this.userMapper.toDomain(entity));
+    const qb = this.typeOrmRepository
+      .createQueryBuilder('user')
+      .where('user.emailHash = :emailHash', { emailHash })
+      .orderBy('user.id', 'ASC')
+      .take(limit + 1);
+
+    if (afterId) {
+      qb.andWhere('user.id > :afterId', { afterId });
+    }
+
+    const entities = await qb.getMany();
+    const hasMore = entities.length > limit;
+    const items = entities.slice(0, limit).map((e) => this.userMapper.toDomain(e));
+    return { items, hasMore };
   }
 
   async findAllActive(): Promise<User[]> {
     const entities = await this.typeOrmRepository.find({ where: { isActive: true } });
-    return entities.map((entity) => this.userMapper.toDomain(entity));
+    return entities.map((e) => this.userMapper.toDomain(e));
   }
 
   async delete(id: string): Promise<boolean> {
