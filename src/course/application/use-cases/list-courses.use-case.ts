@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { UseCase } from '../../../shared/application/use-case.base';
-import { ICourseRepository } from '../../domain/repositories/course-repository.interface';
+import { ICourseRepository, COURSE_REPOSITORY } from '../../domain/repositories/course-repository.interface';
 
 /**
  * List Courses Use Case Request
@@ -47,44 +47,26 @@ export class ListCoursesResponse {
  */
 @Injectable()
 export class ListCoursesUseCase extends UseCase<ListCoursesRequest, ListCoursesResponse> {
-  constructor(private readonly courseRepository: ICourseRepository) {
+  constructor(@Inject(COURSE_REPOSITORY) private readonly courseRepository: ICourseRepository) {
     super();
   }
 
   async execute(request: ListCoursesRequest): Promise<ListCoursesResponse> {
     const limit = request.limit || 20;
+    const { cursor } = request;
 
-    let courses = [];
-
+    let result;
     if (request.category && request.difficulty) {
-      courses = await this.courseRepository.findByCategoryAndDifficulty(
-        request.category,
-        request.difficulty,
-      );
+      result = await this.courseRepository.findByCategoryAndDifficulty(request.category, request.difficulty, limit, cursor);
     } else if (request.category) {
-      courses = await this.courseRepository.findByCategory(request.category);
+      result = await this.courseRepository.findByCategory(request.category, limit, cursor);
     } else if (request.difficulty) {
-      courses = await this.courseRepository.findByDifficulty(request.difficulty);
+      result = await this.courseRepository.findByDifficulty(request.difficulty, limit, cursor);
     } else {
-      courses = await this.courseRepository.findAll();
+      result = await this.courseRepository.findPaginated(limit, cursor);
     }
 
-    // Apply cursor-based pagination
-    let filteredCourses = courses;
-    if (request.cursor) {
-      const cursorIndex = courses.findIndex((c) => c.id === request.cursor);
-      if (cursorIndex !== -1) {
-        filteredCourses = courses.slice(cursorIndex + 1);
-      }
-    }
-
-    // Check if there are more results
-    const hasMore = filteredCourses.length > limit;
-
-    // Take only the requested limit
-    const paginatedCourses = hasMore ? filteredCourses.slice(0, limit) : filteredCourses;
-
-    const courseItems = paginatedCourses.map((course) => {
+    const courseItems = result.items.map((course) => {
       const primitives = course.toPrimitives();
       return new ListCourseItem(
         primitives.id,
@@ -98,10 +80,8 @@ export class ListCoursesUseCase extends UseCase<ListCoursesRequest, ListCoursesR
       );
     });
 
-    // Generate next cursor
-    const nextCursor =
-      hasMore && courseItems.length > 0 ? courseItems[courseItems.length - 1].id : null;
+    const nextCursor = result.hasMore && courseItems.length > 0 ? courseItems[courseItems.length - 1].id : null;
 
-    return new ListCoursesResponse(courseItems, nextCursor, hasMore);
+    return new ListCoursesResponse(courseItems, nextCursor, result.hasMore);
   }
 }
