@@ -25,6 +25,7 @@
     "test:contract:cov": "jest --testPathPattern=contract --coverage",
     "test:visual": "jest --testPathPattern=visual",
     "test:visual:watch": "jest --testPathPattern=visual --watch",
+    "test:memory": "node --expose-gc node_modules/jest/bin/jest.js --testPathPattern=memory-leak --runInBand --logHeapUsage",
     "check:circular": "node scripts/check-circular-deps.js",
     "check:complexity": "node scripts/check-complexity.js",
     "contract:validate": "node scripts/validate-contract.js",

@@ -1,4 +1,4 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, LoggerService, Optional } from '@nestjs/common';
 
 /**
  * Configuration for sensitive data sanitization
@@ -78,7 +78,7 @@ export class SecureLoggerService implements LoggerService {
   private readonly config: SecureLoggerConfig;
   private readonly defaultLogger: LoggerService;
 
-  constructor(config?: Partial<SecureLoggerConfig>) {
+  constructor(@Optional() config?: Partial<SecureLoggerConfig>) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.defaultLogger = new (class implements LoggerService {
       log(message: any, ...optionalParams: any[]) {
