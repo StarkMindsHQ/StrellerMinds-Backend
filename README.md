@@ -30,6 +30,9 @@ StrellerMinds Backend is a modern NestJS-based API server that powers a blockcha
   - `/database/pool/health`
   - `/database/pool/stats`
 
+### Troubleshooting
+- Common startup, database, auth, CORS, contract testing, and deployment issues are covered in [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+
 ---
 
 ## 🛠️ Tech Stack
