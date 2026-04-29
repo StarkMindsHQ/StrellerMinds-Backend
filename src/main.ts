@@ -9,6 +9,7 @@ import { OpenAPIValidationMiddleware } from './common/contract-testing/openapi-v
 import { SecureLoggingInterceptor } from './common/secure-logging/secure-logging.interceptor';
 import { CsrfGuard } from './auth/guards/csrf.guard';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { xssSanitizerMiddleware } from './common/middleware/xss-sanitizer.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -86,6 +87,7 @@ async function bootstrap() {
   const expressInstance = httpAdapter.getInstance();
   expressInstance.use(expressInstance.json({ limit: maxRequestSize }));
   expressInstance.use(expressInstance.urlencoded({ limit: maxRequestSize, extended: true }));
+  expressInstance.use(xssSanitizerMiddleware);
 
   // Apply secure logging interceptor globally
   app.useGlobalInterceptors(new SecureLoggingInterceptor());

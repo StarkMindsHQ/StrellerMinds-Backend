@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { UseCase } from '../../../shared/application/use-case.base';
-import { ICourseRepository } from '../../domain/repositories/course-repository.interface';
+import { ICourseRepository, COURSE_REPOSITORY } from '../../domain/repositories/course-repository.interface';
 import { CourseNotFoundException } from '../../domain/exceptions/course-exceptions';
 
 /**
@@ -32,7 +32,7 @@ export class GetCourseResponse {
  */
 @Injectable()
 export class GetCourseUseCase extends UseCase<GetCourseRequest, GetCourseResponse> {
-  constructor(private readonly courseRepository: ICourseRepository) {
+  constructor(@Inject(COURSE_REPOSITORY) private readonly courseRepository: ICourseRepository) {
     super();
   }
 
