@@ -54,6 +54,14 @@ StrellerMinds Backend is a modern NestJS-based API server that powers a blockcha
 
 ---
 
+## 🚢 Deploying to production
+
+For production deployments — required env vars, image build, Kubernetes
+manifests, probes, security checklist, and operational runbook — see
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+---
+
 ## 🚀 Quick Start
 
 ### Clone repo
