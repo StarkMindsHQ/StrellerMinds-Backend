@@ -67,6 +67,15 @@ async function fireBatched(
   return { responses, durationMs: Date.now() - start };
 }
 
+/** Fire all requests together to simulate true concurrent user load */
+async function fireConcurrent(
+  reqs: (() => Promise<request.Response>)[],
+): Promise<{ responses: request.Response[]; durationMs: number }> {
+  const start = Date.now();
+  const responses = await Promise.all(reqs.map((fn) => fn()));
+  return { responses, durationMs: Date.now() - start };
+}
+
 // ─── App factory ────────────────────────────────────────────────────────────
 
 async function buildApp(): Promise<INestApplication> {
@@ -74,7 +83,9 @@ async function buildApp(): Promise<INestApplication> {
   const courses = Array.from({ length: 120 }, (_, i) => makeCourse(i));
 
   const mockRateLimiter = {
-    isAllowed: jest.fn().mockReturnValue({ allowed: true, remaining: 999, resetTime: Date.now() + 60000 }),
+    isAllowed: jest
+      .fn()
+      .mockReturnValue({ allowed: true, remaining: 999, resetTime: Date.now() + 60000 }),
     getStatus: jest.fn(),
     reset: jest.fn(),
     resetAll: jest.fn(),
@@ -83,42 +94,56 @@ async function buildApp(): Promise<INestApplication> {
 
   const mockAuthService = {
     login: jest.fn().mockResolvedValue({ message: 'Login successful', user: makeUser(0) }),
-    register: jest.fn().mockResolvedValue({ message: 'Registration successful', user: makeUser(0) }),
-    forgotPassword: jest.fn().mockResolvedValue({ message: 'If email exists, a reset link has been sent' }),
+    register: jest
+      .fn()
+      .mockResolvedValue({ message: 'Registration successful', user: makeUser(0) }),
+    forgotPassword: jest
+      .fn()
+      .mockResolvedValue({ message: 'If email exists, a reset link has been sent' }),
   };
 
   const mockCourseService = {
     findAll: jest.fn().mockResolvedValue(courses.slice(0, 20)),
-    findOne: jest.fn().mockImplementation((id: string) =>
-      Promise.resolve(courses.find((c) => c.id === id) ?? null),
-    ),
+    findOne: jest
+      .fn()
+      .mockImplementation((id: string) =>
+        Promise.resolve(courses.find((c) => c.id === id) ?? null),
+      ),
   };
 
   const mockUserService = {
     findAll: jest.fn().mockResolvedValue(users.slice(0, 20)),
-    findOne: jest.fn().mockImplementation((id: string) =>
-      Promise.resolve(users.find((u) => u.id === id) ?? null),
-    ),
+    findOne: jest
+      .fn()
+      .mockImplementation((id: string) => Promise.resolve(users.find((u) => u.id === id) ?? null)),
   };
 
   const mockListUsersUseCase = {
-    execute: jest.fn().mockResolvedValue({ users: users.slice(0, 20), nextCursor: null, hasMore: false }),
+    execute: jest
+      .fn()
+      .mockResolvedValue({ users: users.slice(0, 20), nextCursor: null, hasMore: false }),
   };
 
   const mockGetUserUseCase = {
-    execute: jest.fn().mockImplementation(({ userId }: { userId: string }) =>
-      Promise.resolve(users.find((u) => u.id === userId) ?? null),
-    ),
+    execute: jest
+      .fn()
+      .mockImplementation(({ userId }: { userId: string }) =>
+        Promise.resolve(users.find((u) => u.id === userId) ?? null),
+      ),
   };
 
   const mockListCoursesUseCase = {
-    execute: jest.fn().mockResolvedValue({ courses: courses.slice(0, 20), nextCursor: null, hasMore: false }),
+    execute: jest
+      .fn()
+      .mockResolvedValue({ courses: courses.slice(0, 20), nextCursor: null, hasMore: false }),
   };
 
   const mockGetCourseUseCase = {
-    execute: jest.fn().mockImplementation(({ courseId }: { courseId: string }) =>
-      Promise.resolve(courses.find((c) => c.id === courseId) ?? null),
-    ),
+    execute: jest
+      .fn()
+      .mockImplementation(({ courseId }: { courseId: string }) =>
+        Promise.resolve(courses.find((c) => c.id === courseId) ?? null),
+      ),
   };
 
   const module: TestingModule = await Test.createTestingModule({
@@ -140,10 +165,14 @@ async function buildApp(): Promise<INestApplication> {
   const app = module.createNestApplication();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   await app.init();
+  await app.listen(0);
 
   // Raise the connection limit so 100 concurrent requests don't get ECONNRESET
+  http.globalAgent.maxSockets = 1000;
   const httpServer = app.getHttpServer() as http.Server;
-  httpServer.maxConnections = 500;
+  httpServer.maxConnections = 1000;
+  httpServer.keepAliveTimeout = 60000;
+  httpServer.headersTimeout = 65000;
 
   return app;
 }
@@ -153,10 +182,12 @@ async function buildApp(): Promise<INestApplication> {
 describe('Concurrent Load – 100+ users', () => {
   let app: INestApplication;
   let server: any;
+  let agent: any;
 
   beforeAll(async () => {
     app = await buildApp();
     server = app.getHttpServer();
+    agent = request.agent(server);
   });
 
   afterAll(async () => {
@@ -166,18 +197,18 @@ describe('Concurrent Load – 100+ users', () => {
   // ── Read endpoints ────────────────────────────────────────────────────────
 
   it('handles 100 concurrent GET /courses requests', async () => {
-    const reqs = Array.from({ length: 100 }, () => () => request(server).get('/courses'));
+    const reqs = Array.from({ length: 100 }, () => () => agent.get('/courses'));
 
-    const { responses, durationMs } = await fireBatched(reqs);
+    const { responses, durationMs } = await fireConcurrent(reqs);
 
     expect(responses.every((r) => r.status === 200)).toBe(true);
     expect(durationMs).toBeLessThan(10000);
   }, 15000);
 
   it('handles 100 concurrent GET /users requests', async () => {
-    const reqs = Array.from({ length: 100 }, () => () => request(server).get('/users'));
+    const reqs = Array.from({ length: 100 }, () => () => agent.get('/users'));
 
-    const { responses, durationMs } = await fireBatched(reqs);
+    const { responses, durationMs } = await fireConcurrent(reqs);
 
     expect(responses.every((r) => r.status === 200)).toBe(true);
     expect(durationMs).toBeLessThan(10000);
@@ -188,17 +219,19 @@ describe('Concurrent Load – 100+ users', () => {
     const userIds = Array.from({ length: 10 }, (_, i) => `user-${i}`);
 
     const reqs = [
-      ...Array.from({ length: 40 }, () => () => request(server).get('/courses')),
-      ...Array.from({ length: 40 }, () => () => request(server).get('/users')),
-      ...Array.from({ length: 20 }, (_, i) => () =>
-        request(server).get(`/courses/${courseIds[i % courseIds.length]}`),
+      ...Array.from({ length: 40 }, () => () => agent.get('/courses')),
+      ...Array.from({ length: 40 }, () => () => agent.get('/users')),
+      ...Array.from(
+        { length: 20 },
+        (_, i) => () => agent.get(`/courses/${courseIds[i % courseIds.length]}`),
       ),
-      ...Array.from({ length: 20 }, (_, i) => () =>
-        request(server).get(`/users/${userIds[i % userIds.length]}`),
+      ...Array.from(
+        { length: 20 },
+        (_, i) => () => agent.get(`/users/${userIds[i % userIds.length]}`),
       ),
     ];
 
-    const { responses } = await fireBatched(reqs);
+    const { responses } = await fireConcurrent(reqs);
 
     expect(responses.filter((r) => r.status >= 500).length).toBe(0);
   }, 20000);
@@ -206,23 +239,23 @@ describe('Concurrent Load – 100+ users', () => {
   // ── Write endpoints ───────────────────────────────────────────────────────
 
   it('handles 100 concurrent POST /auth/login requests', async () => {
-    const reqs = Array.from({ length: 100 }, (_, i) => () =>
-      request(server)
-        .post('/auth/login')
-        .send({ email: `user${i}@test.com`, password: 'Password123!' }),
+    const reqs = Array.from(
+      { length: 100 },
+      (_, i) => () =>
+        agent.post('/auth/login').send({ email: `user${i}@test.com`, password: 'Password123!' }),
     );
 
-    const { responses, durationMs } = await fireBatched(reqs);
+    const { responses, durationMs } = await fireConcurrent(reqs);
 
     expect(responses.every((r) => r.status === 200)).toBe(true);
     expect(durationMs).toBeLessThan(10000);
   }, 15000);
 
   it('handles 100 concurrent POST /auth/register requests', async () => {
-    const reqs = Array.from({ length: 100 }, (_, i) => () =>
-      request(server)
-        .post('/auth/register')
-        .send({
+    const reqs = Array.from(
+      { length: 100 },
+      (_, i) => () =>
+        agent.post('/auth/register').send({
           email: `newuser${i}@test.com`,
           password: 'Password123!',
           passwordConfirm: 'Password123!',
@@ -231,7 +264,7 @@ describe('Concurrent Load – 100+ users', () => {
         }),
     );
 
-    const { responses } = await fireBatched(reqs);
+    const { responses } = await fireConcurrent(reqs);
 
     expect(responses.every((r) => r.status === 201)).toBe(true);
   }, 15000);
@@ -270,13 +303,15 @@ describe('Concurrent Load – 100+ users', () => {
   it('no 5xx errors under 100 concurrent password-strength checks', async () => {
     const passwords = ['weak', 'Password123!', 'short', 'VeryStr0ng!Pass#2024', ''];
 
-    const reqs = Array.from({ length: 100 }, (_, i) => () =>
-      request(server)
-        .post('/auth/check-password-strength')
-        .send({ password: passwords[i % passwords.length] }),
+    const reqs = Array.from(
+      { length: 100 },
+      (_, i) => () =>
+        agent
+          .post('/auth/check-password-strength')
+          .send({ password: passwords[i % passwords.length] }),
     );
 
-    const { responses } = await fireBatched(reqs);
+    const { responses } = await fireConcurrent(reqs);
 
     expect(responses.filter((r) => r.status >= 500).length).toBe(0);
   }, 15000);
@@ -288,12 +323,12 @@ describe('Concurrent Load – 100+ users', () => {
 
     const reqs = Array.from({ length: 100 }, () => async () => {
       const start = Date.now();
-      const res = await request(server).get('/courses');
+      const res = await agent.get('/courses');
       times.push(Date.now() - start);
       return res;
     });
 
-    await fireBatched(reqs);
+    await fireConcurrent(reqs);
 
     times.sort((a, b) => a - b);
     const p95 = times[Math.floor(times.length * 0.95)];
@@ -305,12 +340,12 @@ describe('Concurrent Load – 100+ users', () => {
 
     const reqs = Array.from({ length: 100 }, () => async () => {
       const start = Date.now();
-      const res = await request(server).get('/users');
+      const res = await agent.get('/users');
       times.push(Date.now() - start);
       return res;
     });
 
-    await fireBatched(reqs);
+    await fireConcurrent(reqs);
 
     times.sort((a, b) => a - b);
     const p95 = times[Math.floor(times.length * 0.95)];
@@ -321,11 +356,12 @@ describe('Concurrent Load – 100+ users', () => {
 
   it('sustains 100 users over 3 waves without degradation', async () => {
     const wave = () =>
-      fireBatched([
-        ...Array.from({ length: 34 }, () => () => request(server).get('/courses')),
-        ...Array.from({ length: 33 }, () => () => request(server).get('/users')),
-        ...Array.from({ length: 33 }, () => () =>
-          request(server).post('/auth/check-password-strength').send({ password: 'Test123!' }),
+      fireConcurrent([
+        ...Array.from({ length: 34 }, () => () => agent.get('/courses')),
+        ...Array.from({ length: 33 }, () => () => agent.get('/users')),
+        ...Array.from(
+          { length: 33 },
+          () => () => agent.post('/auth/check-password-strength').send({ password: 'Test123!' }),
         ),
       ]);
 
