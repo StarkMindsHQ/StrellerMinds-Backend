@@ -16,6 +16,7 @@ StrellerMinds Backend is a modern NestJS-based API server that powers a blockcha
 - **Database Connection Pooling**: Optimized DB performance
 - **APM Monitoring**: DataDog & New Relic integration
 - **Performance Profiling**: CPU, memory, and latency tracking
+- **ADRs**: [Architecture Decision Records](docs/adr/README.md)
 
 ---
 
