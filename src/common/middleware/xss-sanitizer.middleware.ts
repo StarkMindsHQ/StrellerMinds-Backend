@@ -1,3 +1,4 @@
+import * as xss from "xss";
 import { Request, Response, NextFunction } from 'express';
 import { IFilterXSSOptions } from 'xss';
 
