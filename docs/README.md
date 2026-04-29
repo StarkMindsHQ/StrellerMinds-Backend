@@ -21,6 +21,7 @@ This directory contains comprehensive documentation for the StrellerMinds Backen
 |------|---------|
 | `API_OVERVIEW.md` | Complete API reference with endpoint inventory, authentication, error handling, and examples |
 | `AUTHENTICATION_GUIDE.md` | Detailed authentication guide covering JWT tokens, MFA, password reset, and security best practices |
+| `DATABASE_SCHEMA.md` | Database ERD, table dictionary, indexes, relationships, and data protection notes |
 | `openapi.json` | Machine-readable OpenAPI 3.0.3 specification for API clients and tools |
 | `README.md` | This file |
 
