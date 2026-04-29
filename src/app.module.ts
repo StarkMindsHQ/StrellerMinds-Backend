@@ -64,6 +64,8 @@ import { ImageProcessingModule } from './common/image/image-processing.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    // Security headers applied first, before any route logic
+    consumer.apply(SecurityHeadersMiddleware).forRoutes('*');
     consumer.apply(RequestIdMiddleware).forRoutes('*');
     consumer.apply(CertificatePinningMiddleware).forRoutes('*');
   }

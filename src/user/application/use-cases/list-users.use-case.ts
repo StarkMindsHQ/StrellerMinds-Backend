@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { UseCase } from '../../../shared/application/use-case.base';
-import { IUserRepository } from '../../domain/repositories/user-repository.interface';
+import { IUserRepository, USER_REPOSITORY } from '../../domain/repositories/user-repository.interface';
 
 /**
  * List Users Use Case Request
@@ -46,37 +46,18 @@ export class ListUsersResponse {
  */
 @Injectable()
 export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersResponse> {
-  constructor(private readonly userRepository: IUserRepository) {
+  constructor(@Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository) {
     super();
   }
 
   async execute(request: ListUsersRequest): Promise<ListUsersResponse> {
     const limit = request.limit || 20;
 
-    let users = [];
+    const result = request.search
+      ? await this.userRepository.findBySearchTerm(request.search, limit, request.cursor)
+      : await this.userRepository.findPaginated(limit, request.cursor);
 
-    if (request.search) {
-      users = await this.userRepository.findBySearchTerm(request.search);
-    } else {
-      users = await this.userRepository.findAll();
-    }
-
-    // Apply cursor-based pagination
-    let filteredUsers = users;
-    if (request.cursor) {
-      const cursorIndex = users.findIndex((u) => u.id === request.cursor);
-      if (cursorIndex !== -1) {
-        filteredUsers = users.slice(cursorIndex + 1);
-      }
-    }
-
-    // Check if there are more results
-    const hasMore = filteredUsers.length > limit;
-
-    // Take only the requested limit
-    const paginatedUsers = hasMore ? filteredUsers.slice(0, limit) : filteredUsers;
-
-    const userItems = paginatedUsers.map((user) => {
+    const userItems = result.items.map((user) => {
       const primitives = user.toPrimitives();
       return new ListUserItem(
         primitives.id,
@@ -90,9 +71,8 @@ export class ListUsersUseCase extends UseCase<ListUsersRequest, ListUsersRespons
       );
     });
 
-    // Generate next cursor
-    const nextCursor = hasMore && userItems.length > 0 ? userItems[userItems.length - 1].id : null;
+    const nextCursor = result.hasMore && userItems.length > 0 ? userItems[userItems.length - 1].id : null;
 
-    return new ListUsersResponse(userItems, nextCursor, hasMore);
+    return new ListUsersResponse(userItems, nextCursor, result.hasMore);
   }
 }
