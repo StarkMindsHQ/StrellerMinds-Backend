@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import compression from 'compression';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { OpenAPIValidationMiddleware } from './common/contract-testing/openapi-validation.middleware';
 import { SecureLoggingInterceptor } from './common/secure-logging/secure-logging.interceptor';
 import { CsrfGuard } from './auth/guards/csrf.guard';
@@ -123,6 +124,40 @@ async function bootstrap() {
 
   // Enable graceful shutdown hooks to handle SIGTERM, SIGINT, etc.
   app.enableShutdownHooks();
+
+  // Set up Swagger / OpenAPI documentation with request & response examples
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('StrellerMinds Backend API')
+    .setDescription(
+      'Minimal Blockchain Education Platform API. ' +
+      'All state-changing endpoints require a valid CSRF token (X-CSRF-Token header). ' +
+      'Authentication uses httpOnly cookie-based JWT tokens.',
+    )
+    .setVersion('1.0.0')
+    .addCookieAuth('access_token', { type: 'apiKey', in: 'cookie', name: 'access_token' }, 'cookieAuth')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'bearerAuth')
+    .addServer('http://localhost:3000', 'Development server')
+    .addServer('https://api.strellerminds.com', 'Production server')
+    .addTag('Health', 'Health check and system status')
+    .addTag('Authentication', 'User authentication, tokens, and MFA')
+    .addTag('Users', 'User management operations')
+    .addTag('Courses', 'Course management operations')
+    .addTag('GDPR', 'Data privacy and retention operations')
+    .addTag('Database Pool', 'Connection pool monitoring')
+    .addTag('Database Metrics', 'Database performance metrics')
+    .addTag('Contract Testing', 'OpenAPI contract validation (admin)')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+      showExtensions: true,
+    },
+    customSiteTitle: 'StrellerMinds API Docs',
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
