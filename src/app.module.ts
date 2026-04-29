@@ -22,6 +22,7 @@ import { AppCacheModule } from './common/cache/cache.module';
 import { RedisPoolModule } from './common/redis/redis-pool.module';
 import { DebounceModule } from './common/debounce/debounce.module';
 import { ImageProcessingModule } from './common/image/image-processing.module';
+import { TaxModule } from './tax/tax.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ImageProcessingModule } from './common/image/image-processing.module';
     RedisPoolModule,
     DebounceModule,
     ImageProcessingModule,
+    TaxModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_INTERCEPTOR, useClass: ResponseTimeInterceptor }],
