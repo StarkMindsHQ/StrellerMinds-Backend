@@ -18,6 +18,8 @@
     "test:cov": "jest --coverage",
     "test:contract": "jest --testPathPattern=contract",
     "test:contract:request": "jest --testPathPattern=contract --grep=\"Request Validation\"",
+    "docs:generate": "node scripts/generate-openapi.js",
+    "docs:validate": "node scripts/validate-openapi.js",
     "test:contract:response": "jest --testPathPattern=contract --grep=\"Response Validation\"",
     "test:contract:coverage": "jest --testPathPattern=contract --grep=\"Coverage\"",
     "test:contract:performance": "jest --testPathPattern=contract --grep=\"Performance\"",
