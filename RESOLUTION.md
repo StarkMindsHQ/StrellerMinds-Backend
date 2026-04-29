@@ -125,3 +125,23 @@ curl -I http://localhost:3000/health | grep X-Response-Time
 - Closes #825
 - Closes #826
 - Closes #829
+
+
+
+
+ async findAll(category?: string, difficulty?: string): Promise<Course[]> {
+    const key = `courses:all:${category ?? ''}:${difficulty ?? ''}`;
+    return this.queryCache.getOrSet(key, async () => {
+      const where: Record<string, string> = {};
+      if (category) where.category = category;
+      if (difficulty) where.difficulty = difficulty;
+      return this.courseRepository.find({ where });
+    });
+  }
+
+  async findOne(id: string): Promise<Course | null> {
+    const key = `courses:one:${id}`;
+    return this.queryCache.getOrSet(key, () =>
+      this.courseRepository.findOne({ where: { id } }),
+    );
+  }
