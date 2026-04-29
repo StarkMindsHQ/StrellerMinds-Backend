@@ -25,6 +25,8 @@
     "test:contract:cov": "jest --testPathPattern=contract --coverage",
     "test:visual": "jest --testPathPattern=visual",
     "test:visual:watch": "jest --testPathPattern=visual --watch",
+    "test:chaos": "jest --testPathPattern=chaos --verbose",
+    "test:chaos:watch": "jest --testPathPattern=chaos --watch --verbose",
     "check:circular": "node scripts/check-circular-deps.js",
     "check:complexity": "node scripts/check-complexity.js",
     "contract:validate": "node scripts/validate-contract.js",
